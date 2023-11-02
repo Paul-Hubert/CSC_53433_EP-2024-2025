@@ -3,7 +3,11 @@ guid: 58addec6626ef40dfb932e8efbbb6236
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - animalPrefab: {fileID: 6733265589692463594, guid: b8a4860b06bc8b44fa2e523916edd3dd,
+      type: 3}
+  - alligatorPrefab: {fileID: 6594655994588039511, guid: 9648bc5ce1be82041aa59b7d689a3df4,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

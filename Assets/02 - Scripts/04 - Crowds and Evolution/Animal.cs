@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,7 +16,7 @@ public class Animal : MonoBehaviour
     public float maxAngle = 10.0f;
 
     [Header("Energy parameters")]
-    public float maxEnergy = 10.0f;
+    public float maxEnergy = 20.0f;
     public float lossEnergy = 0.1f;
     public float gainEnergy = 10.0f;
     private float energy;
@@ -37,12 +38,18 @@ public class Animal : MonoBehaviour
     // Animal.
     private Transform tfm;
     private float[] vision;
+    private float speed;
 
-    // Genetic alg.
+    // Genetic alg
     private GeneticAlgo genetic_algo = null;
 
     // Renderer.
     private Material mat = null;
+
+    // Controll Points
+    public GameObject Goal;
+
+
 
     void Start()
     {
@@ -51,6 +58,7 @@ public class Animal : MonoBehaviour
         networkStruct = new int[] { nEyes, 5, 1 };
         energy = maxEnergy;
         tfm = transform;
+        
 
         // Renderer used to update animal color.
         // It needs to be updated for more complex models.
@@ -91,6 +99,8 @@ public class Animal : MonoBehaviour
             genetic_algo.addOffspring(this);
         }
 
+        genetic_algo.updateSpeed(this, energy / maxEnergy);
+
         // If the energy is below 0, the animal dies.
         if (energy < 0)
         {
@@ -105,12 +115,26 @@ public class Animal : MonoBehaviour
         // 1. Update receptor.
         UpdateVision();
 
+        // TO DO Draw the lines from the eyes to the direction
+        DrawVisionLines();
+
         // 2. Use brain.
         float[] output = brain.getOutput(vision);
 
         // 3. Act using actuators.
-        float angle = (output[0] * 2.0f - 1.0f) * maxAngle;
+        float angle = (output[0] - 1.0f) * maxAngle;
         tfm.Rotate(0.0f, angle, 0.0f);
+    }
+
+    private void DrawVisionLines()
+    {
+        float startingAngle = -((float)nEyes / 2.0f) * stepAngle;
+        for (int i = 0; i < nEyes; i++)
+        {
+            Quaternion rotAnimal = tfm.rotation * Quaternion.Euler(0.0f, startingAngle + (stepAngle * i), 0.0f);
+            Vector3 forwardAnimal = rotAnimal * Vector3.forward;
+            UnityEngine.Debug.DrawRay(tfm.position, forwardAnimal * maxVision, Color.green);
+        }
     }
 
     /// <summary>

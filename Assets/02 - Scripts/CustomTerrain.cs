@@ -14,6 +14,7 @@ public class CustomTerrain : MonoBehaviour {
 
     [Header("Instance brush attributes")]
     public GameObject object_prefab = null;
+    public GameObject[] prefabs;
     public float min_scale = 0.8f;
     public float max_scale = 1.2f;
 
@@ -34,6 +35,7 @@ public class CustomTerrain : MonoBehaviour {
     private GameObject highlight_go;
     private Projector highlight_proj;
     public static System.Random rnd = new System.Random();
+
 
     [SerializeField] Camera cam;
 
@@ -169,7 +171,7 @@ public class CustomTerrain : MonoBehaviour {
     }
 
     // Spawn a new object (tree)
-    public void spawnObject(Vector3 loc, float scale, int proto_idx) {
+    public TreeInstance spawnObject(Vector3 loc, float scale, int proto_idx) {
         TreeInstance obj = new TreeInstance();
         loc = new Vector3(loc.x / heightmap_width,
                           loc.y / terrain_data.heightmapScale.y,
@@ -182,6 +184,7 @@ public class CustomTerrain : MonoBehaviour {
         obj.rotation = (float)rnd.NextDouble() * 2 * Mathf.PI;
         obj.color = Color.white;
         terrain.AddTreeInstance(obj);
+        return obj;
     }
     // Object (tree) manipulation
     public int getObjectCount() {
@@ -276,5 +279,10 @@ public class CustomTerrain : MonoBehaviour {
     }
     public Brush getBrush() {
         return current_brush;
+    }
+    public void changeTree()
+    {
+        int tree = rnd.Next(0, 3);
+        object_prefab = prefabs[tree];
     }
 }

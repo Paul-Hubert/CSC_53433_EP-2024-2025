@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net;
 using UnityEngine;
 
 public class FootStepper : MonoBehaviour
@@ -47,15 +49,13 @@ public class FootStepper : MonoBehaviour
          */
 
         // START TODO ###################
-
-        // float distFromHome = ...
-        // float angleFromHome = ...
-
+        float distFromHome = (homeTransform.position - transform.position).magnitude;
+        float angleFromHome = Quaternion.Angle(homeTransform.rotation, homeTransform.rotation);     
         // Change condition!
-        if (false)
+        if (distFromHome > distanceThreshold || angleFromHome > angleThreshold)
         {
             // END TODO ###################
-
+            UnityEngine.Debug.Log("Oi");
             // Get the grounded location for the feet. It can return false - in that case, it won't move.
             // This method modifies the values by reference, which are used later.
             if (GetGroundedEndPosition(out Vector3 endPos, out Vector3 endNormal))
@@ -68,7 +68,15 @@ public class FootStepper : MonoBehaviour
                 // Start MoveFoot coroutine with the target position, rotation and duration of the movement.
                 StartCoroutine(MoveFoot(endPos, endRot, moveDuration));
             }
+
+            else
+            {
+                Quaternion endRot = Quaternion.LookRotation(Vector3.ProjectOnPlane(homeTransform.forward, endNormal), endNormal);
+                StartCoroutine(MoveFoot(endPos, endRot, moveDuration));
+            }
         }
+
+
     }
 
     /// <summary>
@@ -103,19 +111,20 @@ public class FootStepper : MonoBehaviour
 
         // START TODO ###################
 
-        // Vector3 raycastOrigin = ...
+        Vector3 raycastOrigin = homeTransform.position;
 
-        // if (Physics.Raycast(...))
-        // {
-        //  ...
-        //  return true;
-        // }
+        RaycastHit hit;
+        if (Physics.Raycast(raycastOrigin, Vector3.down, out hit))
+        {
+            endPos = hit.point + 2*overshootVector;
+            endNormal = hit.normal;
+            return true;
+        }
 
-        // END TODO ###################
-
-        endPos = Vector3.zero;
+        endPos = homeTransform.position + overshootVector;
         endNormal = Vector3.zero;
         return false;
+
     }
 
     /// <summary>
@@ -162,7 +171,10 @@ public class FootStepper : MonoBehaviour
              */
 
             // START TODO ###################
-
+            Vector3 controlPoint1 = startPos + (Vector3.up);
+            //transform.position = Vector3.Lerp(startPos, endPos, normalizedTime);
+            Vector3 controlPoint2 = endPos + (Vector3.up);
+            transform.position = BezierCurve(startPos, controlPoint1, controlPoint2, endPos, normalizedTime);
             // transform.position = ...
 
             // END TODO ###################
@@ -173,7 +185,7 @@ public class FootStepper : MonoBehaviour
 
             // START TODO ###################
 
-            // transform.rotation = ...
+            transform.rotation = Quaternion.Lerp(startRot, endRot, normalizedTime);
 
             // END TODO ###################
 
@@ -184,6 +196,14 @@ public class FootStepper : MonoBehaviour
 
         // Motion has finished.
         Moving = false;
+    }
+
+    private Vector3 BezierCurve(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)
+    {
+        return Mathf.Pow(1 - t, 3) * p0 +
+               3 * Mathf.Pow(1 - t, 2) * t * p1 +
+               3 * (1 - t) * Mathf.Pow(t, 2) * p2 +
+               Mathf.Pow(t, 3) * p3;
     }
 
     /// <summary>

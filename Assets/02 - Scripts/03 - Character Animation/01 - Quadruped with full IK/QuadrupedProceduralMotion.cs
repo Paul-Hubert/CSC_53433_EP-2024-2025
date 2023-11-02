@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Diagnostics;
 using UnityEngine;
 
 public class QuadrupedProceduralMotion : MonoBehaviour
@@ -153,14 +155,24 @@ public class QuadrupedProceduralMotion : MonoBehaviour
 
         // The ray information gives you where you hit and the normal of the terrain in that location.
         if (Physics.Raycast(raycastOrigin, -transform.up, out RaycastHit hit, Mathf.Infinity))
-        {
-            if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Ground"))
-            {
-                posHit = hit.point;
-                distanceHit = hit.distance;
-                normalTerrain = hit.normal;
-            }
+        {   
+            posHit = hit.point;
+            distanceHit = hit.distance;
+            normalTerrain = hit.normal;
+
+            // Rotate the root body to be parallel to the ground
+            //Quaternion desiredRotation = Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation;
+            //transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotation, Time.deltaTime * heightAcceleration);
+
+            UnityEngine.Debug.Log(hips.position);
+
         }
+
+        Vector3 desiredHipPosition = new Vector3(transform.position.x, hit.point.y + 0.95f, transform.position.z);
+        hips.position = desiredHipPosition;
+
+        Quaternion desiredRotation = Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation;
+        hips.rotation = Quaternion.Slerp(hips.rotation, desiredRotation, Time.deltaTime * heightAcceleration);
 
         /*
          * In this layer, we need to refine the position and rotation of the hips based on the ground. Without this part, the animal would not lift its root body when walking on high terrains.
@@ -169,10 +181,11 @@ public class QuadrupedProceduralMotion : MonoBehaviour
          * When you have the angle that you want to have in your root body, you can place it directly, or use some interpolation technique to go smoothly to that value, in order to have less drastical movements.
          */
 
-        // START TODO ###################
+        // START TODO ###################/
+        // Calculate the desired hip position based on the hit point and distance
+        UnityEngine.Debug.DrawRay(raycastOrigin, -transform.up, Color.red);
 
-        // hips.position = ...
-        // hips.rotation = ...
+
 
         // END TODO ###################
     }
@@ -233,11 +246,11 @@ public class QuadrupedProceduralMotion : MonoBehaviour
 
         // START TODO ###################
 
-        // goalWorldLookDir = ...
-        // goalLocalLookDir = ...
+        goalWorldLookDir = goal.position - headBone.position;
+        goalLocalLookDir = headBone.parent.InverseTransformDirection(goalWorldLookDir);
+        Vector3 goalForward = Vector3.RotateTowards(headBone.forward, goalLocalLookDir, angleHeadLimit * Mathf.Deg2Rad, 0);
 
-        Quaternion targetLocalRotation = Quaternion.identity; // Change!
-
+        Quaternion targetLocalRotation = Quaternion.LookRotation(goalLocalLookDir, Vector3.up);
         // END TODO ###################
 
         /* 

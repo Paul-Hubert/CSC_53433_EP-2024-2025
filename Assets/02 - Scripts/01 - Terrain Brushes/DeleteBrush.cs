@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SimpleBrush : TerrainBrush {
+public class DeleteBrush : TerrainBrush {
 
-    public float height = 5;
+    private float height = 0;
 
     public override void draw(int x, int z) {
         for (int zi = -radius; zi <= radius; zi++) {

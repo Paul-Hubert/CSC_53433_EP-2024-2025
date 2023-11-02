@@ -10,12 +10,15 @@ public class GeneticAlgo : MonoBehaviour
     [Header("Genetic Algorithm parameters")]
     public int popSize = 100;
     public GameObject animalPrefab;
+    public GameObject alligatorPrefab;
 
     [Header("Dynamic elements")]
     public float vegetationGrowthRate = 1.0f;
     public float currentGrowth;
+    public float maxAltitudeGrowth;
 
     private List<GameObject> animals;
+    private List<GameObject> aligators;
     protected Terrain terrain;
     protected CustomTerrain customTerrain;
     protected float width;
@@ -38,6 +41,7 @@ public class GeneticAlgo : MonoBehaviour
         {
             GameObject animal = makeAnimal();
             animals.Add(animal);
+
         }
     }
 
@@ -66,11 +70,19 @@ public class GeneticAlgo : MonoBehaviour
         {
             int x = (int)(UnityEngine.Random.value * detail_sz.x);
             int y = (int)(UnityEngine.Random.value * detail_sz.y);
-            details[y, x] = 1;
-            currentGrowth -= 1.0f;
+
+            Vector3 scale = terrain.terrainData.heightmapScale;
+            float altitude = customTerrain.getInterp(x / scale.x / detail_sz.x * width, y / scale.z / detail_sz.y * height);
+            float altitudeTest = UnityEngine.Random.value * altitude / maxAltitudeGrowth;
+            if (altitudeTest < 1.0f)
+            {
+                details[y, x] = 1;
+                currentGrowth -= 1.0f;
+            }
         }
         customTerrain.saveDetails();
     }
+
 
     /// <summary>
     /// Method to instantiate an animal prefab. It must contain the animal.cs class attached.
@@ -118,6 +130,13 @@ public class GeneticAlgo : MonoBehaviour
     {
         animals.Remove(animal.transform.gameObject);
         Destroy(animal.transform.gameObject);
+    }
+
+    public void updateSpeed(Animal animal, float speed)
+    {
+        CapsuleAutoController capsuleMotionScript = animal.GetComponent<CapsuleAutoController>();
+        capsuleMotionScript.changeSpeed(speed);
+
     }
 
 }
