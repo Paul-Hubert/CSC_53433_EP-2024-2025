@@ -16,26 +16,26 @@
 - [Starting our project](#Startingourproject)
 	- [Opening the project](#Openingtheproject)
 	- [Running the scene](#Runningthescene)
-- [Session 01 - Terrain Edition](#Session01)
-	- [Getting started](#Session01Gettingstarted)
-	- [Brush ideas](#Session01Brushideas)
-	- [Examples](#Session01Examples)
-	- [Useful functions and variables](#Session01Useful)
-- [Session 02 - Object Placement](#Session02)
-	- [Getting started](#Session02Gettingstarted)
-	- [Brush ideas](#Session02Brushideas)
-	- [Useful functions and variables](#Session02Useful)
-- [Session 03 - Character Animation](#Session03)
-	- [Getting started](#Session03Gettingstarted)
-	- [Fast IK Demo](#Session03FastIKDemo)
-	- [Quadruped with full IK](#Session03Quadruped)
-	- [Bonus: Controllable character with FK and IK](#Session03Human)
-- [Session 04 - Crowds and Evolution](#Session04)
-	- [Getting started](#Session04Gettingstarted)
-	- [Animals](#Session04Animals)
-	- [Evolution](#Session04Evolution)
-	- [Resources](#Session04Resources)
-	- [Extensions](#Session04Ideas)
+- [Session 01 - Terrain Edition](#Session_1)
+	- [Getting started](#Session_1Gettingstarted)
+	- [Brush ideas](#Session_1Brushideas)
+	- [Examples](#Session_1Examples)
+	- [Useful functions and variables](#Session_1Useful)
+- [Session 02 - Crowds and Evolution](#Session_2)
+	- [Getting started](#Session_2Gettingstarted)
+	- [Animals](#Session_2Animals)
+	- [Evolution](#Session_2Evolution)
+	- [Resources](#Session_2Resources)
+	- [Extensions](#Session_2Ideas)
+- [Session 03 - Object Placement](#Session_3)
+	- [Getting started](#Session_3Gettingstarted)
+	- [Brush ideas](#Session_3Brushideas)
+	- [Useful functions and variables](#Session_3Useful)
+- [Session 04 - Character Animation](#Session_4)
+	- [Getting started](#Session_4Gettingstarted)
+	- [Fast IK Demo](#Session_4FastIKDemo)
+	- [Quadruped with full IK](#Session_4Quadruped)
+	- [Bonus: Controllable character with FK and IK](#Session_4Human)
 - [Interesting Links](#InterestingLinks)
 
 ------
@@ -127,10 +127,10 @@ Some fast tips regarding the overall workflow in Unity:
 
 ------
 
-<a name="Session01"></a>
+<a name="Session_1"></a>
 ## SESSION 01 - Terrain edition
 
-<a name="Session01Gettingstarted"></a>
+<a name="Session_1Gettingstarted"></a>
 ### Getting started
 
 In this session, you will be designing and implementing brushes, allowing you to dynamically edit the terrain. Your brushes will extend the base class
@@ -155,7 +155,7 @@ public class SimpleBrush : TerrainBrush {
 
 Copy this file to use it as a base for your own brushes, by changing the name of the copied file and class name.
 
-<a name="Session01Brushideas"></a>
+<a name="Session_1Brushideas"></a>
 ### Brush ideas
 
 - Simple brush (square shape - already done!)
@@ -169,7 +169,7 @@ Copy this file to use it as a base for your own brushes, by changing the name of
 - Erosion brush (simulates water droplets falling in the region, eroding the terrain)
 - Coherent noise brush (Perlin Noise or other approach, using Mathf.PerlinNoise or your own implementation)
 
-<a name="Session01Examples"></a>
+<a name="Session_1Examples"></a>
 ### Examples
 
 <p align="center">
@@ -192,7 +192,7 @@ Copy this file to use it as a base for your own brushes, by changing the name of
     <img src="01-TerrainBrushGifs/volcano.gif" width="400">
 </p>
 
-<a name="Session01Useful"></a>
+<a name="Session_1Useful"></a>
 ### Useful functions and variables
 
 ```csharp
@@ -225,10 +225,10 @@ Copy this file to use it as a base for your own brushes, by changing the name of
 ```
 <p align=center>Code Snippet 3: Useful variables</p>
 
-<a name="Session02"></a>
+<a name="Session_3"></a>
 ## SESSION 02 - Object Placement
 
-<a name="Session02Gettingstarted"></a>
+<a name="Session_3Gettingstarted"></a>
 ### Getting started
 
 In this second session, you will design brushes that place objects on the terrain. Here it will be trees, but you can search for or provide other objects.
@@ -260,7 +260,7 @@ You can set the object that will be instantiated by drag-and-dropping a model in
 To remove objects, you can use the default tools provided in the original terrain editor by Unity. For this, select the terrain and go to the `terrain > Paint trees`
 tab (in the inspector). You can then shift-click on the terrain to remove objects around your cursor. Note that this works outside of play mode in the Scene view (**not in the Game view!**), as opposed to the brushes you implement.
 
-<a name="Session02Brushideas"></a>
+<a name="Session_3Brushideas"></a>
 ### Brush ideas
 
 - Random placement in a square
@@ -288,7 +288,7 @@ tab (in the inspector). You can then shift-click on the terrain to remove object
 - Rocks
 - Buildings
 
-<a name="Session02Useful"></a>
+<a name="Session_3Useful"></a>
 ### Useful functions and variables
 
 ```csharp
@@ -319,10 +319,10 @@ tab (in the inspector). You can then shift-click on the terrain to remove object
 ```
 <p align=center>Code Snippet 6: Useful variables</p>
 
-<a name="Session03"></a>
+<a name="Session_4"></a>
 ## SESSION 03 - Character Animation
 
-<a name="Session03Gettingstarted"></a>
+<a name="Session_4Gettingstarted"></a>
 ### Getting started
 
 In this session, you will learn about some important concepts such as **Inverse Kinematics**, and learn about how to use this technique in order to fully animate one character using procedural methods.
@@ -345,7 +345,7 @@ In this session, we will learn to convert this...
 
 All the necessary files will be in the folder `03 - Character Animation`. Let's start!
 
-<a name="Session03FastIKDemo"></a>
+<a name="Session_4FastIKDemo"></a>
 ### Fast IK Demonstration
 
 First, let's go to `03 - Character Animation > 00 - IK Demonstration`. In the scene, you will learn how to build a simple Fast IK algorithm. The script `FabricIK.cs` contains several code snippets that you will need to complete. All the information that you need to understand the code is already included as comments along the script.
@@ -359,7 +359,7 @@ This IK technique is called **Fabric IK**. A forward and backward pass are used 
 	&nbsp; &nbsp;
 </p>
 
-<a name="Session03Quadruped"></a>
+<a name="Session_4Quadruped"></a>
 ### Quadruped with full IK
 
 Now, we can use this knowledge to animate our quadruped:
@@ -380,24 +380,24 @@ At the beginning, moving the **goal** will make the character to follow it witho
 
 Once you have it, think about particular applications. Characters that follow autonomously a piece of food, or animals that run away from "anti-goals" such as predators. Could we even use some learning-based approach to teach them to follow certain assets? There are many options! We will see more in the next session.
 
-<a name="Session03Human"></a>
+<a name="Session_4Human"></a>
 ### Bonus: Controllable character with FK and IK
 
 If you have time, you can try to set a character controllable by Forward Kinematics, and using IK just to adapt its feet on the ground. This character is already included in the hierarchy, *Controllable Characters > Human - (Controller + IK)*. In the Game window, you can change the display to *Display 2* to set a third-person view. You can control the humanoid using the keyboard arrows or WASD keys.
 
 Inside `03 - Character Animation > 02 - Biped Controller with IK` you will find the script `PlayerControllerIKFeetPlacementTask.cs`. All the information about this task can be found in the repo in a separated document, under the `Docs` folder.
 
-<a name="Session04"></a>
+<a name="Session_2"></a>
 ## SESSION 04 - Crowds and Evolution
 
-<a name="Session04Gettingstarted"></a>
+<a name="Session_2Gettingstarted"></a>
 ### Getting started
 
 During this session, you will be given a basic setup containing simple creatures with **eyes**, a **brain**, and **steering capabilities**, as well as a primitive **evolution method**. With these, the creatures are able to gradually develop from generation to generation in order to learn how to efficiently reach their food. Your goal is to change parts of this base to extend it to your liking. Ideas of such extensions will be given below.
 
 In order to activate the module of this session, select the terrain and activate the checkbox next to the `Genetic Algo` component. When you launch the project, you should see capsules (representing animals) appearing and moving on the terrain. Their color changes from white to black as their hunger increases, and they die after some time if they do not manage to reach food in time. After letting the simulation run for a few generations, you should see the animal counter drastically increase, when some animals become smart enough to efficiently get their food.
 
-<a name="Session04Animals"></a>
+<a name="Session_2Animals"></a>
 ### Animals
 
 The animals created in this session are basic creatures, made of three main components:
@@ -406,17 +406,17 @@ The animals created in this session are basic creatures, made of three main comp
 - **Actuators**, that gives the animal the ability to make actions and interact with the environment. Here, the animals automatically and continuously move forward at a constant speed, but have an actuator to rotate their body. This actuator is handled at the end of the function `Animal.Update()`.
 - A **brain** to link the receptors to the actuators, giving the animals a way to make decisions on what to do based on what they sense. A simple neural network with a configurable network structure is used for this purpose in the base project. For example, the array `[5, 3, 3, 1]` passed to its constructor will generate a network with 5 input neurons, 1 output neuron, and 2 hidden layers with 3 neurons each. The details of this class are in the `04 - Crowds and Evolution/NeuralNet.cs` file.
 
-<a name="Session04Evolution"></a>
+<a name="Session_2Evolution"></a>
 ### Evolution
 
 A  `genetic algorithm` is used to teach the animals how to steer towards their food, after multiple generations. This works by allowing the animals that reach food to reproduce, thus spreading their genes (parameters of their brain), with minor random modifications to allow evolution. The animals with inefficient genes are unable to reach food before dying, thus encouraging only the spread and evolution of successful animals. This is implemented in the file  `04 - Crowds and Evolution/GeneticAlgo.cs `.
 
-<a name="Session04Resources"></a>
+<a name="Session_2Resources"></a>
 ### Resources
 
 The animals simulated here are designed to be herbivores, that eat by passing over a source of food. Grass grows randomly over the terrain, creating a competition between the different animals to access the resources.
 
-<a name="Session04Ideas"></a>
+<a name="Session_2Ideas"></a>
 ### Meta Extensions
 
 - If you have particular terrain zones (water, mountains, etc.), tweak grass spawn parameters to make it appear differently based on the zone. This should create clusters of animals grouping in certain places over time.
@@ -438,7 +438,7 @@ The animals simulated here are designed to be herbivores, that eat by passing ov
 - Prey-predator model, where the predators try to catch preys to eat, and the preys try to evade them (and eat grass at the same time?).
 - Enable physical creature evolution (transmit actuators, receptors, besides the brain to the offspring). Dynamically generate an appearance based on capabilities.
 
-<a name="Session04Useful"></a>
+<a name="Session_2Useful"></a>
 ### Useful functions
 
 ```csharp
