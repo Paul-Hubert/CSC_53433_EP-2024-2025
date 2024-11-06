@@ -1,8 +1,8 @@
-# INF633 - Advanced 3D Graphics (2023 - 2024)
+# CSC_53433_EP - Smart models for 3D creation & animation (2024-2025)
 
 ------
 
-[Github Repository](https://github.com/Paul-Hubert/inf633-2023-2024/) | [Github Page](https://paul-hubert.github.io/inf633-2023-2024/) | [Moodle](https://moodle.polytechnique.fr/course/view.php?id=17662)
+[Github Repository](https://github.com/Paul-Hubert/inf633-2023-2024/) | [Github Page](https://paul-hubert.github.io/inf633-2023-2024/) | [Moodle]([https://moodle.polytechnique.fr/course/view.php?id=17662](https://moodle.polytechnique.fr/course/view.php?id=19354))
 
 ------
 
@@ -45,7 +45,7 @@
 
 ### Introduction
 
-Welcome to the official page for the lab sessions of INF633 for the course 2023-2024! 
+Welcome to the official page for the lab sessions of CSC_53433_EP for the course 2024-2025! 
 
 The goal of this project is to create, starting from a flat empty terrain, one with interesting features, objects and dynamic, living creatures all interacting together. For this, multiple edition tools will be created and basic principles of animation and crowd simulation used to give life to the virtual world.
 
