@@ -2,7 +2,7 @@
 
 ------
 
-[Github Repository](https://github.com/Paul-Hubert/inf633-2023-2024/) | [Github Page](https://paul-hubert.github.io/inf633-2023-2024/) | [Moodle]([https://moodle.polytechnique.fr/course/view.php?id=17662](https://moodle.polytechnique.fr/course/view.php?id=19354))
+[Github Repository](https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/) | [Github Page](https://paul-hubert.github.io/CSC_53433_EP-2024-2025/) | [Moodle](https://moodle.polytechnique.fr/course/view.php?id=19354)
 
 ------
 
@@ -49,7 +49,7 @@ Welcome to the official page for the lab sessions of CSC_53433_EP for the course
 
 The goal of this project is to create, starting from a flat empty terrain, one with interesting features, objects and dynamic, living creatures all interacting together. For this, multiple edition tools will be created and basic principles of animation and crowd simulation used to give life to the virtual world.
 
-In this page, you will find the same introduction to install and setup Unity that you can find also in the README.md of the repository at [https://github.com/Paul-Hubert/inf633-2023-2024](https://github.com/Paul-Hubert/inf633-2023-2024), and also the description and content for each lab session.
+In this page, you will find the same introduction to install and setup Unity that you can find also in the README.md of the repository at https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/, and also the description and content for each lab session.
 
 ### Installing Unity
 
