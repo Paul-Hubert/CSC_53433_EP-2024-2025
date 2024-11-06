@@ -1,6 +1,6 @@
-# INF633 - Advanced 3D Graphics (2023-2024) - Lab Course
+# CSC_53433_EP - Smart models for 3D creation & animation (2024-2025) - Lab Course
 
-[Github Repository](https://github.com/Paul-Hubert/inf633-2023-2024) | [Github Page](https://edualvarado.github.io/inf633-2022-2023/) | [Moodle](https://moodle.polytechnique.fr/course/view.php?id=17662)
+[Github Repository](https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025) | [Github Page](https://paul-hubert.github.io/CSC_53433_EP-2024-2025/) | [Moodle](https://moodle.polytechnique.fr/course/view.php?id=19354)
 
 ------
 
@@ -24,11 +24,11 @@
 <a name="Introduction"></a>
 ### Introduction
 
-Welcome to the repository for the lab sessions of INF633 for the course 2023-2024! 
+Welcome to the repository for the lab sessions of INF633 for the course 2024-2025! 
 
 Here, you will find a brief introduction to install and setup Unity, in addition to some quick tips and examples for those who didn't use this game-engine before. 
 
-Part of this information, in addition to all the content of the course sessions, tasks descriptions and tips can be found in the official page for the lab course: https://edualvarado.github.io/inf633-2022-2023/
+Part of this information, in addition to all the content of the course sessions, tasks descriptions and tips can be found in the official page for the lab course: https://paul-hubert.github.io/CSC_53433_EP-2024-2025/
 
 <a name="InstallingUnity"></a>
 ### Installing Unity
