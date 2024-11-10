@@ -551,7 +551,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_BoundingSphereOverride: {x: 7.8e-44, y: 3.4e-44, z: 0, w: 1e-45}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
@@ -563,14 +563,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 170076733}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: 0, y: 5.11, z: 0}
+  m_LocalRotation: {x: 0.73136026, y: -0.16906826, z: 0.19596736, w: 0.63097143}
+  m_LocalPosition: {x: 37295, y: -8203, z: 17063}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 98.429016, y: -30, z: 0}
 --- !u!4 &223894168 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6733265589692463591, guid: b8a4860b06bc8b44fa2e523916edd3dd,
@@ -693,7 +693,12 @@ GameObject:
   - component: {fileID: 374040444}
   - component: {fileID: 374040443}
   - component: {fileID: 374040442}
+  - component: {fileID: 374040449}
   - component: {fileID: 374040441}
+  - component: {fileID: 374040446}
+  - component: {fileID: 374040445}
+  - component: {fileID: 374040448}
+  - component: {fileID: 374040447}
   m_Layer: 0
   m_Name: Terrain
   m_TagString: Ground
@@ -865,6 +870,79 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 460e715d6eb3c17279746e473177843f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  height: 5
+  kernelType: 0
+--- !u!114 &374040445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 374040426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46dfabc071a52fea3a61b8d15485d185, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  growHeight: 1
+  kernelType: 0
+--- !u!114 &374040446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 374040426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fffd793887f098fb4a822faff489f984, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  height: 1
+  kernelType: 0
+--- !u!114 &374040447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 374040426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da2d31f4f61ffe09fbc788df32576cd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  erosionHeight: 0.1
+  delta: 0.4
+  kernelType: 0
+--- !u!114 &374040448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 374040426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f17da20f305c395c848d54840814422, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  step: 0.1
+  outerKernelType: 0
+  innerKernelType: 1
+  innerRadius: 1
+--- !u!114 &374040449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 374040426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d42789e80676275b98140c890956c647, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   height: 5
@@ -1951,7 +2029,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2137751596}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0.09467272, y: 0.47933796, z: -0.052104168, w: 0.870952}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
