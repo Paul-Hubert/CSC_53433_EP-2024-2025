@@ -10,6 +10,7 @@ public abstract class BrushKernel {
     };
 }
 
+[System.Serializable]
 public enum KernelType {
     Square,
     Circle,
