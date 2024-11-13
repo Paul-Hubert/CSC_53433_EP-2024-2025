@@ -11,13 +11,8 @@ public class ConstantVolumeBrush : TerrainBrush {
             for (int xi = -radius; xi <= radius; xi++) {
                 if (!BrushKernel.kernels[kernelType].included(xi, zi, radius)) continue;
                 
-                float addHeight = 0;
-                float r = Mathf.Sqrt(xi * xi + zi * zi) / (radius / 2.0f);
-                if (r <= 1.0f) {
-                    addHeight = height * (1 - r * r);
-                } else {
-                    addHeight = -height * Mathf.Sqrt(r - 1.0f);
-                }
+                float r = Mathf.Sqrt(xi * xi + zi * zi) / (radius);
+                float addHeight = -height * Mathf.Pow(1 - r, 2) * Mathf.Pow(1 + r, 2) * (r + 1.0f / Mathf.Sqrt(7.0f)) * (r - 1.0f / Mathf.Sqrt(7.0f));
                 terrain.set(x + xi, z + zi, terrain.get(x + xi, z + zi) + addHeight);
             }
         }
