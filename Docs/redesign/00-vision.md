@@ -16,8 +16,8 @@
 1. **Agent brain = small local model with typed output.**
    Combine small, locally-run LLMs with a *"type-safe" / classification-style
    model* that takes text in and returns a decision from a fixed set of types.
-   The model name was given verbally as something like "J-Laya" **(TBC — see
-   [05](05-decision-backend.md#which-model-family-is-j-laya))**.
+   Resolved: this means the **Jev / Laya decision models**. **Laya** (open,
+   local) is the chosen backend. See [05](05-decision-backend.md).
    It decides the agent's behaviour: direction, where to look, eat vs attack,
    follow vs run away, etc.
 
@@ -34,7 +34,8 @@
    When two agents reproduce, the child receives **half of each parent's
    genes** — the prompts are mixed, producing a different behaviour.
 
-5. **Mutation by LLM.**
+5. **Mutation by LLM.** (Generative work may use a class-pooled **Ollama
+   Cloud** subscription.)
    With a small probability, a gene is mutated by a small local LLM that is
    prompted to *"make a random change to this prompt"*, **without further
    context**. The mutated gene goes back into the agent's genome. If it helps,

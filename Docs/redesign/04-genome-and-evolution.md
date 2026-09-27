@@ -2,6 +2,14 @@
 
 ## Genome structure
 
+> **Update (Laya):** with Laya, the natural loci are the **action options**:
+> each action's criteria text *is* a gene (see
+> [05 §4](05-decision-backend.md#4-where-the-genes-go-mapping-the-genome-onto-layas-input)),
+> plus a few **temperament genes** placed in the state. Laya's short
+> context means genes should be ≈ 8–15 words. The table below is being
+> re-cut along those lines. Roles such as hunger → `eat` and fear → `flee`
+> map directly; terrain/risk/attention become temperament genes.
+
 - **Fixed set of loci** (proposal: 12), each with a semantic role and a
   fixed position in the prompt. A gene = one short sentence (≤ 25 words).
 - Optional **free loci** (2–4) with no assigned role for open-ended content.
