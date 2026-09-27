@@ -46,6 +46,13 @@ should *usually* cause small behaviour changes. Two failure modes:
 - **Chaos.** One word changes the output distribution completely. Then
   offspring don't resemble parents and nothing accumulates.
 
+**Update (Laya chosen):** confirmed. Laya's base checkpoint is close to
+random zero-shot on its own decision benchmark (0.362 vs 0.318 random), and
+reaches 0.766 only after fine-tuning. → Plan: **distil** a large LLM
+(teacher, Ollama Cloud) into Laya using contrast sets, where the same
+observation with different genomes gets different labels. See
+[05 §5](05-decision-backend.md#5-fine-tuning-laya-to-read-genes-distillation-from-a-large-llm).
+
 **Mitigation:** measure it before building anything — a *gene-sensitivity
 test* (see [07](07-open-questions-and-roadmap.md)): same observations,
 different genomes → do action distributions differ, and do they differ
@@ -58,8 +65,15 @@ A 20-gene genome is ~400–1 000 tokens. 100 agents deciding once per
 second = 100 prompts/s. Re-processing the full prompt each time is
 infeasible on a student laptop.
 
+**Update (Laya chosen):** Laya is a ~420M encoder: ~33–40 ms per call on a
+T4 GPU, ~0.2–0.5 s on CPU, one pass for all questions. It cannot use prefix
+caching (bidirectional encoder), but it has no generation loop either.
+Per-decision mode is realistic on a GPU with batching; on a laptop CPU,
+use option B or small populations. The first bullet below applies only
+to a generative-LLM backend.
+
 **Mitigations (combine them):**
-- **Prefix caching.** The genome is constant for an agent's whole life —
+- **Prefix caching (generative LLM backends only).** The genome is constant for an agent's whole life —
   put it first, cache its KV state once per agent, and only process the
   short observation suffix (~30–60 tokens) per decision. (llama.cpp
   supports per-slot prompt caching.)

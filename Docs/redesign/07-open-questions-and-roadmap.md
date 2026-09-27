@@ -2,7 +2,10 @@
 
 ## Decisions needed from the course owner
 
-1. **Model family** meant by "J-Laya" (see [05](05-decision-backend.md)).
+1. ~~Model family~~ → **Laya** local decision model; Jev optional
+   baseline; pooled **Ollama Cloud** for generation (see [05](05-decision-backend.md)).
+   Still open: English vs multilingual checkpoint (context 512 vs 1 024).
+   Which Ollama plan (Team with shared credits vs several Pro seats)?
 2. **Option A vs B** (LLM per decision vs LLM at birth) — or both, with B as
    the default lab. See [02](02-assessment.md#the-design-decision-i-would-push-hardest-on).
 3. **Student hardware** and whether a shared lab inference server is possible.
@@ -16,8 +19,12 @@
 
 **Phase 0 — Headless feasibility spike (before any Unity work, ~days)**
 - Python script, 2D grid world, food + walls/water, 20–40 agents.
-- Candidate backends: rule-based, 1–2 small LLMs with constrained output,
-  (the classifier candidate if confirmed).
+- Candidate backends: rule-based, **Laya zero-shot**, **Laya fine-tuned**
+  (teacher labels from Ollama Cloud), optionally one small generative LLM.
+- Compare gene placements in Laya's input: option criteria vs question
+  instructions vs state.
+- Distillation pilot: ~2–5k teacher labels with contrast sets → expert head
+  (layaMOE-style) or Kaggle fine-tune → re-run the sensitivity test.
 - **Gene-sensitivity test:** fixed set of ~50 observations × varied
   genomes → do action distributions differ? Are small edits → small
   changes? Is the difference larger than between two random-text genomes?
@@ -53,3 +60,4 @@
 | Date | Decision | By |
 |---|---|---|
 | 2026-09-27 | Idea captured; docs created. | course owner / Claude |
+| 2026-09-27 | "J-Laya" = Jev/Laya decision models. Laya (local) chosen as decision backend; Ollama Cloud (pooled) for generative jobs. | course owner |

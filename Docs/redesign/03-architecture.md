@@ -26,7 +26,8 @@ student can re-implement in one file.
 └─────────────────────────────────────────────────────────────────────────────────┘
           │ batched requests                         ▲ typed responses
           ▼                                          │
-  Inference service (local): llama.cpp server / Ollama / in-engine ONNX / mock
+  Decision service (local): Laya sidecar (laya-serve, Jev-compatible API) / in-engine ONNX / mock
+  Generation service: Ollama Cloud (pooled) or local Ollama, used for mutation, founders and teacher labels
 ```
 
 ## Key interfaces (C# sketch)
@@ -56,8 +57,9 @@ public interface IReproductionRule{ bool CanMate(Agent a, Agent b); }
 |---|---|
 | `RuleBasedBackend` | Keyword heuristics over gene text. No model. Default for dev/CI and no-GPU students. |
 | `NeuralNetBackend` | Wraps the existing `SimpleNeuralNet` (numeric genome) — continuity + comparison. |
-| `LlmPerDecisionBackend` | Option **A**: genome as cached prefix, observation suffix, constrained enum output. |
-| `DevelopmentBackend` | Option **B**: one call at birth → typed `Phenotype` (utilities/thresholds/BT JSON), then cheap local evaluation. |
+| `LayaBackend` | **Default.** Option **A** with Laya: action genes as option criteria, temperament genes + observation as state; action/direction/speed/flags in one pass; sample from calibrated probabilities. Same client works for Jev. |
+| `LayaDevelopmentBackend` | Option **B**: one Laya call at birth asking many typed questions → `Phenotype` (utilities, thresholds), then cheap local evaluation. CPU-friendly. |
+| `GenerativeLlmBackend` | Optional comparison: small generative LLM with constrained enum output (llama.cpp / Ollama). |
 
 ## Simulation loop
 
