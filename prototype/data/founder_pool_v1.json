@@ -1,0 +1,96 @@
+{
+ "version": "v1",
+ "note": "Draft for owner review (H1). Action genes <= 12 words, temperament <= 15. Imperative, plain words, no numbers.",
+ "loci": {
+  "eat": {
+   "neutral": "No preference.",
+   "alleles": [
+    "Eat whenever food is close.",
+    "Only look for food when energy is low.",
+    "Always finish eating before doing anything else.",
+    "Eat quickly, then move on."
+   ]
+  },
+  "flee": {
+   "neutral": "No preference.",
+   "alleles": [
+    "Run from any predator you see.",
+    "Flee only when a predator is very close.",
+    "Stay calm unless danger is right next to you.",
+    "Run away from anything that attacks you."
+   ]
+  },
+  "follow": {
+   "neutral": "No preference.",
+   "alleles": [
+    "Stay close to other animals.",
+    "Follow others when you are lost or hungry.",
+    "Keep your distance from other animals.",
+    "Follow the strongest animal nearby."
+   ]
+  },
+  "wander": {
+   "neutral": "No preference.",
+   "alleles": [
+    "Keep moving to new places.",
+    "Explore when there is nothing else to do.",
+    "Stay near where you last found food.",
+    "Roam far when food is scarce."
+   ]
+  },
+  "rest": {
+   "neutral": "No preference.",
+   "alleles": [
+    "Rest when you are tired.",
+    "Never stop moving.",
+    "Rest only when you feel safe.",
+    "Save energy by resting when food is far."
+   ]
+  },
+  "mate": {
+   "neutral": "No preference.",
+   "alleles": [
+    "Look for a partner when energy is high.",
+    "Mate with any nearby adult.",
+    "Mate only when food is plentiful.",
+    "Seek a partner before growing old."
+   ]
+  },
+  "attack": {
+   "neutral": "No preference.",
+   "alleles": [
+    "Never fight.",
+    "Attack weaker animals when you are hungry.",
+    "Fight anyone who comes too close.",
+    "Attack only to defend your food."
+   ]
+  },
+  "risk": {
+   "neutral": "No particular temperament.",
+   "alleles": [
+    "Cautious: safety comes before food.",
+    "Bold: take risks when the reward is food.",
+    "Nervous: any movement nearby means danger.",
+    "Reckless when starving, careful when fed."
+   ]
+  },
+  "social": {
+   "neutral": "No particular temperament.",
+   "alleles": [
+    "Social: feels safer in a group.",
+    "Solitary: prefers to be alone.",
+    "Curious about other animals.",
+    "Wary of strangers, friendly to companions."
+   ]
+  },
+  "place": {
+   "neutral": "No particular temperament.",
+   "alleles": [
+    "Likes open ground where danger is easy to see.",
+    "Prefers staying near water.",
+    "Attached to familiar places.",
+    "Restless: always wants somewhere new."
+   ]
+  }
+ }
+}

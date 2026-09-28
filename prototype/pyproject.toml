@@ -1,0 +1,26 @@
+[project]
+name = "promptevo"
+version = "0.1.0"
+description = "Phase 0 spike: prompt genomes, Laya decisions, LLM mutation"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "pyyaml>=6"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+laya = ["laya"]            # installed on the local machine (S1.2)
+analysis = ["matplotlib", "pandas", "scipy"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["promptevo*", "experiments*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "laya: needs the real laya package and weights (run locally)",
+  "ollama: needs a running local Ollama server",
+]
+addopts = "-m 'not laya and not ollama'"
