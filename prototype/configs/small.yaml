@@ -1,0 +1,4 @@
+# CPU-friendly profile
+world: {width: 48, height: 48}
+predators: {count: 2}
+agents: {init_pop: 24, cap: 40}

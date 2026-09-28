@@ -1,0 +1,65 @@
+{
+ "tag": "rule_based",
+ "backend": "rule_based",
+ "placement": null,
+ "style": null,
+ "n_genomes": 114,
+ "n_obs": 48,
+ "calls": 5472,
+ "mi_g_founders": 0.22942479265946672,
+ "mi_g_random": -2.42861286636753e-17,
+ "mi_o_founders": 0.8293052468780897,
+ "directed": {
+  "eat": {
+   "mean_dp": 0.6409779944436444,
+   "sign_acc": 1.0,
+   "n": 39
+  },
+  "flee": {
+   "mean_dp": 0.8111307050260659,
+   "sign_acc": 1.0,
+   "n": 18
+  },
+  "follow": {
+   "mean_dp": 0.3888186931050639,
+   "sign_acc": 1.0,
+   "n": 39
+  },
+  "wander": {
+   "mean_dp": 0.6156546042416192,
+   "sign_acc": 1.0,
+   "n": 48
+  },
+  "rest": {
+   "mean_dp": 0.3830633167747628,
+   "sign_acc": 1.0,
+   "n": 48
+  },
+  "mate": {
+   "mean_dp": 0.28101224731459623,
+   "sign_acc": 1.0,
+   "n": 34
+  },
+  "attack": {
+   "mean_dp": 0.2701643088458044,
+   "sign_acc": 1.0,
+   "n": 34
+  }
+ },
+ "sign_acc": 1.0,
+ "mean_dp": 0.4844031242502224,
+ "locality": {
+  "median_edit": 6.368468592796595e-06,
+  "median_unrelated": 0.10744960472921285,
+  "ratio": 5.926935337590096e-05
+ },
+ "rho_text_behaviour": 0.4489241053902638,
+ "gibberish_to_neutral": 0.0,
+ "founder_to_neutral": 0.06848443329493267,
+ "approx_probs": 0,
+ "gates": {
+  "G1": true,
+  "G2": false,
+  "G3": true
+ }
+}

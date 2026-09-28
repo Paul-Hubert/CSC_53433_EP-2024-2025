@@ -4,16 +4,37 @@
 > `notes/archive.md`. Plan: `../Docs/redesign/08-phase0-spike-plan.md`.
 
 ## Position
-Session: S1 (not started) · Last updated: 2026-09-28
+Session: S1 (offline parts pre-built in a cloud session) · Last updated: 2026-09-28
 
 ## Next action
-S1.1 — scaffold (plan Part B › S1).
+S1.2 — on the local machine: `pip install -e ".[dev]" && pip install laya`, run
+`pytest -q`, then `python -m experiments.e0_probe_laya`. Read results/e0_laya_api.md,
+fix `extract_probs` / `LayaClient` in promptevo/backends/laya_backend.py if the schema
+differs, fill "API facts — Laya" below, commit. Then S1.3 (Ollama probe), S1.5 (budget).
+
+## Pre-built without models (2026-09-28, cloud session) — verify locally
+Done and tested offline (28 tests green, `pytest -q`):
+- S1.1 scaffold: config/profiles, rng streams, sqlite cache, progress, status, peek.
+- S1.4 allele files: founder_pool_v1 (DRAFT → owner review H1), contrast, control.
+- S2 complete: world, perception, obs text V1/V2, 7 executors, random + rule_based
+  backends, lockstep sim with decision memo, sexual/asexual, floor/cap, event log,
+  determinism test, smoke run. Provisional tuning (see Decisions).
+- S3 parts: metrics.py (all §A9), make_obs.py (data/observations_v1.jsonl, small),
+  e1_sensitivity.py (any backend). Reference run: results/e1_rule_based.md.
+- S4 parts: mutation.py (word ops + LLM rewrite + guards), ollama_client.py (stdlib,
+  cached), ollama_policy.py teacher (points / ksample), prompts/teacher_v1.md, mutate_v1.md.
+Written but UNVERIFIED (need real models):
+- backends/laya_backend.py — answer schema guessed from the model card (`extract_probs`).
+- experiments/e0_probe_laya.py, e0_probe_ollama.py, e0_budget.py (needs `transformers`).
+- tests/test_local_models.py (`pytest -m laya`, `pytest -m ollama`).
+Not started: teacher_gate, make_mutants, make_dataset, label_teacher, finetune_laya,
+e3_eval, run_matrix, common_garden, analyze, report.
 
 ## Progress
-- [ ] S1 scaffold, probes, founder pool · H1 founder pool approved
-- [ ] S2 world, sim, rule-based backend
-- [ ] S3 Laya backend, metrics, E1, E2 · H2 zero-shot reviewed
-- [ ] S4 teacher gate, mutation, dataset, labels · H3 teacher approved
+- [~] S1 scaffold ✔, probes ☐, founder pool drafted ✔ · H1 founder pool approved ☐
+- [x] S2 world, sim, rule-based backend (provisional tuning; re-check on small+full)
+- [~] S3 metrics ✔, obs set ✔, E1 script ✔ · Laya backend unverified · E1a/E1b/E2 ☐ · H2 ☐
+- [~] S4 client/teacher/mutation code ✔ · gate, mutants, dataset, labels ☐ · H3 ☐
 - [ ] S5 distillation + E3 (G1–G3)
 - [ ] S6 evolution matrix · H4 preregistration approved
 - [ ] S7 report, go/no-go · H5 decision
@@ -35,9 +56,16 @@ tokens/s, embedding model)
 ## Decisions
 | Date | Decision | Why |
 |---|---|---|
+| 2026-09-28 | Provisional world tuning: food_regrow_p 0.001, cost_base 0.7, kill_p 0.3, predators 3 (base) / 2 (small) | rule_based 5k ticks small: pop ≈ 28 (< cap 40, food-limited), deaths split starvation 294 / predator 254, lifespan ≈ 300, 24 generations; random policy collapses (needs immigrants) → behaviour matters |
+| 2026-09-28 | Invalid action → wander (logged) | plan §A6 |
 
 ## Key numbers
-(measured latencies, E1/E3 metrics, pilot dec/s, cache hit rate…)
+- Sim speed (small, rule_based): 5 000 ticks ≈ 12 s CPU; decision memo hit rate ≈ 0.75.
+- E1 rule_based reference (small, 48 obs): MI_G founders 0.23, MI_G random 0.00,
+  MI_O 0.83, directed sign acc 1.00, ΔP 0.48, gibberish→neutral 0.00.
+  Note for H2: even the "ideal" keyword interpreter scores MI_G 0.23 < G2 threshold 0.25
+  → consider whether G2's MI_G threshold is too strict (decide before S6).
+  Locality ratio is 0 for rule_based because many word edits don't touch its keywords.
 
 ## Preregistration (frozen at H4)
 
@@ -46,3 +74,5 @@ tokens/s, embedding model)
 |---|---|---|---|---|
 
 ## Open issues
+- Founder pool v1 is a draft by Claude — needs owner review (H1).
+- Laya answer schema unknown until S1.2; `extract_probs` falls back to choice+confidence.

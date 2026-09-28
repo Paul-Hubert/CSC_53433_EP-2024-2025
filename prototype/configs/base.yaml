@@ -1,0 +1,81 @@
+# Starting values from plan §A4. Tuned in S2.6 — record changes in STATUS.md.
+seed: 1234
+world:
+  width: 64
+  height: 64
+  water_fraction: 0.15
+  mountain_fraction: 0.10
+  noise_octaves: [16, 8, 4]
+  min_walkable_connected: 0.60
+  food_initial_fraction: 0.08
+  food_regrow_p: 0.001        # tuned 2026-09-28 (rule_based, 5k ticks): food-limited pop
+  food_water_bonus: 2.0        # regrowth multiplier near water
+  water_bonus_radius: 3
+predators:
+  count: 3
+  chase_radius: 6
+  kill_p: 0.3
+  turn_p: 0.2
+  rest_after_kill: 20
+agents:
+  init_pop: 30
+  floor: 10
+  cap: 60
+  vision: 12
+  near: 3
+  energy_max: 100.0
+  energy_start: 60.0
+  cost_base: 0.7
+  cost_move: 0.5
+  cost_rest: 0.2
+  eat_gain: 25.0
+  maturity: 150
+  max_age: 1500
+  mate_energy: 50.0
+  child_energy: 40.0
+  attack_steal: 10.0
+  attack_cost: 3.0
+  energy_low: 30.0
+  energy_high: 70.0
+  wander_turn_p: 0.25
+sim:
+  decision_period: 4
+  sampling_temperature: 1.0
+  stats_every: 100
+evolution:
+  sexual: true
+  p_mut: 0.03
+  shuffled: false             # C3 control
+  random_founders: false      # C4 control
+  operators:                  # weights, plan §A8
+    intensity: 1.0
+    negate: 1.0
+    condition_swap: 1.0
+    synonym: 1.0
+    founder_reintroduce: 0.5
+    llm_rewrite: 0.0          # set > 0 once Ollama is verified (S4.4)
+  max_action_words: 12
+  max_temperament_words: 15
+backend:
+  name: rule_based            # random | rule_based | laya | ollama_policy
+  obs_style: V1
+laya:
+  checkpoint: convaiinnovations/laya   # or subfolder multilingual (decided in S1.5)
+  subfolder: null
+  placement: P4
+  device: null                # null = library default
+  head_max_len: {english: 192, multilingual: 256}   # model card; S1.2 confirms
+  tokenizer: {english: answerdotai/ModernBERT-large, multilingual: jhu-clsp/mmBERT-base}  # fallback for e0_budget
+ollama:
+  host: http://localhost:11434
+  teacher_model: null         # chosen in S1.3
+  mutator_model: null
+  embed_model: null
+  teacher_mode: points        # points | ksample
+  ksample_k: 8
+  timeout_s: 120
+paths:
+  cache_dir: cache
+  data_dir: data
+  results_dir: results
+  logs_dir: logs
