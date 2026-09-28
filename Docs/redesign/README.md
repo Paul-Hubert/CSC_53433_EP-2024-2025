@@ -14,6 +14,7 @@ pre-design** — nothing here is implemented yet.
 | 05 | [Decision backend](05-decision-backend.md) | Laya vs Jev, gene → Laya input mapping, fine-tuning by distillation, Unity integration, Ollama Cloud for generation, performance budget. |
 | 06 | [World: terrain & foliage](06-world-terrain-foliage.md) | Terrain, water, mountains, food/foliage — **to be filled in by the course owner**. |
 | 07 | [Open questions & roadmap](07-open-questions-and-roadmap.md) | Decisions pending, and a de-risked build order. |
+| 08 | [Phase 0 spike plan](08-phase0-spike-plan.md) | Local-only Python test (Laya + local Ollama): spec, go/no-go gates, and a multi-session runbook with `/compact` points. Work lives in [`prototype/`](../../prototype/). |
 
 ## One-paragraph summary
 
