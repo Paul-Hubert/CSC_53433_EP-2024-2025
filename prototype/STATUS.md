@@ -22,19 +22,23 @@ Done and tested offline (28 tests green, `pytest -q`):
 - S3 parts: metrics.py (all §A9), make_obs.py (data/observations_v1.jsonl, small),
   e1_sensitivity.py (any backend). Reference run: results/e1_rule_based.md.
 - S4 parts: mutation.py (word ops + LLM rewrite + guards), ollama_client.py (stdlib,
-  cached), ollama_policy.py teacher (points / ksample), prompts/teacher_v1.md, mutate_v1.md.
+  cached), ollama_policy.py teacher (points / ksample, strict mode), prompts/teacher_v1.md,
+  mutate_v1.md, novel_v1.md.
+- S4 scripts (tested with a fake Ollama): teacher_gate.py (S4.3), make_mutants.py (S4.4;
+  word ops only without --mutator), make_dataset.py (S4.5; allele-split, contrast groups,
+  leak-checked), label_teacher.py (S4.6; resumable, --limit, --check, --workers).
+  e1_sensitivity.py refactored into build_sets/evaluate/report_lines (shared by the gate).
 Written but UNVERIFIED (need real models):
 - backends/laya_backend.py — answer schema guessed from the model card (`extract_probs`).
 - experiments/e0_probe_laya.py, e0_probe_ollama.py, e0_budget.py (needs `transformers`).
 - tests/test_local_models.py (`pytest -m laya`, `pytest -m ollama`).
-Not started: teacher_gate, make_mutants, make_dataset, label_teacher, finetune_laya,
-e3_eval, run_matrix, common_garden, analyze, report.
+Not started: finetune_laya, e3_eval, run_matrix, common_garden, analyze, report.
 
 ## Progress
 - [~] S1 scaffold ✔, probes ☐, founder pool drafted ✔ · H1 founder pool approved ☐
 - [x] S2 world, sim, rule-based backend (provisional tuning; re-check on small+full)
 - [~] S3 metrics ✔, obs set ✔, E1 script ✔ · Laya backend unverified · E1a/E1b/E2 ☐ · H2 ☐
-- [~] S4 client/teacher/mutation code ✔ · gate, mutants, dataset, labels ☐ · H3 ☐
+- [~] S4 all scripts ✔ (offline-tested) · run gate ☐, LLM mutants ☐, dataset ☐, labels ☐ · H3 ☐
 - [ ] S5 distillation + E3 (G1–G3)
 - [ ] S6 evolution matrix · H4 preregistration approved
 - [ ] S7 report, go/no-go · H5 decision
@@ -72,6 +76,15 @@ tokens/s, embedding model)
 ## Background jobs
 | Job | Started | Log | Progress file | State |
 |---|---|---|---|---|
+
+## S4 run order (local, once S1.3 picked the models)
+1. `python -m experiments.teacher_gate --workers 4` → results/teacher_gate.md (H3).
+2. `python -m experiments.make_mutants --mutator <small-model>` (LLM rewrites + OOD).
+3. `python -m experiments.make_dataset --profile small` (re-run after step 2!).
+4. `python -m experiments.label_teacher --limit 50` then `--check` (sanity), then
+   `nohup python -m experiments.label_teacher --workers 4 > logs/label_teacher.log 2>&1 &`.
+Offline dataset check (word mutants only): 3 000 rows; train 2 400 / val 300 / test 300;
+contrast 50 %, regular 40 %, random-text 10 %; 0 leaks; every val/test row has ≥ 1 unseen gene.
 
 ## Open issues
 - Founder pool v1 is a draft by Claude — needs owner review (H1).

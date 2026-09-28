@@ -34,6 +34,16 @@ pytest -m laya ; pytest -m ollama                           # real-model smoke t
 python -m experiments.e1_sensitivity --backend laya --placement P4 --style V1 --tag laya_zs_P4V1
 ```
 
+## Teacher pipeline (S4, needs Ollama)
+
+```bash
+python -m experiments.teacher_gate --workers 4                     # can the teacher read genes?
+python -m experiments.make_mutants --mutator <small-model>         # held-out alleles (+ OOD)
+python -m experiments.make_dataset --profile small                 # 3 000 keys, allele-split
+python -m experiments.label_teacher --limit 50 && python -m experiments.label_teacher --check
+nohup python -m experiments.label_teacher --workers 4 > logs/label_teacher.log 2>&1 &
+```
+
 ## Layout
 
 | Path | What |

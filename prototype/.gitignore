@@ -7,3 +7,7 @@ logs/
 models/
 results/runs/
 *.egg-info/
+# regenerable in seconds (make_mutants / make_dataset); labels_*.jsonl ARE committed (expensive)
+data/mutants_v*.jsonl
+data/dataset_v*_*.jsonl
+data/dataset_v*_meta.json

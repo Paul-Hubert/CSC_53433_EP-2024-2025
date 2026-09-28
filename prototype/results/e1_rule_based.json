@@ -1,8 +1,4 @@
 {
- "tag": "rule_based",
- "backend": "rule_based",
- "placement": null,
- "style": null,
  "n_genomes": 114,
  "n_obs": 48,
  "calls": 5472,
@@ -61,5 +57,9 @@
   "G1": true,
   "G2": false,
   "G3": true
- }
+ },
+ "tag": "rule_based",
+ "backend": "rule_based",
+ "placement": null,
+ "style": null
 }

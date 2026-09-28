@@ -37,11 +37,12 @@ class TeacherBackend:
 
     def __init__(self, client, model: str, prompt_path: str | Path, mode: str = "points",
                  style: str = "V1", k: int = 8, seed: int = 0, workers: int = 1,
-                 keep_alive: str = "30m"):
+                 keep_alive: str = "30m", strict: bool = False):
         self.client, self.model, self.mode, self.style = client, model, mode, style
         self.template = Path(prompt_path).read_text()
         self.k, self.seed, self.workers, self.keep_alive = k, seed, workers, keep_alive
         self.failures = 0
+        self.strict = strict            # True: raise instead of returning a uniform fallback
 
     def _one(self, q: Query) -> np.ndarray:
         prompt = teacher_prompt(self.template, q.genes, render(q.obs, self.style), self.mode)
@@ -60,6 +61,8 @@ class TeacherBackend:
             return normalise(counts + 1.0)          # add-one smoothing
         except Exception:
             self.failures += 1
+            if self.strict:
+                raise
             return np.full(len(ACTIONS), 1.0 / len(ACTIONS))
 
     def decide(self, queries: list[Query]) -> np.ndarray:
