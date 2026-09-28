@@ -18,6 +18,7 @@
 ## De-risked build order
 
 **Phase 0 — Headless feasibility spike (before any Unity work, ~days)**
+→ Full plan and session runbook: [08](08-phase0-spike-plan.md).
 - Python script, 2D grid world, food + walls/water, 20–40 agents.
 - Candidate backends: rule-based, **Laya zero-shot**, **Laya fine-tuned**
   (teacher labels from Ollama Cloud), optionally one small generative LLM.
@@ -60,4 +61,5 @@
 | Date | Decision | By |
 |---|---|---|
 | 2026-09-27 | Idea captured; docs created. | course owner / Claude |
+| 2026-09-28 | Phase 0 spike planned: local only (Laya + local Ollama), 7 sessions, preregistered gates G1–G5. | course owner / Claude |
 | 2026-09-27 | "J-Laya" = Jev/Laya decision models. Laya (local) chosen as decision backend; Ollama Cloud (pooled) for generative jobs. | course owner |
