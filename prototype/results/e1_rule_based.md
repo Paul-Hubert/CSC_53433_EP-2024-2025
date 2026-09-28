@@ -1,6 +1,6 @@
-# E1 — rule_based
+# E1 — rule_based (backend=rule_based placement=None style=None)
 
-backend=rule_based placement=None style=None genomes=114 obs=48
+genomes=114 obs=48 calls=5472
 
 | metric | value |
 |---|---|

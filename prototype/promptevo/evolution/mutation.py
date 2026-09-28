@@ -82,6 +82,8 @@ def op_negate(text: str, rng: np.random.Generator) -> str:
                 return new
     if re.match(r"(do not|never) ", text, re.I):
         return re.sub(r"^(do not|never) ", "", text, flags=re.I).capitalize()
+    if re.match(r"^\w+:", text):                     # temperament style "Bold: ..."
+        return re.sub(r"^Not ", "", text) if text.startswith("Not ") else f"Not {_decap(text)}"
     return f"Do not {_decap(text)}"
 
 
