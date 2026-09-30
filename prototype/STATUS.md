@@ -4,13 +4,34 @@
 > `notes/archive.md`. Plan: `../Docs/redesign/08-phase0-spike-plan.md`.
 
 ## Position
-Session: S1 (offline parts pre-built in a cloud session) · Last updated: 2026-09-28
+Session: S1 (offline parts pre-built in a cloud session) · Last updated: 2026-09-30
 
 ## Next action
-S1.2 — on the local machine: `pip install -e ".[dev]" && pip install laya`, run
-`pytest -q`, then `python -m experiments.e0_probe_laya`. Read results/e0_laya_api.md,
-fix `extract_probs` / `LayaClient` in promptevo/backends/laya_backend.py if the schema
-differs, fill "API facts — Laya" below, commit. Then S1.3 (Ollama probe), S1.5 (budget).
+S1.3 — on the machine with Ollama (or with an Ollama Cloud key):
+`pip install -e ".[dev]" && pytest -q`, then
+`python -m experiments.e0_probe_ollama --teacher <brain-model> --mutator <small-model>`.
+Read results/e0_ollama.md: pick policy.model + ollama.mutator_model, and policy.mode
+(`logprobs` if "logprobs_mode_usable": true, else `points`). Fill "API facts — Ollama",
+commit. Then `pytest -m ollama`, the decision-model gate (teacher_gate) and E1 with
+`--backend llm` (plan revision box). S1.2 (Laya probe) is optional now.
+
+## Revision 2026-09-30 — LLM brain, Laya parked
+Owner decision: no Laya fine-tuning for now. Decisions AND gene mutation by Ollama LLMs
+(local or cloud). See ../Docs/redesign/05-decision-backend.md §0 and the revision box
+at the top of plan 08. Implemented (offline-tested with fake Ollama, 38 tests):
+- `LLMPolicyBackend` (backends/ollama_policy.py; `TeacherBackend` = alias) with modes
+  points (default) / logprobs (1 token per decision; UNVERIFIED Ollama response format,
+  auto-fallback to points) / table (+prefetch) / ksample; per-situation cache
+  (cache/policy.sqlite) keyed by model+digest+prompt hash; parallel `workers`.
+- backends/factory.py: make_backend(name) and make_rewriter(cfg) used by all scripts;
+  smoke_run --backend llm also mutates genes with ollama.mutator_model.
+- Ollama Cloud: ollama.host https://ollama.com + key in env OLLAMA_API_KEY
+  (client_from_config); or cloud tags through the local server after `ollama signin`.
+- Measured with a fake near-random LLM (small, 2 000 ticks): 5 349 decisions →
+  2 211 LLM queries with points (0.41/decision). Table+prefetch k=8: 1 185 requests
+  but 9 342 generated answers (4×) → only for request-limited cloud, not for speed.
+Parked (kept, not deleted): laya_backend.py, e0_probe_laya.py, e0_budget.py,
+make_dataset.py, label_teacher.py, S5 distillation.
 
 ## Pre-built without models (2026-09-28, cloud session) — verify locally
 Done and tested offline (28 tests green, `pytest -q`):
@@ -37,9 +58,9 @@ Not started: finetune_laya, e3_eval, run_matrix, common_garden, analyze, report.
 ## Progress
 - [~] S1 scaffold ✔, probes ☐, founder pool drafted ✔ · H1 founder pool approved ☐
 - [x] S2 world, sim, rule-based backend (provisional tuning; re-check on small+full)
-- [~] S3 metrics ✔, obs set ✔, E1 script ✔ · Laya backend unverified · E1a/E1b/E2 ☐ · H2 ☐
+- [~] S3 metrics ✔, obs set ✔, E1 script ✔ (`--backend llm`) · E1 on LLM ☐ · E2 (s/decision) ☐ · H2 ☐
 - [~] S4 all scripts ✔ (offline-tested) · run gate ☐, LLM mutants ☐, dataset ☐, labels ☐ · H3 ☐
-- [ ] S5 distillation + E3 (G1–G3)
+- [—] S5 distillation: PARKED (rev. 2026-09-30); G1–G3 measured on the LLM brain instead
 - [ ] S6 evolution matrix · H4 preregistration approved
 - [ ] S7 report, go/no-go · H5 decision
 
@@ -88,4 +109,7 @@ contrast 50 %, regular 40 %, random-text 10 %; 0 leaks; every val/test row has �
 
 ## Open issues
 - Founder pool v1 is a draft by Claude — needs owner review (H1).
-- Laya answer schema unknown until S1.2; `extract_probs` falls back to choice+confidence.
+- LLM cost dominates E4: estimate 13–22 k LLM answers per 20 k-tick small run
+  (4–6 h at ~1 s/answer). Decide run length / D / seeds after measuring s/decision (S1.3).
+- Ollama logprobs response format unverified (logprobs mode falls back to points).
+- (parked) Laya answer schema unknown; `extract_probs` falls back to choice+confidence.

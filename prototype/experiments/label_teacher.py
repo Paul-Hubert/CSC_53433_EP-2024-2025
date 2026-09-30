@@ -25,7 +25,7 @@ import numpy as np
 from experiments.make_dataset import load_rows
 from promptevo import metrics as M
 from promptevo.backends.base import Query
-from promptevo.cache import KVCache, make_key
+from promptevo.cache import make_key
 from promptevo.config import load_config, resolve
 from promptevo.genome import ACTIONS, LOCI
 from promptevo.perception import Observation
@@ -140,9 +140,8 @@ def main() -> None:
         print("\n".join(check(rows, out) if out.exists() else [f"{out} does not exist"]))
         return
     from promptevo.backends.ollama_policy import TeacherBackend
-    from promptevo.llm.ollama_client import OllamaClient
-    client = OllamaClient(cfg.ollama.host, KVCache(resolve(cfg.paths.cache_dir) / "ollama.sqlite"),
-                          cfg.ollama.timeout_s)
+    from promptevo.llm.ollama_client import client_from_config
+    client = client_from_config(cfg)
     teacher = TeacherBackend(client, model, resolve(a.prompt), mode=mode, style=cfg.backend.obs_style,
                              k=int(cfg.ollama.ksample_k), strict=True)
     meta = {"model": model, "digest": client.digest(model), "mode": mode,

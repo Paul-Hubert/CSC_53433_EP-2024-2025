@@ -14,7 +14,6 @@ from pathlib import Path
 
 import numpy as np
 
-from promptevo.cache import KVCache
 from promptevo.config import load_config, resolve
 from promptevo.evolution.mutation import LLM_STYLES, Mutator, clean, valid
 from promptevo.founder import AllelePools
@@ -91,9 +90,8 @@ def main() -> None:
     rewriter = client = None
     model = a.mutator or cfg.ollama.mutator_model
     if model:
-        from promptevo.llm.ollama_client import OllamaClient, make_rewriter
-        client = OllamaClient(cfg.ollama.host, KVCache(resolve(cfg.paths.cache_dir) / "ollama.sqlite"),
-                              cfg.ollama.timeout_s)
+        from promptevo.llm.ollama_client import client_from_config, make_rewriter
+        client = client_from_config(cfg)
         rewriter = make_rewriter(client, model, resolve("prompts/mutate_v1.md"),
                                  max_words=int(cfg.evolution.max_action_words))
     rows = make_mutants(cfg, reg, pools, rng, a.per_allele, rewriter, model)

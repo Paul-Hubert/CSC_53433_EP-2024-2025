@@ -1,9 +1,63 @@
-# 05 — Decision backend: Laya (local) + Ollama Cloud (generation)
+# 05 — Decision backend: LLM brain (local Ollama or Ollama Cloud); Laya parked
 
-> Updated 2026-09-27: "J-Laya" = **Jev and Laya**, two *decision models*.
-> Laya is the chosen local decision backend. Generative work (mutation,
-> founder drafting, teacher labels) goes to a pooled **Ollama Cloud**
-> subscription, with local Ollama as fallback.
+> **Revision 2026-09-30 — decision:** fine-tuning Laya is too much work for
+> now. **An instruction-following LLM served by Ollama decides directly**:
+> local models, or Ollama Cloud models when local hardware is too slow. The
+> same LLMs also **mutate the genes**. Laya stays in the code as an optional
+> backend, and the distillation pipeline (§5) is parked; see §0.
+> Everything below §0 is the earlier Laya analysis, kept for reference.
+
+## 0. The LLM brain (current plan)
+
+**Why the switch works:** zero-shot Laya barely reads instructions, so it
+would need a fine-tuning pipeline (dataset → teacher labels → training →
+calibration). An instruction-following LLM reads the genes directly. The gene
+→ behaviour link we need is exactly its strength, with no training step.
+
+**Costs we accept in exchange:**
+
+| Cost | Mitigation (implemented in `prototype/`) |
+|---|---|
+| **Speed:** one LLM answer per uncached decision (~0.2–2 s) | Run memo: identical (genome, situation) pairs are never asked twice; 60–75 % of decisions hit it. Persistent per-situation cache across runs. Lockstep sim, so slow ≠ wrong. Parallel requests. |
+| **Output tokens** dominate generation time | `logprobs` mode: one generated token per decision if Ollama returns logprobs (probe S1.3); `points` mode (~60 tokens) otherwise. |
+| **Request limits** (cloud) | `table` mode: one call answers K situations for a genome, topped up with frequent situations. Cuts requests ~2× but generates 4–6× more answers, so use it only when requests, not tokens, are the bottleneck. |
+| **Reproducibility:** cloud models change, and seeds aren't guaranteed on cloud | Every answer is cached with model name + digest + prompt hash; runs record them. Re-runs hit the cache. |
+| **Cost / quota** (cloud) | Same caches; small population; decision period D can be raised (D = 8 halves the calls). |
+| **Keys** (cloud) | API key only via an environment variable (`OLLAMA_API_KEY`), never in files. |
+
+**Modes** (`policy.mode` in `prototype/configs/base.yaml`):
+
+| Mode | How | When |
+|---|---|---|
+| `points` | JSON with integer points per action → distribution (1 call, ~60 output tokens) | default |
+| `logprobs` | Model answers with one action word; Ollama's `top_logprobs` for that token → distribution (1 call, 1 output token) | if the probe shows logprobs are returned |
+| `table` | K situations per call, with prefetch | cloud with tight request limits |
+| `ksample` | k sampled answers per situation | checks only (k× the cost) |
+
+**Two ways to use Ollama Cloud** (verify on your install in S1.3): either
+through the local server after `ollama signin` using a cloud model tag, or
+directly with `ollama.host: https://ollama.com` plus an API key in
+`OLLAMA_API_KEY`. The API is the same, so switching is configuration only.
+
+**Rough budget** (small profile; replace with S1.3 measurements):
+
+- A 2 000-tick run makes ≈ 5 300 decisions, of which ≈ 2 200 reach the LLM
+  (measured with a fake LLM that behaves almost randomly; a real, more
+  consistent LLM should do better).
+- 20 000 ticks ≈ 13–22 k LLM answers. At ~1 s/answer (local GPU, points)
+  that is 4–6 h per run. It is less with logprobs, parallel requests or a
+  fast cloud model.
+- **The E4 evolution matrix is the expensive part.** Plan shorter runs
+  (10 k ticks), D = 8, 3 seeds, and keep `rule_based` for iterating on world
+  design.
+
+**What students get:** the decision model is swappable by name (any Ollama
+tag). Laya — or distilling an LLM into a fast model — can come back later as
+an advanced project, and the dataset/labelling code is kept for it.
+
+---
+
+## Earlier analysis (2026-09-27): Laya as the decision model — parked
 
 Sources: [Laya model card](https://huggingface.co/convaiinnovations/laya),
 [Laya GitHub](https://github.com/NandhaKishorM/laya),

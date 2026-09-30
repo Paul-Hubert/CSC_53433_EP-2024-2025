@@ -1,16 +1,17 @@
 # promptevo — Phase 0 spike
 
-Headless Python test of *genes = text prompts → Laya decides → an LLM mutates*.
+Headless Python test of *genes = text prompts → an LLM decides → an LLM mutates*
+(Ollama, local or cloud; Laya parked — see `../Docs/redesign/05-decision-backend.md` §0).
 Plan: [`../Docs/redesign/08-phase0-spike-plan.md`](../Docs/redesign/08-phase0-spike-plan.md) ·
 Handoff state: [`STATUS.md`](STATUS.md) · Rules for Claude: [`CLAUDE.md`](CLAUDE.md)
 
-## Setup (local machine with Laya + Ollama)
+## Setup (machine with Ollama, or an Ollama Cloud key)
 
 ```bash
 cd prototype
 python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"            # numpy, pyyaml, pytest
-pip install laya                   # decision model (S1.2)
+# optional, parked: pip install laya
 pytest -q                          # offline tests (no models needed)
 ```
 
@@ -24,7 +25,18 @@ python -m experiments.status                                # background jobs
 python -m experiments.peek results/runs/smoke/events.jsonl -n 3
 ```
 
-## First local steps (need the real models)
+## LLM brain (needs Ollama)
+
+```bash
+# configs/base.yaml: policy.model = <decision model>, ollama.mutator_model = <small model>
+python -m experiments.e0_probe_ollama --teacher <model> --mutator <small-model>   # logprobs? s/decision?
+python -m experiments.teacher_gate --modes points,logprobs --workers 4           # do genes steer it? (G1/G2)
+python -m experiments.e1_sensitivity --backend llm --tag llm_points               # full E1 suite
+python -m experiments.smoke_run --backend llm --ticks 500                         # read llm_calls, then extrapolate
+# cloud: export OLLAMA_API_KEY=...; set ollama.host: https://ollama.com (or use cloud tags via local server)
+```
+
+## Parked: Laya + distillation (kept for a later project)
 
 ```bash
 python -m experiments.e0_probe_laya                         # S1.2 → results/e0_laya_api.md
@@ -34,10 +46,9 @@ pytest -m laya ; pytest -m ollama                           # real-model smoke t
 python -m experiments.e1_sensitivity --backend laya --placement P4 --style V1 --tag laya_zs_P4V1
 ```
 
-## Teacher pipeline (S4, needs Ollama)
+## Parked: distillation dataset (S4.5–S5)
 
 ```bash
-python -m experiments.teacher_gate --workers 4                     # can the teacher read genes?
 python -m experiments.make_mutants --mutator <small-model>         # held-out alleles (+ OOD)
 python -m experiments.make_dataset --profile small                 # 3 000 keys, allele-split
 python -m experiments.label_teacher --limit 50 && python -m experiments.label_teacher --check
@@ -52,7 +63,7 @@ nohup python -m experiments.label_teacher --workers 4 > logs/label_teacher.log 2
 | `promptevo/genome.py`, `founder.py` | alleles, genomes, crossover; founder/contrast/control pools |
 | `promptevo/perception.py`, `obs_text.py`, `actions.py` | discretised observations, text styles V1/V2, 7 behaviours |
 | `promptevo/sim.py` | lockstep loop, decision memo, reproduction, deaths, logging |
-| `promptevo/backends/` | `random`, `rule_based`, `laya` (P1–P4), `ollama_policy` (teacher) |
+| `promptevo/backends/` | `random`, `rule_based`, `llm` (ollama_policy: points/logprobs/table/ksample), `laya` (parked); `factory.py` |
 | `promptevo/evolution/mutation.py` | word operators + LLM rewrite with guards |
 | `promptevo/llm/ollama_client.py` | stdlib Ollama client with sqlite cache |
 | `promptevo/metrics.py` | MI_G, MI_O, JSD, directed ΔP, locality, Spearman, bootstrap |

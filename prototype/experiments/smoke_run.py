@@ -1,25 +1,17 @@
-"""S2.6 smoke run: python -m experiments.smoke_run --profile small --ticks 5000 [--backend rule_based]"""
+"""Smoke run: python -m experiments.smoke_run --profile small --ticks 5000 [--backend rule_based|llm]
+
+With --backend llm the LLM decides (policy.model) and, if ollama.mutator_model is set,
+also rewrites genes. Start short (--ticks 500) and read "llm_calls" to extrapolate.
+"""
 from __future__ import annotations
 
 import argparse
 import json
 
-from promptevo.backends.random_policy import RandomBackend
-from promptevo.backends.rule_based import RuleBasedBackend
+from promptevo.backends.factory import make_backend, make_rewriter
 from promptevo.config import load_config, resolve
 from promptevo.render import ascii_map
 from promptevo.sim import Simulation
-
-
-def make_backend(name: str, cfg):
-    if name == "rule_based":
-        return RuleBasedBackend()
-    if name == "random":
-        return RandomBackend()
-    if name == "laya":
-        from promptevo.backends.laya_backend import LayaBackend
-        return LayaBackend.from_config(cfg)
-    raise SystemExit(f"unknown backend {name}")
 
 
 def main() -> None:
@@ -33,7 +25,9 @@ def main() -> None:
     a = ap.parse_args()
     cfg = load_config(a.profile)
     backend = make_backend(a.backend or cfg.backend.name, cfg)
-    sim = Simulation(cfg, backend, seed=a.seed, out_dir=resolve(a.out))
+    rewriter, rw_model = make_rewriter(cfg)
+    sim = Simulation(cfg, backend, seed=a.seed, out_dir=resolve(a.out),
+                     rewriter=rewriter, rewriter_model=rw_model)
     every = max(1, a.ticks // max(1, a.snapshots))
     for i in range(a.ticks):
         sim.step()
@@ -46,6 +40,9 @@ def main() -> None:
                               "backend_s", "alleles")}
     print(json.dumps(keep))
     print("actions:", s["action_share"])
+    if hasattr(backend, "calls"):
+        print(f"llm_calls={backend.calls} failures={getattr(backend, 'failures', 0)} "
+              f"backend_queries={s['backend_queries']} (memo hit rate {s['memo_hit_rate']})")
     print("details:", resolve(a.out))
 
 
