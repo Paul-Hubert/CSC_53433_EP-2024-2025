@@ -53,12 +53,20 @@ evolution:
     condition_swap: 1.0
     synonym: 1.0
     founder_reintroduce: 0.5
-    llm_rewrite: 0.0          # set > 0 once Ollama is verified (S4.4)
+    llm_rewrite: 1.0          # used only when ollama.mutator_model is set
   max_action_words: 12
   max_temperament_words: 15
 backend:
-  name: rule_based            # random | rule_based | laya | ollama_policy
+  name: rule_based            # random | rule_based | llm | laya (parked)
   obs_style: V1
+policy:                       # LLM decision backend (default brain, rev. 2026-09-30)
+  model: null                 # local tag (e.g. an 8B instruct) or a cloud model tag — set in S1.3
+  mode: points                # points (default) | logprobs (1 token/decision, if Ollama returns
+                              # logprobs — probe S1.3) | table (fewer requests but ~4-6x more
+                              # generated answers via prefetch; only for request-limited cloud) | ksample
+  table_k: 8
+  workers: 2                  # parallel requests (match OLLAMA_NUM_PARALLEL / cloud limits)
+  prompt: prompts/teacher_v1.md
 laya:
   checkpoint: convaiinnovations/laya   # or subfolder multilingual (decided in S1.5)
   subfolder: null
@@ -67,7 +75,8 @@ laya:
   head_max_len: {english: 192, multilingual: 256}   # model card; S1.2 confirms
   tokenizer: {english: answerdotai/ModernBERT-large, multilingual: jhu-clsp/mmBERT-base}  # fallback for e0_budget
 ollama:
-  host: http://localhost:11434
+  host: http://localhost:11434   # or https://ollama.com (direct cloud API, needs a key)
+  api_key_env: OLLAMA_API_KEY    # name of the env var holding the key; sent only if set
   teacher_model: null         # chosen in S1.3
   mutator_model: null
   embed_model: null

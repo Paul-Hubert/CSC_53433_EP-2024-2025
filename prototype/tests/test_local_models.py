@@ -1,6 +1,6 @@
 """Smoke tests against the REAL local models. Skipped by default; run locally with
     pytest -m laya      (needs `pip install laya` + weights)
-    pytest -m ollama    (needs `ollama serve` and cfg.ollama.teacher_model set)
+    pytest -m ollama    (needs Ollama — local or cloud — and policy.model set)
 """
 import pytest
 
@@ -23,15 +23,16 @@ def test_real_laya_contrast(cfg, reg_pools):
 
 
 @pytest.mark.ollama
-def test_real_ollama_teacher(cfg, reg_pools):
-    from promptevo.backends.ollama_policy import TeacherBackend
-    from promptevo.config import resolve
-    from promptevo.llm.ollama_client import OllamaClient
-    if not cfg.ollama.teacher_model:
-        pytest.skip("set ollama.teacher_model in configs/base.yaml (S1.3)")
+def test_real_llm_brain(cfg, reg_pools):
+    """Needs policy.model set (local tag, or cloud via OLLAMA_API_KEY + ollama.host)."""
+    from promptevo.backends.ollama_policy import LLMPolicyBackend
+    if not (cfg.policy.model or cfg.ollama.teacher_model):
+        pytest.skip("set policy.model in configs/base.yaml (S1.3)")
     reg, pools = reg_pools
-    t = TeacherBackend(OllamaClient(cfg.ollama.host), cfg.ollama.teacher_model,
-                       resolve("prompts/teacher_v1.md"))
+    b = LLMPolicyBackend.from_config(cfg)
+    b.cache = None
     pro, anti = pools.contrast_pair("flee")
-    p = t.decide([Query(reg.genome_key(g), reg.genes(g), O) for g in (pro, anti)])
+    p = b.decide([Query(reg.genome_key(g), reg.genes(g), O) for g in (pro, anti)])
+    print("P(flee) always/never:", p[:, ACTIONS.index("flee")], "calls", b.calls,
+          "logprob_fallbacks", b.logprob_fallbacks)
     assert p[0, ACTIONS.index("flee")] > p[1, ACTIONS.index("flee")]

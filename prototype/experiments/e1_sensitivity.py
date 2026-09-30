@@ -2,7 +2,7 @@
 
     python -m experiments.e1_sensitivity --backend rule_based --tag rb
     python -m experiments.e1_sensitivity --backend laya --placement P4 --style V1 --tag laya_zs
-    python -m experiments.e1_sensitivity --backend teacher --tag teacher   (slow)
+    python -m experiments.e1_sensitivity --backend llm --tag llm_table     (LLM brain; needs policy.model)
 
 Writes results/e1_<tag>.json + .md and prints a ≤ 20-line summary with G1–G3.
 Long runs: launch with nohup; progress in logs/e1_<tag>.progress.json.
@@ -32,26 +32,8 @@ GATES = {"G1_sign_acc": 0.85, "G1_mean_dp": 0.25, "G2_mi_g": 0.25, "G2_mi_o": 0.
 
 
 def make_backend(name, cfg, a):
-    if name == "rule_based":
-        from promptevo.backends.rule_based import RuleBasedBackend
-        return RuleBasedBackend()
-    if name == "random":
-        from promptevo.backends.random_policy import RandomBackend
-        return RandomBackend()
-    if name == "laya":
-        from promptevo.backends.laya_backend import LayaBackend
-        return LayaBackend.from_config(cfg, placement=a.placement or cfg.laya.placement,
-                                       style=a.style or cfg.backend.obs_style)
-    if name == "teacher":
-        from promptevo.backends.ollama_policy import TeacherBackend
-        from promptevo.cache import KVCache
-        from promptevo.llm.ollama_client import OllamaClient
-        oc = cfg.ollama
-        client = OllamaClient(oc.host, KVCache(resolve(cfg.paths.cache_dir) / "ollama.sqlite"), oc.timeout_s)
-        return TeacherBackend(client, oc.teacher_model, resolve("prompts/teacher_v1.md"),
-                              oc.teacher_mode, a.style or cfg.backend.obs_style, oc.ksample_k,
-                              workers=a.workers)
-    raise SystemExit(f"unknown backend {name}")
+    from promptevo.backends.factory import make_backend as mk
+    return mk(name, cfg, placement=a.placement, style=a.style, workers=a.workers, mode=a.mode)
 
 
 def single_edit(mut: Mutator, reg: AlleleRegistry, g: Genome, rng) -> Genome | None:
@@ -161,7 +143,8 @@ def main() -> None:
     ap.add_argument("--style", default=None)
     ap.add_argument("--obs", default=None)
     ap.add_argument("--tag", default=None)
-    ap.add_argument("--workers", type=int, default=1)
+    ap.add_argument("--workers", type=int, default=None)
+    ap.add_argument("--mode", default=None, help="llm backend: table | points | ksample")
     ap.add_argument("--chunk", type=int, default=64)
     a = ap.parse_args()
     cfg = load_config(a.profile)

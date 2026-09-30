@@ -1,6 +1,6 @@
 # 08 — Phase 0 spike: local Python test (full plan + session runbook)
 
-> **Goal:** find out, with numbers, whether *"genes = text prompts, Laya
+> **Goal:** find out, with numbers, whether *"genes = text prompts, an LLM
 > decides, an LLM mutates"* works **before** any Unity work.
 >
 > **Local only:** **Laya** runs in-process for decisions. **Local Ollama**
@@ -13,6 +13,24 @@
 > **Where to run:** Claude Code **on the machine that has Laya + Ollama**
 > (terminal or desktop app), launched from `prototype/`. A cloud session
 > can't reach your local Ollama.
+
+> ### Revision 2026-09-30: LLM brain instead of Laya
+> The decision backend is now an **Ollama LLM** (local or cloud), called
+> `llm` in code (see [05 §0](05-decision-backend.md)). It also mutates the
+> genes. What changes in this plan:
+>
+> | Section | Change |
+> |---|---|
+> | S1.2 Laya probe | optional (skip unless Laya comes back) |
+> | S1.3 Ollama probe | **key step**: pick `policy.model` (the brain) and `ollama.mutator_model`; check whether logprobs are returned and the seconds per decision by mode; local vs cloud |
+> | S3 | E1 zero-shot on Laya is replaced by `e1_sensitivity --backend llm`; E2 benchmark = seconds per decision, memo hit rate, calls per 1 000 ticks |
+> | S4.3 | `teacher_gate` is now the **decision-model gate** (G1/G2 for the brain itself; modes `points,table` or `points,logprobs`) |
+> | S4.5–S4.6, S5 | **parked** (dataset, labelling, distillation). Code kept for a later "distil the LLM into a fast model" project |
+> | S6 | C1 FULL uses `--backend llm`; C6 ZERO-SHOT is dropped. Expect LLM cost to dominate: see [05 §0](05-decision-backend.md) budget; default to 10 k ticks, D = 8, 3 seeds |
+> | A2 gates | unchanged. G1–G3 are measured on the LLM brain; G5 (throughput) is now the main risk |
+>
+> Where the text below says "Laya", read "the decision backend" unless the
+> section is marked parked.
 
 **How to use this document**
 
@@ -448,7 +466,7 @@ resuming after a crash:
 ```
 Read STATUS.md. Then run `git log --oneline -8` and, if it exists,
 `python -m experiments.status`. In ../Docs/redesign/08-phase0-spike-plan.md
-read ONLY section B0, the session section named in STATUS.md › Next action,
+read ONLY the "Revision" box at the top, section B0, the session section named in STATUS.md › Next action,
 and the Part A sections that session lists under "Reads". Continue from
 STATUS.md › Next action. Follow CLAUDE.md. Stop at every ⏸.
 ```

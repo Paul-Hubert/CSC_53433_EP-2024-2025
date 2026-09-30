@@ -1,6 +1,10 @@
-"""S4.3 — teacher gate: can the local teacher LLM express the genes?
+"""Decision-model gate (was S4.3 "teacher gate"): does the LLM brain read the genes?
 
-    python -m experiments.teacher_gate [--modes points,ksample] [--n-obs 24] [--workers 4]
+    python -m experiments.teacher_gate [--modes points,table] [--n-obs 24] [--workers 4] [--model TAG]
+
+Since rev. 2026-09-30 the LLM is the decision backend itself, so this gate is the
+main G1/G2 check (plan §A2), per mode. "table" is the cheap simulation mode; the
+agreement column shows how much batching K situations per call changes answers.
 
 Runs the E1 suite on a small set (contrast pairs + 10 founders + 10 random-text,
 × n observations) for each teacher mode, compares modes (mean JSD between their
@@ -19,11 +23,10 @@ from experiments.e1_sensitivity import build_sets, evaluate, report_lines
 from experiments.make_obs import load_obs
 from promptevo import metrics as M
 from promptevo.backends.ollama_policy import TeacherBackend
-from promptevo.cache import KVCache
 from promptevo.config import load_config, resolve
 from promptevo.founder import AllelePools
 from promptevo.genome import AlleleRegistry
-from promptevo.llm.ollama_client import OllamaClient
+from promptevo.llm.ollama_client import client_from_config
 from promptevo.progress import Progress
 
 GATE_SIGN_ACC = 0.85
@@ -61,7 +64,7 @@ def run_gate(cfg, client, modes, n_obs, workers, prompt, model, logs=True, obs=N
     results, Ps = {}, {}
     for mode in modes:
         b = TeacherBackend(client, model, prompt, mode=mode, style=cfg.backend.obs_style,
-                           k=int(cfg.ollama.ksample_k), workers=workers)
+                           k=int(cfg.ollama.ksample_k), workers=workers, table_k=int(cfg.policy.table_k))
         prog = Progress(resolve(cfg.paths.logs_dir), f"teacher_gate_{mode}") if logs else None
         res, P, _ = evaluate(b, reg, sets, obs, prog, chunk=16)
         res["failures"] = b.failures
@@ -78,18 +81,17 @@ def run_gate(cfg, client, modes, n_obs, workers, prompt, model, logs=True, obs=N
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--profile", default="small")
-    ap.add_argument("--modes", default="points,ksample")
+    ap.add_argument("--modes", default="points,table")
     ap.add_argument("--n-obs", type=int, default=24)
     ap.add_argument("--workers", type=int, default=1)
     ap.add_argument("--model", default=None)
     ap.add_argument("--prompt", default="prompts/teacher_v1.md")
     a = ap.parse_args()
     cfg = load_config(a.profile)
-    model = a.model or cfg.ollama.teacher_model
+    model = a.model or cfg.policy.model or cfg.ollama.teacher_model
     if not model:
-        raise SystemExit("set ollama.teacher_model in configs/base.yaml or pass --model")
-    client = OllamaClient(cfg.ollama.host, KVCache(resolve(cfg.paths.cache_dir) / "ollama.sqlite"),
-                          cfg.ollama.timeout_s)
+        raise SystemExit("set policy.model in configs/base.yaml or pass --model")
+    client = client_from_config(cfg)
     modes = a.modes.split(",")
     results, agreement = run_gate(cfg, client, modes, a.n_obs, a.workers, resolve(a.prompt), model)
     lines = [f"# Teacher gate — {model} ({a.prompt}, digest {client.digest(model)})", ""]
@@ -99,7 +101,7 @@ def main() -> None:
         lines.append(f"| {m} | {r['sign_acc']:.2f} | {r['mean_dp']:.3f} | {r['mi_g_founders']:.3f} | "
                      f"{r['mi_g_random']:.3f} | {r['mi_o_founders']:.3f} | {r['failures']} | {r['gate']['pass']} |")
     if agreement is not None:
-        lines.append(f"\nMode agreement (mean JSD points vs ksample, lower = closer): {agreement:.3f}")
+        lines.append(f"\nMode agreement (mean JSD {modes[0]} vs {modes[1]}, lower = closer): {agreement:.3f}")
     for m, r in results.items():
         lines += [""] + report_lines(r, f"Detail — {m}")[4:]
     out = resolve(cfg.paths.results_dir)

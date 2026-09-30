@@ -1,6 +1,6 @@
-# promptevo — Phase 0 spike (Laya + local Ollama)
+# promptevo — Phase 0 spike (LLM brain via Ollama)
 
-Headless Python test of "genes = text prompts, Laya decides, an LLM mutates".
+Headless Python test of "genes = text prompts, an LLM decides, an LLM mutates".
 - Plan: `../Docs/redesign/08-phase0-spike-plan.md`. Read ONLY B0, your session
   section, and the Part A sections that session lists under "Reads".
 - State: `STATUS.md` is the single source of truth between sessions.
@@ -32,5 +32,9 @@ Headless Python test of "genes = text prompts, Laya decides, an LLM mutates".
 - All randomness via `promptevo.rng` named substreams; no global `random`/`np.random`.
 - Every model call goes through the sqlite cache in `cache/`; never delete caches unasked.
 - Record model digests / checkpoint ids with every result.
-- Local only: Ollama at http://localhost:11434, Laya in-process. No cloud calls.
+- Decision backend = Ollama LLM (`--backend llm`, rev. 2026-09-30); Laya is parked.
+  Ollama runs locally (http://localhost:11434) or in the cloud (https://ollama.com with the
+  key in the env var `OLLAMA_API_KEY`). Never write keys to files, configs or logs.
+- LLM calls are the expensive resource: start runs short (`--ticks 500`), read llm_calls,
+  extrapolate before launching long runs.
 - Don't edit files outside `prototype/` (exception: `Docs/redesign/` in S7).
