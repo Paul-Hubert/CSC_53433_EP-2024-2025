@@ -4,7 +4,7 @@
 > `notes/archive.md`. Plan: `../Docs/redesign/08-phase0-spike-plan.md`.
 
 ## Position
-Session: S1 (offline parts pre-built in a cloud session) · Last updated: 2026-09-30
+Session: S1 (offline parts pre-built in a cloud session) · Last updated: 2026-09-30 (docs: 09-progress-log.md)
 
 ## Next action
 S1.3 — on the machine with Ollama (or with an Ollama Cloud key):
@@ -108,6 +108,8 @@ Offline dataset check (word mutants only): 3 000 rows; train 2 400 / val 300 / t
 contrast 50 %, regular 40 %, random-text 10 %; 0 leaks; every val/test row has ≥ 1 unseen gene.
 
 ## Open issues
+- Own git server mirror: waiting for the URL + auth from the owner (see
+  ../Docs/redesign/09-progress-log.md › Mirroring).
 - Founder pool v1 is a draft by Claude — needs owner review (H1).
 - LLM cost dominates E4: estimate 13–22 k LLM answers per 20 k-tick small run
   (4–6 h at ~1 s/answer). Decide run length / D / seeds after measuring s/decision (S1.3).
