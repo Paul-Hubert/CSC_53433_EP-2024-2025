@@ -1,8 +1,9 @@
 # Course Redesign — "Prompt-Genome" Evolutionary Agents
 
 Design notes for reworking the **Crowds & Evolution** lab (and the surrounding
-terrain / foliage labs) of this Master 2 course. Status: **idea capture &
-pre-design** — nothing here is implemented yet.
+terrain / foliage labs) of this Master 2 course. Status: **Phase 0 prototype
+in progress** — a headless Python prototype lives in [`prototype/`](../../prototype/);
+see [09](09-progress-log.md) for the current state.
 
 | # | Document | What it holds |
 |---|----------|---------------|
@@ -15,6 +16,7 @@ pre-design** — nothing here is implemented yet.
 | 06 | [World: terrain & foliage](06-world-terrain-foliage.md) | Terrain, water, mountains, food/foliage — **to be filled in by the course owner**. |
 | 07 | [Open questions & roadmap](07-open-questions-and-roadmap.md) | Decisions pending, and a de-risked build order. |
 | 08 | [Phase 0 spike plan](08-phase0-spike-plan.md) | Python test (LLM brain via Ollama, local or cloud; rev. 2026-09-30): spec, go/no-go gates, and a multi-session runbook with `/compact` points. Work lives in [`prototype/`](../../prototype/). |
+| 09 | [Progress log & handoff](09-progress-log.md) | Timeline, what exists, key numbers, pending owner decisions, next commands, mirroring to your own git server. |
 
 ## One-paragraph summary
 

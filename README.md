@@ -2,6 +2,12 @@
 
 [Github Repository](https://github.com/imaginadine/CSC_53433_EP-2025-2026)
 
+> **Course redesign in progress (2026–2027):** the Crowds & Evolution lab is being
+> reworked around evolving *text-prompt genomes* whose behaviour is decided by an LLM.
+> Design docs: [`Docs/redesign/`](Docs/redesign/README.md) · current state:
+> [`Docs/redesign/09-progress-log.md`](Docs/redesign/09-progress-log.md) · Python
+> prototype: [`prototype/`](prototype/README.md). The Unity instructions below are unchanged.
+
 ------
 
 - [Introduction](#Introduction)
