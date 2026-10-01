@@ -1,15 +1,18 @@
 # Starting values from plan §A4. Tuned in S2.6 — record changes in STATUS.md.
 seed: 1234
 world:
+  # Lab 1 (2026-10-01): a flat world. No water and no mountains, so every cell is
+  # walkable and food appears uniformly at random. The terrain and foliage labs change
+  # this; configs/worlds/terrain_preview.yaml shows the built-in noise terrain.
   width: 64
   height: 64
-  water_fraction: 0.15
-  mountain_fraction: 0.10
-  noise_octaves: [16, 8, 4]
+  water_fraction: 0.0          # share of cells that are water (impassable)
+  mountain_fraction: 0.0       # share of cells that are mountain (impassable)
+  noise_octaves: [16, 8, 4]    # heightmap noise, used only when a fraction above is > 0
   min_walkable_connected: 0.60
   food_initial_fraction: 0.08
-  food_regrow_p: 0.001        # tuned 2026-09-28 (rule_based, 5k ticks): food-limited pop
-  food_water_bonus: 2.0        # regrowth multiplier near water
+  food_regrow_p: 0.0007       # chance per empty cell per tick; tuned 2026-10-01 for the flat world (food-limited, below cap)
+  food_water_bonus: 2.0        # regrowth multiplier near water (no effect without water)
   water_bonus_radius: 3
 predators:
   count: 3

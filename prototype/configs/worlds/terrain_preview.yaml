@@ -1,0 +1,8 @@
+# Preview of the terrain and foliage labs, layered on top of base.yaml + a profile:
+#   python -m experiments.smoke_run --world terrain_preview
+# Noise heightmap: the lowest 15 % of cells become water and the highest 10 % mountains
+# (both impassable); food regrows twice as fast within 3 cells of water.
+world:
+  water_fraction: 0.15
+  mountain_fraction: 0.10
+  food_regrow_p: 0.001         # less walkable ground than the flat world (tuned 2026-09-28)

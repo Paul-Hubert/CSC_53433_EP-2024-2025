@@ -1,4 +1,5 @@
 """Smoke run: python -m experiments.smoke_run --profile small --ticks 5000 [--backend rule_based|llm]
+                                            [--world terrain_preview]
 
 With --backend llm the LLM decides (policy.model) and, if ollama.mutator_model is set,
 also rewrites genes. Start short (--ticks 500) and read "llm_calls" to extrapolate.
@@ -9,7 +10,7 @@ import argparse
 import json
 
 from promptevo.backends.factory import make_backend, make_rewriter
-from promptevo.config import load_config, resolve
+from promptevo.config import CONFIG_DIR, load_config, resolve
 from promptevo.render import ascii_map
 from promptevo.sim import Simulation
 
@@ -22,8 +23,10 @@ def main() -> None:
     ap.add_argument("--seed", type=int, default=None)
     ap.add_argument("--out", default="results/runs/smoke")
     ap.add_argument("--snapshots", type=int, default=3)
+    ap.add_argument("--world", default=None,
+                    help="world overlay from configs/worlds/ (default: the flat Lab 1 world)")
     a = ap.parse_args()
-    cfg = load_config(a.profile)
+    cfg = load_config(a.profile, extra_files=[CONFIG_DIR / "worlds" / f"{a.world}.yaml"] if a.world else None)
     backend = make_backend(a.backend or cfg.backend.name, cfg)
     rewriter, rw_model = make_rewriter(cfg)
     sim = Simulation(cfg, backend, seed=a.seed, out_dir=resolve(a.out),
