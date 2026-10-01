@@ -3,6 +3,11 @@ from __future__ import annotations
 
 from .world import MOUNTAIN, WATER
 
+ACTION_CHAR = {"eat": "E", "flee": "F", "follow": "L", "wander": "W",
+               "rest": "R", "mate": "M", "attack": "A"}
+LEGEND = ("animals by current action: E eat, F flee, L follow, W wander, R rest, M mate, "
+          "A attack | P predator | . food | ~ water | ^ mountain")
+
 
 def ascii_map(world, agents=(), max_w: int = 48, max_h: int = 24) -> str:
     sy = max(1, -(-world.h // max_h))
@@ -23,7 +28,7 @@ def ascii_map(world, agents=(), max_w: int = 48, max_h: int = 24) -> str:
             row.append(ch)
         grid.append(row)
     for a in agents:
-        grid[a.y // sy][a.x // sx] = (a.action or "?")[0].upper()
+        grid[a.y // sy][a.x // sx] = ACTION_CHAR.get(a.action, "?")
     for p in world.predators:
-        grid[p.y // sy][p.x // sx] = "W"
+        grid[p.y // sy][p.x // sx] = "P"
     return "\n".join("".join(r) for r in grid)

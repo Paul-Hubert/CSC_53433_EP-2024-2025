@@ -3,6 +3,7 @@ import pytest
 
 from promptevo.backends.rule_based import RuleBasedBackend
 from promptevo.config import CONFIG_DIR, load_config
+from promptevo.render import ascii_map
 from promptevo.rng import Streams
 from promptevo.sim import Simulation
 from promptevo.world import GRASS, World
@@ -39,3 +40,12 @@ def test_nobody_enters_blocked_cells(terrain_cfg):
             assert sim.world.terrain[a.y, a.x] == GRASS
         for p in sim.world.predators:
             assert sim.world.terrain[p.y, p.x] == GRASS
+
+
+def test_ascii_map_symbols_are_unambiguous(cfg):
+    sim = Simulation(cfg, RuleBasedBackend(), seed=2)
+    sim.step()
+    p = sim.world.predators[0]
+    sim.agents = [a for a in sim.agents if (a.y, a.x) != (p.y, p.x)]
+    grid = ascii_map(sim.world, sim.agents, max_w=sim.world.w, max_h=sim.world.h).splitlines()
+    assert grid[p.y][p.x] == "P"

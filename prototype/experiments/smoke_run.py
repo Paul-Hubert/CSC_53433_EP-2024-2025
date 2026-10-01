@@ -11,7 +11,7 @@ import json
 
 from promptevo.backends.factory import make_backend, make_rewriter
 from promptevo.config import CONFIG_DIR, load_config, resolve
-from promptevo.render import ascii_map
+from promptevo.render import LEGEND, ascii_map
 from promptevo.sim import Simulation
 
 
@@ -32,6 +32,8 @@ def main() -> None:
     sim = Simulation(cfg, backend, seed=a.seed, out_dir=resolve(a.out),
                      rewriter=rewriter, rewriter_model=rw_model)
     every = max(1, a.ticks // max(1, a.snapshots))
+    if a.snapshots:
+        print(LEGEND)
     for i in range(a.ticks):
         sim.step()
         if a.snapshots and sim.t % every == 0:
