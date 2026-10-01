@@ -6,7 +6,7 @@ from .world import MOUNTAIN, WATER
 ACTION_CHAR = {"eat": "E", "flee": "F", "follow": "L", "wander": "W",
                "rest": "R", "mate": "M", "attack": "A"}
 LEGEND = ("animals by current action: E eat, F flee, L follow, W wander, R rest, M mate, "
-          "A attack | P predator | . food | ~ water | ^ mountain")
+          "A attack, ? not decided yet | P predator | . food | ~ water | ^ mountain")
 
 
 def ascii_map(world, agents=(), max_w: int = 48, max_h: int = 24) -> str:
