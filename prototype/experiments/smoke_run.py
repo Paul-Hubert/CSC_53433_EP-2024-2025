@@ -2,7 +2,8 @@
                                             [--world terrain_preview]
 
 With --backend llm the LLM decides (policy.model) and, if ollama.mutator_model is set,
-also rewrites genes. Start short (--ticks 500) and read "llm_calls" to extrapolate.
+also rewrites genes. Other brains use the word operators only, so they need no model.
+Start short (--ticks 500) and read "llm_calls" to extrapolate.
 """
 from __future__ import annotations
 
@@ -27,8 +28,9 @@ def main() -> None:
                     help="world overlay from configs/worlds/ (default: the flat Lab 1 world)")
     a = ap.parse_args()
     cfg = load_config(a.profile, extra_files=[CONFIG_DIR / "worlds" / f"{a.world}.yaml"] if a.world else None)
-    backend = make_backend(a.backend or cfg.backend.name, cfg)
-    rewriter, rw_model = make_rewriter(cfg)
+    name = a.backend or cfg.backend.name
+    backend = make_backend(name, cfg)
+    rewriter, rw_model = make_rewriter(cfg) if name in ("llm", "teacher", "ollama_policy") else (None, None)
     sim = Simulation(cfg, backend, seed=a.seed, out_dir=resolve(a.out),
                      rewriter=rewriter, rewriter_model=rw_model)
     every = max(1, a.ticks // max(1, a.snapshots))
