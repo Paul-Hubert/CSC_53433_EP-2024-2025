@@ -60,7 +60,7 @@ backend:
   name: rule_based            # random | rule_based | llm | laya (parked)
   obs_style: V1
 policy:                       # LLM decision backend (default brain, rev. 2026-09-30)
-  model: gemma4:26b           # chosen 2026-10-01 (S1.3, local RTX 5080); or a cloud model tag
+  model: gemma4:12b           # chosen 2026-10-01 (gate 12b vs 26b, local RTX 5080); or a cloud model tag
   mode: points                # points (default) | logprobs (1 token/decision, if Ollama returns
                               # logprobs — probe S1.3) | table (fewer requests but ~4-6x more
                               # generated answers via prefetch; only for request-limited cloud) | ksample
