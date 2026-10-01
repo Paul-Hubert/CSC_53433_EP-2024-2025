@@ -96,6 +96,13 @@ overflow behaviour, batch API, determinism, latency)
 Both read directed genes well, but irrelevant/shuffled text moves behaviour as much as founder
 genes (gate wants founders ≥ 2× random). Control texts contain world words (mountains, river,
 bread...). Owner decision needed before prompt iteration (≤ 3 tries) or gate change.
+Point totals (60 gate decisions, 12b, 2026-10-01): 73 % exactly 100, the rest 56-98 (never above).
+Harmless (points_to_probs divides by the total), EXCEPT all-zero answers: 3/17 random-text answers
+were all zeros (none for founder/contrast/neutral genomes) and normalise(eps) turns them into a
+uniform 1/7 distribution → likely inflates MI_G random (G2). Candidate fix (needs owner OK): treat
+all-zero as "no effect" → use the neutral genome's answer for that situation. Speed with a free
+GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were never cached
+(empty-KVCache bug, fixed ed485c5).
 
 ## Decisions
 | Date | Decision | Why |
