@@ -32,7 +32,7 @@ class OllamaClient:
         self.base_options = dict(options or {})
         self.base_extra = {} if think is None else {"think": think}
         self.api_key = api_key
-        self.cache = cache or KVCache()
+        self.cache = cache if cache is not None else KVCache()   # an empty KVCache is falsy (__len__)
         self.timeout, self.retries = timeout, retries
         self._transport = transport or self._http
         self._digests: dict[str, str] = {}

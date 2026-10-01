@@ -111,7 +111,7 @@ class LayaBackend:
         if placement not in PLACEMENTS:
             raise ValueError(placement)
         self.client, self.placement, self.style = client, placement, style
-        self.cache = cache or KVCache()
+        self.cache = cache if cache is not None else KVCache()   # an empty KVCache is falsy (__len__)
         self.client_id = client_id or getattr(client, "id", "laya")
         self.approx = 0
         self.calls = 0

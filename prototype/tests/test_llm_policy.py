@@ -171,3 +171,13 @@ def test_logprobs_mode_and_fallback(reg_pools):
                           resolve("prompts/teacher_v1.md"), mode="logprobs")
     p2 = b2.decide(q)[0]
     assert b2.logprob_fallbacks == 1 and abs(p2.sum() - 1) < 1e-9
+
+
+def test_empty_persistent_cache_is_used(tmp_path):
+    """An empty KVCache has len 0: the client must still write to it, not to memory."""
+    cache = KVCache(tmp_path / "o.sqlite")
+    client = OllamaClient(cache=cache, transport=lambda method, path, payload: (
+        {"models": []} if path == "/api/tags" else {"message": {"content": "hi"}}))
+    assert client.cache is cache
+    client.chat("brain", [{"role": "user", "content": "x"}])
+    assert len(KVCache(tmp_path / "o.sqlite")) == 1
