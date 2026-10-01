@@ -1,0 +1,74 @@
+{
+ "model": "gemma4:26b",
+ "prompt": "prompts/teacher_v1.md",
+ "results": {
+  "points": {
+   "n_genomes": 35,
+   "n_obs": 12,
+   "calls": 420,
+   "mi_g_founders": 0.2444886506664308,
+   "mi_g_random": 0.31424753377205755,
+   "mi_o_founders": 0.7352019717264419,
+   "directed": {
+    "eat": {
+     "mean_dp": 0.6495453182772057,
+     "sign_acc": 0.875,
+     "n": 8
+    },
+    "flee": {
+     "mean_dp": 0.9326804570134236,
+     "sign_acc": 1.0,
+     "n": 6
+    },
+    "follow": {
+     "mean_dp": 0.5646047766563405,
+     "sign_acc": 1.0,
+     "n": 10
+    },
+    "wander": {
+     "mean_dp": 0.3830651877019419,
+     "sign_acc": 1.0,
+     "n": 12
+    },
+    "rest": {
+     "mean_dp": 0.5537790213517204,
+     "sign_acc": 1.0,
+     "n": 12
+    },
+    "mate": {
+     "mean_dp": 0.5646047766563406,
+     "sign_acc": 1.0,
+     "n": 10
+    },
+    "attack": {
+     "mean_dp": 0.6845155948457617,
+     "sign_acc": 1.0,
+     "n": 10
+    }
+   },
+   "sign_acc": 0.9852941176470589,
+   "mean_dp": 0.6189707332146763,
+   "locality": {
+    "median_edit": NaN,
+    "median_unrelated": NaN,
+    "ratio": NaN
+   },
+   "rho_text_behaviour": NaN,
+   "gibberish_to_neutral": 0.20431470575446625,
+   "founder_to_neutral": 0.13345333520047573,
+   "approx_probs": 0,
+   "gates": {
+    "G1": true,
+    "G2": false,
+    "G3": false
+   },
+   "failures": 0,
+   "gate": {
+    "directed": true,
+    "mi_margin": false,
+    "pass": false
+   }
+  }
+ },
+ "agreement": null
+}

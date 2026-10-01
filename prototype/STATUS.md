@@ -81,10 +81,21 @@ overflow behaviour, batch API, determinism, latency)
 - Speed warm: 26 gen tok/s, 210 prompt tok/s, ~290 prompt tokens; points ≈ 2.9 s/decision (3.5 s in gate).
 - logprobs: returned (top_logprobs), but first token is "f" (flee/follow ambiguous) → parser returns None;
   and top-1 vs top-2 gap ≈ 18 nats → effectively argmax anyway. Use points mode.
+- gemma4:12b (digest 6114515d63c1, 8 GB, 100 % GPU): 90 gen tok/s, 0.9 s compute/decision (26b: 2.8 s).
+  Wall time per call varied 1.6-34 s (load_duration) while ML-Agents training + 3 Unity editors shared the GPU.
 - Mutator (same model) samples sensible: "Avoid food whenever it is near." No embed model pulled.
 
 ## FT facts
 (S5.1)
+
+## Gate results 2026-10-01 (points, --n-obs 12, 420 calls each; results/teacher_gate_gemma4-*.md)
+| model | sign acc | ΔP | MI_G founders | MI_G random | gib→neutral / founder→neutral | G1 | G2 |
+|---|---|---|---|---|---|---|---|
+| gemma4:12b | 0.96 | 0.75 | 0.250 | 0.297 | 0.16 / 0.23 | ✔ | ✘ |
+| gemma4:26b | 0.99 | 0.62 | 0.244 | 0.314 | 0.20 / 0.13 | ✔ | ✘ |
+Both read directed genes well, but irrelevant/shuffled text moves behaviour as much as founder
+genes (gate wants founders ≥ 2× random). Control texts contain world words (mountains, river,
+bread...). Owner decision needed before prompt iteration (≤ 3 tries) or gate change.
 
 ## Decisions
 | Date | Decision | Why |
