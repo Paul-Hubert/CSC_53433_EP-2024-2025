@@ -30,8 +30,12 @@ def main() -> None:
     ap.add_argument("--teacher", required=True)
     ap.add_argument("--mutator", default=None)
     ap.add_argument("--embed", default=None)
+    ap.add_argument("--num-ctx", type=int, default=4096, help="0 = server default")
+    ap.add_argument("--think", choices=["off", "on", "default"], default="off")
     a = ap.parse_args()
-    c = OllamaClient(a.host, api_key=os.environ.get("OLLAMA_API_KEY"))
+    c = OllamaClient(a.host, api_key=os.environ.get("OLLAMA_API_KEY"), timeout=600,
+                     options={"num_ctx": a.num_ctx} if a.num_ctx else None,
+                     think={"off": False, "on": True, "default": None}[a.think])
     out, facts = [], {}
 
     def section(title, fn):

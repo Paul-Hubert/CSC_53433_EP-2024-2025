@@ -60,7 +60,7 @@ backend:
   name: rule_based            # random | rule_based | llm | laya (parked)
   obs_style: V1
 policy:                       # LLM decision backend (default brain, rev. 2026-09-30)
-  model: null                 # local tag (e.g. an 8B instruct) or a cloud model tag — set in S1.3
+  model: gemma4:26b           # chosen 2026-10-01 (S1.3, local RTX 5080); or a cloud model tag
   mode: points                # points (default) | logprobs (1 token/decision, if Ollama returns
                               # logprobs — probe S1.3) | table (fewer requests but ~4-6x more
                               # generated answers via prefetch; only for request-limited cloud) | ksample
@@ -78,11 +78,13 @@ ollama:
   host: http://localhost:11434   # or https://ollama.com (direct cloud API, needs a key)
   api_key_env: OLLAMA_API_KEY    # name of the env var holding the key; sent only if set
   teacher_model: null         # chosen in S1.3
-  mutator_model: null
+  mutator_model: gemma4:26b
   embed_model: null
   teacher_mode: points        # points | ksample
   ksample_k: 8
   timeout_s: 120
+  options: {num_ctx: 4096}    # fixed context: avoids model reloads and CPU spill (gemma4 default 256k)
+  think: false                # thinking models (gemma4, qwen3...) otherwise reason before the JSON; null = server default
 paths:
   cache_dir: cache
   data_dir: data

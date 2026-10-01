@@ -25,8 +25,12 @@ Transport = Callable[[str, str, dict | None], dict]
 class OllamaClient:
     def __init__(self, host: str = "http://localhost:11434", cache: KVCache | None = None,
                  timeout: float = 120, transport: Transport | None = None, retries: int = 3,
-                 api_key: str | None = None):
+                 api_key: str | None = None, options: dict | None = None, think: bool | None = None):
         self.host = host.rstrip("/")
+        # Sent with every chat call: a fixed num_ctx stops Ollama reloading the model
+        # (and a 256k default context spilling to CPU); think=False for thinking models.
+        self.base_options = dict(options or {})
+        self.base_extra = {} if think is None else {"think": think}
         self.api_key = api_key
         self.cache = cache or KVCache()
         self.timeout, self.retries = timeout, retries
@@ -78,7 +82,8 @@ class OllamaClient:
     def chat(self, model: str, messages: list[dict], schema: dict | None = None,
              options: dict | None = None, keep_alive: str | int | None = None,
              use_cache: bool = True, extra: dict | None = None) -> str:
-        options = options or {}
+        options = {**self.base_options, **(options or {})}
+        extra = {**self.base_extra, **(extra or {})} or None
         key = make_key("chat", model, self.digest(model), messages, schema, options, extra)
         if use_cache:
             hit = self.cache.get(key)
@@ -104,10 +109,11 @@ class OllamaClient:
     def chat_raw(self, model: str, messages: list[dict], options: dict | None = None,
                  extra: dict | None = None, keep_alive: str | int | None = None) -> dict:
         """Uncached call returning the whole response (e.g. to read logprobs)."""
-        payload = {"model": model, "messages": messages, "stream": False, "options": options or {}}
+        payload = {"model": model, "messages": messages, "stream": False,
+                   "options": {**self.base_options, **(options or {})}}
         if keep_alive is not None:
             payload["keep_alive"] = keep_alive
-        payload.update(extra or {})
+        payload.update({**self.base_extra, **(extra or {})})
         return self._call("POST", "/api/chat", payload)
 
     def chat_json(self, model: str, messages: list[dict], schema: dict, **kw) -> dict:
@@ -131,7 +137,8 @@ def client_from_config(cfg, transport: Transport | None = None) -> OllamaClient:
     env = oc.get("api_key_env")
     key = os.environ.get(env) if env else None
     return OllamaClient(oc.host, KVCache(resolve(cfg.paths.cache_dir) / "ollama.sqlite"),
-                        oc.timeout_s, transport=transport, api_key=key or None)
+                        oc.timeout_s, transport=transport, api_key=key or None,
+                        options=dict(oc.get("options") or {}), think=oc.get("think"))
 
 
 def make_rewriter(client: OllamaClient, model: str, prompt_path: str | Path, max_words: int = 12,

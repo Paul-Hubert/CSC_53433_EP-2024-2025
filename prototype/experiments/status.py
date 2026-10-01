@@ -10,6 +10,16 @@ from promptevo.config import resolve
 
 
 def _alive(pid: int) -> bool:
+    if os.name == "nt":          # os.kill(pid, 0) would TerminateProcess on Windows
+        import ctypes
+        k32 = ctypes.windll.kernel32
+        h = k32.OpenProcess(0x1000, False, pid)      # PROCESS_QUERY_LIMITED_INFORMATION
+        if not h:
+            return False
+        code = ctypes.c_ulong()
+        ok = k32.GetExitCodeProcess(h, ctypes.byref(code))
+        k32.CloseHandle(h)
+        return bool(ok) and code.value == 259          # STILL_ACTIVE
     try:
         os.kill(pid, 0)
         return True

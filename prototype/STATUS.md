@@ -65,15 +65,23 @@ Not started: finetune_laya, e3_eval, run_matrix, common_garden, analyze, report.
 - [ ] S7 report, go/no-go · H5 decision
 
 ## Environment
-(S1: OS, Python, CPU, GPU + VRAM, laya version, torch version, Ollama version)
+Windows 11 Pro, Python 3.13.5 (.venv), RTX 5080 16 GB, Ollama 0.32.0. Offline suite 38 passed on Windows.
+Windows: experiments.status used os.kill(pid, 0) = TerminateProcess on Windows → fixed (OpenProcess).
 
 ## API facts — Laya
 (S1.2: return schema, per-option probabilities?, criteria effect, head_max_len,
 overflow behaviour, batch API, determinism, latency)
 
 ## API facts — Ollama
-(S1.3: models + digests, JSON-schema output, seed determinism, logprobs,
-tokens/s, embedding model)
+(2026-10-01, results/e0_ollama.md) gemma4:26b digest 001e5dafc3c7 (25.2B MoE, Q4_K_M, 18 GB, thinking model).
+- MUST send `think: false` and a fixed `num_ctx` (ollama.options/think in base.yaml): default ctx 256k
+  spills 32 % to CPU and any change of num_ctx between requests reloads the model (60-100 s each).
+  With num_ctx 4096 it runs 100 % GPU.
+- JSON-schema output OK; seed + temperature 0 → identical 3/3.
+- Speed warm: 26 gen tok/s, 210 prompt tok/s, ~290 prompt tokens; points ≈ 2.9 s/decision (3.5 s in gate).
+- logprobs: returned (top_logprobs), but first token is "f" (flee/follow ambiguous) → parser returns None;
+  and top-1 vs top-2 gap ≈ 18 nats → effectively argmax anyway. Use points mode.
+- Mutator (same model) samples sensible: "Avoid food whenever it is near." No embed model pulled.
 
 ## FT facts
 (S5.1)
