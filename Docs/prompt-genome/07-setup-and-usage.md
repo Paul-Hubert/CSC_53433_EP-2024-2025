@@ -1,0 +1,193 @@
+# 07 — Setup, usage and troubleshooting
+
+How to install the prototype, run it with each brain, check a new model, read
+the outputs and fix the usual problems. Commands run from `prototype/` unless
+stated otherwise.
+
+## Contents
+
+1. [Requirements](#1-requirements)
+2. [Install](#2-install)
+3. [Run without a model](#3-run-without-a-model)
+4. [Check a new model](#4-check-a-new-model)
+5. [Run with the LLM brain](#5-run-with-the-llm-brain)
+6. [Read the outputs](#6-read-the-outputs)
+7. [Long jobs](#7-long-jobs)
+8. [Troubleshooting](#8-troubleshooting)
+
+---
+
+## 1. Requirements
+
+| For | You need |
+|---|---|
+| The simulation, the random and rule-based brains, all offline tests | Python ≥ 3.10 (tested with 3.13 on Windows 11), `numpy`, `pyyaml`, `pytest` |
+| The LLM brain | [Ollama](https://ollama.com) (tested with 0.32.0) and a model; a GPU is strongly recommended |
+| Measured setup | RTX 5080 16 GB, 62 GB RAM, Windows 11, gemma4:12b (8 GB download), fully on the GPU |
+
+Without a GPU, use the rule-based brain, a shared lab server, or Ollama
+Cloud ([05](05-decision-backends.md#ollama-settings-that-matter)).
+
+## 2. Install
+
+macOS / Linux:
+
+```bash
+cd prototype
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+pytest -q                      # 41 passed, no model needed
+```
+
+Windows (PowerShell):
+
+```powershell
+cd prototype
+python -m venv .venv
+.venv\Scripts\activate
+pip install -e ".[dev]"
+pytest -q
+```
+
+In Git Bash on Windows, activate with `source .venv/Scripts/activate`, or call
+`.venv/Scripts/python` directly.
+
+## 3. Run without a model
+
+```bash
+python -m experiments.smoke_run                          # Lab 1 world, rule-based brain, 5 000 ticks, ≈ 12 s
+python -m experiments.smoke_run --backend random         # null model: watch the population collapse
+python -m experiments.smoke_run --seed 7 --ticks 2000    # another seed, shorter
+python -m experiments.smoke_run --profile full           # 64 × 64 world, 30 animals, cap 60
+python -m experiments.smoke_run --world terrain_preview  # preview of the terrain labs (water, mountains)
+python -m experiments.e1_sensitivity --backend rule_based   # gene-sensitivity suite, reference numbers
+```
+
+`smoke_run` prints a legend, a few ASCII snapshots, a one-line summary and the
+share of each action:
+
+```text
+animals by current action: E eat, F flee, L follow, W wander, R rest, M mate, A attack, ? not decided yet | P predator | . food | ~ water | ^ mountain
+--- t=1666 pop=24
+     RL.       R  F  E F
+      ..  E     .     P
+          LR  L
+...
+{"ticks": 5000, "pop_final": 33, "births": 416, "immigrants": 0, "deaths": {"predator": 226, "starvation": 181}, "mean_lifespan": 301.2, "max_gen": 22, ...}
+actions: {'eat': 0.417, 'wander': 0.139, 'rest': 0.136, 'flee': 0.128, 'follow': 0.085, 'mate': 0.079, 'attack': 0.016}
+```
+
+The map is downsampled to fit the terminal, so one character can cover
+several cells.
+
+## 4. Check a new model
+
+Run these before trusting any model as a brain:
+
+```bash
+ollama pull gemma4:12b
+python -m experiments.e0_probe_ollama --teacher gemma4:12b --mutator gemma4:12b   # ≈ 1–3 min
+pytest -m ollama                                                                  # two real decisions (a flee contrast pair)
+python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b   # 420 decisions, ≈ 5–15 min
+```
+
+- **The probe** (`results/e0_ollama.md`) checks structured output,
+  determinism and logprobs, then measures seconds per decision and prints
+  three mutator samples. It overwrites the file, so rename it to keep one per
+  model.
+- **The gate** answers "does this model read the genes?" (G1, G2;
+  [06 §4](06-experiments-and-results.md#4-gates-g1g5)). It writes
+  `results/teacher_gate.md`.
+- After the gate, check `ollama ps`: the model should show **100% GPU** and
+  the context **4096**.
+
+Then set `policy.model` (and `ollama.mutator_model`) in `configs/base.yaml`.
+
+## 5. Run with the LLM brain
+
+1. Install Ollama and pull the model (`ollama pull gemma4:12b`). The server
+   runs at `http://localhost:11434`.
+2. Check `configs/base.yaml`: `policy.model: gemma4:12b`,
+   `ollama.options: {num_ctx: 4096}`, `ollama.think: false`.
+3. Start short:
+
+```bash
+python -m experiments.smoke_run --backend llm --ticks 500 --snapshots 1
+```
+
+The last lines report the cost:
+
+```text
+llm_calls=761 failures=0 backend_queries=761 (memo hit rate 0.558)
+```
+
+On the measured setup this took 425 s. Extrapolate before launching anything
+longer: 5 000 ticks ≈ 1 hour. Answers are cached in `cache/`, so repeating a
+run with the same genomes costs almost nothing.
+
+**Cloud instead of a local GPU:**
+
+```bash
+export OLLAMA_API_KEY=...            # PowerShell: $env:OLLAMA_API_KEY = "..."
+# configs/base.yaml: ollama.host: https://ollama.com, policy.model: <a cloud model tag>
+```
+
+Never write the key into a file. Alternatively, run `ollama signin` and use a
+cloud model tag through the local server.
+
+## 6. Read the outputs
+
+A run writes to `results/runs/<name>/` ([03 §12](03-world-and-simulation.md#12-what-a-run-writes-to-disk)).
+
+```bash
+python -m experiments.peek results/runs/smoke/stats.csv -n 10
+python -m experiments.peek results/runs/smoke/events.jsonl -n 5
+python -m experiments.peek results/runs/smoke/alleles.jsonl -n 5
+```
+
+Load them in Python for analysis:
+
+```python
+import json, csv
+stats = list(csv.DictReader(open("results/runs/smoke/stats.csv")))
+events = [json.loads(l) for l in open("results/runs/smoke/events.jsonl")]
+alleles = {a["id"]: a for a in map(json.loads, open("results/runs/smoke/alleles.jsonl"))}
+births = [e for e in events if e["kind"] == "birth"]
+mutations = [m for b in births for m in b["mutations"]]
+print(len(births), "births,", len(mutations), "mutations")
+print(alleles[mutations[0]["child"]] if mutations else "no mutation yet")
+```
+
+## 7. Long jobs
+
+Jobs longer than a few minutes should run in the background with a log file:
+
+```bash
+nohup python -m experiments.e1_sensitivity --backend llm --tag llm_points > logs/e1_llm.log 2>&1 &
+python -m experiments.status          # one line per job: running / done / DEAD?, progress, ETA
+```
+
+On Windows PowerShell, use `Start-Process` with `-RedirectStandardOutput`, or
+run from Git Bash. `e1_sensitivity` and `teacher_gate` write
+`logs/<job>.progress.json`. `smoke_run` prints only at its snapshots, so watch
+the cache grow instead:
+
+```bash
+python -c "import sqlite3; print(sqlite3.connect('cache/policy.sqlite').execute('select count(*) from kv').fetchone()[0])"
+```
+
+## 8. Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| Every LLM call takes 30–100 s | Ollama reloads the model on each call, because requests use different context sizes or another model is competing for memory | Keep `ollama.options.num_ctx` fixed (it is sent with every call); check `ollama ps`; stop other models with `ollama stop <model>` |
+| `ollama ps` shows e.g. `32%/68% CPU/GPU` | the model, or its context, doesn't fit in GPU memory | use a smaller model, or keep `num_ctx` at 4096 |
+| Call times vary between about 1.5 s and 35 s | the GPU is shared with other work (training jobs, games, a Unity editor) | stop the other GPU work, or accept slower runs (results don't change, the simulation waits) |
+| Answers come slowly and the model "thinks" | a thinking model with reasoning on | `ollama.think: false` |
+| A long run disappears; the system is low on memory | other applications use most of the RAM | close them, or use a smaller model |
+| Rule-based runs try to reach Ollama | fixed on 2026-10-01: `smoke_run` now uses LLM mutation only with `--backend llm` | update the code |
+| A rerun asks the LLM again for everything | the cache key includes the model digest and the prompt's hash, so a new `ollama pull` or an edited prompt starts fresh. Before 2026-10-01 a bug kept the request cache (`cache/ollama.sqlite`) empty. | expected after a model or prompt change |
+| `experiments.status` shows `DEAD?` for a running job | old liveness check on Windows: `os.kill(pid, 0)` sends Ctrl+C there (signal 0) instead of probing (fixed 2026-10-01) | update the code |
+| The gate's output got overwritten | `teacher_gate` always writes `results/teacher_gate.md` | copy it per model after each run |
+| `RuntimeError: Ollama /api/chat failed after 3 tries` | server not running, wrong host, or model not pulled | `ollama list`, `ollama serve`, check `ollama.host` |

@@ -23,6 +23,8 @@
 
 2. **Terrain matters.** Integrated with the terrain system; some areas are
    inaccessible (water, mountains).
+   *(Update 2026-10-01: the evolution lab is Lab 1 and starts on a flat world with
+   food at random; terrain and foliage arrive with the labs that follow.)*
 
 3. **Genes are prompts.**
    Instead of the genome being neural-network weights mutated numerically, each

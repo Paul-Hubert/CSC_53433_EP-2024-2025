@@ -4,16 +4,17 @@
 > `notes/archive.md`. Plan: `../Docs/redesign/08-phase0-spike-plan.md`.
 
 ## Position
-Session: S1 (offline parts pre-built in a cloud session) · Last updated: 2026-09-30 (docs: 09-progress-log.md)
+Session: S1.3 done locally, S4.3 gate run · Last updated: 2026-10-01 (Lab 1 flat world; docs in
+../Docs/prompt-genome/)
 
 ## Next action
-S1.3 — on the machine with Ollama (or with an Ollama Cloud key):
-`pip install -e ".[dev]" && pytest -q`, then
-`python -m experiments.e0_probe_ollama --teacher <brain-model> --mutator <small-model>`.
-Read results/e0_ollama.md: pick policy.model + ollama.mutator_model, and policy.mode
-(`logprobs` if "logprobs_mode_usable": true, else `points`). Fill "API facts — Ollama",
-commit. Then `pytest -m ollama`, the decision-model gate (teacher_gate) and E1 with
-`--backend llm` (plan revision box). S1.2 (Laya probe) is optional now.
+WAIT for owner decisions (../Docs/prompt-genome/09-status-and-roadmap.md §4): G2 handling
+(all-zero answers → neutral answer? cleaner control sentences? prompt iteration 1/3?), mutator
+model (26b vs 12b), founder pool H1. Then rerun
+`python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b` (cached, cheap),
+then E1 on the LLM brain in the background:
+`nohup python -m experiments.e1_sensitivity --backend llm --tag llm_points > logs/e1_llm.log 2>&1 &`
+(≈ 5 500 decisions, ≈ 50 min). Then several-seed LLM runs on the Lab 1 world (S6 prep).
 
 ## Revision 2026-09-30 — LLM brain, Laya parked
 Owner decision: no Laya fine-tuning for now. Decisions AND gene mutation by Ollama LLMs
@@ -33,40 +34,19 @@ at the top of plan 08. Implemented (offline-tested with fake Ollama, 38 tests):
 Parked (kept, not deleted): laya_backend.py, e0_probe_laya.py, e0_budget.py,
 make_dataset.py, label_teacher.py, S5 distillation.
 
-## Pre-built without models (2026-09-28, cloud session) — verify locally
-Done and tested offline (28 tests green, `pytest -q`):
-- S1.1 scaffold: config/profiles, rng streams, sqlite cache, progress, status, peek.
-- S1.4 allele files: founder_pool_v1 (DRAFT → owner review H1), contrast, control.
-- S2 complete: world, perception, obs text V1/V2, 7 executors, random + rule_based
-  backends, lockstep sim with decision memo, sexual/asexual, floor/cap, event log,
-  determinism test, smoke run. Provisional tuning (see Decisions).
-- S3 parts: metrics.py (all §A9), make_obs.py (data/observations_v1.jsonl, small),
-  e1_sensitivity.py (any backend). Reference run: results/e1_rule_based.md.
-- S4 parts: mutation.py (word ops + LLM rewrite + guards), ollama_client.py (stdlib,
-  cached), ollama_policy.py teacher (points / ksample, strict mode), prompts/teacher_v1.md,
-  mutate_v1.md, novel_v1.md.
-- S4 scripts (tested with a fake Ollama): teacher_gate.py (S4.3), make_mutants.py (S4.4;
-  word ops only without --mutator), make_dataset.py (S4.5; allele-split, contrast groups,
-  leak-checked), label_teacher.py (S4.6; resumable, --limit, --check, --workers).
-  e1_sensitivity.py refactored into build_sets/evaluate/report_lines (shared by the gate).
-Written but UNVERIFIED (need real models):
-- backends/laya_backend.py — answer schema guessed from the model card (`extract_probs`).
-- experiments/e0_probe_laya.py, e0_probe_ollama.py, e0_budget.py (needs `transformers`).
-- tests/test_local_models.py (`pytest -m laya`, `pytest -m ollama`).
-Not started: finetune_laya, e3_eval, run_matrix, common_garden, analyze, report.
-
 ## Progress
-- [~] S1 scaffold ✔, probes ☐, founder pool drafted ✔ · H1 founder pool approved ☐
-- [x] S2 world, sim, rule-based backend (provisional tuning; re-check on small+full)
-- [~] S3 metrics ✔, obs set ✔, E1 script ✔ (`--backend llm`) · E1 on LLM ☐ · E2 (s/decision) ☐ · H2 ☐
-- [~] S4 all scripts ✔ (offline-tested) · run gate ☐, LLM mutants ☐, dataset ☐, labels ☐ · H3 ☐
+- [~] S1 scaffold ✔, Ollama probe ✔ (gemma4 26b, 12b), founder pool drafted ✔ · H1 founder pool approved ☐
+- [x] S2 world, sim, rule-based backend · Lab 1 flat world tuned on small + full (2026-10-01)
+- [~] S3 metrics ✔, obs set ✔, E1 script ✔ (`--backend llm`) · E1 on LLM ☐ · E2 (s/decision) ~ (≈ 0.5 s/call, 4 decisions/s in a run) · H2 ☐
+- [~] S4 all scripts ✔ (offline-tested) · gate run ✔ (G1 ✔, G2 ✘) · LLM mutants / dataset / labels: parked · H3 ☐
 - [—] S5 distillation: PARKED (rev. 2026-09-30); G1–G3 measured on the LLM brain instead
 - [ ] S6 evolution matrix · H4 preregistration approved
 - [ ] S7 report, go/no-go · H5 decision
 
 ## Environment
 Windows 11 Pro, Python 3.13.5 (.venv), RTX 5080 16 GB, Ollama 0.32.0. Offline suite 38 passed on Windows.
-Windows: experiments.status used os.kill(pid, 0) = TerminateProcess on Windows → fixed (OpenProcess).
+Windows: experiments.status used os.kill(pid, 0); signal 0 is CTRL_C_EVENT on Windows, so live jobs
+showed as DEAD? → fixed (OpenProcess + GetExitCodeProcess).
 
 ## API facts — Laya
 (S1.2: return schema, per-option probabilities?, criteria effect, head_max_len,
@@ -96,7 +76,7 @@ overflow behaviour, batch API, determinism, latency)
 Both read directed genes well, but irrelevant/shuffled text moves behaviour as much as founder
 genes (gate wants founders ≥ 2× random). Control texts contain world words (mountains, river,
 bread...). Owner decision needed before prompt iteration (≤ 3 tries) or gate change.
-Point totals (60 gate decisions, 12b, 2026-10-01): 73 % exactly 100, the rest 56-98 (never above).
+Point totals (60 gate decisions, 12b, 2026-10-01): 44 (73 %) exactly 100, 13 at 56-98, 3 at 0; none above.
 Harmless (points_to_probs divides by the total), EXCEPT all-zero answers: 3/17 random-text answers
 were all zeros (none for founder/contrast/neutral genomes) and normalise(eps) turns them into a
 uniform 1/7 distribution → likely inflates MI_G random (G2). Candidate fix (needs owner OK): treat
@@ -113,7 +93,12 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
 | 2026-10-01 | **Lab 1 world = flat**: water/mountain fractions 0, food uniformly random, food_regrow_p 0.0007; old noise terrain kept as configs/worlds/terrain_preview.yaml (food 0.001), `smoke_run --world terrain_preview` | Owner: the evolution lab becomes Lab 1; the terrain and foliage labs come later and change the world. Flat at 0.001 sat at the cap 25-68 % of the time. At 0.0007 (rule_based, 5k ticks, 3 seeds): small mean pop 25-28 (cap 40, never reached), deaths predator ≈ 230 / starvation ≈ 185, lifespan ≈ 290, 22-25 generations; full mean pop 47-49 (cap 60); random brain collapses to the floor (≈ 250 immigrants) |
 
 ## Key numbers
-- Sim speed (small, rule_based): 5 000 ticks ≈ 12 s CPU; decision memo hit rate ≈ 0.75.
+- Sim speed (small, rule_based): 5 000 ticks ≈ 12 s CPU; decision memo hit rate ≈ 0.6 (Lab 1 world).
+- LLM brain run (Lab 1 world, small, seed 1234, 500 ticks, gemma4:12b, 2026-10-01): 1 722 decisions,
+  761 LLM calls (memo 0.56), 425 s, 0 failures. Pop fell to the floor (10): births 10, immigrants 9,
+  deaths predator 22 / starvation 11; actions eat .33 wander .20 attack .16 follow .09 mate .09 rest .08
+  flee .05. Rule-based, same 500 ticks: pop 17, births 23, immigrants 0, deaths 25 / 5, attack .02.
+  results/runs/lab1_llm_500 (not committed).
 - E1 rule_based reference (small, 48 obs): MI_G founders 0.23, MI_G random 0.00,
   MI_O 0.83, directed sign acc 1.00, ΔP 0.48, gibberish→neutral 0.00.
   Note for H2: even the "ideal" keyword interpreter scores MI_G 0.23 < G2 threshold 0.25
@@ -126,20 +111,14 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
 | Job | Started | Log | Progress file | State |
 |---|---|---|---|---|
 
-## S4 run order (local, once S1.3 picked the models)
-1. `python -m experiments.teacher_gate --workers 4` → results/teacher_gate.md (H3).
-2. `python -m experiments.make_mutants --mutator <small-model>` (LLM rewrites + OOD).
-3. `python -m experiments.make_dataset --profile small` (re-run after step 2!).
-4. `python -m experiments.label_teacher --limit 50` then `--check` (sanity), then
-   `nohup python -m experiments.label_teacher --workers 4 > logs/label_teacher.log 2>&1 &`.
-Offline dataset check (word mutants only): 3 000 rows; train 2 400 / val 300 / test 300;
-contrast 50 %, regular 40 %, random-text 10 %; 0 leaks; every val/test row has ≥ 1 unseen gene.
-
 ## Open issues
 - Own git server mirror: waiting for the URL + auth from the owner (see
   ../Docs/redesign/09-progress-log.md › Mirroring).
 - Founder pool v1 is a draft by Claude — needs owner review (H1).
-- LLM cost dominates E4: estimate 13–22 k LLM answers per 20 k-tick small run
-  (4–6 h at ~1 s/answer). Decide run length / D / seeds after measuring s/decision (S1.3).
-- Ollama logprobs response format unverified (logprobs mode falls back to points).
+- LLM cost dominates E4: measured ≈ 4 decisions/s (gemma4:12b, RTX 5080) → 5 000 ticks ≈ 1 h
+  (small). Decide run length / D / seeds before S6.
+- Logprobs: Ollama 0.32 returns them, but unusable with gemma4 (first token "f" = flee/follow,
+  saturated top-1) → points mode.
+- G2 fails for gemma4 12b/26b; all-zero answers on random-text genomes become uniform (see Gate
+  results). Mutator 26b + brain 12b swap models on 16 GB (owner decision pending).
 - (parked) Laya answer schema unknown; `extract_probs` falls back to choice+confidence.

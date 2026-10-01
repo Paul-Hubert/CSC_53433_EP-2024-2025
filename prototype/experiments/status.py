@@ -10,7 +10,7 @@ from promptevo.config import resolve
 
 
 def _alive(pid: int) -> bool:
-    if os.name == "nt":          # os.kill(pid, 0) would TerminateProcess on Windows
+    if os.name == "nt":          # signal 0 is CTRL_C_EVENT on Windows: os.kill can't probe
         import ctypes
         k32 = ctypes.windll.kernel32
         h = k32.OpenProcess(0x1000, False, pid)      # PROCESS_QUERY_LIMITED_INFORMATION

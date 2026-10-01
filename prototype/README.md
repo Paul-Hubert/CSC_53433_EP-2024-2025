@@ -3,7 +3,8 @@
 Headless Python test of *genes = text prompts → an LLM decides → an LLM mutates*
 (Ollama, local or cloud; Laya parked — see `../Docs/redesign/05-decision-backend.md` §0).
 Plan: [`../Docs/redesign/08-phase0-spike-plan.md`](../Docs/redesign/08-phase0-spike-plan.md) ·
-Handoff state: [`STATUS.md`](STATUS.md) · Rules for Claude: [`CLAUDE.md`](CLAUDE.md)
+Handoff state: [`STATUS.md`](STATUS.md) · Rules for Claude: [`CLAUDE.md`](CLAUDE.md) ·
+Full documentation: [`../Docs/prompt-genome/`](../Docs/prompt-genome/README.md)
 
 ## Setup (machine with Ollama, or an Ollama Cloud key)
 
@@ -18,7 +19,9 @@ pytest -q                          # offline tests (no models needed)
 ## What already works (offline)
 
 ```bash
-python -m experiments.smoke_run --ticks 5000              # world + sim + rule-based agents, ASCII snapshots
+python -m experiments.smoke_run --ticks 5000              # Lab 1 flat world + rule-based agents, ASCII snapshots
+python -m experiments.smoke_run --backend random          # null model: the population collapses to the floor
+python -m experiments.smoke_run --world terrain_preview   # preview of the terrain labs (water, mountains)
 python -m experiments.make_obs                              # data/observations_v1.jsonl
 python -m experiments.e1_sensitivity --backend rule_based   # gene-sensitivity suite (reference numbers)
 python -m experiments.status                                # background jobs
@@ -28,11 +31,11 @@ python -m experiments.peek results/runs/smoke/events.jsonl -n 3
 ## LLM brain (needs Ollama)
 
 ```bash
-# configs/base.yaml: policy.model = <decision model>, ollama.mutator_model = <small model>
-python -m experiments.e0_probe_ollama --teacher <model> --mutator <small-model>   # logprobs? s/decision?
-python -m experiments.teacher_gate --modes points,logprobs --workers 4           # do genes steer it? (G1/G2)
+# configs/base.yaml: policy.model: gemma4:12b (chosen 2026-10-01), ollama.mutator_model: gemma4:26b
+python -m experiments.e0_probe_ollama --teacher gemma4:12b --mutator gemma4:12b  # speed, determinism, logprobs
+python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b  # do genes steer it? (G1/G2)
 python -m experiments.e1_sensitivity --backend llm --tag llm_points               # full E1 suite
-python -m experiments.smoke_run --backend llm --ticks 500                         # read llm_calls, then extrapolate
+python -m experiments.smoke_run --backend llm --ticks 500                         # ≈ 7 min on a 16 GB GPU; read llm_calls
 # cloud: export OLLAMA_API_KEY=...; set ollama.host: https://ollama.com (or use cloud tags via local server)
 ```
 
@@ -59,7 +62,7 @@ nohup python -m experiments.label_teacher --workers 4 > logs/label_teacher.log 2
 
 | Path | What |
 |---|---|
-| `promptevo/world.py` | grid terrain (water/mountains), food regrowth, scripted predators |
+| `promptevo/world.py` | grid world (flat in Lab 1; optional noise terrain with water/mountains), food regrowth, scripted predators |
 | `promptevo/genome.py`, `founder.py` | alleles, genomes, crossover; founder/contrast/control pools |
 | `promptevo/perception.py`, `obs_text.py`, `actions.py` | discretised observations, text styles V1/V2, 7 behaviours |
 | `promptevo/sim.py` | lockstep loop, decision memo, reproduction, deaths, logging |

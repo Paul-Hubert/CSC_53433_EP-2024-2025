@@ -5,6 +5,10 @@ terrain / foliage labs) of this Master 2 course. Status: **Phase 0 prototype
 in progress** — a headless Python prototype lives in [`prototype/`](../../prototype/);
 see [09](09-progress-log.md) for the current state.
 
+> **Reference documentation of the system as built:** [`Docs/prompt-genome/`](../prompt-genome/README.md).
+> Since 2026-10-01 the evolution lab is **Lab 1** and runs on a flat world with food
+> at random; the terrain and foliage labs follow and change the world.
+
 | # | Document | What it holds |
 |---|----------|---------------|
 | 00 | [Vision](00-vision.md) | The idea as stated by the course owner, lightly structured. Source of truth for intent. |

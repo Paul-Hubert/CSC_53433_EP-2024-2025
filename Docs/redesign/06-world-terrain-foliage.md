@@ -3,6 +3,13 @@
 > **Placeholder — to be filled in by the course owner** with the details of
 > the terrain-creation and foliage-generation labs of this course.
 
+> **Update 2026-10-01:** the evolution lab is now **Lab 1** and starts on a
+> **flat world** (no water, no mountains) with food appearing uniformly at random.
+> The terrain and foliage labs come after it and change the animals' world; the
+> requirements below apply from then on. A noise-based preview exists:
+> `prototype/configs/worlds/terrain_preview.yaml` (`smoke_run --world terrain_preview`).
+> See [`Docs/prompt-genome/02-lab1.md` §7](../prompt-genome/02-lab1.md#7-toward-the-next-labs-terrain-and-foliage).
+
 ## What the evolution lab needs from the world (requirements)
 
 - **Walkability map** derived from terrain: water (height < sea level),

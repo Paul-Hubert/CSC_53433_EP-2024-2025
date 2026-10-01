@@ -64,3 +64,5 @@
 | 2026-09-30 | Laya fine-tuning dropped for now. Decisions and gene mutation by Ollama LLMs (local or cloud); Laya/distillation parked as an optional later project. | course owner |
 | 2026-09-28 | Phase 0 spike planned: local only (Laya + local Ollama), 7 sessions, preregistered gates G1–G5. | course owner / Claude |
 | 2026-09-27 | "J-Laya" = Jev/Laya decision models. Laya (local) chosen as decision backend; Ollama Cloud (pooled) for generative jobs. | course owner |
+| 2026-10-01 | Brain = gemma4:12b via local Ollama (mutator stays gemma4:26b for now); every request sends `think: false` and `num_ctx: 4096`. | course owner / Claude |
+| 2026-10-01 | The evolution lab becomes **Lab 1**: flat world, food uniformly random (regrowth 0.0007). Terrain and foliage labs follow and change the world. | course owner |
