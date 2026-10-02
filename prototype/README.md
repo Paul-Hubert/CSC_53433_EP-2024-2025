@@ -16,14 +16,19 @@ pip install -e ".[dev]"            # numpy, pyyaml, pytest
 pytest -q                          # offline tests (no models needed)
 ```
 
-## What already works (offline)
+## What already works
+
+Genes mutate through the mutator LLM (`ollama.mutator_model`, gemma4:12b) with every brain,
+so these runs need Ollama; add `--no-mutation` to run fully offline (crossover only).
 
 ```bash
 python -m experiments.smoke_run --ticks 5000              # Lab 1 flat world + rule-based agents, ASCII snapshots
+python -m experiments.smoke_run --no-mutation             # the same with no model at all
 python -m experiments.smoke_run --backend random          # null model: the population collapses to the floor
 python -m experiments.smoke_run --world terrain_preview   # preview of the terrain labs (water, mountains)
 python -m experiments.make_obs                              # data/observations_v1.jsonl
 python -m experiments.e1_sensitivity --backend rule_based   # gene-sensitivity suite (reference numbers)
+python -m experiments.mutation_test                         # pure mutation: variety per temperature + lineages
 python -m experiments.status                                # background jobs
 python -m experiments.peek results/runs/smoke/events.jsonl -n 3
 ```
@@ -31,7 +36,7 @@ python -m experiments.peek results/runs/smoke/events.jsonl -n 3
 ## LLM brain (needs Ollama)
 
 ```bash
-# configs/base.yaml: policy.model: gemma4:12b (chosen 2026-10-01), ollama.mutator_model: gemma4:26b
+# configs/base.yaml: policy.model and ollama.mutator_model: gemma4:12b (2026-10-01 / 2026-10-02)
 python -m experiments.e0_probe_ollama --teacher gemma4:12b --mutator gemma4:12b  # speed, determinism, logprobs
 python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b  # do genes steer it? (G1/G2)
 python -m experiments.e1_sensitivity --backend llm --tag llm_points               # full E1 suite
@@ -52,7 +57,7 @@ python -m experiments.e1_sensitivity --backend laya --placement P4 --style V1 --
 ## Parked: distillation dataset (S4.5–S5)
 
 ```bash
-python -m experiments.make_mutants --mutator <small-model>         # held-out alleles (+ OOD)
+python -m experiments.make_mutants                                 # held-out alleles via the mutator (+ OOD)
 python -m experiments.make_dataset --profile small                 # 3 000 keys, allele-split
 python -m experiments.label_teacher --limit 50 && python -m experiments.label_teacher --check
 nohup python -m experiments.label_teacher --workers 4 > logs/label_teacher.log 2>&1 &
@@ -67,7 +72,7 @@ nohup python -m experiments.label_teacher --workers 4 > logs/label_teacher.log 2
 | `promptevo/perception.py`, `obs_text.py`, `actions.py` | discretised observations, text styles V1/V2, 7 behaviours |
 | `promptevo/sim.py` | lockstep loop, decision memo, reproduction, deaths, logging |
 | `promptevo/backends/` | `random`, `rule_based`, `llm` (ollama_policy: points/logprobs/table/ksample), `laya` (parked); `factory.py` |
-| `promptevo/evolution/mutation.py` | word operators + LLM rewrite with guards |
+| `promptevo/evolution/mutation.py` | blind mutation: the LLM gets a random-change instruction (`prompts/mutate_v2.txt`) + the gene, nothing else; guards |
 | `promptevo/llm/ollama_client.py` | stdlib Ollama client with sqlite cache |
 | `promptevo/metrics.py` | MI_G, MI_O, JSD, directed ΔP, locality, Spearman, bootstrap |
 | `experiments/` | probes, smoke run, observation set, E1 suite, status/peek helpers |

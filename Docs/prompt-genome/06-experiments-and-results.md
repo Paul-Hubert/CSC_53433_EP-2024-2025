@@ -30,7 +30,8 @@ Three risks can sink the idea (`Docs/redesign/02-assessment.md`):
   variation.
 - **R2 — Compute.** Every new (genome, situation) pair costs an LLM call.
 - **R3 — Mutation collapses diversity.** Repeated LLM rewriting may make
-  genes longer, blander and alike.
+  genes longer, blander and alike (measured for the blind LLM mutation in
+  §5.7).
 
 So the prototype is a headless, measurable Python spike, and the Unity work
 waits for its verdict.
@@ -49,7 +50,7 @@ in observation o.
 | JSD(p, q) | H((p+q)/2) − ½ (H(p) + H(q)), between 0 and 1 | how different are two decisions? |
 | Behaviour distance d(g, g′) | mean over observations of JSD | how differently do two genomes behave? |
 | **Directed ΔP** | for a contrast pair at locus ℓ: mean over relevant observations of p(ℓ \| pro) − p(ℓ \| anti); **sign accuracy** = share of cases with ΔP > 0 | does a gene push its own action in the stated direction? |
-| **Locality ratio** | median d(parent, child with one word edit) ÷ median d(two unrelated founders) | are small edits small changes? |
+| **Locality ratio** | median d(parent, child with one gene mutated) ÷ median d(two unrelated founders) | are small edits small changes? |
 | **Spearman ρ** | rank correlation between text distance (1 − difflib similarity) and behaviour distance | do more different texts behave more differently? |
 | **Gibberish → neutral** | mean d(random-text genome, all-neutral genome), compared with founder → neutral | does nonsense stay close to "no preference"? |
 | Shannon diversity | entropy of allele frequencies | how diverse is a locus? (evolution analysis) |
@@ -68,7 +69,7 @@ predator, `follow` an animal, `mate` and `attack` an animal near; `wander` and
 | Random-text genomes | every gene drawn from `control_alleles_v1.json`: 20 shuffled-word sentences ("Needs bakery green bread records nine attic.") and 20 irrelevant ones ("Trains leave from the north platform.") |
 | Neutral genome | "No preference." / "No particular temperament." everywhere |
 | Contrast pairs | for each action locus, two genomes that are neutral everywhere except that locus: "pro" ("Always eat, whatever happens.") vs "anti" ("Never eat unless starving.") |
-| Single edits | founder genomes with one word-operator edit (full E1 suite only) |
+| Single edits | founder genomes with one gene mutated by the mutator LLM (full E1 suite only; skipped without a mutator) |
 
 `teacher_gate` uses a reduced set: 10 founders, 10 random-text genomes, the
 neutral genome and the 7 contrast pairs, times n observations (default 24).
@@ -93,8 +94,8 @@ What happens on failure (plan A2, adapted to the LLM brain):
 - **G1 or G2 fails:** iterate on the prompt or the model, up to three
   documented tries. If it still fails, switch to "LLM as development": one LLM
   call at birth turns the genome into a fixed behaviour profile.
-- **G3 fails:** restrict mutation to word operators, shorten genes, reduce
-  loci, re-test.
+- **G3 fails:** keep only the small-edit mutation instructions, shorten
+  genes, reduce loci, re-test.
 - **G4 fails while G1–G3 pass:** the world is the problem. Raise selection
   pressure, lengthen runs, check that newcomers aren't swamping selection.
 - **G5 fails:** LLM-at-birth for students, the per-decision LLM on a GPU or a
@@ -119,7 +120,8 @@ decisions.
 This brain is the "ideal keyword interpreter", and even it scores MI_G 0.229,
 just under the G2 threshold of 0.25. Whether that threshold is realistic is an
 open decision. Its locality ratio is 0 because most single-word edits don't
-touch its keywords.
+touch its keywords (measured with the word operators that mutation used
+before 2026-10-02).
 
 ### 5.2 Ollama probe
 
@@ -185,6 +187,31 @@ population fell to the floor, against 17 animals with the rule-based brain over
 the same ticks. Details:
 [05 §6](05-decision-backends.md#6-what-the-llm-brain-costs).
 
+### 5.7 Mutation test
+
+`results/mutation_test.md`, 2026-10-02, gemma4:12b, 2 000 calls in 223 s, no
+selection. Every founder sentence was mutated with 8 seeds at temperatures
+0.9, 1.2, 1.5 and 2.0, and six founder sentences were mutated 30 times in a row
+at each temperature.
+
+- **Single mutations:**
+  - 99 % valid at every temperature, with 7.0–7.3 different mutants out of 8
+    per sentence.
+  - About 3 words change per mutation: 46–47 % are one-word edits, 21–22 % are
+    big jumps, and genes grow by only 0.07–0.19 words.
+- **The instruction sets the step size:** 1–2 words for the small-edit
+  instructions, 6–7 words with 41–88 % jumps for the four "big" ones. Going
+  from temperature 0.9 to 2.0 adds only 0.3 different mutants per sentence.
+- **Keyword brain:** 50–55 % of single mutations change nothing, because it
+  reads only its keywords.
+- **Lineages:**
+  - Genes still using a word of the animal's world: 83 % after 1 mutation,
+    58 % after 10, 21 % after 15, 12 % after 30.
+  - Genes grow from 4.7 to 6.5–7.8 words.
+  - "Toaster" appears in 18 of the 24 lineages.
+
+Examples and discussion: [04 §5](04-genome-and-evolution.md#5-mutation).
+
 ### Summary
 
 | Gate | Status (2026-10-01) |
@@ -219,11 +246,17 @@ the same ticks. Details:
    be a world-tuning problem (tuned with the rule-based brain), a founder-pool
    problem, or exactly what evolution should fix. More seeds are needed
    before concluding.
-4. **Mutator model swap.** A 26b mutator next to a 12b brain forces model
-   reloads in 16 GB. Proposed: mutator = 12b (owner decision).
-5. **Word operators are blunt.** "Rest when you are tired when tired.",
-   "Stay put to new places." ([04 §5](04-genome-and-evolution.md#5-mutation)).
-6. **Founder pool v1 is a draft** awaiting the owner's review (H1).
+4. **Blind mutation leaves the animal's world.** Without selection, 79 % of
+   genes use no word of the world after 15 mutations, and the model favours a
+   few words ("toaster" in 18 of 24 lineages, §5.7). A gene meets about 1.4
+   mutations in a 10 000-tick Lab 1 run, so this matters for long runs, where
+   only selection can keep genes meaningful. With the keyword brain most
+   nonsense is neutral and can spread by drift.
+5. **Founder pool v1 is a draft** awaiting the owner's review (H1).
+6. **Changed on 2026-10-02:** mutation is one blind LLM operator (the word
+   operators and rewrite styles are gone, [04 §5](04-genome-and-evolution.md#5-mutation)),
+   and the mutator is gemma4:12b like the brain, so there are no more model
+   swaps. Every run with mutation needs the model.
 7. **Fixed on 2026-10-01** (no longer issues): the request cache
    (`cache/ollama.sqlite`) was never written (an empty cache file counted as
    "no cache"); `smoke_run` used LLM mutation with every brain;
@@ -235,8 +268,8 @@ the same ticks. Details:
 
 In the order of the plan (`prototype/STATUS.md` holds the live position):
 
-1. **Owner decisions** on the G2 fixes, the mutator model and the founder
-   pool, then rerun the gate. Cached answers make reruns cheap.
+1. **Owner decisions** on the G2 fixes and the founder pool, then rerun
+   the gate. Cached answers make reruns cheap.
 2. **Full E1 suite on the LLM brain:** `e1_sensitivity --backend llm`, about
    5 500 decisions, ≈ 45–60 min. Gives G3 (locality) and a larger G1/G2
    sample.
@@ -258,6 +291,7 @@ python -m experiments.e0_probe_ollama --teacher gemma4:12b --mutator gemma4:12b 
 python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b # 5.3
 python -m experiments.smoke_run --ticks 5000 --snapshots 0 --seed 7             # 5.5, one seed
 python -m experiments.smoke_run --backend llm --ticks 500 --snapshots 1         # 5.6
+python -m experiments.mutation_test                                             # 5.7 (≈ 4 min, cached afterwards)
 ```
 
 The gate writes `results/teacher_gate.md`. Rename it per model to keep both,

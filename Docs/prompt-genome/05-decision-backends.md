@@ -195,8 +195,8 @@ same situations now cost nothing.
 ### Ollama settings that matter
 
 Every request sends `num_ctx` and `think`. The brain's requests also send
-`keep_alive`, temperature 0 and seed 0. Mutator rewrites use temperature 0.9
-and a seed per mutation; ksample uses temperature 0.8 and seeds 0–7.
+`keep_alive`, temperature 0 and seed 0. Mutations use `evolution.temperature`
+(1.2) and a seed per mutation; ksample uses temperature 0.8 and seeds 0–7.
 
 | Setting | Value | Why |
 |---|---|---|
@@ -234,10 +234,11 @@ faster to generate and leaves GPU memory free, so `policy.model` is
 `gemma4:12b`. Both fail G2 in the same way
 ([06](06-experiments-and-results.md#53-decision-model-gate-gemma4-12b-vs-26b)).
 
-**Mutator model.** `ollama.mutator_model` is still `gemma4:26b`. A 12b brain
-and a 26b mutator don't fit in 16 GB together, so Ollama swaps models whenever
-a mutation needs the LLM. That costs a minute or more per swap. Switching the
-mutator to 12b as well avoids this; it is awaiting the owner's decision.
+**Mutator model.** `ollama.mutator_model` is `gemma4:12b`, the same model as
+the brain (decided 2026-10-02). A 26b mutator next to a 12b brain didn't fit in
+16 GB, so Ollama swapped models, a minute or more each time. Mutation is the
+only change to genes, so every run with mutation needs this model, whatever the
+brain ([04 §5](04-genome-and-evolution.md#5-mutation)).
 
 **On another machine:** a smaller GPU (8 GB) needs a smaller model; check that
 it fits fully in GPU memory with `ollama ps`. Without a GPU, use the

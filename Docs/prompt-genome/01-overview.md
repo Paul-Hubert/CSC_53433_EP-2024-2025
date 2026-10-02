@@ -10,7 +10,7 @@ with how likely each of seven behaviours is (eat, flee, follow, wander, rest,
 mate, attack), and one behaviour is drawn from those probabilities.
 Animals that find food, avoid predators and mate leave children. A child takes
 each sentence from one parent or the other, and now and then a sentence is
-**mutated**, either by a simple word edit or by an LLM asked to rewrite it.
+**mutated**: an LLM makes one random change to it, seeing nothing but that sentence.
 Nobody scores the genomes; survival does. Because genes are sentences, what
 evolves can be **read**.
 
@@ -25,7 +25,7 @@ neural networks:
 | Genome | weights of a 5-neuron network | 10 readable sentences in fixed slots |
 | Behaviour | one output: a turn angle | 7 behaviours with probabilities |
 | Reproduction | eating spawns a mutated copy (asexual) | two parents mate; gene-by-gene crossover |
-| Mutation | random noise on weights | word edits and LLM rewrites, logged with their lineage |
+| Mutation | random noise on weights | blind random changes made by an LLM, logged with their lineage |
 | Selection | hard-wired into the agent's update | implicit: survival, food, mating |
 | Result | a population count | which sentences survived, and why |
 | AI content | none beyond a tiny network | local LLMs, structured output, prompts, LLMs as operators |
@@ -58,7 +58,7 @@ neural networks:
    │                                  │                               │
    │                                  ▼                               │
    └──── child genome = crossover(parent A, parent B) + mutation ─────┘
-                                  (word edits or LLM rewrite)
+                             (an LLM makes one random change)
 ```
 
 ## Design choices and why
@@ -71,7 +71,7 @@ neural networks:
 | **High-level decisions every 4 ticks**, executed by plain code | the LLM never does motor control; far fewer calls | [03 §6–7](03-world-and-simulation.md#6-actions-the-seven-behaviours) |
 | **Discrete observations** (low / near / far …) | short stable prompts; identical situations are cached | [03 §5](03-world-and-simulation.md#5-perception-what-an-animal-knows) |
 | **Lockstep simulation** that waits for the brain | a slower machine gives a slower run, never a different one | [03 §7](03-world-and-simulation.md#7-decisions) |
-| **Several mutation operators**, the LLM only one of them | an LLM asked repeatedly to "change this" tends to make genes long and bland | [04 §5](04-genome-and-evolution.md#5-mutation) |
+| **Blind mutation**: the LLM gets one random-change instruction, drawn from a list of 16, and the gene sentence, nothing else | mutation must not know what helps; the instruction list, the seed and the temperature make it random, and a length guard stops genes growing | [04 §5](04-genome-and-evolution.md#5-mutation) |
 | **No fitness function** | selection emerges from the world, as in nature; easy to change the world without touching evolution | [04 §6](04-genome-and-evolution.md#6-selection) |
 | **Swappable brains** (random, rule-based, LLM) | null model, transparent reference, CPU-only work | [05](05-decision-backends.md) |
 | **Measure before building** (gates G1–G5) | the whole idea fails if the LLM doesn't really read the genes | [06](06-experiments-and-results.md) |

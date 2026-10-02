@@ -22,10 +22,10 @@ owner-facing log is in `Docs/redesign/09-progress-log.md`.
 | World, simulation, logging, seeds | working and tested; **Lab 1 flat world** tuned |
 | Random and rule-based brains | working |
 | LLM brain (`--backend llm`, gemma4:12b, points mode) | working end to end; ≈ 4 decisions/s on a 16 GB GPU |
-| Mutation: word operators + LLM rewrite | working; LLM rewrite uses gemma4:26b |
+| Mutation: one blind random change by the LLM (16 instructions, temperature) | working; gemma4:12b; pure-mutation test in `results/mutation_test.md` |
 | Metrics, E1 suite, decision-model gate | working; gate run on gemma4 12b and 26b |
 | Persistent answer caches | working (request-cache bug fixed 2026-10-01) |
-| Tests | 41 offline tests pass; real-model test passes on gemma4:12b |
+| Tests | 43 offline tests pass; real-model test passes on gemma4:12b |
 | Analysis tools (allele frequencies, lineages, diversity) | not written |
 | Evolution matrix (E4), common garden (E5), report | not written |
 | Unity version | not started |
@@ -59,7 +59,8 @@ owner-facing log is in `Docs/redesign/09-progress-log.md`.
 | 2026-10-01 | Send `think: false` and `num_ctx: 4096` with every request | without them gemma4 spilled to CPU and reloaded on every call (60–100 s) |
 | 2026-10-01 | Brain = gemma4:12b (mutator stays gemma4:26b) | reads genes as well as 26b, ≈ 3× faster, fits fully in 16 GB |
 | 2026-10-01 | **Lab 1 world is flat, food uniformly random, regrowth 0.0007** | owner: evolution is Lab 1; terrain and foliage labs come later. At 0.001 the flat world sat at the cap 25–68 % of the time; 0.0007 keeps it food-limited |
-| 2026-10-01 | `smoke_run` uses LLM mutation only with the LLM brain | matches the script's documentation; rule-based runs need no model |
+| 2026-10-01 | `smoke_run` uses LLM mutation only with the LLM brain (superseded 2026-10-02) | matches the script's documentation; rule-based runs need no model |
+| 2026-10-02 | **Mutation = one blind random change by the LLM**: an instruction drawn from 16 "random change" variants + the gene, nothing else; the word operators, rewrite styles and founder reintroduction are gone; mutator = gemma4:12b; every run with mutation needs the model (`--no-mutation` otherwise) | owner: mutation doesn't care about state or success, pure random; review in `prototype/notes/mutation-review.md` |
 
 ## 4. Decisions waiting on the course owner
 
@@ -67,12 +68,11 @@ owner-facing log is in `Docs/redesign/09-progress-log.md`.
 |---|---|---|
 | 1 | Approve or edit the founder pool (H1) | `prototype/data/founder_pool_v1.json`, [04 §3](04-genome-and-evolution.md#3-the-founder-pool) |
 | 2 | How to handle G2: all-zero answers → neutral answer? rewrite the control sentences? prompt iterations? keep the MI_G ≥ 0.25 threshold? | [06 §6](06-experiments-and-results.md#6-known-issues-and-open-questions) |
-| 3 | Mutator model: keep gemma4:26b or switch to 12b (no model swaps) | [05 §5](05-decision-backends.md#5-choosing-the-model) |
-| 4 | Lab 1 platform (Python prototype or Unity) and format (sessions, deliverables, grading) | [02 §8](02-lab1.md#8-open-decisions-for-the-course-owner) |
-| 5 | Default brain in class and student hardware (lab server, cloud plan) | [02 §6](02-lab1.md#6-compute-budget) |
-| 6 | Budget for the evolution matrix: run length, decision period, seeds | at ≈ 4 decisions/s, 5 000 ticks ≈ 1 h per run on one GPU |
-| 7 | Details of the terrain and foliage labs | `Docs/redesign/06-world-terrain-foliage.md` |
-| 8 | URL of your own git server for mirroring | `Docs/redesign/09-progress-log.md` |
+| 3 | Lab 1 platform (Python prototype or Unity) and format (sessions, deliverables, grading) | [02 §8](02-lab1.md#8-open-decisions-for-the-course-owner) |
+| 4 | Default brain in class and student hardware (lab server, cloud plan) | [02 §6](02-lab1.md#6-compute-budget) |
+| 5 | Budget for the evolution matrix: run length, decision period, seeds | at ≈ 4 decisions/s, 5 000 ticks ≈ 1 h per run on one GPU |
+| 6 | Details of the terrain and foliage labs | `Docs/redesign/06-world-terrain-foliage.md` |
+| 7 | URL of your own git server for mirroring | `Docs/redesign/09-progress-log.md` |
 
 ## 5. Roadmap
 
@@ -99,8 +99,8 @@ cheaply every tick. That is 100–1 000× fewer calls
 1. **Unity core:** fixed-step lockstep simulation, configuration asset, seeds,
    logging; agents split into perception / decision / executor / metabolism;
    rule-based and neural-network brains; walkability from the terrain.
-2. **Prompt genome in Unity:** loci, founder pool, crossover, operators; an
-   inference client with batching and caching; LLM mutation with logging.
+2. **Prompt genome in Unity:** loci, founder pool, crossover; an inference
+   client with batching and caching; blind LLM mutation with logging.
 3. **Student-facing tools:** genome browser, allele-frequency plots, lineage
    view, lab handouts with exercises, reference results for the founder pool.
 

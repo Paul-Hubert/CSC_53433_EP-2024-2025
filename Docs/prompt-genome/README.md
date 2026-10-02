@@ -3,7 +3,7 @@
 Animals in a simulated world carry **genomes made of English sentences**. A
 local **LLM** reads those sentences, together with the animal's situation, and
 decides what the animal does. **Evolution** (mating, crossover, mutation by
-word edits and LLM rewrites, survival) reshapes the sentences over
+blind random LLM changes, survival) reshapes the sentences over
 generations, and at the end you can read what evolved.
 
 This is the redesign of the course's Crowds & Evolution lab, which becomes
@@ -25,7 +25,7 @@ world the animals live in.
 | 01 | [Overview](01-overview.md) | the idea, why the lab changes, how it works, design choices, glossary |
 | 02 | [Lab 1](02-lab1.md) | the flat world, learning goals, how to run it, suggested activities, compute budget, the bridge to the terrain and foliage labs |
 | 03 | [World and simulation](03-world-and-simulation.md) | grid, food, predators, energy, perception, actions, decisions, reproduction, tick order, outputs, reference numbers |
-| 04 | [Genome and evolution](04-genome-and-evolution.md) | loci, alleles, founder pool, crossover, mutation operators with real examples, selection, controls |
+| 04 | [Genome and evolution](04-genome-and-evolution.md) | loci, alleles, founder pool, crossover, blind LLM mutation with real examples, selection, controls |
 | 05 | [The brain: decision backends](05-decision-backends.md) | random, rule-based and LLM brains; the prompt; points mode; caching; Ollama settings; model choice; measured costs |
 | 06 | [Experiments, metrics and results](06-experiments-and-results.md) | metrics, gates G1–G5, every result so far, known issues, next experiments |
 | 07 | [Setup, usage and troubleshooting](07-setup-and-usage.md) | install, run with and without a model, check a model, read outputs, long jobs, fixes |

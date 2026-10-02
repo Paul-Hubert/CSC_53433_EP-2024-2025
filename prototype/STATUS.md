@@ -4,13 +4,13 @@
 > `notes/archive.md`. Plan: `../Docs/redesign/08-phase0-spike-plan.md`.
 
 ## Position
-Session: S1.3 done locally, S4.3 gate run · Last updated: 2026-10-01 (Lab 1 flat world; docs in
-../Docs/prompt-genome/)
+Session: S1.3 done locally, S4.3 gate run · Last updated: 2026-10-02 (mutation = one blind LLM
+operator, results/mutation_test.md; docs in ../Docs/prompt-genome/)
 
 ## Next action
 WAIT for owner decisions (../Docs/prompt-genome/09-status-and-roadmap.md §4): G2 handling
-(all-zero answers → neutral answer? cleaner control sentences? prompt iteration 1/3?), mutator
-model (26b vs 12b), founder pool H1. Then rerun
+(all-zero answers → neutral answer? cleaner control sentences? prompt iteration 1/3?), founder
+pool H1. Then rerun
 `python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b` (cached, cheap),
 then E1 on the LLM brain in the background:
 `nohup python -m experiments.e1_sensitivity --backend llm --tag llm_points > logs/e1_llm.log 2>&1 &`
@@ -44,7 +44,7 @@ make_dataset.py, label_teacher.py, S5 distillation.
 - [ ] S7 report, go/no-go · H5 decision
 
 ## Environment
-Windows 11 Pro, Python 3.13.5 (.venv), RTX 5080 16 GB, Ollama 0.32.0. Offline suite 38 passed on Windows.
+Windows 11 Pro, Python 3.13.5 (.venv), RTX 5080 16 GB, Ollama 0.32.0. Offline suite 43 passed on Windows.
 Windows: experiments.status used os.kill(pid, 0); signal 0 is CTRL_C_EVENT on Windows, so live jobs
 showed as DEAD? → fixed (OpenProcess + GetExitCodeProcess).
 
@@ -90,6 +90,7 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
 | 2026-09-28 | Provisional world tuning: food_regrow_p 0.001, cost_base 0.7, kill_p 0.3, predators 3 (base) / 2 (small) | rule_based 5k ticks small: pop ≈ 28 (< cap 40, food-limited), deaths split starvation 294 / predator 254, lifespan ≈ 300, 24 generations; random policy collapses (needs immigrants) → behaviour matters |
 | 2026-09-28 | Invalid action → wander (logged) | plan §A6 |
 | 2026-10-01 | Brain (policy.model) = gemma4:12b; mutator stays gemma4:26b | gate: reads genes as well as 26b (sign acc 0.96 vs 0.99, ΔP 0.75 vs 0.62), ~3× less compute per decision (0.9 vs 2.8 s), fits 100 % in 16 GB VRAM |
+| 2026-10-02 | **Mutation = one blind LLM operator**: instruction drawn from prompts/mutate_v2.txt (16 "random change" variants) + the gene, nothing else; temperature 1.2; word operators, styles, founder_reintroduce removed; mutator_model gemma4:12b; every run with mutation needs Ollama (`--no-mutation` otherwise) | owner: "evolution and mutation does not care about state and success, pure random"; review notes/mutation-review.md; test results/mutation_test.md |
 | 2026-10-01 | **Lab 1 world = flat**: water/mountain fractions 0, food uniformly random, food_regrow_p 0.0007; old noise terrain kept as configs/worlds/terrain_preview.yaml (food 0.001), `smoke_run --world terrain_preview` | Owner: the evolution lab becomes Lab 1; the terrain and foliage labs come later and change the world. Flat at 0.001 sat at the cap 25-68 % of the time. At 0.0007 (rule_based, 5k ticks, 3 seeds): small mean pop 25-28 (cap 40, never reached), deaths predator ≈ 230 / starvation ≈ 185, lifespan ≈ 290, 22-25 generations; full mean pop 47-49 (cap 60); random brain collapses to the floor (≈ 250 immigrants) |
 
 ## Key numbers
@@ -99,6 +100,12 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
   deaths predator 22 / starvation 11; actions eat .33 wander .20 attack .16 follow .09 mate .09 rest .08
   flee .05. Rule-based, same 500 ticks: pop 17, births 23, immigrants 0, deaths 25 / 5, attack .02.
   results/runs/lab1_llm_500 (not committed).
+- Mutation test (2026-10-02, gemma4:12b, 2 000 calls, 223 s, no selection): single mutations 99 % valid,
+  7.0-7.3 distinct of 8 per sentence (T 0.9 → 2.0: temperature barely matters; the instruction sets
+  the step: 1-2 words vs 6-7 for the 4 "big" ones), +0.1 word, 50-55 % neutral for rule_based.
+  Lineages (24 × 30 steps): genes using a world word 83 % after 1, 58 % after 10, 21 % after 15,
+  12 % after 30; 4.7 → 6.5-7.8 words; "toaster" in 18/24 lineages. ≈ 270 mutation calls per
+  10 000 ticks (rule_based, small).
 - E1 rule_based reference (small, 48 obs): MI_G founders 0.23, MI_G random 0.00,
   MI_O 0.83, directed sign acc 1.00, ΔP 0.48, gibberish→neutral 0.00.
   Note for H2: even the "ideal" keyword interpreter scores MI_G 0.23 < G2 threshold 0.25
@@ -120,5 +127,8 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
 - Logprobs: Ollama 0.32 returns them, but unusable with gemma4 (first token "f" = flee/follow,
   saturated top-1) → points mode.
 - G2 fails for gemma4 12b/26b; all-zero answers on random-text genomes become uniform (see Gate
-  results). Mutator 26b + brain 12b swap models on 16 GB (owner decision pending).
+  results).
+- Blind mutation leaves the animal's world after 10-15 mutations without selection (mutation test);
+  a gene meets ≈ 1.4 mutations per 10 000-tick run, so watch long runs (rule_based: nonsense is
+  mostly neutral → drift).
 - (parked) Laya answer schema unknown; `extract_probs` falls back to choice+confidence.

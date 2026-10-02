@@ -8,7 +8,7 @@ stated otherwise.
 
 1. [Requirements](#1-requirements)
 2. [Install](#2-install)
-3. [Run without a model](#3-run-without-a-model)
+3. [Run with the rule-based brain](#3-run-with-the-rule-based-brain)
 4. [Check a new model](#4-check-a-new-model)
 5. [Run with the LLM brain](#5-run-with-the-llm-brain)
 6. [Read the outputs](#6-read-the-outputs)
@@ -22,11 +22,12 @@ stated otherwise.
 | For | You need |
 |---|---|
 | The simulation, the random and rule-based brains, all offline tests | Python ≥ 3.10 (tested with 3.13 on Windows 11), `numpy`, `pyyaml`, `pytest` |
-| The LLM brain | [Ollama](https://ollama.com) (tested with 0.32.0) and a model; a GPU is strongly recommended |
+| Gene mutation (every run, any brain) and the LLM brain | [Ollama](https://ollama.com) (tested with 0.32.0) and a model (`ollama pull gemma4:12b`); a GPU is strongly recommended |
 | Measured setup | RTX 5080 16 GB, 62 GB RAM, Windows 11, gemma4:12b (8 GB download), fully on the GPU |
 
-Without a GPU, use the rule-based brain, a shared lab server, or Ollama
-Cloud ([05](05-decision-backends.md#ollama-settings-that-matter)).
+Without a GPU, use a shared lab server or Ollama Cloud
+([05](05-decision-backends.md#ollama-settings-that-matter)), or run without
+mutation (`--no-mutation`).
 
 ## 2. Install
 
@@ -37,7 +38,7 @@ cd prototype
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
-pytest -q                      # 41 passed, no model needed
+pytest -q                      # 43 passed, no model needed
 ```
 
 Windows (PowerShell):
@@ -53,15 +54,22 @@ pytest -q
 In Git Bash on Windows, activate with `source .venv/Scripts/activate`, or call
 `.venv/Scripts/python` directly.
 
-## 3. Run without a model
+## 3. Run with the rule-based brain
+
+Genes mutate through the mutator model (`ollama.mutator_model`, gemma4:12b) with
+every brain, so Ollama must be running: a 5 000-tick run makes about 130
+mutation calls, cached afterwards. If Ollama doesn't answer, `smoke_run` stops
+at the start and says so. `--no-mutation` runs with no model at all (crossover
+only).
 
 ```bash
-python -m experiments.smoke_run                          # Lab 1 world, rule-based brain, 5 000 ticks, ≈ 12 s
+python -m experiments.smoke_run                          # Lab 1 world, rule-based brain, 5 000 ticks
+python -m experiments.smoke_run --no-mutation            # the same without any model, ≈ 12 s
 python -m experiments.smoke_run --backend random         # null model: watch the population collapse
 python -m experiments.smoke_run --seed 7 --ticks 2000    # another seed, shorter
 python -m experiments.smoke_run --profile full           # 64 × 64 world, 30 animals, cap 60
 python -m experiments.smoke_run --world terrain_preview  # preview of the terrain labs (water, mountains)
-python -m experiments.e1_sensitivity --backend rule_based   # gene-sensitivity suite, reference numbers
+python -m experiments.e1_sensitivity --backend rule_based   # gene-sensitivity suite (its single-gene edits come from the mutator)
 ```
 
 `smoke_run` prints a legend, a few ASCII snapshots, a one-line summary and the
@@ -186,7 +194,7 @@ python -c "import sqlite3; print(sqlite3.connect('cache/policy.sqlite').execute(
 | Call times vary between about 1.5 s and 35 s | the GPU is shared with other work (training jobs, games, a Unity editor) | stop the other GPU work, or accept slower runs (results don't change, the simulation waits) |
 | Answers come slowly and the model "thinks" | a thinking model with reasoning on | `ollama.think: false` |
 | A long run disappears; the system is low on memory | other applications use most of the RAM | close them, or use a smaller model |
-| Rule-based runs try to reach Ollama | fixed on 2026-10-01: `smoke_run` now uses LLM mutation only with `--backend llm` | update the code |
+| `gene mutation uses the Ollama model … but the server didn't answer` | since 2026-10-02 every run mutates genes with the mutator model, whatever the brain | start Ollama and `ollama pull gemma4:12b`, or add `--no-mutation` |
 | A rerun asks the LLM again for everything | the cache key includes the model digest and the prompt's hash, so a new `ollama pull` or an edited prompt starts fresh. Before 2026-10-01 a bug kept the request cache (`cache/ollama.sqlite`) empty. | expected after a model or prompt change |
 | `experiments.status` shows `DEAD?` for a running job | old liveness check on Windows: `os.kill(pid, 0)` sends Ctrl+C there (signal 0) instead of probing (fixed 2026-10-01) | update the code |
 | The gate's output got overwritten | `teacher_gate` always writes `results/teacher_gate.md` | copy it per model after each run |

@@ -60,7 +60,7 @@ An **allele** (`genome.Allele`) records:
 | `text` | the sentence (whitespace normalised) |
 | `origin` | `founder`, `neutral`, `contrast`, `control`, `mutant` or `ood` |
 | `parent_id` | the allele it was mutated from (mutants only) |
-| `operator`, `model`, `seed` | how it was made (mutants only) |
+| `operator`, `model`, `seed` | how it was made (mutants only); `operator` is `llm#<n>`, the number of the mutation instruction drawn |
 
 The `AlleleRegistry` holds every allele seen in a run. The same text at the
 same locus is always the same allele, so if two mutations produce the same
@@ -125,107 +125,119 @@ alleles.
 
 ## 5. Mutation
 
+Mutation is **blind**. It doesn't know the world, the other genes or what
+helps; selection alone decides what stays (owner decision, 2026-10-02; the
+review behind it is `prototype/notes/mutation-review.md`).
+
 ### Rate
 
 After crossover, each of the child's 10 genes mutates with probability
-`evolution.p_mut` = 0.03. On average that's 0.3 mutation attempts per child,
-and about 26 % of children (1 − 0.97¹⁰) get at least one. A few attempts
-change nothing (see below).
+`evolution.p_mut` = 0.03. On average that's 0.3 mutations per child, and
+about 26 % of children (1 − 0.97¹⁰) get at least one.
 
-### Operators
+### One operator: the LLM makes a random change
 
-Each mutation picks one operator at random, in proportion to its weight
-(`evolution.operators`):
-
-| Operator | Weight | Share (with LLM) | Share (no LLM) | Uses a model |
-|---|---|---|---|---|
-| `intensity` | 1.0 | 18 % | 22 % | no |
-| `negate` | 1.0 | 18 % | 22 % | no |
-| `condition_swap` | 1.0 | 18 % | 22 % | no |
-| `synonym` | 1.0 | 18 % | 22 % | no |
-| `founder_reintroduce` | 0.5 | 9 % | 11 % | no |
-| `llm_rewrite` | 1.0 | 18 % | — | yes (`ollama.mutator_model`) |
-
-Without a mutator, `llm_rewrite` gets weight 0 and the other weights are
-rescaled. That happens when `ollama.mutator_model` is `null`, and in
-`smoke_run` whenever the brain isn't `llm`. Runs with the random or rule-based
-brain therefore need no model at all. If an operator can't change the
-sentence, for example `synonym` with no word from its table, that gene simply
-doesn't mutate this time.
-
-### Word operators: what they do
-
-Real outputs, produced by running each operator on founder sentences:
-
-| Operator | Rule | Examples |
-|---|---|---|
-| `intensity` | Moves one step along *never → rarely → sometimes → often → always*. Without such a word, it prefixes *Rarely* or *Often*. | "Never fight." → "Rarely fight." · "Eat whenever food is close." → "Often eat whenever food is close." |
-| `negate` | Swaps opposites: *always/never, seek/avoid, stay close to/keep your distance from, run from/stand up to, follow/ignore, keep moving/stay put*. Otherwise it removes a leading *Never/Do not*, prefixes *Not* (temperament), or prefixes *Do not*. | "Never fight." → "Always fight." · "Stay close to other animals." → "Keep your distance from other animals." · "Run from any predator you see." → "Stand up to any predator you see." |
-| `condition_swap` | Replaces a known condition (*when hungry, when full, when threatened, when alone, when food is close, when food is scarce, when tired, when safe*) with another, or appends one. | "Never fight." → "Never fight when alone." · "Keep moving to new places." → "Keep moving to new places when alone." |
-| `synonym` | Swaps one word from a small table (*close/near, run/dash, fight/attack, tired/exhausted, weaker/smaller…*). | "Run from any predator you see." → "Dash from any predator you see." · "Rest when you are tired." → "Rest when you are exhausted." |
-| `founder_reintroduce` | Replaces the gene with another founder or neutral allele of the same locus. | any → e.g. "Flee only when a predator is very close." |
-
-Word operators are cheap and predictable, but blunt. Real outputs include "Rest
-when you are tired." → "Rest when you are tired when tired." (the condition list
-doesn't recognise *when you are tired*, so a new condition is appended),
-"Keep moving to new places." → "Stay put to new places.", and "Attack weaker
-animals when you are hungry." → "…when you are hungry when safe.". Improving
-them is a good student exercise.
-
-### LLM rewrite
-
-`llm_rewrite` asks the mutator model to rewrite the gene in one of seven
-styles, chosen at random: *random change, invert, exaggerate, soften, add a
-condition, make more specific, make more general*. The model is **never told
-what is good** for survival. The prompt (`prompts/mutate_v1.md`):
+For each mutating gene, the code draws one instruction at random from
+`prompts/mutate_v2.txt` and sends it, with the gene sentence and nothing
+else, to the mutator model (`ollama.mutator_model`, gemma4:12b):
 
 ```text
-Here is a short instruction describing an animal's instinct:
+Randomly change one word in this sentence.
 
-"{text}"
+"Rest when you are tired."
 
-Rewrite it with this kind of change: {style}.
-Keep it one plain sentence of at most {max_words} words, about the same behaviour topic.
 Reply with the new sentence only.
 ```
 
-Settings: temperature 0.9 and a seed drawn from the mutation stream, so the
-same (gene, style, seed) always gives the same answer. Answers are cached in
-`cache/ollama.sqlite`. The prompt says at most 12 words, and the guards below
-accept 12 for action genes and 15 for temperament genes.
+All 16 instructions are variants of "make a random change". Some ask for a
+small edit (change, add, remove or swap words), others for a big one
+("Randomly change the meaning of this sentence a lot.", "Change this sentence
+in a random way, big or small."). Randomness comes from three places: the
+instruction drawn, the seed (drawn from the simulation's `mutation` stream,
+so a run can be replayed) and the sampling temperature
+(`evolution.temperature`, 1.2). Answers are cached in `cache/ollama.sqlite`.
 
-Real outputs from the probe ([06](06-experiments-and-results.md#52-ollama-probe)),
-starting from "Eat whenever food is close.":
-
-| Style | gemma4:26b | gemma4:12b |
-|---|---|---|
-| invert | "Avoid food whenever it is near." | "Avoid eating whenever food is far away." |
-| add a condition | "Eat whenever food is close and you are hungry." | "Eat whenever food is close and you are hungry." |
-| random change | "Snack when snacks are nearby." | "Hunt when a prey animal appears nearby." |
-
-The 12b "invert" answer flips two things at once and so is not a clean
-inversion. Rewrites are more fluent than word operators but less
-predictable. The spike watches whether repeated rewriting makes genes longer
-and blander ("bloat") or makes them all alike.
+There is no other way for a gene to change. Without a mutator model
+(`ollama.mutator_model: null`, or `smoke_run --no-mutation`), children only
+recombine their parents' genes. To add an instruction, add a line to the file.
 
 ### Guards
 
-Every new sentence from a word operator or the LLM passes through `clean` and
-`valid` before it can enter a genome (`founder_reintroduce` copies an existing
-founder sentence as is):
-
-- **clean:** keep the quoted sentence if the answer quotes one; strip
-  meta-text such as "Here is the modified prompt:"; keep only the first
-  sentence; collapse spaces; capitalise; end with a full stop.
-- **valid:** 1 to max words long, different from the old text (ignoring
-  case), and only plain characters (letters, digits, spaces and `,.'’;:!?-`).
-
-An LLM rewrite gets up to three attempts with different seeds. If all fail, the
-mutation falls back to `intensity`, `negate` or `condition_swap`.
+The answer goes through `clean` (keep the quoted sentence if there is one,
+strip meta-text such as "Here is the new sentence:", keep the first sentence,
+capitalise, end with a full stop) and `valid` (1–12 words for an action gene,
+1–15 for a temperament gene, different from the old text, plain characters
+only). If it fails, the gene doesn't mutate this time. The guards check form,
+never meaning: 99 % of answers pass.
 
 Every accepted mutation is logged in the child's `birth` event (locus, parent
-allele, new allele, operator, text) and registered as an allele with its
-parent, operator, model and seed.
+allele, new allele, instruction number, text) and registered as an allele with
+its parent, `operator` = `llm#<instruction number>`, model and seed.
+
+### One mutation: what comes out
+
+`python -m experiments.mutation_test` mutates every founder sentence with 8
+seeds at four temperatures, with no selection (`results/mutation_test.md`,
+2026-10-02, gemma4:12b, 2 000 calls in about 4 minutes):
+
+| Temperature | 0.9 | 1.2 | 1.5 | 2.0 |
+|---|---|---|---|---|
+| valid answers | 99 % | 99 % | 99 % | 99 % |
+| different mutants per sentence (out of 8) | 7.0 | 7.1 | 7.2 | 7.3 |
+| words changed per mutation | 2.9 | 3.0 | 3.0 | 3.0 |
+| one-word edits | 47 % | 46 % | 46 % | 47 % |
+| big jumps (little left of the parent) | 21 % | 21 % | 22 % | 22 % |
+| length change (words) | +0.19 | +0.15 | +0.08 | +0.07 |
+| no effect on the keyword brain | 50 % | 51 % | 52 % | 55 % |
+
+- **The instruction matters more than the temperature.** Nine small-edit
+  instructions change 1–2 words and almost never jump (0–3 %). Three change
+  about 3 words ("a few words", "one part", "an unexpected change"). "Change
+  this sentence randomly.", "Mutate this sentence at random.", "…change the
+  meaning of this sentence a lot." and "…big or small." rewrite 6–7 words and
+  jump in 41–88 % of cases. Raising the temperature from 0.9 to 2.0 adds only 0.3
+  different mutants per sentence.
+- **One mutation usually stays on topic.** 87 % of mutants still use a word
+  of the animal's world (the founder sentences' words and the situation
+  words), but 61 % bring in an unrelated word: "Run from any butterfly you
+  see.", "Eat whenever food is expensive.", "Never dance.".
+
+### Many mutations, no selection: where genes go
+
+The test also mutates six founder sentences 30 times in a row at each
+temperature, keeping each new sentence (24 lineages):
+
+| Mutations so far | 0 | 1 | 3 | 5 | 10 | 15 | 20 | 30 |
+|---|---|---|---|---|---|---|---|---|
+| genes still using a word of the animal's world | 100 % | 83 % | 83 % | 67 % | 58 % | 21 % | 17 % | 12 % |
+
+"Rest when you are tired." at temperature 1.2:
+
+```text
+ 1  Run when you are tired.
+ 2  Stop when you are tired.
+ 3  Stop when you are hungry.
+ 7  When are you hungry, stay?
+ 9  Stay, when are you toaster?
+21  Please, is the pizza ready?
+24  The gravitational waves are screaming.
+30  The dancing is a banana wave.
+```
+
+"Never fight.": 1 "Never fly." → 3 "Don't sneeze." → 5 "Sneezes banana." →
+14 "Cybernetic gears hum." → 30 "The toaster ate the pancakes quickly.".
+
+- **Genes leave the animal's world after 10–15 mutations.** After 30 the
+  sentence shares almost nothing with its founder, and genes grow from 4.7 to
+  6.5–7.8 words.
+- **The model's "random" has favourite words.** "Toaster" appears in 18 of
+  the 24 lineages, "bicycle" in 13, "gravity" in 11, "banana" in 10. LLM
+  randomness is a style with its own biases, not a uniform draw.
+- **In a run, selection is the only force against this drift.** A gene meets
+  about 0.03 mutations per generation, so about 1.4 in a 10 000-tick Lab 1 run
+  (≈ 46 generations): the first steps above. In longer runs, watch whether
+  selection keeps genes meaningful. The keyword brain reads only its keywords,
+  so most nonsense is neutral for it and can spread by drift.
 
 ## 6. Selection
 
@@ -258,7 +270,7 @@ conditions (the experiment matrix in the spike plan, A10):
 
 | Control | Setting | Question it answers |
 |---|---|---|
-| C2 NO-MUT | `p_mut: 0` | How far does selection get with founder variation alone? |
+| C2 NO-MUT | `p_mut: 0` (or `smoke_run --no-mutation`) | How far does selection get with founder variation alone? |
 | C3 SHUFFLED | `shuffled: true` | Each decision uses a random *other* living animal's genome. Genes are inherited but don't affect their carrier, so any change is drift. |
 | C4 RANDOM-FOUNDERS | `random_founders: true` | Founders get random-text genes. Can evolution climb out of nonsense? |
 | C5 RULE-BASED | `--backend rule_based` | The same experiment with the transparent keyword brain. |

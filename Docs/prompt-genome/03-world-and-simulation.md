@@ -282,9 +282,9 @@ brain survives only because of the floor (see §13).
 
 | File | Content |
 |---|---|
-| `events.jsonl` | one line per event: `founder`, `immigrant` (id, genome), `birth` (child id, parents, generation, genome, mutations with operator and new text), `death` (cause, age, generation, food eaten, offspring, steals) |
+| `events.jsonl` | one line per event: `founder`, `immigrant` (id, genome), `birth` (child id, parents, generation, genome, mutations with the locus, parent and new allele, instruction number and new text), `death` (cause, age, generation, food eaten, offspring, steals) |
 | `stats.csv` | every 100 ticks: `t, pop, mean_energy, mean_gen, max_gen, births, immigrants, deaths_starve, deaths_pred, deaths_age, decisions, backend_queries, invalid, alleles` (counts are cumulative) |
-| `alleles.jsonl` | every allele seen in the run: id, locus, text, origin, parent allele, operator, model, seed (the lineage of every gene) |
+| `alleles.jsonl` | every allele seen in the run: id, locus, text, origin, parent allele, operator (`llm#<n>`: the mutation instruction drawn), model, seed (the lineage of every gene) |
 | `final_population.json` | the living animals at the end: id, generation, genome (allele ids) |
 | `summary.json` | totals: births, newcomers, deaths by cause, mean lifespan, maximum generation, decisions, brain queries, memo hit rate, brain time, invalid rate, share of each action, mutation counts per operator, number of alleles, event hash |
 

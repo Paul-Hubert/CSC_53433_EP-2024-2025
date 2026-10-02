@@ -54,15 +54,15 @@ lives only in `prototype/`. A Unity version is on the roadmap
 | `actions.py` | Behaviour executors | `EXECUTORS[action](agent, world, agents, cfg, rng) -> moved`; invalid choices call `_invalid` → wander |
 | `genome.py` | Genes | `LOCI`, `ACTION_LOCI`, `TEMPERAMENT_LOCI`, `ACTIONS`; `Allele`; `Genome` (10 allele ids); `AlleleRegistry` (dedup, `genes()`, `genome_key()`, `dump_jsonl`); `crossover_uniform` |
 | `founder.py` | Allele files → genomes | `AllelePools`: `sample_founder`, `sample_control`, `neutral_genome`, `contrast_pair(locus)` |
-| `evolution/mutation.py` | Mutation | word operators (`op_intensity`, `op_negate`, `op_condition_swap`, `op_synonym`), guards (`clean`, `valid`), `LLM_STYLES`, `Mutator` (`mutate(genome, rng) -> (genome, events)`, `stats`) |
+| `evolution/mutation.py` | Mutation | one blind random change by the mutator LLM: `TEMPLATE`, `load_instructions(path)`, guards (`clean`, `valid`), `Mutator` (`mutate(genome, rng) -> (genome, events)`, `mutate_text(locus, text, rng) -> (text or None, instruction index, seed)`, `stats`) |
 | `sim.py` | The simulation | `Agent`, `Counters`, `Simulation` (`step`, `decide`, `run`, `finish`, `summary`, `stats_row`) |
 | `backends/base.py` | Brain protocol | `Query(genome_key, genes, obs)`; `Backend` protocol (`name`, `decide(queries) -> [n, 7]`); `normalise` |
 | `backends/random_policy.py` | Uniform brain | `RandomBackend` |
 | `backends/rule_based.py` | Keyword brain | `RuleBasedBackend`; `default_logits`, `gene_weight`, `temperament_deltas` |
 | `backends/ollama_policy.py` | LLM brain | `LLMPolicyBackend` (modes points / table / ksample / logprobs, caches, workers, `from_config`); `TeacherBackend` (alias); `teacher_prompt`, `table_prompt`, `POINTS_SCHEMA`, `points_to_probs`, `logprobs_to_probs` |
-| `backends/factory.py` | Name → brain | `make_backend(name, cfg)`; `make_rewriter(cfg)` → `(rewriter, model)`, or `(None, None)` when LLM mutation is off |
+| `backends/factory.py` | Name → brain | `make_backend(name, cfg)`; `make_rewriter(cfg, check=False)` → `(llm, model)` for mutation, or `(None, None)` when mutation is off; with `check=True` it raises `MutatorUnavailable` if Ollama doesn't answer |
 | `backends/laya_backend.py` | Laya brain (parked) | `LayaBackend` |
-| `llm/ollama_client.py` | Ollama HTTP client | `OllamaClient` (`chat`, `chat_json`, `chat_raw`, `embed`, `models`, `digest`, retries, sqlite cache, base options, `think`); `client_from_config(cfg)`; `make_rewriter(client, model, prompt)` |
+| `llm/ollama_client.py` | Ollama HTTP client | `OllamaClient` (`chat`, `chat_json`, `chat_raw`, `embed`, `models`, `digest`, retries, sqlite cache, base options, `think`); `client_from_config(cfg)`; `make_rewriter(client, model, temperature)` → `llm(prompt, seed)` |
 | `cache.py` | Persistent cache | `KVCache` (sqlite key → JSON value); `make_key(*parts)` (sha256 of the JSON) |
 | `metrics.py` | Measurement | `entropy`, `jsd`, `mi_genome`, `mi_obs`, `behaviour_distance`, `directed`, `spearman`, `locality`, `shannon_diversity`, `bootstrap_ci` |
 | `eventlog.py` | Run logs | `EventLog` (`events.jsonl` with a running hash, `stats.csv`) |
@@ -169,11 +169,12 @@ cfg = load_config("small", overrides={"world": {"food_regrow_p": 0.0005},
 | Key | Default | Meaning |
 |---|---|---|
 | `sexual` | true | two parents with crossover (false: one parent, the old lab's regime) |
-| `p_mut` | 0.03 | mutation chance per gene per child |
+| `p_mut` | 0.03 | chance per gene per child that the mutator LLM changes it |
 | `shuffled` | false | control C3: decide with another living animal's genome |
 | `random_founders` | false | control C4: founders with random-text genes |
-| `operators.*` | intensity 1, negate 1, condition_swap 1, synonym 1, founder_reintroduce 0.5, llm_rewrite 1 | operator weights ([04 §5](04-genome-and-evolution.md#5-mutation)) |
-| `max_action_words` | 12 | maximum length of an action gene |
+| `mutation_prompts` | prompts/mutate_v2.txt | the mutation instructions, one drawn at random per mutation ([04 §5](04-genome-and-evolution.md#5-mutation)) |
+| `temperature` | 1.2 | sampling temperature of the mutator LLM |
+| `max_action_words` | 12 | maximum length of an action gene (longer answers are rejected) |
 | `max_temperament_words` | 15 | maximum length of a temperament gene |
 
 ### `backend`
@@ -200,7 +201,7 @@ cfg = load_config("small", overrides={"world": {"food_regrow_p": 0.0005},
 | `host` | http://localhost:11434 | local server, or `https://ollama.com` for the cloud API |
 | `api_key_env` | OLLAMA_API_KEY | name of the environment variable holding a cloud key (never put the key itself in a file) |
 | `teacher_model` | null | fallback for `policy.model` (older name) |
-| `mutator_model` | gemma4:26b | model for `llm_rewrite`; `null` disables LLM mutation |
+| `mutator_model` | gemma4:12b | the model that mutates genes (the same as the brain: no model swaps); `null` = no mutation |
 | `embed_model` | null | embedding model (optional; parked analyses) |
 | `teacher_mode`, `ksample_k` | points, 8 | settings of the labelling pipeline and of ksample mode |
 | `timeout_s` | 120 | HTTP timeout per request |
@@ -232,10 +233,12 @@ and `peek` don't read it.
 
 | Script | Purpose | Options |
 |---|---|---|
-| `smoke_run` | Run a simulation, print ASCII snapshots and a summary, write the run files | `--ticks` (5000), `--backend` (config default `rule_based`; `random`, `llm`), `--seed`, `--out` (`results/runs/smoke`), `--snapshots` (3; 0 = none), `--world` (overlay from `configs/worlds/`) |
+| `smoke_run` | Run a simulation, print ASCII snapshots and a summary, write the run files | `--ticks` (5000), `--backend` (config default `rule_based`; `random`, `llm`), `--seed`, `--out` (`results/runs/smoke`), `--snapshots` (3; 0 = none), `--world` (overlay from `configs/worlds/`), `--no-mutation` (crossover only, no model needed) |
 
 With `--backend llm` the summary also prints `llm_calls`, failures and the
-memo hit rate. Only then are genes also rewritten by the mutator model.
+memo hit rate. Genes mutate through the mutator model with every brain, so
+Ollama must be running; if it doesn't answer, the run stops at the start with a
+clear message. `--no-mutation` runs without it.
 
 ### Measuring the brain
 
@@ -244,6 +247,7 @@ memo hit rate. Only then are genes also rewritten by the mutator model.
 | `e0_probe_ollama` | Facts about an Ollama model: structured output, determinism, logprobs, speed, mutator samples → `results/e0_ollama.md` | `--teacher` (decision model, required), `--mutator`, `--embed`, `--host`, `--num-ctx` (4096; 0 = server default), `--think` (off / on / default) |
 | `teacher_gate` | Decision-model gate: contrast pairs + 10 founders + 10 random-text genomes × n observations → `results/teacher_gate.md/.json` | `--modes` (points,table), `--n-obs` (24), `--workers`, `--model`, `--prompt` |
 | `e1_sensitivity` | The full gene-sensitivity suite (E1) with any brain → `results/e1_<tag>.md/.json` | `--backend`, `--tag`, `--mode`, `--workers`, `--obs`, `--chunk`, `--style`, `--placement` (Laya) |
+| `mutation_test` | Pure mutation, no selection: every founder sentence × seeds × temperatures (variety, edit size, length, keyword-brain effect) and lineages mutated step after step → `results/mutation_test.md/.json` | `--temps` (0.9,1.2,1.5,2.0), `--seeds` (8), `--steps` (30), `--workers` (4), `--model`, `--tag` |
 | `make_obs` | Rebuild the observation set (`data/observations_v1.jsonl`) from synthetic situations + the most frequent ones of a rule-based run | `--ticks` (3000), `--out` |
 
 ### Helpers
@@ -269,12 +273,12 @@ let the LLM decide directly. Their usage is in their docstrings and in
 | `data/control_alleles_v1.json` | 20 shuffled-word + 20 irrelevant sentences for random-text genomes |
 | `data/observations_v1.jsonl` | 48 observations (32 synthetic + 16 frequent in a rule-based run), with directed-test tags |
 | `prompts/teacher_v1.md` | decision prompt ([05](05-decision-backends.md#the-prompt)) |
-| `prompts/mutate_v1.md` | LLM rewrite prompt ([04 §5](04-genome-and-evolution.md#llm-rewrite)) |
+| `prompts/mutate_v2.txt` | the 16 mutation instructions, one per line ([04 §5](04-genome-and-evolution.md#5-mutation)) |
 | `prompts/novel_v1.md` | prompt for brand-new alleles (parked dataset pipeline) |
 
 ## 6. Tests
 
-`cd prototype && pytest -q` runs 41 offline tests in about 20 s, with no model
+`cd prototype && pytest -q` runs 43 offline tests in about 20 s, with no model
 needed. LLM calls are replaced by small fake servers. Two marked tests talk to
 real models: `pytest -m ollama` (needs Ollama and `policy.model`) and
 `pytest -m laya` (parked).
@@ -285,9 +289,9 @@ real models: `pytest -m ollama` (needs Ollama and `policy.model`) and
 | `test_world.py` | flat Lab 1 world, terrain fractions and connectivity, nobody enters blocked cells, unambiguous map symbols |
 | `test_behaviour.py` | flee increases distance, eating gains energy, invalid eat → wander, text styles, rule-based directed tests and gibberish |
 | `test_genome.py` | allele pools, registry dedup and genome keys, crossover |
-| `test_evolution.py` | word operators, mutator with a fake LLM, determinism, population bounds, shuffled control, no mutation → no new alleles |
+| `test_evolution.py` | guards and instruction list, the mutator sends only the instruction and the gene (fake LLM), rejected answers, no LLM → no mutation, determinism, population bounds, shuffled control, no mutation → no new alleles |
 | `test_metrics.py` | entropy, JSD, mutual information, directed ΔP, Spearman |
-| `test_llm_policy.py` | table mode vs points, malformed rows, persistent caches (incl. an empty cache file), API key header, factory, logprobs fallback |
+| `test_llm_policy.py` | table mode vs points, malformed rows, persistent caches (incl. an empty cache file), API key header, factory (incl. mutation off and Ollama down), logprobs fallback |
 | `test_adapters.py` | Laya request layouts and answer parsing (parked), Ollama client |
 | `test_dataset.py` | dataset splits, resumable labelling, gate with a fake model (parked pipeline) |
 | `test_local_models.py` | real-model smoke tests (`-m ollama`, `-m laya`) |
@@ -312,6 +316,6 @@ student exercises ([02 §5](02-lab1.md#5-suggested-activities)).
 | A brain | a class with `name` and `decide(queries) -> [n, 7]` in `backends/`; register it in `factory.make_backend` | return rows that sum to 1 in `ACTIONS` order |
 | A sense | a field in `perception.Observation`, computed in `sense`, rendered in `obs_text.render` | keep values discrete (cache hits); update the rule-based brain if it should react |
 | An action | an executor in `actions.EXECUTORS`, a locus in `genome.ACTION_LOCI`, a line in `prompts/teacher_v1.md`, alleles in the founder and contrast files, keywords in `rule_based.ACTION_WORDS` (and a default in `default_logits`), a relevance tag in `perception.RELEVANT_TAG` | the action list is part of the JSON schema (`POINTS_SCHEMA` is built from `ACTIONS`); the rule-based brain and E1 fail with a `KeyError` without the last two |
-| A mutation operator | a function `(text, rng) -> text or None` in `WORD_OPS`, plus a weight in `evolution.operators` | new text passes the guards automatically |
+| A mutation instruction | a line in `prompts/mutate_v2.txt` | it is drawn at random like the others; measure it with `experiments.mutation_test` |
 | A crossover scheme | a function like `crossover_uniform`, called in `Simulation._birth` | keep loci homologous |
 | A world feature | `world.py` (generation, `regrow_food`, movement) plus keys in `world:` | keep randomness in the world's streams; add a test |
