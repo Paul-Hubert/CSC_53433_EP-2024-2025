@@ -1,19 +1,22 @@
-"""Which genes did best? Ranks every allele of a run by how the animals that carried it did.
+"""Which genes did best? Ranks genes by how the animals that carried them did.
 
     python -m experiments.gene_report results/runs/long_1234 [results/runs/long_7 ...]
                                       [--min-carriers 100] [--tag long]
 
-Fitness of an allele = mean number of offspring of the animals that carried it and died during
-the run (complete lives), divided by the mean of all animals that died (1.00 = average).
-★ marks the best allele of each gene slot when its 95 % interval (normal approximation)
-stays above 1.00. Also: lifespan, share killed by predators, frequency in the living
-population over time, and the lineage of mutant genes. The first run is the main one; extra
-runs (other seeds) show whether the founder alleles rank the same way.
+Fitness = mean number of offspring of the animals that carried the gene and died during the
+run (complete lives), each divided by the mean of the animals that died in the same 5 000
+ticks, so animals are compared with their contemporaries (1.00 = average; 95 % interval by
+normal approximation). Mutation spreads a population over thousands of texts, so genes are
+also grouped by what the keyword brain reads in them (strength, action, conditions).
+Marks use every run given (seeds): ★ clearly above average, ▲ steady leader (above average
+in every run), ✗ clearly below average. Also: share killed by predators, frequency over
+time, predator kills per 1 000 animal-ticks, and the lineage of the most common genes.
 Writes results/<tag>_genes.md + .json and prints the marked genes.
 """
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import re
 from collections import Counter, defaultdict
@@ -21,6 +24,7 @@ from pathlib import Path
 
 import numpy as np
 
+from promptevo.backends.rule_based import ACTION_WORDS, CONDITIONS, INTENSITY, TEMPERAMENT
 from promptevo.config import load_config, resolve
 from promptevo.evolution.mutation import load_instructions
 from promptevo.genome import LOCI
@@ -41,6 +45,43 @@ def words(t: str) -> set[str]:
     return {w for w in re.findall(r"[a-z']+", t.lower()) if w not in STOP}
 
 
+STRENGTH = {-2.5: "never", -1.2: "rarely", 0.3: "sometimes", 0.8: "names the action", 1.2: "often", 2.5: "always"}
+
+
+def first_alt(pattern: str) -> str:
+    """Readable name of a keyword pattern: its first alternative ("food is (close|near)|…" -> "food is close")."""
+    depth, cut = 0, len(pattern)
+    for i, ch in enumerate(pattern):
+        depth += (ch == "(") - (ch == ")")
+        if ch == "|" and depth == 0:
+            cut = i
+            break
+    return re.sub(r"\(([^|)]*)(?:\|[^)]*)?\)\??", r"\1", pattern[:cut])
+
+
+def reading(locus: str, text: str) -> str:
+    """What the keyword brain reads in a gene (same rules as rule_based.gene_weight / temperament_deltas)."""
+    t = text.lower()
+    if locus not in ACTION_WORDS:
+        hits = [first_alt(p) for p, _ in TEMPERAMENT if re.search(p, t)]
+        return " + ".join(hits) if hits else "no effect"
+    w = next((v for p, v in INTENSITY if re.search(p, t)), None)
+    if w is None:
+        w = 0.8 if re.search(ACTION_WORDS[locus], t) else 0.0
+    if w == 0.0:
+        return "no effect"
+    unless = re.search(r"\bunless (.+)$", t)
+    main = t[:unless.start()] if unless else t
+    conds = [first_alt(p) for p in CONDITIONS if re.search(p, main)]
+    exc = [first_alt(p) for p in CONDITIONS if unless and re.search(p, unless.group(1))]
+    label = f"{locus} {w:+.1f} ({STRENGTH.get(w, w)})"
+    if conds:
+        label += ", when " + " & ".join(conds)
+    if exc:
+        label += ", unless " + " & ".join(exc)
+    return label
+
+
 class Run:
     def __init__(self, path: Path):
         self.path, self.name = path, path.name
@@ -54,6 +95,7 @@ class Run:
             elif e["kind"] == "death":
                 self.death[e["id"]] = e
         self.final = json.loads((path / "final_population.json").read_text())
+        self._reading: dict[str, str] = {}
         self.world = set(SITUATION_WORDS)
         for a in self.alleles.values():
             if a["origin"] in ("founder", "neutral"):
@@ -76,27 +118,74 @@ class Run:
         out.append((self.summary["ticks"], len(self.final), Counter(a for x in self.final for a in x["genome"])))
         return out
 
+    def dead(self, window: int = 5000) -> list[tuple[list, dict, float]]:
+        """(genome, death event, relative offspring) for every animal that died. Relative offspring =
+        offspring ÷ the mean of the animals that died in the same window of ticks, so animals are only
+        compared with their contemporaries (early on, while the population grows, everyone has more)."""
+        rows = [(self.genome[i], d) for i, d in self.death.items() if i in self.genome]
+        by_w = defaultdict(list)
+        for _, d in rows:
+            by_w[d["t"] // window].append(d["offspring"])
+        mean_w = {w: float(np.mean(v)) for w, v in by_w.items()}
+        return [(g, d, d["offspring"] / mean_w[d["t"] // window] if mean_w[d["t"] // window] else 1.0) for g, d in rows]
+
     def fitness(self, min_carriers: int) -> dict:
         """{allele: stats} over animals that died (complete lives)."""
-        dead = [(self.genome[i], d) for i, d in self.death.items() if i in self.genome]
-        mean_all = float(np.mean([d["offspring"] for _, d in dead]))
+        dead = self.dead()
         by = defaultdict(list)
-        for g, d in dead:
+        for g, d, rel in dead:
             for aid in g:
-                by[aid].append(d)
-        pred_all = float(np.mean([d["cause"] == "predator" for _, d in dead]))
-        res = {}
-        for aid, ds in by.items():
-            if len(ds) < min_carriers:
-                continue
-            off = np.array([d["offspring"] for d in ds], float)
-            se = off.std(ddof=1) / np.sqrt(len(off))
-            pred = float(np.mean([d["cause"] == "predator" for d in ds]))
-            res[aid] = {"n": len(ds), "fitness": off.mean() / mean_all,
-                        "lo": (off.mean() - 1.96 * se) / mean_all, "hi": (off.mean() + 1.96 * se) / mean_all,
-                        "lifespan": float(np.mean([d["age"] for d in ds])), "predator": pred,
-                        "predator_lo": pred - 2 * np.sqrt(pred * (1 - pred) / len(ds))}
-        return {"mean_offspring": mean_all, "predator_share": pred_all, "n_dead": len(dead), "alleles": res}
+                by[aid].append((d, rel))
+        res = {aid: {**stats([rel for _, rel in ds]), "lifespan": float(np.mean([d["age"] for d, _ in ds])),
+                     "predator": float(np.mean([d["cause"] == "predator" for d, _ in ds]))}
+               for aid, ds in by.items() if len(ds) >= min_carriers}
+        return {"mean_offspring": float(np.mean([d["offspring"] for _, d, _ in dead])),
+                "predator_share": float(np.mean([d["cause"] == "predator" for _, d, _ in dead])),
+                "n_dead": len(dead), "alleles": res}
+
+    def read(self, aid: str) -> str:
+        if aid not in self._reading:
+            self._reading[aid] = reading(self.alleles[aid]["locus"], self.text(aid))
+        return self._reading[aid]
+
+    def reading_values(self) -> dict:
+        """{(locus, reading): [(relative offspring, killed by a predator, text)]} over the animals that died."""
+        out = defaultdict(list)
+        for g, d, rel in self.dead():
+            for locus, aid in zip(LOCI, g):
+                out[(locus, self.read(aid))].append((rel, d["cause"] == "predator", self.text(aid)))
+        return out
+
+    def by_reading(self, min_carriers: int) -> dict:
+        """Genes grouped by what the keyword brain reads in them: {locus: {reading: stats}}."""
+        return group_stats(self.reading_values(), min_carriers)
+
+    def reading_shares(self, freq) -> list[tuple[int, dict]]:
+        """[(t, {(locus, reading): share of the living animals})] at each checkpoint."""
+        out = []
+        for t, pop, counts in freq:
+            sh = Counter()
+            for aid, n in counts.items():
+                sh[(self.alleles[aid]["locus"], self.read(aid))] += n / max(1, pop)
+            out.append((t, sh))
+        return out
+
+    def predation(self, every: int) -> list[dict]:
+        """Deaths per window of `every` ticks, with predator kills per 1 000 animal-ticks."""
+        pops = defaultdict(list)
+        with (self.path / "stats.csv").open() as f:
+            for row in csv.DictReader(f):
+                pops[(int(row["t"]) - 1) // every].append(int(row["pop"]))
+        wins = defaultdict(Counter)
+        for d in self.death.values():
+            wins[d["t"] // every][d["cause"]] += 1
+        out = []
+        for w in sorted(wins):
+            animal_ticks = float(np.mean(pops[w])) * every if pops.get(w) else float("nan")
+            out.append({"from": w * every, "to": (w + 1) * every, "predator": wins[w]["predator"],
+                        "starvation": wins[w]["starvation"], "pop": float(np.mean(pops[w])) if pops.get(w) else float("nan"),
+                        "kill_rate": 1000 * wins[w]["predator"] / animal_ticks})
+        return out
 
     def lineage(self, aid: str, instructions: list[str]) -> list[str]:
         chain, cur = [], aid
@@ -111,9 +200,35 @@ class Run:
         return chain[::-1]
 
 
+def stats(rel: list[float]) -> dict:
+    """Fitness = mean relative offspring, with a 95 % interval (normal approximation)."""
+    x = np.asarray(rel, float)
+    se = x.std(ddof=1) / np.sqrt(len(x)) if len(x) > 1 else float("inf")
+    return {"n": len(x), "fitness": float(x.mean()), "lo": float(x.mean() - 1.96 * se), "hi": float(x.mean() + 1.96 * se)}
+
+
+def group_stats(values: dict, min_carriers: int) -> dict:
+    """{locus: {reading: stats}} from {(locus, reading): [(rel, killed by predator, text)]}."""
+    out = {locus: {} for locus in LOCI}
+    for (locus, rd), vs in values.items():
+        if len(vs) < min_carriers:
+            continue
+        texts = Counter(t for _, _, t in vs)
+        out[locus][rd] = {**stats([r for r, _, _ in vs]), "predator": float(np.mean([p for _, p, _ in vs])),
+                          "texts": len(texts), "examples": texts.most_common(3)}
+    return out
+
+
 def origin(run: Run, aid: str) -> str:
     a = run.alleles[aid]
     return a["origin"] if a["origin"] != "mutant" else f"mutant ({a['operator']})"
+
+
+def fmt_fit(x: dict) -> str:
+    """1.08 [1.03–1.13], bold when the interval is above 1, italic when below."""
+    v = f"{x['fitness']:.2f}"
+    v = f"**{v}**" if x["lo"] > 1 else f"*{v}*" if x["hi"] < 1 else v
+    return f"{v} [{x['lo']:.2f}–{x['hi']:.2f}]"
 
 
 def main() -> None:
@@ -130,90 +245,144 @@ def main() -> None:
     tag = a.tag or main_run.name
     fit = {r.name: r.fitness(a.min_carriers) for r in runs}
     F = fit[main_run.name]
+    R = {r.name: r.by_reading(a.min_carriers) for r in runs}
+    RM = R[main_run.name]
     freq = main_run.frequencies(a.every)
+    shares = main_run.reading_shares(freq)
+    mid = min(shares, key=lambda x: abs(x[0] - main_run.summary["ticks"] / 2))
     s = main_run.summary
     deaths = s["deaths"]
     n_deaths = sum(deaths.values())
     living = [aid for x in main_run.final for aid in x["genome"]]
     mut = s["mutations"] if "ok" in s["mutations"] else {     # runs before 2026-10-02: one entry per operator
         k: sum(v[k] for v in s["mutations"].values()) for k in ("tried", "ok")}
+    merged = defaultdict(list)                    # all runs together: the marks use every seed
+    for r in runs:
+        for k, v in r.reading_values().items():
+            merged[k] += v
+    P = group_stats(merged, a.min_carriers)
+    star, lead = {}, {}
+    for locus in LOCI:
+        if P[locus]:
+            best = max(P[locus], key=lambda r: P[locus][r]["fitness"])
+            if P[locus][best]["lo"] > 1.0:
+                star[locus] = best
+        # ▲ consistent leader: above average in every run that has it (at least 2 runs, or the only run)
+        steady = [rd for rd in P[locus] if rd != "no effect"
+                  and len([r for r in runs if rd in R[r.name][locus]]) >= min(2, len(runs))
+                  and all(R[r.name][locus][rd]["fitness"] > 1.0 for r in runs if rd in R[r.name][locus])]
+        if steady and locus not in star:
+            lead[locus] = max(steady, key=lambda rd: P[locus][rd]["fitness"])
+
+    def share(reading_key, point):
+        return point[1].get(reading_key, 0.0)
+
     lines = [f"# Which genes did best — {main_run.name}", "",
              f"Run: {s['ticks']} ticks, {s['max_gen']} generations, {s['births']} births, {n_deaths} deaths "
              f"(predators {deaths.get('predator', 0) / n_deaths:.0%}, starvation {deaths.get('starvation', 0) / n_deaths:.0%}, "
              f"old age {deaths.get('old_age', 0) / n_deaths:.0%}), {mut['ok']} mutations "
-             f"({mut['tried']} tried), brain `{s['backend']}`, seed {s['seed']}.",
+             f"({mut['tried']} tried), brain `{s['backend']}`, seed {s['seed']}."
+             + (f" Replicates: {', '.join(r.name for r in runs[1:])}." if len(runs) > 1 else ""),
              f"Living animals at the end: {len(main_run.final)}; their genes: "
              f"{np.mean([main_run.alleles[x]['origin'] == 'mutant' for x in living]):.0%} mutants, "
              f"{np.mean([bool(words(main_run.text(x)) & main_run.world) for x in living]):.0%} still use a word of the "
              f"animal's world, {np.mean([len(main_run.text(x).split()) for x in living]):.1f} words on average.", "",
-             f"**Fitness** = mean offspring of the {F['n_dead']} animals that carried the gene and died during the run, "
-             f"÷ the mean of all of them ({F['mean_offspring']:.2f}); 1.00 = average. 95 % interval in brackets; "
-             f"bold when the whole interval is above 1.00. "
-             f"**★** = best gene of its slot, interval above 1.00. Genes carried by fewer than {a.min_carriers} "
-             f"animals are not ranked. Killed by predators: share of carriers (all animals: {F['predator_share']:.0%}).", ""]
-
-    def row(aid, mark=""):
+             f"**Fitness** = mean number of offspring of the animals that carried the gene and died during the "
+             f"run ({F['n_dead']} animals here), each divided by the mean of the animals that died in the same "
+             f"5 000 ticks (so animals are compared with their contemporaries). 1.00 = average; 95 % interval in "
+             f"brackets; **bold** = clearly above average, *italic* = clearly below. Mutation spreads the "
+             f"population over thousands of different texts, so genes are grouped by what the keyword brain reads "
+             f"in them (strength, action, conditions): texts that read the same behave the same. Marks"
+             + (f" (all {len(runs)} runs together)" if len(runs) > 1 else "")
+             + f": **★** best reading of its slot and clearly above average; **▲** best of the readings that are "
+             f"above average in every run (a steady lead, too small to be sure of); **✗** clearly below average. "
+             f"Readings carried by fewer than {a.min_carriers} animals are left out.", "",
+             "## Marked genes", ""]
+    for locus in LOCI:
+        pick = star.get(locus) or lead.get(locus)
+        if pick:
+            x = P[locus][pick]
+            ex = "; ".join(f'"{t}"' for t, _ in x["examples"])
+            per_run = ", ".join(f"{R[r.name][locus][pick]['fitness']:.2f}" for r in runs if pick in R[r.name][locus])
+            lines.append(f"- {'★' if locus in star else '▲'} **{locus}** — {pick}: fitness {fmt_fit(x)} over {x['n']} "
+                         f"carriers (per run: {per_run}), killed by predators {x['predator']:.0%}. "
+                         f"Most carried texts: {ex}.")
+        else:
+            lines.append(f"- **{locus}** — no steady leader.")
+        for rd, x in P[locus].items():
+            if x["hi"] < 1:
+                ex = "; ".join(f'"{t}"' for t, _ in x["examples"][:2])
+                lines.append(f"  - ✗ {rd}: {fmt_fit(x)}, killed by predators {x['predator']:.0%} ({ex})")
+    # predation over time
+    lines += ["", "## Selection by predators over time", "",
+              "| ticks | mean population | killed by predators | starved | predator kills per 1 000 animal-ticks |",
+              "|---|---|---|---|---|"]
+    lines += [f"| {w['from']}–{w['to']} | {w['pop']:.0f} | {w['predator']} | {w['starvation']} | {w['kill_rate']:.2f} |"
+              for w in main_run.predation(a.every)]
+    for r in runs[1:]:
+        p = r.predation(a.every)
+        lines.append(f"\n{r.name}: predator kills per 1 000 animal-ticks {p[0]['kill_rate']:.2f} in the first "
+                     f"{a.every} ticks, {p[-1]['kill_rate']:.2f} in the last.")
+    # readings, slot by slot
+    lines += ["", "## Slot by slot: what the keyword brain reads in each gene", "",
+              f"Living share: share of the living animals carrying that reading at the start, at tick {mid[0]} and at the end."]
+    for locus in LOCI:
+        ranked = sorted(RM[locus], key=lambda r: -RM[locus][r]["fitness"])
+        lines += ["", f"### {locus}", "", "| | reading | carriers | fitness | killed by predators | living share | different texts | most carried texts |",
+                  "|---|---|---|---|---|---|---|---|"]
+        for rd in ranked:
+            x = RM[locus][rd]
+            mark = "★" if star.get(locus) == rd else "▲" if lead.get(locus) == rd else \
+                "✗" if rd in P[locus] and P[locus][rd]["hi"] < 1 else ""
+            ex = "<br>".join(f'"{t}" ({n})' for t, n in x["examples"])
+            lines.append(f"| {mark} | {rd} | {x['n']} | {fmt_fit(x)} | {x['predator']:.0%} | "
+                         f"{share((locus, rd), shares[0]):.0%} → {share((locus, rd), mid):.0%} → {share((locus, rd), shares[-1]):.0%} | "
+                         f"{x['texts']} | {ex} |")
+    if len(runs) > 1:
+        lines += ["", "## Does it replicate? The same readings in every run", "",
+                  "| slot | reading | " + " | ".join(r.name for r in runs) + " | all runs |",
+                  "|---|---|" + "---|" * (len(runs) + 1)]
+        for locus in LOCI:
+            for rd in sorted(P[locus], key=lambda r: -P[locus][r]["fitness"]):
+                cells = [fmt_fit(R[r.name][locus][rd]) if rd in R[r.name][locus] else "—" for r in runs]
+                mark = "★ " if star.get(locus) == rd else "▲ " if lead.get(locus) == rd else \
+                    "✗ " if P[locus][rd]["hi"] < 1 else ""
+                lines.append(f"| {locus} | {mark}{rd} | " + " | ".join(cells) + f" | {fmt_fit(P[locus][rd])} |")
+    # single texts
+    lines += ["", "## Single texts", "",
+              f"The same fitness for each exact text carried by at least {a.min_carriers} animals"
+              + (" (no text is clearly above average)." if not any(x["lo"] > 1 for x in F["alleles"].values()) else "."),
+              "", "| slot | gene | origin | reading | carriers | fitness | killed by predators |", "|---|---|---|---|---|---|---|"]
+    for aid in sorted(F["alleles"], key=lambda aid: -F["alleles"][aid]["fitness"])[:15]:
         x = F["alleles"][aid]
-        f0, fend = freq[0], freq[-1]
-        start = f0[2].get(aid, 0) / max(1, f0[1])
-        peak = max(c.get(aid, 0) / max(1, p) for _, p, c in freq)
-        end = fend[2].get(aid, 0) / max(1, fend[1])
-        fit_txt = f"**{x['fitness']:.2f}**" if x["lo"] > 1 else f"{x['fitness']:.2f}"
-        return (f"| {mark} | {main_run.alleles[aid]['locus']} | {main_run.text(aid)} | {origin(main_run, aid)} | {x['n']} | "
-                f"{fit_txt} [{x['lo']:.2f}–{x['hi']:.2f}] | {x['lifespan']:.0f} | {x['predator']:.0%} | "
-                f"{start:.0%} → {peak:.0%} → {end:.0%} |")
-
-    header = ["| | slot | gene | origin | carriers | fitness | lifespan | killed by predators | frequency start → peak → end |",
-              "|---|---|---|---|---|---|---|---|---|"]
-    stars = {}
-    for locus in LOCI:
-        ranked = sorted((aid for aid in F["alleles"] if main_run.alleles[aid]["locus"] == locus),
-                        key=lambda aid: -F["alleles"][aid]["fitness"])
-        if ranked and F["alleles"][ranked[0]]["lo"] > 1.0:
-            stars[locus] = ranked[0]
-    top = sorted(F["alleles"], key=lambda aid: -F["alleles"][aid]["fitness"])[:12]
-    lines += ["## The best genes, all slots", ""] + header
-    lines += [row(aid, "★" if aid in stars.values() else "") for aid in top]
-    lines += ["", "## Slot by slot", ""]
-    for locus in LOCI:
-        ranked = sorted((aid for aid in F["alleles"] if main_run.alleles[aid]["locus"] == locus),
-                        key=lambda aid: -F["alleles"][aid]["fitness"])
-        lines += [f"### {locus}", ""] + header + [row(aid, "★" if stars.get(locus) == aid else "") for aid in ranked] + [""]
-    mutant_wins = [aid for aid in top if main_run.alleles[aid]["origin"] == "mutant"]
+        lines.append(f"| {main_run.alleles[aid]['locus']} | {main_run.text(aid)} | {origin(main_run, aid)} | "
+                     f"{main_run.read(aid)} | {x['n']} | {fmt_fit(x)} | {x['predator']:.0%} |")
     spread = sorted({aid for aid in set(living) if main_run.alleles[aid]["origin"] == "mutant"},
                     key=lambda aid: -living.count(aid))[:5]
-    lines += ["## Where the mutant genes came from", ""]
-    for aid in list(dict.fromkeys(mutant_wins + spread)):
-        lines += [f"**{main_run.alleles[aid]['locus']}: \"{main_run.text(aid)}\"** "
+    lines += ["", "## The most common genes at the end, and where they came from", ""]
+    for aid in spread:
+        lines += [f"**{main_run.alleles[aid]['locus']}: \"{main_run.text(aid)}\"** — {main_run.read(aid)} "
                   f"({living.count(aid)} of {len(main_run.final)} living animals)", "", "```text"]
         lines += main_run.lineage(aid, instructions) + ["```", ""]
-    if len(runs) > 1:
-        lines += ["## Does it replicate? Founder genes in every run", "",
-                  "| slot | founder gene | " + " | ".join(r.name for r in runs) + " |",
-                  "|---|---|" + "---|" * len(runs)]
-        for locus in LOCI:
-            texts = sorted({r.alleles[aid]["text"] for r in runs for aid in fit[r.name]["alleles"]
-                            if r.alleles[aid]["locus"] == locus and r.alleles[aid]["origin"] in ("founder", "neutral")})
-            for t in texts:
-                cells = []
-                for r in runs:
-                    aid = next((x for x in fit[r.name]["alleles"] if r.alleles[x]["locus"] == locus
-                                and r.alleles[x]["text"] == t), None)
-                    x = fit[r.name]["alleles"].get(aid) if aid else None
-                    cells.append("—" if x is None else (f"**{x['fitness']:.2f}**" if x["lo"] > 1 else f"{x['fitness']:.2f}"))
-                lines.append(f"| {locus} | {t} | " + " | ".join(cells) + " |")
-        lines += ["", "Bold: interval above 1.00 in that run."]
     out = resolve(cfg.paths.results_dir)
     (out / f"{tag}_genes.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     (out / f"{tag}_genes.json").write_text(json.dumps(
-        {"runs": [r.name for r in runs], "min_carriers": a.min_carriers, "stars": stars,
-         "fitness": {r.name: {aid: {**v, "text": r.text(aid), "locus": r.alleles[aid]["locus"], "origin": origin(r, aid)}
-                              for aid, v in fit[r.name]["alleles"].items()} for r in runs}},
+        {"runs": [r.name for r in runs], "min_carriers": a.min_carriers, "stars": star,
+         "readings": {r.name: R[r.name] for r in runs}, "readings_all_runs": P,
+         "predation": {r.name: r.predation(a.every) for r in runs},
+         "texts": {r.name: {aid: {**v, "text": r.text(aid), "locus": r.alleles[aid]["locus"], "origin": origin(r, aid),
+                                  "reading": r.read(aid)} for aid, v in fit[r.name]["alleles"].items()} for r in runs}},
         indent=1, ensure_ascii=False, default=float), encoding="utf-8")
     print("\n".join(lines[:3]))
-    for locus, aid in stars.items():
-        x = F["alleles"][aid]
-        print(f"★ {locus:<7} {x['fitness']:.2f} [{x['lo']:.2f}–{x['hi']:.2f}] n={x['n']:<5} {main_run.text(aid)}")
+    for locus in LOCI:
+        pick = star.get(locus) or lead.get(locus)
+        if pick:
+            x = P[locus][pick]
+            print(f"{'★' if locus in star else '▲'} {locus:<7} {x['fitness']:.2f} [{x['lo']:.2f}–{x['hi']:.2f}] "
+                  f"n={x['n']:<6} {pick}")
+        for rd, x in P[locus].items():
+            if x["hi"] < 1:
+                print(f"✗ {locus:<7} {x['fitness']:.2f} [{x['lo']:.2f}–{x['hi']:.2f}] n={x['n']:<6} {rd}")
     print(f"details: {out / (tag + '_genes.md')}")
 
 

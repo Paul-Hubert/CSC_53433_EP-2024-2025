@@ -212,6 +212,26 @@ at each temperature.
 
 Examples and discussion: [04 §5](04-genome-and-evolution.md#5-mutation).
 
+### 5.8 Long runs with selection
+
+`results/long_1234_genes.md`, 2026-10-02:
+
+- **Setup:** full profile (64 × 64, 3 predators, cap 60), rule-based brain, blind LLM mutation (gemma4:12b, `mutate_v2`), 50 000 ticks (≈ 230 generations). Three seeds (1234, 7, 42) ran in parallel in about 14 minutes, with about 2 400 mutation calls each.
+- **Deaths:** predators caused 42–43 % of them, starvation the rest.
+- **No gene is clearly better than average, even with the three runs pooled.** Genes are grouped by what the keyword brain reads in them. The steady leaders (above average in every seed) are only 1–2 % ahead:
+  - cautious;
+  - solitary;
+  - attached to familiar places;
+  - "flee when a predator is very close";
+  - "never attack";
+  - "rest when food is far".
+- **Selection works against harmful genes:**
+  - "always attack": fitness 0.77;
+  - restless: 0.79, with 60 % of carriers killed by predators against 43 % on average;
+  - losing the cautious temperament: 0.89, with 53 % killed by predators.
+- **Drift is strong with about 50 animals.** Readings swing from about 25 % to 98 % and back. At the end, 92–100 % of living genes are mutants, 62–79 % still use a word of the animal's world, and only 55–65 different texts remain.
+- **The keyword brain can't tell nonsense from sense.** "Never potato." reads like "Never fight.", and "Eat whenever food is enough to hear it screaming." like "Eat whenever food is close.".
+
 ### Summary
 
 | Gate | Status (2026-10-01) |
@@ -292,6 +312,8 @@ python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b 
 python -m experiments.smoke_run --ticks 5000 --snapshots 0 --seed 7             # 5.5, one seed
 python -m experiments.smoke_run --backend llm --ticks 500 --snapshots 1         # 5.6
 python -m experiments.mutation_test                                             # 5.7 (≈ 4 min, cached afterwards)
+python -m experiments.smoke_run --profile full --ticks 50000 --seed 1234 --snapshots 5 --out results/runs/long_1234   # 5.8 (also seeds 7, 42)
+python -m experiments.gene_report results/runs/long_1234 results/runs/long_7 results/runs/long_42 --tag long_1234
 ```
 
 The gate writes `results/teacher_gate.md`. Rename it per model to keep both,

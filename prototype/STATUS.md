@@ -106,6 +106,11 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
   Lineages (24 × 30 steps): genes using a world word 83 % after 1, 58 % after 10, 21 % after 15,
   12 % after 30; 4.7 → 6.5-7.8 words; "toaster" in 18/24 lineages. ≈ 270 mutation calls per
   10 000 ticks (rule_based, small).
+- Long runs (2026-10-02, full, rule_based, LLM mutation v2, 50 000 ticks ≈ 230 generations, seeds 1234/7/42 in
+  parallel ≈ 14 min, ≈ 2 400 mutation calls each): predators 42-43 % of deaths. No gene reading clearly above
+  average even pooled; steady leaders +1-2 % (cautious, solitary, familiar, flee when predator very close, never
+  attack, rest when food far); clearly worse: attack always 0.77, restless 0.79 (60 % killed by predators), risk
+  no effect 0.89 (53 %). Living genes 92-100 % mutants, 62-79 % use a world word. results/long_1234_genes.md.
 - E1 rule_based reference (small, 48 obs): MI_G founders 0.23, MI_G random 0.00,
   MI_O 0.83, directed sign acc 1.00, ΔP 0.48, gibberish→neutral 0.00.
   Note for H2: even the "ideal" keyword interpreter scores MI_G 0.23 < G2 threshold 0.25

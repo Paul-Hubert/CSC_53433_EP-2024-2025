@@ -254,7 +254,7 @@ clear message. `--no-mutation` runs without it.
 
 | Script | Purpose | Options |
 |---|---|---|
-| `gene_report RUN [RUN …]` | Ranks every gene of a run by the fitness of its carriers (mean offspring of the animals that carried it and died, ÷ the mean of all), with lifespan, share killed by predators, frequency over time and the lineage of mutant genes. ★ marks the best gene of a slot when its 95 % interval is above 1.00; extra runs (other seeds) show whether founder genes rank the same → `results/<tag>_genes.md/.json` | `--min-carriers` (100), `--every` (10000 ticks), `--tag` |
+| `gene_report RUN [RUN …]` | Ranks genes by the fitness of their carriers: offspring of the animals that carried them and died, each divided by the mean of the animals that died in the same 5 000 ticks. Genes are grouped by what the keyword brain reads in them (strength, action, conditions), since mutation spreads the population over thousands of texts; exact texts are ranked too. Also: share killed by predators, frequency over time, predator kills per 1 000 animal-ticks, lineage of the most common genes. With several runs (seeds) the marks use all of them: ★ clearly above average, ▲ steady leader (above average in every run), ✗ clearly below → `results/<tag>_genes.md/.json` | `--min-carriers` (100), `--every` (10000 ticks), `--tag` |
 
 ### Helpers
 
