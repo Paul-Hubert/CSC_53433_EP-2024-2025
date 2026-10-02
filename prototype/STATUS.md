@@ -44,7 +44,7 @@ make_dataset.py, label_teacher.py, S5 distillation.
 - [ ] S7 report, go/no-go · H5 decision
 
 ## Environment
-Windows 11 Pro, Python 3.13.5 (.venv), RTX 5080 16 GB, Ollama 0.32.0. Offline suite 43 passed on Windows.
+Windows 11 Pro, Python 3.13.5 (.venv), RTX 5080 16 GB, Ollama 0.32.0. Offline suite 44 passed on Windows.
 Windows: experiments.status used os.kill(pid, 0); signal 0 is CTRL_C_EVENT on Windows, so live jobs
 showed as DEAD? → fixed (OpenProcess + GetExitCodeProcess).
 

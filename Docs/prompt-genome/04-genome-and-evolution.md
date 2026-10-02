@@ -289,8 +289,12 @@ Everything needed to study evolution after the fact is logged
 - `stats.csv` → population, energy, generations and the number of alleles over
   time.
 
-**Not built yet:** the analysis layer the design promises for students:
-allele frequencies per locus over time, lineage trees with gene diffs, a "top
-surviving genes" table, per-locus diversity and gene length. These are planned
-for the spike's S6/S7 sessions and would make a natural Lab 1 exercise. The
-building blocks exist: `metrics.shannon_diversity` and `metrics.bootstrap_ci`.
+**First analysis tool:** `python -m experiments.gene_report results/runs/<run>`
+ranks every gene by the fitness of the animals that carried it (their mean
+number of offspring, relative to all animals), with lifespan, the share
+killed by predators, frequency at the start, peak and end, and the lineage of
+mutant genes; ★ marks the best gene of each slot when the difference is clear
+([08 §4](08-code-and-config-reference.md)). **Not built yet:** frequency
+curves, lineage trees with gene diffs, per-locus diversity over time. They
+would make a natural Lab 1 exercise; the building blocks exist
+(`metrics.shannon_diversity`, `metrics.bootstrap_ci`).

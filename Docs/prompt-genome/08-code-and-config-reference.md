@@ -250,6 +250,12 @@ clear message. `--no-mutation` runs without it.
 | `mutation_test` | Pure mutation, no selection: every founder sentence × seeds × temperatures (variety, edit size, length, keyword-brain effect) and lineages mutated step after step → `results/mutation_test.md/.json` | `--temps` (0.9,1.2,1.5,2.0), `--seeds` (8), `--steps` (30), `--workers` (4), `--model`, `--tag` |
 | `make_obs` | Rebuild the observation set (`data/observations_v1.jsonl`) from synthetic situations + the most frequent ones of a rule-based run | `--ticks` (3000), `--out` |
 
+### Reading a run
+
+| Script | Purpose | Options |
+|---|---|---|
+| `gene_report RUN [RUN …]` | Ranks every gene of a run by the fitness of its carriers (mean offspring of the animals that carried it and died, ÷ the mean of all), with lifespan, share killed by predators, frequency over time and the lineage of mutant genes. ★ marks the best gene of a slot when its 95 % interval is above 1.00; extra runs (other seeds) show whether founder genes rank the same → `results/<tag>_genes.md/.json` | `--min-carriers` (100), `--every` (10000 ticks), `--tag` |
+
 ### Helpers
 
 | Script | Purpose |
@@ -278,7 +284,7 @@ let the LLM decide directly. Their usage is in their docstrings and in
 
 ## 6. Tests
 
-`cd prototype && pytest -q` runs 43 offline tests in about 20 s, with no model
+`cd prototype && pytest -q` runs 44 offline tests in about 20 s, with no model
 needed. LLM calls are replaced by small fake servers. Two marked tests talk to
 real models: `pytest -m ollama` (needs Ollama and `policy.model`) and
 `pytest -m laya` (parked).
@@ -291,6 +297,7 @@ real models: `pytest -m ollama` (needs Ollama and `policy.model`) and
 | `test_genome.py` | allele pools, registry dedup and genome keys, crossover |
 | `test_evolution.py` | guards and instruction list, the mutator sends only the instruction and the gene (fake LLM), rejected answers, no LLM → no mutation, determinism, population bounds, shuffled control, no mutation → no new alleles |
 | `test_metrics.py` | entropy, JSD, mutual information, directed ΔP, Spearman |
+| `test_gene_report.py` | `gene_report` on a short run: fitness averages to 1.00 in every slot, frequencies add up to the population |
 | `test_llm_policy.py` | table mode vs points, malformed rows, persistent caches (incl. an empty cache file), API key header, factory (incl. mutation off and Ollama down), logprobs fallback |
 | `test_adapters.py` | Laya request layouts and answer parsing (parked), Ollama client |
 | `test_dataset.py` | dataset splits, resumable labelling, gate with a fake model (parked pipeline) |

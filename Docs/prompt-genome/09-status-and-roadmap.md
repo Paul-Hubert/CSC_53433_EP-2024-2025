@@ -25,8 +25,8 @@ owner-facing log is in `Docs/redesign/09-progress-log.md`.
 | Mutation: one blind random change by the LLM (16 instructions, temperature) | working; gemma4:12b; pure-mutation test in `results/mutation_test.md` |
 | Metrics, E1 suite, decision-model gate | working; gate run on gemma4 12b and 26b |
 | Persistent answer caches | working (request-cache bug fixed 2026-10-01) |
-| Tests | 43 offline tests pass; real-model test passes on gemma4:12b |
-| Analysis tools (allele frequencies, lineages, diversity) | not written |
+| Tests | 44 offline tests pass; real-model test passes on gemma4:12b |
+| Analysis tools | `gene_report` (gene fitness, frequency, mutant lineages) since 2026-10-02; frequency curves and diversity over time not written |
 | Evolution matrix (E4), common garden (E5), report | not written |
 | Unity version | not started |
 | Laya brain and distillation | parked |

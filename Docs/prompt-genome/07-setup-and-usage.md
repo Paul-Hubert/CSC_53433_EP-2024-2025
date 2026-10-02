@@ -38,7 +38,7 @@ cd prototype
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
-pytest -q                      # 43 passed, no model needed
+pytest -q                      # 44 passed, no model needed
 ```
 
 Windows (PowerShell):
