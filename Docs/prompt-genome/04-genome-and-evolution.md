@@ -253,7 +253,9 @@ if it:
 
 Each of these depends on the decisions its genes produce. Selection is
 *measured* afterwards for analysis (lifespan, offspring, food eaten, allele
-frequencies), never used to choose parents.
+frequencies), never used to choose parents. How it is measured, and what
+230-generation runs with predators showed, is in
+[10 — Natural selection in long runs](10-natural-selection-runs.md).
 
 Two things weaken selection, and both are watched in the experiments:
 

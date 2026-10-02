@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import time
 from pathlib import Path
 
 from promptevo.backends.factory import MutatorUnavailable, make_backend, make_rewriter
@@ -30,6 +31,8 @@ def main() -> None:
     ap.add_argument("--world", default=None,
                     help="world overlay from configs/worlds/ (default: the flat Lab 1 world)")
     ap.add_argument("--no-mutation", action="store_true", help="no gene mutation (no mutator LLM needed)")
+    ap.add_argument("--minutes", type=float, default=None,
+                    help="stop after this much wall-clock time, even before --ticks (time-boxed runs)")
     a = ap.parse_args()
     cfg = load_config(a.profile, extra_files=[CONFIG_DIR / "worlds" / f"{a.world}.yaml"] if a.world else None,
                       overrides={"evolution": {"p_mut": 0.0}} if a.no_mutation else None)
@@ -48,13 +51,17 @@ def main() -> None:
     prog = Progress(resolve(cfg.paths.logs_dir), f"run_{Path(a.out).name}", total=a.ticks)
     if a.snapshots:
         print(LEGEND)
+    started = time.time()
     for i in range(a.ticks):
         sim.step()
         if sim.t % 500 == 0:
             prog.update(sim.t, pop=len(sim.agents), births=sim.c.births, mutations=sim.mutator.stats["ok"])
         if a.snapshots and sim.t % every == 0:
-            print(f"--- t={sim.t} pop={len(sim.agents)}")
-            print(ascii_map(sim.world, sim.agents, max_w=40, max_h=14))
+            print(f"--- t={sim.t} pop={len(sim.agents)}", flush=True)
+            print(ascii_map(sim.world, sim.agents, max_w=40, max_h=14), flush=True)
+        if a.minutes and time.time() - started > 60 * a.minutes:
+            print(f"time limit: stopped after {a.minutes:g} min at t={sim.t}")
+            break
     s = sim.finish()
     prog.finish(sim.t)
     keep = {k: s[k] for k in ("ticks", "pop_final", "births", "immigrants", "deaths",

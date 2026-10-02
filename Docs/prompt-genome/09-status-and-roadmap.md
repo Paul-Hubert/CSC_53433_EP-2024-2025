@@ -47,6 +47,7 @@ owner-facing log is in `Docs/redesign/09-progress-log.md`.
 | 2026-09-28 | Phase 0 spike planned: preregistered gates G1–G5, 7-session runbook (08). Offline core built and tested: world, simulation, rule-based brain, metrics, mutation, probes, E1. Teacher/distillation pipeline written. |
 | 2026-09-30 | Decision: no Laya fine-tuning; Ollama LLMs decide and mutate. Laya parked. |
 | 2026-10-01 | First local tests (Windows 11, RTX 5080, Ollama 0.32). gemma4:26b and 12b probed. Fixes: `think: false` and a fixed `num_ctx` (model reloads), Windows liveness check in `status`, request cache never written, `smoke_run` LLM mutation with every brain, ambiguous ASCII map symbols. Decision-model gate on both models (G1 ✔, G2 ✘). Brain switched to gemma4:12b. Point-total analysis (all-zero answers on random text). **Lab 1 = flat world with random food**, food regrowth retuned; noise terrain moved to `configs/worlds/terrain_preview.yaml`. First 500-tick run with the LLM brain. This documentation. |
+| 2026-10-02 | Mutation reviewed (`prototype/notes/mutation-review.md`), then replaced by one blind operator: the LLM gets a random-change instruction and the gene, nothing else. Mutation test (`results/mutation_test.md`). Three 50 000-tick runs with predators and the new `gene_report` ([10](10-natural-selection-runs.md)): no gene clearly best, careless temperaments clearly selected against. First hour-long LLM-brain run. |
 
 ## 3. Decisions taken
 

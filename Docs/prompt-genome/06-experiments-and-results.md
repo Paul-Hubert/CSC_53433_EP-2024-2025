@@ -214,6 +214,8 @@ Examples and discussion: [04 §5](04-genome-and-evolution.md#5-mutation).
 
 ### 5.8 Long runs with selection
 
+Full write-up, method and tables: [10](10-natural-selection-runs.md).
+
 `results/long_1234_genes.md`, 2026-10-02:
 
 - **Setup:** full profile (64 × 64, 3 predators, cap 60), rule-based brain, blind LLM mutation (gemma4:12b, `mutate_v2`), 50 000 ticks (≈ 230 generations). Three seeds (1234, 7, 42) ran in parallel in about 14 minutes, with about 2 400 mutation calls each.

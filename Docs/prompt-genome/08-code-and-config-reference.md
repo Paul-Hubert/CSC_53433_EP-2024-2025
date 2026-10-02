@@ -233,7 +233,7 @@ and `peek` don't read it.
 
 | Script | Purpose | Options |
 |---|---|---|
-| `smoke_run` | Run a simulation, print ASCII snapshots and a summary, write the run files | `--ticks` (5000), `--backend` (config default `rule_based`; `random`, `llm`), `--seed`, `--out` (`results/runs/smoke`), `--snapshots` (3; 0 = none), `--world` (overlay from `configs/worlds/`), `--no-mutation` (crossover only, no model needed) |
+| `smoke_run` | Run a simulation, print ASCII snapshots and a summary, write the run files | `--ticks` (5000), `--backend` (config default `rule_based`; `random`, `llm`), `--seed`, `--out` (`results/runs/smoke`), `--snapshots` (3; 0 = none), `--world` (overlay from `configs/worlds/`), `--no-mutation` (crossover only, no model needed), `--minutes` (stop after N minutes of wall-clock time) |
 
 With `--backend llm` the summary also prints `llm_calls`, failures and the
 memo hit rate. Genes mutate through the mutator model with every brain, so
@@ -254,7 +254,7 @@ clear message. `--no-mutation` runs without it.
 
 | Script | Purpose | Options |
 |---|---|---|
-| `gene_report RUN [RUN …]` | Ranks genes by the fitness of their carriers: offspring of the animals that carried them and died, each divided by the mean of the animals that died in the same 5 000 ticks. Genes are grouped by what the keyword brain reads in them (strength, action, conditions), since mutation spreads the population over thousands of texts; exact texts are ranked too. Also: share killed by predators, frequency over time, predator kills per 1 000 animal-ticks, lineage of the most common genes. With several runs (seeds) the marks use all of them: ★ clearly above average, ▲ steady leader (above average in every run), ✗ clearly below → `results/<tag>_genes.md/.json` | `--min-carriers` (100), `--every` (10000 ticks), `--tag` |
+| `gene_report RUN [RUN …]` | Ranks genes by the fitness of their carriers: offspring of the animals that carried them and died, each divided by the mean of the animals that died in the same 5 000 ticks. Genes are grouped by what the keyword brain reads in them (strength, action, conditions), since mutation spreads the population over thousands of texts; exact texts are ranked too. Also: share killed by predators, frequency over time, predator kills per 1 000 animal-ticks, lineage of the most common genes. With several runs (seeds) the marks use all of them: ★ clearly above average, ▲ steady leader (above average in every run), ✗ clearly below → `results/<tag>_genes.md/.json`; method in [10 §2](10-natural-selection-runs.md#2-measuring-which-genes-did-best) | `--min-carriers` (100), `--every` (10000 ticks), `--tag` |
 
 ### Helpers
 
