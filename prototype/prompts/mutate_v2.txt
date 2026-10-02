@@ -1,0 +1,19 @@
+# Mutation instructions, one per line. For each mutation one line is drawn at random
+# and sent to the mutator LLM with the gene sentence, and nothing else: no world, no
+# other genes, no fitness. Lines starting with # are ignored. Add a line to add one.
+Make one random change to this sentence.
+Change this sentence randomly.
+Mutate this sentence at random.
+Make a small random edit to this sentence.
+Randomly change one word in this sentence.
+Replace one word in this sentence with a random word.
+Randomly change a few words in this sentence.
+Randomly add a word to this sentence.
+Randomly remove a word from this sentence.
+Randomly swap two words in this sentence.
+Randomly rewrite one part of this sentence.
+Change one random detail in this sentence.
+Make an unexpected change to this sentence.
+Randomly change the meaning of this sentence a little.
+Randomly change the meaning of this sentence a lot.
+Change this sentence in a random way, big or small.

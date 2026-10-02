@@ -32,9 +32,15 @@ def fake_transport(calls):
     return t
 
 
+def fake_mutator(prompt, seed):
+    """Stands in for the mutator LLM: appends one of six endings, chosen by the seed."""
+    text = re.search(r'"(.*)"', prompt).group(1).rstrip(".")
+    return f"{text} {['slowly', 'at night', 'near others', 'when calm', 'quietly', 'alone'][seed % 6]}."
+
+
 def _dataset(cfg, reg_pools, n=240):
     reg, pools = reg_pools
-    mutants = make_mutants(cfg, reg, pools, np.random.default_rng(1), per_allele=3)
+    mutants = make_mutants(cfg, reg, pools, np.random.default_rng(1), per_allele=3, llm=fake_mutator, model="fake")
     rows, meta = build(cfg, reg, pools, mutants, synthetic(), n, seed=5)
     return rows, meta
 

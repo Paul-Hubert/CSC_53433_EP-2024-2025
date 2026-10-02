@@ -18,13 +18,23 @@ def make_backend(name: str, cfg, **over):
     raise SystemExit(f"unknown backend {name!r} (random | rule_based | llm | laya)")
 
 
-def make_rewriter(cfg, client=None):
-    """(rewriter, model) for LLM gene mutation, or (None, None) if disabled/unconfigured."""
+class MutatorUnavailable(RuntimeError):
+    """Gene mutation is configured but the Ollama server can't be reached."""
+
+
+def make_rewriter(cfg, client=None, check: bool = False):
+    """(llm, model) for gene mutation, or (None, None) when mutation is off
+    (ollama.mutator_model is null or evolution.p_mut is 0). check=True asks the server
+    once and raises MutatorUnavailable instead of failing at the first birth."""
     model = cfg.ollama.mutator_model
-    if not model or float(cfg.evolution.operators.get("llm_rewrite", 0)) <= 0:
+    if not model or float(cfg.evolution.p_mut) <= 0:
         return None, None
-    from ..config import resolve
     from ..llm.ollama_client import client_from_config, make_rewriter as _mk
     client = client or client_from_config(cfg)
-    return _mk(client, model, resolve("prompts/mutate_v1.md"),
-               max_words=int(cfg.evolution.max_action_words)), model
+    if check:
+        try:
+            client.version()
+        except RuntimeError as e:
+            raise MutatorUnavailable(f"gene mutation uses the Ollama model {model} at {cfg.ollama.host}, "
+                                     f"but the server didn't answer ({e})") from e
+    return _mk(client, model, temperature=float(cfg.evolution.temperature)), model

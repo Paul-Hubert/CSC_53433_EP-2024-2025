@@ -5,6 +5,8 @@
     python -m experiments.e1_sensitivity --backend llm --tag llm_table     (LLM brain; needs policy.model)
 
 Writes results/e1_<tag>.json + .md and prints a ≤ 20-line summary with G1–G3.
+The single-gene edits for G3 come from the mutator LLM (ollama.mutator_model); without a
+reachable mutator the edits are skipped and G3 is not measured.
 Long runs: launch with nohup; progress in logs/e1_<tag>.progress.json.
 """
 from __future__ import annotations
@@ -37,12 +39,13 @@ def make_backend(name, cfg, a):
 
 
 def single_edit(mut: Mutator, reg: AlleleRegistry, g: Genome, rng) -> Genome | None:
-    for _ in range(20):
+    """g with one gene mutated by the mutator LLM (up to 5 attempts), or None."""
+    for _ in range(5):
         locus = LOCI[int(rng.integers(len(LOCI)))]
-        op = ["intensity", "negate", "condition_swap", "synonym"][int(rng.integers(4))]
-        new = mut.mutate_text(locus, reg.text(g.at(locus)), op, rng, 0)
+        new, k, seed = mut.mutate_text(locus, reg.text(g.at(locus)), rng)
         if new:
-            return g.replace(locus, reg.add(locus, new, "mutant", parent_id=g.at(locus), operator=op).id)
+            return g.replace(locus, reg.add(locus, new, "mutant", parent_id=g.at(locus),
+                                            operator=f"llm#{k}", seed=seed, model=mut.model).id)
     return None
 
 
@@ -52,15 +55,15 @@ def text_distance(reg, g1: Genome, g2: Genome) -> float:
     return 1.0 - difflib.SequenceMatcher(None, a, b).ratio()
 
 
-def build_sets(cfg, reg: AlleleRegistry, pools: AllelePools, rng, size: dict) -> dict:
-    """Genome sets for the suite: founders, random-text controls, neutral, contrast pairs, edits."""
-    mut = Mutator(cfg, reg, pools.founders)
+def build_sets(cfg, reg: AlleleRegistry, pools: AllelePools, rng, size: dict, mutator: Mutator | None = None) -> dict:
+    """Genome sets for the suite: founders, random-text controls, neutral, contrast pairs, and
+    single-gene edits (only with a mutator that has an LLM)."""
     founders = list(dict.fromkeys(pools.sample_founder(rng) for _ in range(size["founders"])))
     controls = [pools.sample_control(rng) for _ in range(size["random"])]
     edits = []
-    for parent in founders[: size["edit_parents"]]:
+    for parent in (founders[: size["edit_parents"]] if mutator is not None and mutator.llm else []):
         for _ in range(size["edits"]):
-            child = single_edit(mut, reg, parent, rng)
+            child = single_edit(mutator, reg, parent, rng)
             if child is not None:
                 edits.append((parent, child))
     return {"founders": founders, "controls": controls, "neutral": pools.neutral_genome(),
@@ -154,7 +157,13 @@ def main() -> None:
     pools = AllelePools(reg, cfg.paths.data_dir)
     obs = load_obs(a.obs)
     backend = make_backend(a.backend, cfg, a)
-    sets = build_sets(cfg, reg, pools, rng, SIZES[a.profile])
+    from promptevo.backends.factory import MutatorUnavailable, make_rewriter
+    try:
+        llm, model = make_rewriter(cfg, check=True)
+    except MutatorUnavailable as e:
+        print(f"no single-gene edits, G3 not measured: {e}")
+        llm, model = None, None
+    sets = build_sets(cfg, reg, pools, rng, SIZES[a.profile], Mutator(cfg, reg, llm, model))
     n_calls = len(obs) * (len(sets["founders"]) + len(sets["controls"]) + 15 + len(sets["edits"]))
     prog = Progress(resolve(cfg.paths.logs_dir), f"e1_{tag}", total=n_calls)
     res, _, _ = evaluate(backend, reg, sets, obs, prog, a.chunk)

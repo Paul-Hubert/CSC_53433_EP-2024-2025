@@ -82,5 +82,5 @@ def test_ollama_client_and_teacher(reg_pools):
         t = TeacherBackend(c, "teach", resolve("prompts/teacher_v1.md"), mode=mode, k=3)
         p = t.decide([q])
         assert p[0].argmax() == ACTIONS.index("flee") and abs(p.sum() - 1) < 1e-9
-    rw = make_rewriter(c, "teach", resolve("prompts/mutate_v1.md"))
-    assert rw("Eat.", "invert", 1) == "Run from every shadow."
+    ask = make_rewriter(c, "teach", temperature=1.2)
+    assert ask('Make one random change to this sentence.\n\n"Eat."', 1) == "Run from every shadow."

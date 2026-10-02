@@ -99,10 +99,11 @@ def main() -> None:
     section("4b. Seconds per decision by mode (warm)", timing)
 
     if a.mutator:
+        from promptevo.evolution.mutation import TEMPLATE, load_instructions
         from promptevo.llm.ollama_client import make_rewriter
-        rw = make_rewriter(c, a.mutator, resolve("prompts/mutate_v1.md"))
-        section("5. Mutator samples", lambda: {s: rw("Eat whenever food is close.", s, 3)
-                                               for s in ("random change", "invert", "add a condition")})
+        ask = make_rewriter(c, a.mutator, temperature=1.2)
+        section("5. Mutator samples (T 1.2)", lambda: {i: ask(TEMPLATE.format(instruction=i, text="Eat whenever food is close."), 3)
+                                                       for i in load_instructions("prompts/mutate_v2.txt")[:3]})
     if a.embed:
         section("6. Embeddings", lambda: {"dim": len(c.embed(a.embed, ["run from predators"])[0])})
 

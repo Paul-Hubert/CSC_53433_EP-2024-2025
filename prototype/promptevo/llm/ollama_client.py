@@ -141,13 +141,9 @@ def client_from_config(cfg, transport: Transport | None = None) -> OllamaClient:
                         options=dict(oc.get("options") or {}), think=oc.get("think"))
 
 
-def make_rewriter(client: OllamaClient, model: str, prompt_path: str | Path, max_words: int = 12,
-                  temperature: float = 0.9):
-    """Return rewriter(text, style, seed) -> str for evolution.mutation.Mutator."""
-    template = Path(prompt_path).read_text()
-
-    def rewrite(text: str, style: str, seed: int) -> str:
-        prompt = template.format(style=style, text=text, max_words=max_words)
+def make_rewriter(client: OllamaClient, model: str, temperature: float = 1.0):
+    """Return llm(prompt, seed) -> str for evolution.mutation.Mutator: one cached chat call."""
+    def ask(prompt: str, seed: int) -> str:
         return client.chat(model, [{"role": "user", "content": prompt}],
-                           options={"seed": int(seed), "temperature": temperature})
-    return rewrite
+                           options={"seed": int(seed), "temperature": float(temperature)})
+    return ask

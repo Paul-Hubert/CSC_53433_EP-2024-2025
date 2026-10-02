@@ -47,17 +47,14 @@ sim:
   stats_every: 100
 evolution:
   sexual: true
-  p_mut: 0.03
+  p_mut: 0.03                 # chance per gene per child that the mutator LLM changes it
   shuffled: false             # C3 control
   random_founders: false      # C4 control
-  operators:                  # weights, plan §A8
-    intensity: 1.0
-    negate: 1.0
-    condition_swap: 1.0
-    synonym: 1.0
-    founder_reintroduce: 0.5
-    llm_rewrite: 1.0          # used only when ollama.mutator_model is set
-  max_action_words: 12
+  # Mutation (rev. 2026-10-02): one operator. The mutator LLM (ollama.mutator_model) gets one
+  # instruction drawn at random from this file plus the gene sentence, nothing else.
+  mutation_prompts: prompts/mutate_v2.txt
+  temperature: 1.2            # mutator sampling temperature (results/mutation_test.md)
+  max_action_words: 12        # guard: longer answers are rejected (the gene doesn't mutate)
   max_temperament_words: 15
 backend:
   name: rule_based            # random | rule_based | llm | laya (parked)
@@ -81,7 +78,7 @@ ollama:
   host: http://localhost:11434   # or https://ollama.com (direct cloud API, needs a key)
   api_key_env: OLLAMA_API_KEY    # name of the env var holding the key; sent only if set
   teacher_model: null         # chosen in S1.3
-  mutator_model: gemma4:26b
+  mutator_model: gemma4:12b   # gene mutation (same model as the brain: no swaps); null = no mutation
   embed_model: null
   teacher_mode: points        # points | ksample
   ksample_k: 8

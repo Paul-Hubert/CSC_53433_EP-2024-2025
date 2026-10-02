@@ -77,7 +77,7 @@ class Simulation:
         self.world = World(cfg, ws.get("world"), self.streams.get("predators"))
         self.registry = registry or AlleleRegistry()
         self.pools = pools or AllelePools(self.registry, cfg.paths.data_dir)
-        self.mutator = Mutator(cfg, self.registry, self.pools.founders, rewriter, rewriter_model)
+        self.mutator = Mutator(cfg, self.registry, rewriter, rewriter_model)   # no rewriter: no mutation
         self.log = EventLog(out_dir)
         self.out_dir = Path(out_dir) if out_dir else None
         self.progress = progress
@@ -297,6 +297,6 @@ class Simulation:
                 "backend_s": round(c.backend_time, 2),
                 "invalid_rate": round(c.invalid / max(1, c.decisions), 3),
                 "action_share": {k: round(v / max(1, c.decisions), 3) for k, v in c.actions.most_common()},
-                "mutations": {k: v for k, v in self.mutator.stats.items() if v["tried"]},
+                "mutations": dict(self.mutator.stats),
                 "alleles": len(self.registry), "events_sha": self.log.digest()[:16]}
 

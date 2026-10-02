@@ -2,6 +2,7 @@ import json
 import re
 
 import numpy as np
+import pytest
 
 from promptevo.backends.base import Query
 from promptevo.backends.factory import make_backend, make_rewriter
@@ -115,9 +116,7 @@ def test_api_key_header_and_client_from_config(monkeypatch):
 
 def test_factory_and_llm_simulation(reg_pools):
     cfg = load_config("small", {"policy": {"model": "brain", "mode": "table"}, "ollama": {"mutator_model": "brain"},
-                                "evolution": {"p_mut": 1.0, "operators": {
-                                    "intensity": 0, "negate": 0, "condition_swap": 0, "synonym": 0,
-                                    "founder_reintroduce": 0, "llm_rewrite": 1.0}}})
+                                "evolution": {"p_mut": 1.0}})
     assert make_backend("rule_based", cfg).name == "rule_based"
     log = []
     client = OllamaClient(transport=fake(log))
@@ -125,8 +124,8 @@ def test_factory_and_llm_simulation(reg_pools):
     backend.cache = None
     calls = []
 
-    def rewriter(text, style, seed):
-        calls.append(style)
+    def rewriter(prompt, seed):
+        calls.append(prompt)
         return "Run from every shadow."
     rw, model = make_rewriter(cfg, client)
     assert rw is not None and model == "brain"
@@ -181,3 +180,15 @@ def test_empty_persistent_cache_is_used(tmp_path):
     assert client.cache is cache
     client.chat("brain", [{"role": "user", "content": "x"}])
     assert len(KVCache(tmp_path / "o.sqlite")) == 1
+
+
+def test_make_rewriter_off_and_unreachable(monkeypatch):
+    from promptevo.backends.factory import MutatorUnavailable
+    assert make_rewriter(load_config("small", {"ollama": {"mutator_model": None}})) == (None, None)
+    assert make_rewriter(load_config("small", {"evolution": {"p_mut": 0.0}})) == (None, None)
+    monkeypatch.setattr("promptevo.llm.ollama_client.time.sleep", lambda s: None)
+
+    def down(method, path, payload):
+        raise ConnectionRefusedError("no server")
+    with pytest.raises(MutatorUnavailable):
+        make_rewriter(load_config("small"), OllamaClient(transport=down, retries=1), check=True)
