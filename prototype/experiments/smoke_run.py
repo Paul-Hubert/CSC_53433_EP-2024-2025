@@ -10,9 +10,11 @@ from __future__ import annotations
 
 import argparse
 import json
+from pathlib import Path
 
 from promptevo.backends.factory import MutatorUnavailable, make_backend, make_rewriter
 from promptevo.config import CONFIG_DIR, load_config, resolve
+from promptevo.progress import Progress
 from promptevo.render import LEGEND, ascii_map
 from promptevo.sim import Simulation
 
@@ -36,25 +38,28 @@ def main() -> None:
     try:
         rewriter, rw_model = make_rewriter(cfg, check=True)
     except MutatorUnavailable as e:
-        raise SystemExit(f"{e}.
-Start Ollama (and `ollama pull {cfg.ollama.mutator_model}`), "
+        raise SystemExit(f"{e}.\nStart Ollama (and `ollama pull {cfg.ollama.mutator_model}`), "
                          "or run with --no-mutation.")
     print(f"mutation: {rw_model} (T={cfg.evolution.temperature}, p_mut={cfg.evolution.p_mut})"
           if rewriter else "mutation: off")
     sim = Simulation(cfg, backend, seed=a.seed, out_dir=resolve(a.out),
                      rewriter=rewriter, rewriter_model=rw_model)
     every = max(1, a.ticks // max(1, a.snapshots))
+    prog = Progress(resolve(cfg.paths.logs_dir), f"run_{Path(a.out).name}", total=a.ticks)
     if a.snapshots:
         print(LEGEND)
     for i in range(a.ticks):
         sim.step()
+        if sim.t % 500 == 0:
+            prog.update(sim.t, pop=len(sim.agents), births=sim.c.births, mutations=sim.mutator.stats["ok"])
         if a.snapshots and sim.t % every == 0:
             print(f"--- t={sim.t} pop={len(sim.agents)}")
             print(ascii_map(sim.world, sim.agents, max_w=40, max_h=14))
     s = sim.finish()
+    prog.finish(sim.t)
     keep = {k: s[k] for k in ("ticks", "pop_final", "births", "immigrants", "deaths",
                               "mean_lifespan", "max_gen", "memo_hit_rate", "invalid_rate",
-                              "backend_s", "alleles")}
+                              "backend_s", "alleles", "mutations")}
     print(json.dumps(keep))
     print("actions:", s["action_share"])
     if hasattr(backend, "calls"):
