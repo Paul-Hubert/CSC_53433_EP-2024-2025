@@ -234,6 +234,18 @@ Full write-up, method and tables: [10](10-natural-selection-runs.md).
 - **Drift is strong with about 50 animals.** Readings swing from about 25 % to 98 % and back. At the end, 92–100 % of living genes are mutants, 62–79 % still use a word of the animal's world, and only 55–65 different texts remain.
 - **The keyword brain can't tell nonsense from sense.** "Never potato." reads like "Never fight.", and "Eat whenever food is enough to hear it screaming." like "Eat whenever food is close.".
 
+### 5.9 One hour with the LLM brain
+
+`results/llm_60min_genes.md`, 2026-10-02.
+
+- **Run:** small Lab 1 world, gemma4:12b deciding and mutating, 60 minutes: 5 269 ticks, 19 211 decisions (5.3 per second), 6 784 LLM calls, no failures.
+- **Population:** it sat at the floor of 10 for 3 400 ticks (65 newcomers), then grew to 25–29 animals with no newcomers after tick 3 437.
+- **Who rescued it:** four newcomers account for 84 % of the survivors' ancestry. "Never fight." spread from about 30 % of that ancestry to 23 of the 25 survivors.
+- **Behaviour:** predators caused 71 % of deaths; animals fled in 4.5 % of decisions and attacked in 9.5 %.
+- **Caveat:** one seed only.
+
+Details: [10 §7](10-natural-selection-runs.md#7-one-hour-with-the-llm-brain).
+
 ### Summary
 
 | Gate | Status (2026-10-01) |

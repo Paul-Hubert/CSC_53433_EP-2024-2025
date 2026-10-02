@@ -14,6 +14,7 @@ genes did best. Code: `prototype/experiments/smoke_run.py` (the runs) and
 4. [What it means](#4-what-it-means)
 5. [Making selection easier to see](#5-making-selection-easier-to-see)
 6. [Reproduce it, and use it in Lab 1](#6-reproduce-it-and-use-it-in-lab-1)
+7. [One hour with the LLM brain](#7-one-hour-with-the-llm-brain)
 
 ---
 
@@ -226,7 +227,7 @@ behaviour.
   when the keyword survives: "Never potato.", "Nervous: any movement nearby
   means a celebration.". So this brain can't favour meaningful genes over
   nonsense with the right words; only the LLM brain can. That needs the
-  hour-per-5 000-ticks runs and the unsolved gate G2
+  hour-per-5 000-ticks runs (a first one is in §7) and the unsolved gate G2
   ([06 §6](06-experiments-and-results.md#6-known-issues-and-open-questions)).
 - **Genes travel together.** Children inherit whole parental gene sets slot by
   slot, so a gene's fitness also reflects the genes it was usually inherited
@@ -271,3 +272,80 @@ Questions for students (Lab 1 activity D, [02](02-lab1.md#d-watch-evolution)):
   and is selection easier to see?
 - Compare the genes at the end with the mutation test, which has no selection:
   does selection keep genes meaningful?
+
+## 7. One hour with the LLM brain
+
+The keyword brain reads keywords. This run asks what happens when the LLM reads
+the genes (`prototype/results/llm_60min_genes.md`, 2026-10-02).
+
+| | |
+|---|---|
+| World | the Lab 1 flat world, small profile: 48 × 48 cells, 2 predators, at most 40 animals |
+| Brain and mutation | gemma4:12b for both (points mode), seed 1234 |
+| Length | `smoke_run --backend llm --minutes 60`: 5 269 ticks, 21 generations |
+| Cost | 19 211 decisions (5.3 per second), 6 784 LLM calls, no failures, 68 mutations |
+
+### What happened
+
+| Tick | 500 | 1 000 | 2 000 | 3 000 | 3 500 | 4 000 | 4 500 | 5 000 | 5 269 |
+|---|---|---|---|---|---|---|---|---|---|
+| Animals | 10 | 13 | 11 | 10 | 11 | 17 | 18 | 29 | 25 |
+| Newcomers so far | 6 | 16 | 36 | 50 | 65 | 65 | 65 | 65 | 65 |
+
+- **For 3 400 ticks the population sat at the floor of 10.** 65 newcomers
+  (fresh founder genomes) kept it alive. As in the first LLM run
+  ([06 §5.6](06-experiments-and-results.md#56-first-run-with-the-llm-brain)),
+  the founders as the LLM reads them can't sustain a population.
+- **Then it took off.** No newcomer was needed after tick 3 437. The last
+  1 269 ticks saw 96 births, against 27–41 per 1 000 ticks before, and the
+  population reached 25–29 animals.
+- **Predators caused 71 % of deaths.** Animals fled in 4.5 % of decisions and
+  attacked in 9.5 %. With the keyword brain on the same world, predators cause
+  about 53–55 % of deaths, animals flee in about 12 % of decisions and attack
+  in about 2 %.
+
+### Who rescued the population
+
+- **Newcomers, not the original lineages.** Four newcomers that arrived
+  between ticks 2 982 and 3 228 account for 84 % of the ancestry of the 25
+  animals alive at the end. The rescue came from a workable combination of
+  founder genes, then breeding.
+- **Their descendants converged on these genes** (animals carrying each, out
+  of 25):
+  - "Never fight." (23);
+  - "Only look for food when energy is low." (20);
+  - "Look for a partner when energy is high." (18);
+  - "Stay near where you last found food." (15);
+  - "Follow others when you are lost or hungry." (13);
+  - "Rest only when you feel safe." (12);
+  - "Solitary: prefers to be alone." (10).
+- **"Never fight." looks selected.**
+  - Only about 30 % of the survivors' ancestry carried it: one of the four main
+    newcomers, plus two minor ancestors.
+  - Yet 23 of the 25 survivors carry it, and its share rose from 39 % to 92 %
+    while the population grew (ticks 4 000 to 5 269).
+  - The keyword-brain runs point the same way: "never attack" ▲, "always
+    attack" ✗ (§3.2).
+- **The numbers are thin.** With 295 deaths, every gene's interval is ± 0.4 or
+  wider, so the report marks nothing as clearly better. This is one seed: a
+  lead, not a result.
+- **Mutation barely mattered yet.** In 21 generations, only 13 % of the living
+  genes are mutants, and 98 % still use a word of the animal's world.
+
+### What it suggests
+
+- **The open question gets a first, partial yes.** The question was whether
+  evolution can fix founders that the LLM makes unviable
+  ([06 §6](06-experiments-and-results.md#6-known-issues-and-open-questions)).
+  Here, recombining founder genes, helped by newcomers, found a viable
+  animal, and non-aggression then spread.
+- **Mutation and meaning need more time.** At 5.3 decisions per second, an hour
+  buys about 5 000 ticks on the small world. Seeing them, and checking this
+  run, needs several seeds and runs of several hours, best run in the
+  background or on a lab server.
+
+```bash
+python -m experiments.smoke_run --backend llm --minutes 60 --seed 1234 --ticks 20000 --snapshots 10 \
+       --out results/runs/llm_60min > logs/llm_60min.log 2>&1 &
+python -m experiments.gene_report results/runs/llm_60min --min-carriers 25 --every 1000 --tag llm_60min
+```
