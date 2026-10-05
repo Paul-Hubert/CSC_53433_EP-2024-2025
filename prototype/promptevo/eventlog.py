@@ -4,7 +4,21 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
+import os
+import time
 from pathlib import Path
+
+
+def replace_file(tmp: Path, path: Path, tries: int = 5) -> bool:
+    """os.replace that waits out a reader holding `path` open (Windows refuses the rename
+    meanwhile). False if it never could; the caller tries again at its next save."""
+    for i in range(tries):
+        try:
+            os.replace(tmp, path)
+            return True
+        except PermissionError:
+            time.sleep(0.2 * (i + 1))
+    return False
 
 
 class EventLog:
@@ -32,6 +46,15 @@ class EventLog:
             self._stats_w = csv.DictWriter(self._stats_f, fieldnames=list(row))
             self._stats_w.writeheader()
         self._stats_w.writerow(row)
+
+    def flush(self, sync: bool = False) -> None:
+        """Push buffered lines to the OS (and to disk with sync=True): a hard stop then loses only
+        what came after."""
+        for f in (self._f, self._stats_f):
+            if f:
+                f.flush()
+                if sync:
+                    os.fsync(f.fileno())
 
     def digest(self) -> str:
         return self.sha.hexdigest()

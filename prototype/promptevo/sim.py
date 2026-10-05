@@ -15,7 +15,7 @@ import numpy as np
 
 from .actions import EXECUTORS
 from .backends.base import Query
-from .eventlog import EventLog
+from .eventlog import EventLog, replace_file
 from .evolution.mutation import Mutator
 from .founder import AllelePools
 from .genome import ACTIONS, AlleleRegistry, Genome, crossover_uniform
@@ -275,10 +275,18 @@ class Simulation:
                 self.progress.update(self.t, pop=len(self.agents))
         return self.finish()
 
+    def checkpoint(self) -> None:
+        """Save what a hard stop would lose: events and stats to disk, alleles.jsonl rewritten."""
+        self.log.flush(sync=True)
+        if self.out_dir:
+            tmp = self.out_dir / "alleles.jsonl.tmp"
+            self.registry.dump_jsonl(tmp)
+            replace_file(tmp, self.out_dir / "alleles.jsonl")
+
     def finish(self) -> dict:
         s = self.summary()
         if self.out_dir:
-            self.registry.dump_jsonl(self.out_dir / "alleles.jsonl")
+            self.checkpoint()
             (self.out_dir / "summary.json").write_text(json.dumps(s, indent=1))
             living = [{"id": a.id, "gen": a.generation, "genome": list(a.genome.alleles)}
                       for a in self.agents]

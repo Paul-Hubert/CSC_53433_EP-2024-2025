@@ -38,7 +38,16 @@ SITUATION_WORDS = {"energy", "food", "predator", "predators", "animal", "animals
 
 
 def jsonl(path: Path) -> list[dict]:
-    return [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
+    """Records of a JSONL file. A last line cut short (a run stopped hard mid-write) is dropped."""
+    lines = [l for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
+    out = []
+    for i, l in enumerate(lines):
+        try:
+            out.append(json.loads(l))
+        except json.JSONDecodeError:
+            if i < len(lines) - 1:
+                raise
+    return out
 
 
 def words(t: str) -> set[str]:
@@ -85,21 +94,49 @@ def reading(locus: str, text: str) -> str:
 class Run:
     def __init__(self, path: Path):
         self.path, self.name = path, path.name
-        self.alleles = {a["id"]: a for a in jsonl(path / "alleles.jsonl")}
-        self.summary = json.loads((path / "summary.json").read_text())
         self.events = jsonl(path / "events.jsonl")
-        self.genome, self.death = {}, {}
+        self.alleles = {a["id"]: a for a in jsonl(path / "alleles.jsonl")} if (path / "alleles.jsonl").exists() else {}
+        info = path / "run_info.json"
+        self.info = json.loads(info.read_text(encoding="utf-8")) if info.exists() else {}
+        self.genome, self.death, alive = {}, {}, {}
         for e in self.events:
             if e["kind"] in ("founder", "immigrant", "birth"):
                 self.genome[e["id"]] = e["genome"]
+                alive[e["id"]] = {"id": e["id"], "gen": e.get("gen", 0), "genome": e["genome"]}
+                for m in e.get("mutations", []):        # mutants newer than the last alleles.jsonl save
+                    self.alleles.setdefault(m["child"], {
+                        "id": m["child"], "locus": m["locus"], "text": m["text"], "origin": "mutant",
+                        "parent_id": m["parent"], "operator": f"llm#{m['prompt']}", "model": None, "seed": None})
             elif e["kind"] == "death":
                 self.death[e["id"]] = e
-        self.final = json.loads((path / "final_population.json").read_text())
+                alive.pop(e["id"], None)
+        # a run still going, or stopped hard, has no summary yet: rebuild what's needed from the events
+        self.finished = (path / "summary.json").exists() and (path / "final_population.json").exists()
+        if self.finished:
+            self.summary = json.loads((path / "summary.json").read_text())
+            self.final = json.loads((path / "final_population.json").read_text())
+        else:
+            self.final = list(alive.values())
+            self.summary = self._rebuilt_summary()
         self._reading: dict[str, str] = {}
         self.world = set(SITUATION_WORDS)
         for a in self.alleles.values():
             if a["origin"] in ("founder", "neutral"):
                 self.world |= words(a["text"])
+
+    def _rebuilt_summary(self) -> dict:
+        ticks = self.events[-1]["t"] if self.events else 0
+        if (self.path / "stats.csv").exists():
+            with (self.path / "stats.csv").open() as f:
+                ts = [int(r["t"]) for r in csv.DictReader(f) if (r.get("t") or "").isdigit()]
+            ticks = max([ticks, *ts])
+        kinds = Counter(e["kind"] for e in self.events)
+        ok = sum(len(e.get("mutations", [])) for e in self.events if e["kind"] == "birth")
+        return {"ticks": ticks, "seed": self.info.get("seed", "?"), "backend": self.info.get("brain", "?"),
+                "pop_final": len(self.final), "births": kinds["birth"], "immigrants": kinds["immigrant"],
+                "deaths": dict(Counter(e["cause"] for e in self.events if e["kind"] == "death")),
+                "max_gen": max((x["gen"] for x in self.final), default=0),
+                "mutations": {"tried": ok, "ok": ok}}       # attempts aren't logged, only successes
 
     def text(self, aid: str) -> str:
         return self.alleles[aid]["text"]
@@ -175,7 +212,8 @@ class Run:
         pops = defaultdict(list)
         with (self.path / "stats.csv").open() as f:
             for row in csv.DictReader(f):
-                pops[(int(row["t"]) - 1) // every].append(int(row["pop"]))
+                if (row.get("pop") or "").isdigit():      # skips a last row cut short by a hard stop
+                    pops[(int(row["t"]) - 1) // every].append(int(row["pop"]))
         wins = defaultdict(Counter)
         for d in self.death.values():
             wins[d["t"] // every][d["cause"]] += 1
@@ -282,7 +320,9 @@ def main() -> None:
              f"(predators {deaths.get('predator', 0) / n_deaths:.0%}, starvation {deaths.get('starvation', 0) / n_deaths:.0%}, "
              f"old age {deaths.get('old_age', 0) / n_deaths:.0%}), {mut['ok']} mutations "
              f"({mut['tried']} tried), brain `{s['backend']}`, seed {s['seed']}."
-             + (f" Replicates: {', '.join(r.name for r in runs[1:])}." if len(runs) > 1 else ""),
+             + (f" Replicates: {', '.join(r.name for r in runs[1:])}." if len(runs) > 1 else "")
+             + ("" if main_run.finished else " **Unfinished run**: totals rebuilt from the events; "
+                "mutation attempts unknown (only successes are logged)."),
              f"Living animals at the end: {len(main_run.final)}; their genes: "
              f"{np.mean([main_run.alleles[x]['origin'] == 'mutant' for x in living]):.0%} mutants, "
              f"{np.mean([bool(words(main_run.text(x)) & main_run.world) for x in living]):.0%} still use a word of the "
@@ -358,7 +398,7 @@ def main() -> None:
         lines.append(f"| {main_run.alleles[aid]['locus']} | {main_run.text(aid)} | {origin(main_run, aid)} | "
                      f"{main_run.read(aid)} | {x['n']} | {fmt_fit(x)} | {x['predator']:.0%} |")
     spread = sorted({aid for aid in set(living) if main_run.alleles[aid]["origin"] == "mutant"},
-                    key=lambda aid: -living.count(aid))[:5]
+                    key=lambda aid: (-living.count(aid), aid))[:5]      # ties in a fixed order
     lines += ["", "## The most common genes at the end, and where they came from", ""]
     for aid in spread:
         lines += [f"**{main_run.alleles[aid]['locus']}: \"{main_run.text(aid)}\"** — {main_run.read(aid)} "

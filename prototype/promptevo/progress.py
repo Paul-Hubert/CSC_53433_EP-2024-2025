@@ -6,6 +6,8 @@ import os
 import time
 from pathlib import Path
 
+from .eventlog import replace_file
+
 
 class Progress:
     def __init__(self, logs_dir: str | Path, job: str, total: int | None = None):
@@ -25,7 +27,7 @@ class Progress:
                "updated": time.strftime("%Y-%m-%d %H:%M:%S"), **extra}
         tmp = self.path.with_suffix(".tmp")
         tmp.write_text(json.dumps(rec))
-        os.replace(tmp, self.path)
+        replace_file(tmp, self.path)       # status readers may hold the file for a moment
 
     def finish(self, done: int, **extra) -> None:
         self.update(done, state="done", **extra)
