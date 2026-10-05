@@ -255,6 +255,7 @@ clear message. `--no-mutation` runs without it.
 | Script | Purpose | Options |
 |---|---|---|
 | `gene_report RUN [RUN …]` | Ranks genes by the fitness of their carriers: offspring of the animals that carried them and died, each divided by the mean of the animals that died in the same 5 000 ticks. Genes are grouped by what the keyword brain reads in them (strength, action, conditions), since mutation spreads the population over thousands of texts; exact texts are ranked too. Also: share killed by predators, frequency over time, predator kills per 1 000 animal-ticks, lineage of the most common genes. With several runs (seeds) the marks use all of them: ★ clearly above average, ▲ steady leader (above average in every run), ✗ clearly below → `results/<tag>_genes.md/.json`; method in [10 §2](10-natural-selection-runs.md#2-measuring-which-genes-did-best) | `--min-carriers` (100), `--every` (10000 ticks), `--tag` |
+| `gene_timeline RUN` | How the genes develop during one run, from its files (also a run still going): the gene pool per checkpoint and slot (distinct genes, effective number, leader, mutants, mutation depth, length, world words, overlap); genes that reached 25 % with their lineages; mutants produced vs spread vs alive at the end next to the mutation test; gene dropping (genes handed down the real family tree at random) for selection vs drift; families; behaviour per window; optional `--judge` (gemma4:12b says whether a gene still gives a usable rule, `prompts/judge_sense_v1.txt`) → `results/<tag>_timeline.md/.json/.csv/.html` | `--every` (500 ticks), `--window` (2000), `--drops` (500), `--tag`, `--judge`, `--judge-max` (3000) |
 
 ### Helpers
 
@@ -284,7 +285,7 @@ let the LLM decide directly. Their usage is in their docstrings and in
 
 ## 6. Tests
 
-`cd prototype && pytest -q` runs 50 offline tests in about 25 s, with no model
+`cd prototype && pytest -q` runs 52 offline tests in about 25 s, with no model
 needed. LLM calls are replaced by small fake servers. Two marked tests talk to
 real models: `pytest -m ollama` (needs Ollama and `policy.model`) and
 `pytest -m laya` (parked).
@@ -298,6 +299,7 @@ real models: `pytest -m ollama` (needs Ollama and `policy.model`) and
 | `test_evolution.py` | guards and instruction list, the mutator sends only the instruction and the gene (fake LLM), rejected answers, no LLM → no mutation, determinism, population bounds, shuffled control, no mutation → no new alleles, decisions per action in `stats.csv` |
 | `test_metrics.py` | entropy, JSD, mutual information, directed ΔP, Spearman |
 | `test_gene_report.py` | `gene_report` on a short run: fitness averages to 1.00 in every slot, frequencies add up to the population; an unfinished run is rebuilt from its events |
+| `test_gene_timeline.py` | a hand-made run with known numbers (shares, sweep timing, depth, families, gene dropping); invariants on a short unfinished run (slot shares add up, lineages end at founder texts, dropped shares of a slot add up to 1) |
 | `test_long_run.py` | stop file, then resume by replay (same events, no model call asked twice); a failing model stops the run cleanly; `run_info.json`; progress time box |
 | `test_llm_policy.py` | table mode vs points, malformed rows, persistent caches (incl. an empty cache file), a failed call is never cached and strict brains raise, API key header, factory (incl. mutation off and Ollama down), logprobs fallback |
 | `test_adapters.py` | Laya request layouts and answer parsing (parked), Ollama client |
