@@ -14,6 +14,7 @@ the work up. Latest state: **2026-09-30**, branch
 | 2026-09-28 | `prototype/` created: offline core written and tested (world, sim, rule-based brain, metrics, mutation, probes, E1 suite). |
 | 2026-09-28 | Teacher pipeline written: decision gate, mutants, allele-split dataset, resumable labelling. |
 | 2026-09-30 | **Decision:** no Laya fine-tuning for now. **Ollama LLMs (local or cloud) decide and mutate** (05 §0, revision box in 08). Laya and the distillation pipeline are parked, not deleted. |
+| 2026-10-05 | `Docs/system/` (reference docs of the prototype) and `Docs/unity/` (proposed Unity architecture, patterns, editor tooling, change scenarios, Claude Design prompt) written. |
 
 ## What exists
 

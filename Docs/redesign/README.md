@@ -18,6 +18,10 @@ see [09](09-progress-log.md) for the current state.
 | 08 | [Phase 0 spike plan](08-phase0-spike-plan.md) | Python test (LLM brain via Ollama, local or cloud; rev. 2026-09-30): spec, go/no-go gates, and a multi-session runbook with `/compact` points. Work lives in [`prototype/`](../../prototype/). |
 | 09 | [Progress log & handoff](09-progress-log.md) | Timeline, what exists, key numbers, pending owner decisions, next commands, mirroring to your own git server. |
 
+Related folders: [`../system/`](../system/README.md) documents the system as
+implemented (prototype reference); [`../unity/`](../unity/README.md) proposes the
+Unity architecture, with a Claude Design prompt to visualise it.
+
 ## One-paragraph summary
 
 Replace the neural-network genome with a **genome of text genes** (≈10–20
