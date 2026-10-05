@@ -1,0 +1,7 @@
+Animals in a simulation act on short English rules called genes. Each gene sits in a slot. The slot "{slot}" is about {topic}.
+
+The gene in the slot "{slot}" is: "{text}"
+
+Does this gene still give the animal a usable rule about {topic}? A usable rule is understandable and could guide what the animal does, even if it is odd or unwise. Nonsense, or a sentence about something else, is not a usable rule.
+
+Answer yes or no.

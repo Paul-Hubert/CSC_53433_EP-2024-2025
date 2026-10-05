@@ -83,3 +83,30 @@ def test_timeline_invariants_on_a_short_run(tmp_path):
     for i, t in enumerate(x["t"] for x in drop[eat[0]]):
         assert sum(drop[a][i]["expected"] for a in eat) == pytest.approx(1)
     assert all(abs(drop[a][0]["expected"] - drop[a][0]["share"]) < 1e-9 for a in eat)    # tick 0: founders only
+
+
+def test_judge_asks_once_per_gene_within_budget(tmp_path, monkeypatch):
+    from experiments import gene_timeline
+    from promptevo.cache import KVCache
+    from promptevo.llm.ollama_client import OllamaClient
+    asked = []
+
+    def transport(method, path, payload):
+        if path == "/api/tags":
+            return {"models": []}
+        prompt = payload["messages"][0]["content"]
+        asked.append(prompt)
+        return {"message": {"content": json.dumps({"answer": "no" if "Never eat" in prompt else "yes"})}}
+    cache = KVCache()
+    monkeypatch.setattr("promptevo.llm.ollama_client.client_from_config",
+                        lambda cfg: OllamaClient(cache=cache, transport=transport))
+    founder = lambda n: [f"{l}:{n}" for l in LOCI]
+    alleles = [{"id": f"{l}:{n}", "locus": l, "text": ("Never eat." if (l, n) == ("eat", 1) else f"{l} rule {n}."),
+                "origin": "founder"} for l in LOCI for n in (0, 1)]
+    write_run(tmp_path, [{"kind": "founder", "t": 0, "id": i, "genome": founder(i)} for i in (0, 1)], alleles, 10)
+    run = gene_timeline.Run(tmp_path)
+    usable, calls = gene_timeline.judge(run, ["eat:0", "eat:1", "flee:0"], load_config("small"), max_calls=2)
+    assert usable == {"eat:0": True, "eat:1": False} and calls == 2          # the budget stops it
+    assert '"Never eat."' in asked[1] and "when and how to eat" in asked[1]
+    usable, _ = gene_timeline.judge(run, ["eat:0", "eat:1"], load_config("small"), max_calls=10)
+    assert usable == {"eat:0": True, "eat:1": False} and len(asked) == 2     # answered from the cache
