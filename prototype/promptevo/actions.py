@@ -104,6 +104,8 @@ def do_attack(agent, world, agents, cfg, rng) -> bool:
             if rng.random() < p:
                 stolen = min(ac.attack_steal, b.energy)
                 b.energy -= stolen
+                if stolen > 0:
+                    b.robbed = True
                 agent.energy = min(ac.energy_max, agent.energy + stolen)
                 agent.steals += 1
         return False

@@ -77,12 +77,15 @@ class OllamaClient:
     # --- generation --------------------------------------------------------------
     def chat(self, model: str, messages: list[dict], schema: dict | None = None,
              options: dict | None = None, keep_alive: str | int | None = None,
-             use_cache: bool = True, extra: dict | None = None) -> str:
+             use_cache: bool = True, extra: dict | None = None,
+             validate: Callable[[str], bool] | None = None) -> str:
+        """Chat completion. With `validate`, only replies that pass it are cached, and a
+        cached reply that fails it is treated as a miss (so a bad answer is never pinned)."""
         options = options or {}
         key = make_key("chat", model, self.digest(model), messages, schema, options, extra)
         if use_cache:
             hit = self.cache.get(key)
-            if hit is not None:
+            if hit is not None and (validate is None or validate(hit)):
                 return hit
         payload = {"model": model, "messages": messages, "stream": False, "options": options}
         if schema is not None:
@@ -97,7 +100,7 @@ class OllamaClient:
         self.last_meta["raw_keys"] = sorted(res)
         self.last_response = res
         content = res["message"]["content"]
-        if use_cache:
+        if use_cache and (validate is None or validate(content)):
             self.cache.put(key, content)
         return content
 
@@ -111,7 +114,7 @@ class OllamaClient:
         return self._call("POST", "/api/chat", payload)
 
     def chat_json(self, model: str, messages: list[dict], schema: dict, **kw) -> dict:
-        return json.loads(self.chat(model, messages, schema=schema, **kw))
+        return json.loads(self.chat(model, messages, schema=schema, validate=_is_json_object, **kw))
 
     def embed(self, model: str, texts: list[str]) -> list[list[float]]:
         key = make_key("embed", model, self.digest(model), texts)
@@ -121,6 +124,13 @@ class OllamaClient:
         emb = self._call("POST", "/api/embed", {"model": model, "input": texts})["embeddings"]
         self.cache.put(key, emb)
         return emb
+
+
+def _is_json_object(text: str) -> bool:
+    try:
+        return isinstance(json.loads(text), dict)
+    except (ValueError, TypeError):
+        return False
 
 
 def client_from_config(cfg, transport: Transport | None = None) -> OllamaClient:
@@ -136,11 +146,14 @@ def client_from_config(cfg, transport: Transport | None = None) -> OllamaClient:
 
 def make_rewriter(client: OllamaClient, model: str, prompt_path: str | Path, max_words: int = 12,
                   temperature: float = 0.9):
-    """Return rewriter(text, style, seed) -> str for evolution.mutation.Mutator."""
-    template = Path(prompt_path).read_text()
+    """Return rewriter(text, style, seed, max_words=None) -> str for evolution.mutation.Mutator.
 
-    def rewrite(text: str, style: str, seed: int) -> str:
-        prompt = template.format(style=style, text=text, max_words=max_words)
+    `max_words` per call (the locus limit) overrides the default given here."""
+    template = Path(prompt_path).read_text()
+    default_words = max_words
+
+    def rewrite(text: str, style: str, seed: int, max_words: int | None = None) -> str:
+        prompt = template.format(style=style, text=text, max_words=max_words or default_words)
         return client.chat(model, [{"role": "user", "content": prompt}],
                            options={"seed": int(seed), "temperature": temperature})
     return rewrite

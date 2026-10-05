@@ -38,6 +38,10 @@ class AllelePools:
     def sample_founder(self, rng: np.random.Generator) -> Genome:
         return Genome(tuple(self.founders[l][rng.integers(len(self.founders[l]))] for l in LOCI))
 
+    def control_pool(self) -> dict[str, list[str]]:
+        """Per-locus control (random-text) allele ids — the founder pool of control C4."""
+        return {l: [self.registry.add(l, t, "control").id for t in self.control_texts] for l in LOCI}
+
     def sample_control(self, rng: np.random.Generator) -> Genome:
         """Random-text genome (controls C4 / gibberish tests)."""
         ids = []

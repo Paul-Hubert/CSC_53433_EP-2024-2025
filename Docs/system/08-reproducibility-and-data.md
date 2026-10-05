@@ -65,7 +65,7 @@ delete caches without asking: they hold paid-for model answers.
 | File | Owner | Key parts | Value |
 |---|---|---|---|
 | `cache/policy.sqlite` | `LLMPolicyBackend.from_config` | `"policy"`, model, digest, prompt_id, mode (table → points), style, genome_key, situation text | probabilities `[7]` |
-| `cache/ollama.sqlite` | `client_from_config` | `"chat"`, model, digest, messages, schema, options, extra | raw response content (string) |
+| `cache/ollama.sqlite` | `client_from_config` | `"chat"`, model, digest, messages, schema, options, extra | raw response content (string); for JSON calls only replies that parse as a JSON object are stored |
 | (same file) | `OllamaClient.embed` | `"embed"`, model, digest, texts | embedding vectors |
 | `cache/laya.sqlite` 💤 | `LayaBackend.from_config` | `"laya"`, client_id, placement, style, genome_key, situation text | `{p, exact}` |
 
@@ -86,7 +86,7 @@ Events are written only when `out_dir` is set, but the digest is always kept.
 | `founder` | `id`, `genome` (10 allele ids) — initial population, `t = 0` |
 | `immigrant` | `id`, `genome` — floor spawns |
 | `birth` | `id`, `parents` (ids), `gen`, `genome`, `mutations` (list of `{locus, parent, child, op, text}`) |
-| `death` | `id`, `cause` (`starvation` / `predator` / `old_age`), `age`, `gen`, `food`, `offspring`, `steals` |
+| `death` | `id`, `cause` (`starvation` / `attacked` / `predator` / `old_age`), `age`, `gen`, `food`, `offspring`, `steals` |
 
 There is no separate mutation event: mutations are inside `birth`. Allele ids
 resolve to texts through `alleles.jsonl` of the same run.
@@ -107,7 +107,7 @@ Counters are cumulative since `t = 0`.
 | `mean_energy`, `mean_gen` | over living agents (2 decimals) |
 | `max_gen` | highest living generation |
 | `births`, `immigrants` | cumulative |
-| `deaths_starve`, `deaths_pred`, `deaths_age` | cumulative deaths by cause |
+| `deaths_starve`, `deaths_pred`, `deaths_age`, `deaths_attacked` | cumulative deaths by cause |
 | `decisions`, `backend_queries`, `invalid` | cumulative decision counters |
 | `alleles` | registry size |
 
@@ -118,6 +118,7 @@ Counters are cumulative since `t = 0`.
 | `events.jsonl` | JSONL | events above |
 | `stats.csv` | CSV | stats rows above |
 | `alleles.jsonl` | JSONL | every `Allele` (`id, locus, text, origin, parent_id, operator, model, seed`) |
+| `run_info.json` | JSON | provenance: seeds, profile, merged config, backend description (model, digest, prompt id…), mutator model, founder pool, git commit, versions; written at start, completed at `finish()` ([03](03-simulation-loop.md)) |
 | `summary.json` | JSON | `Simulation.summary()` ([03](03-simulation-loop.md)) |
 | `final_population.json` | JSON | `[{"id", "gen", "genome"}]` for living agents |
 

@@ -107,8 +107,9 @@ Reply with the new sentence only.
 The rewriter (`llm/ollama_client.make_rewriter`) calls `client.chat` with
 `seed` and temperature 0.9, through the client's sqlite cache, so the same
 `(text, style, seed, model)` gives the same answer across runs. `max_words` in
-the prompt is always `max_action_words` (12), even for temperament loci, whose
-guard allows 15. No fitness context is given (vision item 5).
+the prompt is the locus limit: `max_action_words` (12) for action loci,
+`max_temperament_words` (15) for temperament loci (the `Mutator` passes it to
+any rewriter that accepts a `max_words` keyword). No fitness context is given (vision item 5).
 
 ### Guards
 
@@ -165,7 +166,7 @@ keys through `load_config(profile, overrides=…)` or by editing a config file.
 | C1 FULL | LLM brain, sexual, mixed mutation, selection | `backend.name: llm` (or `--backend llm`), `policy.model`, optionally `ollama.mutator_model` | 🧪 |
 | C2 NO-MUT | selection on founder variation only | `evolution.p_mut: 0` | ✅ (test: no new alleles) |
 | C3 SHUFFLED | each decision uses a random **other** living agent's genome; genes are inherited but do not affect their carrier (drift only) | `evolution.shuffled: true` | ✅ (test) |
-| C4 RANDOM-FOUNDERS | founders (and immigrants) drawn from control texts | `evolution.random_founders: true` | ✅ (no dedicated test) |
+| C4 RANDOM-FOUNDERS | founders, immigrants and `founder_reintroduce` all drawn from control texts | `evolution.random_founders: true` | ✅ (test) |
 | C5 RULE-BASED | C1 with the rule-based brain | `backend.name: rule_based` | ✅ |
 | C6 ZERO-SHOT | zero-shot Laya | — | dropped (rev. 2026-09-30) |
 | C7 ASEXUAL | one parent, copy + mutation (old lab's regime) | `evolution.sexual: false` | ✅ (no dedicated test) |
@@ -176,9 +177,9 @@ Notes:
   agent lives, the genome used for the query is drawn (stream `agents`) from the
   other living agents; the observation is still the carrier's own. Reproduction
   still copies the carrier's own genome.
-- **C4**: `random_founders` changes `_founder_genome()`, so it affects the
-  initial population and immigrants. The `founder_reintroduce` operator still
-  draws from the **real** founder pool, so with default weights real founder
-  alleles can leak into a C4 run. Set `operators.founder_reintroduce: 0` for a
-  clean C4.
+- **C4**: `random_founders` switches the run's single founder source
+  (`Simulation.founder_pool`) to `AllelePools.control_pool()`: the initial
+  population, immigrants **and** the `founder_reintroduce` operator all draw
+  from the control texts, so no real founder gene can enter a C4 run. (All
+  control texts are registered at start, so `alleles` starts higher in C4.)
 - Plan 08 S6.1 names the third flag `asexual`; in code it is `sexual: false`.

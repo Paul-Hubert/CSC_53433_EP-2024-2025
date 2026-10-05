@@ -171,3 +171,70 @@ def test_logprobs_mode_and_fallback(reg_pools):
                           resolve("prompts/teacher_v1.md"), mode="logprobs")
     p2 = b2.decide(q)[0]
     assert b2.logprob_fallbacks == 1 and abs(p2.sum() - 1) < 1e-9
+
+
+def _flaky(log, fail_first: int):
+    """Fake Ollama whose first `fail_first` chat calls raise (network error)."""
+    inner = fake(log)
+
+    def t(method, path, payload):
+        if path == "/api/chat" and fail_first > len(log):
+            log.append("fail")
+            raise ConnectionError("server down")
+        return inner(method, path, payload)
+    return t
+
+
+def test_failed_call_is_not_cached(reg_pools, tmp_path, monkeypatch):
+    monkeypatch.setattr("promptevo.llm.ollama_client.time.sleep", lambda s: None)
+    reg, pools = reg_pools
+    q = _queries(reg, pools, [pools.contrast_pair("flee")[0]])[:1]   # "always flee": a skewed answer
+    log, cache = [], KVCache(tmp_path / "p.sqlite")
+    b = LLMPolicyBackend(OllamaClient(transport=_flaky(log, 1), retries=1), "brain",
+                         resolve("prompts/teacher_v1.md"), mode="points", cache=cache)
+    p1 = b.decide(q)[0]
+    assert np.allclose(p1, 1 / len(ACTIONS)) and b.last_fallback == {0} and b.failures == 1
+    assert len(cache) == 0                                     # the stand-in answer was not stored
+    p2 = b.decide(q)[0]                                        # asked again, now answered for real
+    assert not np.allclose(p2, 1 / len(ACTIONS)) and b.last_fallback == set() and len(cache) == 1
+
+
+def test_malformed_reply_is_not_pinned_in_client_cache():
+    replies = iter(["not json at all", json.dumps({"eat": 1})])
+    sent = []
+
+    def t(method, path, payload):
+        if path == "/api/tags":
+            return {"models": []}
+        sent.append(payload)
+        return {"message": {"content": next(replies)}}
+    c = OllamaClient(transport=t)
+    msgs = [{"role": "user", "content": "x"}]
+    try:
+        c.chat_json("m", msgs, POINTS_SCHEMA_FOR_TEST)
+        raise AssertionError("malformed JSON should raise")
+    except ValueError:
+        pass
+    assert c.chat_json("m", msgs, POINTS_SCHEMA_FOR_TEST) == {"eat": 1} and len(sent) == 2
+    assert c.chat_json("m", msgs, POINTS_SCHEMA_FOR_TEST) == {"eat": 1} and len(sent) == 2  # cached now
+
+
+POINTS_SCHEMA_FOR_TEST = {"type": "object"}
+
+
+def test_simulation_does_not_memoise_fallback_rows(cfg):
+    from promptevo.backends.rule_based import RuleBasedBackend
+
+    class AlwaysFailing(RuleBasedBackend):
+        def decide(self, queries):
+            self.last_fallback = set(range(len(queries)))
+            self.asked = getattr(self, "asked", 0) + len(queries)
+            return np.full((len(queries), len(ACTIONS)), 1 / len(ACTIONS))
+    b = AlwaysFailing()
+    sim = Simulation(cfg, b, seed=1)
+    sim.decide()
+    first = b.asked
+    assert sim.memo == {} and sim.c.fallbacks == first > 0
+    assert all(a.action in ACTIONS for a in sim.agents)       # agents still act this tick
+    sim.decide()
+    assert b.asked == 2 * first                                 # nothing was served from the memo

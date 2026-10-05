@@ -1,11 +1,13 @@
 """Mutation operators on gene texts, with guards (plan §A8).
 
 Word-level operators need no model. `llm_rewrite` takes any callable
-rewriter(text, style, seed) -> str (e.g. OllamaClient.rewrite), so it can be
-tested with a fake and swapped between local Ollama and the cloud later.
+rewriter(text, style, seed) -> str (e.g. llm.ollama_client.make_rewriter), so it can be
+tested with a fake and swapped between local Ollama and the cloud later. If the rewriter
+also accepts a `max_words` keyword, it receives the locus limit (12 action / 15 temperament).
 """
 from __future__ import annotations
 
+import inspect
 import re
 from typing import Callable
 
@@ -104,6 +106,13 @@ def op_synonym(text: str, rng: np.random.Generator) -> str | None:
     return _sub_once(text, w, SYNONYMS[w])
 
 
+def _accepts(fn: Callable, name: str) -> bool:
+    try:
+        return name in inspect.signature(fn).parameters
+    except (TypeError, ValueError):
+        return False
+
+
 WORD_OPS = {"intensity": op_intensity, "negate": op_negate,
             "condition_swap": op_condition_swap, "synonym": op_synonym}
 
@@ -123,6 +132,7 @@ class Mutator:
         self.op_p = w / w.sum()
         self.registry, self.founders = registry, founders
         self.rewriter, self.rewriter_model = rewriter, rewriter_model
+        self._rw_takes_limit = rewriter is not None and _accepts(rewriter, "max_words")
         self.stats = {k: {"tried": 0, "ok": 0} for k in ops}
 
     def mutate_text(self, locus: str, text: str, op: str, rng: np.random.Generator,
@@ -130,7 +140,8 @@ class Mutator:
         if op == "llm_rewrite":
             style = LLM_STYLES[int(rng.integers(len(LLM_STYLES)))]
             for attempt in range(3):
-                new = clean(self.rewriter(text, style, seed + attempt))
+                kw = {"max_words": self.max_words[locus]} if self._rw_takes_limit else {}
+                new = clean(self.rewriter(text, style, seed + attempt, **kw))
                 if valid(new, text, self.max_words[locus]):
                     return new
             return None

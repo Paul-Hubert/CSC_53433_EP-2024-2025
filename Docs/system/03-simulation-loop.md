@@ -25,7 +25,7 @@ step():
  3. breed          _breed(): pair or clone agents that chose mate (cap applies)
  4. predators move world.move_predators(agents)
  5. predation      _predation(): kills → "predator" deaths, removed now
- 6. ageing/death   age += 1; energy ≤ 0 → "starvation"; else age > max_age → "old_age"; removed
+ 6. ageing/death   age += 1; energy ≤ 0 → "attacked" (robbed this tick) or "starvation"; else age > max_age → "old_age"; removed
  7. food           world.regrow_food(stream "food")
  8. floor          while population < floor: spawn an immigrant from the founder pool
  9. clock          t += 1; every stats_every ticks → one stats.csv row
@@ -138,14 +138,17 @@ removed **before** the starvation check.
 
 ### 6. Ageing and deaths by cause
 
-Every survivor ages by 1. Then, per agent: `energy ≤ 0` → `starvation`;
-otherwise `age > max_age` (1 500) → `old_age`. Death records the age and
+Every survivor ages by 1. Then, per agent: `energy ≤ 0` → `attacked` if the
+agent lost energy to an attack during this tick (`Agent.robbed`, reset at the
+start of each tick), else `starvation`; otherwise `age > max_age` (1 500) →
+`old_age`. Death records the age and
 lifetime counters (page [08](08-reproducibility-and-data.md)).
 
 | Cause | Trigger |
 |---|---|
 | `predator` | a predator's kill draw succeeded (step 5) |
-| `starvation` | energy ≤ 0 at the end of the tick, including energy lost to an attacker |
+| `attacked` | energy ≤ 0 at the end of a tick in which an attacker stole energy from the agent |
+| `starvation` | energy ≤ 0 at the end of the tick, not robbed this tick |
 | `old_age` | age > `max_age` |
 
 ### 7–8. Food regrowth and floor immigration
@@ -185,27 +188,31 @@ The LLM backend keeps its own counters (`calls`, `answered`, `failures`,
 - `run(ticks, progress_every=500)` → `step()` × ticks, updating the optional
   `Progress` file, then `finish()`.
 - `finish()` builds the summary; if `out_dir` is set it writes `alleles.jsonl`,
-  `summary.json` and `final_population.json`, then closes the log.
+  `summary.json` and `final_population.json`, rewrites `run_info.json` with the
+  end time, tick count and `events_sha`, then closes the log.
 
 ### Summary fields (`summary()`)
 
 | Field | Meaning |
 |---|---|
-| `ticks`, `seed`, `backend` | run identity (`backend` = the backend's `name`) |
+| `ticks`, `seed`, `world_seed`, `backend` | run identity (`backend` = the backend's `name`) |
 | `pop_final`, `births`, `immigrants`, `deaths` | population outcome; `deaths` by cause |
 | `mean_lifespan` | mean age at death over all deaths (`None` if none) |
 | `max_gen` | highest generation among the living |
 | `decisions`, `backend_queries`, `memo_hit_rate` | decision load; hit rate = `memo_hits / decisions` |
 | `backend_s` | total seconds in the backend |
+| `fallbacks` | backend rows answered by a stand-in after a failed call (not memoised) |
 | `invalid_rate` | `invalid / decisions` |
 | `action_share` | share of each action among all decisions |
 | `mutations` | per operator `{tried, ok}`, only operators tried at least once |
 | `alleles` | registry size (includes the 64 pre-loaded founder, neutral and contrast alleles) |
 | `events_sha` | first 16 hex chars of the running sha256 of the event log |
 
-Not recorded in the summary: `world_seed`, the config, the profile, model names
-or digests. Keep them next to the run (e.g. the command line) until this is
-added.
+Full provenance is in `run_info.json` (below): seeds, profile, the merged
+config, backend description (for the LLM: model, digest, host, mode, style,
+prompt id), mutator model, founder pool (`founder` or `control`), git commit and
+dirty flag, Python and numpy versions. On a cloud host without `/api/tags` the
+digest is `"unknown"`, so record the model version yourself in that case.
 
 ### Run outputs
 
@@ -213,6 +220,7 @@ Written to `out_dir` (the smoke run uses `results/runs/smoke/`, git-ignored):
 
 | File | Written | Content |
 |---|---|---|
+| `run_info.json` | at start, updated at `finish()` | provenance (above); present even if the run crashes |
 | `events.jsonl` | during the run | founder / immigrant / birth / death events |
 | `stats.csv` | every `stats_every` ticks | population and counter snapshot |
 | `alleles.jsonl` | at `finish()` | every allele in the registry |

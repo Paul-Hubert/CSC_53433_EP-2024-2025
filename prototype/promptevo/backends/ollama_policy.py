@@ -13,6 +13,9 @@ Modes
             all K answers are cached, so that genome's later decisions mostly hit the cache.
 Every (genome, situation) result is also stored in a per-query cache (if given), so a
 situation seen in any earlier run or chunk is never asked again.
+Failed calls (non-strict) answer with a uniform distribution, but that answer is NOT
+cached anywhere: its row index is reported in `last_fallback` so the simulation's memo
+skips it too, and the situation is asked again the next time it comes up.
 `TeacherBackend` is kept as an alias: the same class labels data for distillation.
 """
 from __future__ import annotations
@@ -29,6 +32,7 @@ from ..genome import ACTIONS
 from ..obs_text import render
 from .base import Query, normalise
 
+UNIFORM = np.full(len(ACTIONS), 1.0 / len(ACTIONS))   # answer when a call fails (not cached)
 POINTS_SCHEMA = {"type": "object",
                  "properties": {a: {"type": "integer", "minimum": 0, "maximum": 100} for a in ACTIONS},
                  "required": list(ACTIONS)}
@@ -119,9 +123,11 @@ class LLMPolicyBackend:
         self.calls = 0                  # LLM requests actually sent (after caches)
         self.answered = 0               # situations the LLM generated an answer for (≈ output cost)
         self.logprob_fallbacks = 0
+        self.last_fallback: set[int] = set()   # rows of the latest decide() that are fallbacks
 
     # --- single query ----------------------------------------------------------
-    def _one(self, q: Query) -> np.ndarray:
+    def _one(self, q: Query) -> np.ndarray | None:
+        """Distribution for one query, or None if the LLM call failed (non-strict mode)."""
         mode = "points" if self.mode == "table" else self.mode
         if mode == "logprobs":
             p = self._one_logprobs(q)
@@ -150,7 +156,7 @@ class LLMPolicyBackend:
             self.failures += 1
             if self.strict:
                 raise
-            return np.full(len(ACTIONS), 1.0 / len(ACTIONS))
+            return None
 
     def _one_logprobs(self, q: Query) -> np.ndarray | None:
         prompt = teacher_prompt(self.template, q.genes, render(q.obs, self.style), "logprobs")
@@ -168,7 +174,7 @@ class LLMPolicyBackend:
         return p
 
     # --- several situations for one genome (table mode) ----------------------------
-    def _table(self, qs: list[Query]) -> list[np.ndarray]:
+    def _table(self, qs: list[Query]) -> list[np.ndarray | None]:
         situations = [render(q.obs, self.style) for q in qs]
         prompt = table_prompt(self.template, qs[0].genes, situations)
         try:
@@ -185,8 +191,14 @@ class LLMPolicyBackend:
             if isinstance(entry, dict) and sum(max(0, int(entry.get(a, 0) or 0)) for a in ACTIONS) > 0:
                 out.append(points_to_probs(entry))
             else:
-                out.append(self._one(q))            # malformed row: ask for this one alone
+                out.append(self._one(q))            # malformed row: ask for this one alone (None if it fails)
         return out
+
+    def describe(self) -> dict:
+        """Provenance for run_info.json: everything that changes the answers."""
+        return {"name": self.name, "model": self.model, "digest": self.client.digest(self.model),
+                "host": getattr(self.client, "host", None), "mode": self.mode, "style": self.style,
+                "prompt_id": self.prompt_id, "seed": self.seed, "k": self.k, "table_k": self.table_k}
 
     # --- backend protocol --------------------------------------------------------
     def _key(self, q: Query) -> str:
@@ -227,6 +239,7 @@ class LLMPolicyBackend:
 
     def decide(self, queries: list[Query]) -> np.ndarray:
         out = np.zeros((len(queries), len(ACTIONS)))
+        self.last_fallback = set()
         todo = []
         for i, q in enumerate(queries):
             self._seen[q.obs] += 1
@@ -249,9 +262,14 @@ class LLMPolicyBackend:
         with ThreadPoolExecutor(max(1, self.workers)) as ex:
             for idx, qs, probs in ex.map(run, jobs):
                 for q, p in zip(qs, probs):              # includes prefetched situations
-                    self._store(self._key(q), p)
+                    if p is not None:                    # never cache a failed call
+                        self._store(self._key(q), p)
                 for i, p in zip(idx, probs):
-                    out[i] = p
+                    if p is None:
+                        out[i] = UNIFORM
+                        self.last_fallback.add(i)
+                    else:
+                        out[i] = p
         return out
 
     @classmethod

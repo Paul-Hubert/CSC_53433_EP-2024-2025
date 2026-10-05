@@ -136,7 +136,8 @@ if rng < p_win:
 
 At most one attack per agent per decision period (`attacked` flag). The target
 is any nearest agent, whatever it is doing; the target does not fight back. A
-target drained to 0 dies as `starvation` at the end of the tick.
+target that ends the tick at ≤ 0 energy after being robbed is logged as an
+`attacked` death (not `starvation`).
 
 ### Energy costs
 

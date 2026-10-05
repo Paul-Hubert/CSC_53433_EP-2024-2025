@@ -43,7 +43,7 @@ answered, so a slow backend gives a slower run, not a different one.
  │      predators move ─► predation ─► age / starvation ─► food regrowth ─► floor immigrants   │
  └──────────────┬──────────────────────────────────────────────────────────────────────────────┘
                 ▼
-  EventLog: events.jsonl (running sha256), stats.csv  ·  finish(): alleles.jsonl, summary.json,
+  run_info.json (provenance, at start) · EventLog: events.jsonl (running sha256), stats.csv  ·  finish(): alleles.jsonl, summary.json,
   final_population.json                                                  (results/runs/<name>/)
 ```
 

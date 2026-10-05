@@ -4,7 +4,7 @@
 > `notes/archive.md`. Plan: `../Docs/redesign/08-phase0-spike-plan.md`.
 
 ## Position
-Session: S1 (offline parts pre-built in a cloud session) · Last updated: 2026-09-30 (docs: 09-progress-log.md)
+Session: S1 (offline parts pre-built in a cloud session) · Last updated: 2026-10-05 (bug fixes below; docs: 09-progress-log.md, ../Docs/system/)
 
 ## Next action
 S1.3 — on the machine with Ollama (or with an Ollama Cloud key):
@@ -14,6 +14,18 @@ Read results/e0_ollama.md: pick policy.model + ollama.mutator_model, and policy.
 (`logprobs` if "logprobs_mode_usable": true, else `points`). Fill "API facts — Ollama",
 commit. Then `pytest -m ollama`, the decision-model gate (teacher_gate) and E1 with
 `--backend llm` (plan revision box). S1.2 (Laya probe) is optional now.
+
+## Fixes 2026-10-05 (46 tests)
+- Failed LLM calls are no longer cached: the backend answers uniform for that decision only,
+  lists the row in `last_fallback`; sim memo skips it (`summary.fallbacks`). Client caches a
+  JSON reply only if it parses (a malformed reply is never pinned).
+- C4 is clean: founders, immigrants AND `founder_reintroduce` use `Simulation.founder_pool`
+  (= `AllelePools.control_pool()` when `random_founders`).
+- New death cause `attacked` (robbed this tick, energy ≤ 0); stats column `deaths_attacked`.
+  Earlier "starvation" counts included these (a few %: 6 of 93 in a 2k-tick small smoke run).
+- `run_info.json` per run (at start + finish): seeds, profile, merged config, backend
+  describe() (model, digest, host, mode, prompt id), mutator model, git commit/dirty.
+- LLM rewrite prompt gets the locus word limit (15 for temperament, 12 for action).
 
 ## Revision 2026-09-30 — LLM brain, Laya parked
 Owner decision: no Laya fine-tuning for now. Decisions AND gene mutation by Ollama LLMs

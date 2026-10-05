@@ -24,8 +24,18 @@ class Backend(Protocol):
     name: str
 
     def decide(self, queries: list[Query]) -> np.ndarray:
-        """Return probabilities, shape [len(queries), len(ACTIONS)], rows sum to 1."""
+        """Return probabilities, shape [len(queries), len(ACTIONS)], rows sum to 1.
+
+        A backend that had to answer some rows with a stand-in (e.g. a failed LLM call)
+        lists their indices in an optional attribute `last_fallback: set[int]`, refreshed
+        on every call. Callers must not cache those rows (see `fallback_rows`).
+        """
         ...
+
+
+def fallback_rows(backend) -> set[int]:
+    """Rows of the backend's latest decide() that must not be cached (empty if unsupported)."""
+    return set(getattr(backend, "last_fallback", None) or ())
 
 
 def normalise(p: np.ndarray, eps: float = 1e-6) -> np.ndarray:

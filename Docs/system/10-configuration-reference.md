@@ -78,15 +78,15 @@ stated); *energy* = agent energy units (max 100). "Used in" lists modules under
 | `sexual` | true | bool | false = asexual reproduction (C7) | `sim.py` |
 | `p_mut` | 0.03 | probability per locus per child | Mutation rate; 0 = C2 | `evolution/mutation.py` |
 | `shuffled` | false | bool | C3: decide with a random other agent's genome | `sim.py` |
-| `random_founders` | false | bool | C4: founders and immigrants from control texts | `sim.py` |
+| `random_founders` | false | bool | C4: founders, immigrants and `founder_reintroduce` from control texts | `sim.py` |
 | `operators.intensity` | 1.0 | weight | never ↔ … ↔ always ladder | `evolution/mutation.py` |
 | `operators.negate` | 1.0 | weight | Toggle opposites / add "Do not" | `evolution/mutation.py` |
 | `operators.condition_swap` | 1.0 | weight | Swap or append a "when …" condition | `evolution/mutation.py` |
 | `operators.synonym` | 1.0 | weight | Small lexicon substitution | `evolution/mutation.py` |
 | `operators.founder_reintroduce` | 0.5 | weight | Replace with another founder allele | `evolution/mutation.py` |
 | `operators.llm_rewrite` | 1.0 | weight | LLM rewrite; effective only when `ollama.mutator_model` is set | `evolution/mutation.py`, `backends/factory.py` |
-| `max_action_words` | 12 | words | Guard cap for action genes; also `{max_words}` in the mutate prompt | `evolution/mutation.py`, `backends/factory.py` |
-| `max_temperament_words` | 15 | words | Guard cap for temperament genes | `evolution/mutation.py` |
+| `max_action_words` | 12 | words | Guard cap for action genes; `{max_words}` in the mutate prompt for action loci | `evolution/mutation.py`, `backends/factory.py` |
+| `max_temperament_words` | 15 | words | Guard cap for temperament genes; `{max_words}` in the mutate prompt for temperament loci | `evolution/mutation.py` |
 
 Operator names must match the operators the `Mutator` knows; an unknown name
 with weight > 0 fails with `KeyError` at the first mutation.

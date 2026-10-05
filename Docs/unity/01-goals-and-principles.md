@@ -39,8 +39,9 @@ populations are 20–60), DOTS/ECS, networking, a polished game.
 ## Lessons from the prototype, built in
 
 Writing the [system reference](../system/README.md) surfaced a few
-prototype pitfalls. The Unity design closes each one structurally rather
-than with a fix in one place:
+prototype pitfalls (the first five were fixed in the prototype on
+2026-10-05). The Unity design closes each one structurally rather than with
+a fix in one place:
 
 | Prototype pitfall | Unity rule |
 |---|---|

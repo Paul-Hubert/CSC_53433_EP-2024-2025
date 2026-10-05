@@ -150,7 +150,7 @@ explicit registry or interface in the Unity design.
 | `RELEVANT_TAG` per action | `perception.py` | Needed by the directed tests for every action |
 | Per-action keyword tables | `rule_based.ACTION_WORDS` (lookup fails if missing), `default_logits`, `laya_backend.NEUTRAL_OPTIONS` | One entry per action in each |
 | Mutation lexicons (English) | `evolution/mutation.py` (`LADDER`, `NEGATIONS`, `CONDITIONS`, `SYNONYMS`, `LLM_STYLES`), fallback list `intensity/negate/condition_swap` | Not configurable; language-specific |
-| Death causes, stats columns | `sim.py` (`"starvation"`, `"predator"`, `"old_age"`, `stats_row`) | New causes need log/CSV changes |
+| Death causes, stats columns | `sim.py` (`"starvation"`, `"attacked"`, `"predator"`, `"old_age"`, `stats_row`) | New causes need log/CSV changes |
 | Backend names | `backends/factory.py` `if` chain | No plug-in discovery |
 | Allele file version `v1` | `founder.py` default; `Simulation` builds pools without a version | Switching versions needs code |
 | Energy rules | `sim.step` (cost branches), executors (gains) | Metabolism is not a separate component |

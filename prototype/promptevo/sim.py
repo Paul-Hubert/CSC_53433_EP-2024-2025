@@ -6,7 +6,10 @@ run; identical situations reuse the stored distribution (big speed-up with Laya)
 from __future__ import annotations
 
 import json
+import platform
+import subprocess
 import time
+from datetime import datetime, timezone
 from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -14,7 +17,7 @@ from pathlib import Path
 import numpy as np
 
 from .actions import EXECUTORS
-from .backends.base import Query
+from .backends.base import Query, fallback_rows
 from .eventlog import EventLog
 from .evolution.mutation import Mutator
 from .founder import AllelePools
@@ -45,6 +48,7 @@ class Agent:
     steals: int = 0
     immigrant: bool = False
     killed: bool = False
+    robbed: bool = False        # lost energy to an attack this tick (death cause attribution)
 
 
 @dataclass
@@ -52,6 +56,7 @@ class Counters:
     decisions: int = 0
     backend_queries: int = 0
     memo_hits: int = 0
+    fallbacks: int = 0          # backend rows answered by a stand-in (failed call), not memoised
     invalid: int = 0
     births: int = 0
     immigrants: int = 0
@@ -67,7 +72,8 @@ class Simulation:
                  progress=None):
         self.cfg, self.backend = cfg, backend
         self.seed = int(cfg.seed if seed is None else seed)
-        ws = Streams(int(cfg.seed if world_seed is None else world_seed))
+        self.world_seed = int(cfg.seed if world_seed is None else world_seed)
+        ws = Streams(self.world_seed)
         self.streams = Streams(self.seed)
         self.rng_agents = self.streams.get("agents")
         self.rng_sampling = self.streams.get("sampling")
@@ -77,16 +83,23 @@ class Simulation:
         self.world = World(cfg, ws.get("world"), self.streams.get("predators"))
         self.registry = registry or AlleleRegistry()
         self.pools = pools or AllelePools(self.registry, cfg.paths.data_dir)
-        self.mutator = Mutator(cfg, self.registry, self.pools.founders, rewriter, rewriter_model)
+        # One founder source for founders, immigrants AND founder_reintroduce, so control C4
+        # (random_founders) never lets real founder genes back in through mutation.
+        self.founder_pool = (self.pools.control_pool() if cfg.evolution.random_founders
+                             else self.pools.founders)
+        self.mutator = Mutator(cfg, self.registry, self.founder_pool, rewriter, rewriter_model)
         self.log = EventLog(out_dir)
         self.out_dir = Path(out_dir) if out_dir else None
         self.progress = progress
+        self.rewriter_model = rewriter_model
         self.memo: dict[tuple[str, object], np.ndarray] = {}
         self.c = Counters()
         self.t = 0
         self.next_id = 0
         self.agents: list[Agent] = []
         self.dead_lifespans: list[int] = []
+        self.run_info = self._provenance() if self.out_dir else {}   # only runs that write files
+        self._write_run_info()
         for _ in range(int(cfg.agents.init_pop)):
             self._spawn_founder(immigrant=False)
 
@@ -158,16 +171,21 @@ class Simulation:
                 self.c.memo_hits += 1
             elif key not in pending:
                 pending[key] = Query(gk, self.registry.genes(g), obs)
+        fresh: dict[tuple, np.ndarray] = {}
         if pending:
             t0 = time.perf_counter()
             probs = self.backend.decide(list(pending.values()))
             self.c.backend_time += time.perf_counter() - t0
             self.c.backend_queries += len(pending)
-            for k, p in zip(pending, probs):
-                self.memo[k] = np.asarray(p, dtype=float)
+            failed = fallback_rows(self.backend)
+            self.c.fallbacks += len(failed)
+            for i, (k, p) in enumerate(zip(pending, probs)):
+                fresh[k] = np.asarray(p, dtype=float)
+                if i not in failed:          # a stand-in answer is used now but never memoised
+                    self.memo[k] = fresh[k]
         tau = float(self.cfg.sim.sampling_temperature)
         for a, key in zip(agents, keys):
-            p = self.memo[key]
+            p = fresh[key] if key in fresh else self.memo[key]
             if tau != 1.0:
                 p = p ** (1.0 / tau)
                 p = p / p.sum()
@@ -185,6 +203,8 @@ class Simulation:
             newcomers = [a for a in self.agents if a.action is None]   # born / immigrated
             if newcomers:
                 self.decide(newcomers)
+        for a in self.agents:
+            a.robbed = False
         order = self.rng_act.permutation(len(self.agents))
         for i in order:
             a = self.agents[i]
@@ -202,8 +222,8 @@ class Simulation:
         dead = []
         for a in self.agents:
             a.age += 1
-            if a.energy <= 0:
-                dead.append((a, "starvation"))
+            if a.energy <= 0:          # robbed this tick → the attack is the cause, not hunger
+                dead.append((a, "attacked" if a.robbed else "starvation"))
             elif a.age > ac.max_age:
                 dead.append((a, "old_age"))
         for a, cause in dead:
@@ -263,7 +283,8 @@ class Simulation:
                 "max_gen": max((a.generation for a in self.agents), default=0),
                 "births": self.c.births, "immigrants": self.c.immigrants,
                 "deaths_starve": self.c.deaths["starvation"], "deaths_pred": self.c.deaths["predator"],
-                "deaths_age": self.c.deaths["old_age"], "decisions": self.c.decisions,
+                "deaths_age": self.c.deaths["old_age"], "deaths_attacked": self.c.deaths["attacked"],
+                "decisions": self.c.decisions,
                 "backend_queries": self.c.backend_queries, "invalid": self.c.invalid,
                 "alleles": len(self.registry)}
 
@@ -274,8 +295,28 @@ class Simulation:
                 self.progress.update(self.t, pop=len(self.agents))
         return self.finish()
 
+    # --- provenance --------------------------------------------------------------
+    def _provenance(self) -> dict:
+        """Everything needed to reproduce or audit this run (written to run_info.json)."""
+        describe = getattr(self.backend, "describe", None)
+        return {"created_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "seed": self.seed, "world_seed": self.world_seed,
+                "profile": self.cfg.get("profile"), "config": self.cfg,
+                "backend": describe() if callable(describe) else {"name": getattr(self.backend, "name", "?")},
+                "mutator_model": self.rewriter_model,
+                "founder_pool": "control" if self.cfg.evolution.random_founders else "founder",
+                "git": _git_state(), "python": platform.python_version(), "numpy": np.__version__}
+
+    def _write_run_info(self, **extra) -> None:
+        if self.out_dir:
+            self.out_dir.mkdir(parents=True, exist_ok=True)
+            info = {**self.run_info, **extra}
+            (self.out_dir / "run_info.json").write_text(json.dumps(info, indent=1, default=str))
+
     def finish(self) -> dict:
         s = self.summary()
+        self._write_run_info(finished_utc=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                             ticks=self.t, events_sha=s["events_sha"])
         if self.out_dir:
             self.registry.dump_jsonl(self.out_dir / "alleles.jsonl")
             (self.out_dir / "summary.json").write_text(json.dumps(s, indent=1))
@@ -287,16 +328,27 @@ class Simulation:
 
     def summary(self) -> dict:
         c = self.c
-        return {"ticks": self.t, "seed": self.seed, "backend": getattr(self.backend, "name", "?"),
+        return {"ticks": self.t, "seed": self.seed, "world_seed": self.world_seed,
+                "backend": getattr(self.backend, "name", "?"),
                 "pop_final": len(self.agents), "births": c.births, "immigrants": c.immigrants,
                 "deaths": dict(c.deaths),
                 "mean_lifespan": round(float(np.mean(self.dead_lifespans)), 1) if self.dead_lifespans else None,
                 "max_gen": max((a.generation for a in self.agents), default=0),
                 "decisions": c.decisions, "backend_queries": c.backend_queries,
                 "memo_hit_rate": round(c.memo_hits / max(1, c.decisions), 3),
-                "backend_s": round(c.backend_time, 2),
+                "backend_s": round(c.backend_time, 2), "fallbacks": c.fallbacks,
                 "invalid_rate": round(c.invalid / max(1, c.decisions), 3),
                 "action_share": {k: round(v / max(1, c.decisions), 3) for k, v in c.actions.most_common()},
                 "mutations": {k: v for k, v in self.mutator.stats.items() if v["tried"]},
                 "alleles": len(self.registry), "events_sha": self.log.digest()[:16]}
 
+
+def _git_state() -> dict:
+    """Commit and dirty flag of the prototype's repository, or {} if git is unavailable."""
+    from .config import ROOT
+    try:
+        run = lambda *a: subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True,
+                                        timeout=5, check=True).stdout.strip()
+        return {"commit": run("rev-parse", "HEAD"), "dirty": bool(run("status", "--porcelain", "--", "."))}
+    except (OSError, subprocess.SubprocessError):
+        return {}

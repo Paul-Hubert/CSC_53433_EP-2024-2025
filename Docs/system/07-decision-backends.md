@@ -226,15 +226,17 @@ Passed as Ollama's `format` field (structured output).
 
 | Failure | Default (`strict=False`) | `strict=True` |
 |---|---|---|
-| points/ksample call raises (after the client's 3 retries) | `failures += 1`; return **uniform** 1/7 | re-raise |
+| points/ksample call raises (after the client's 3 retries) | `failures += 1`; answer **uniform** 1/7 for this decision only (row listed in `last_fallback`, not cached) | re-raise |
 | logprobs call raises or returns no usable logprobs | fall back to points for that query | same |
-| table call raises | every row falls back to a single points call | same |
+| table call raises | every row falls back to a single points call; rows whose call also fails are uniform and not cached | same |
+| reply is not a JSON object | treated as a failed call; the client does not cache it (and ignores such a reply if one is already cached) | same |
 
 `strict` is used by the parked labelling script so failed labels are not
-written. In a simulation the uniform fallback is **stored in the caches like a
-real answer** (memo, in-process dict and `policy.sqlite`), so a transient error
-becomes a permanent uniform answer for that `(genome, situation)` until the
-cache entry is removed. Check `failures` after every run.
+written. In a simulation a failed call never enters any cache: the backend
+reports the row in `last_fallback` (see `backends/base.fallback_rows`), the
+`Simulation` uses the uniform answer for that one decision without memoising it
+(counted in `summary["fallbacks"]`), and the same situation is asked again the
+next time it comes up. Check `failures` / `fallbacks` after every run.
 
 ### Caches
 
