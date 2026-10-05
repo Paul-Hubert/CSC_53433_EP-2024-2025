@@ -1,3 +1,4 @@
+import csv
 import re
 
 import numpy as np
@@ -5,6 +6,7 @@ import numpy as np
 from promptevo.backends.rule_based import RuleBasedBackend
 from promptevo.config import load_config
 from promptevo.evolution.mutation import TEMPLATE, Mutator, clean, load_instructions, valid
+from promptevo.genome import ACTIONS
 from promptevo.sim import Simulation
 
 
@@ -93,3 +95,12 @@ def test_no_mutation_means_no_new_alleles(cfg):
     n0 = len(sim.registry)
     sim.run(800)
     assert len(sim.registry) == n0
+
+
+def test_stats_count_decisions_per_action(cfg, tmp_path):
+    sim = Simulation(cfg, RuleBasedBackend(), seed=6, out_dir=tmp_path)
+    sim.run(400)
+    rows = list(csv.DictReader((tmp_path / "stats.csv").open()))
+    last = rows[-1]
+    assert int(last["t"]) == 400
+    assert sum(int(last[f"act_{a}"]) for a in ACTIONS) == int(last["decisions"]) == sim.c.decisions

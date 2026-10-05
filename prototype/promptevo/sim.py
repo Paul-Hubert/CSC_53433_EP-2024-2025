@@ -265,7 +265,8 @@ class Simulation:
                 "deaths_starve": self.c.deaths["starvation"], "deaths_pred": self.c.deaths["predator"],
                 "deaths_age": self.c.deaths["old_age"], "decisions": self.c.decisions,
                 "backend_queries": self.c.backend_queries, "invalid": self.c.invalid,
-                "alleles": len(self.registry)}
+                "alleles": len(self.registry),
+                **{f"act_{a}": self.c.actions[a] for a in ACTIONS}}   # cumulative decisions per action
 
     def run(self, ticks: int, progress_every: int = 500) -> dict:
         for _ in range(ticks):
