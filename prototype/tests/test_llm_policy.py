@@ -93,6 +93,28 @@ def test_per_query_cache_survives_new_backend(reg_pools, tmp_path):
     assert len(log) == n and np.allclose(P1, P2[::-1])
 
 
+def test_failed_call_is_never_cached_and_strict_raises(reg_pools, tmp_path, monkeypatch):
+    monkeypatch.setattr("promptevo.llm.ollama_client.time.sleep", lambda s: None)
+    reg, pools = reg_pools
+    qs = _queries(reg, pools, [pools.neutral_genome()])
+
+    def down(method, path, payload):
+        if path == "/api/tags":
+            return {"models": [{"name": "brain", "digest": "b" * 12}]}
+        raise ConnectionRefusedError("no server")
+    cache = KVCache(tmp_path / "p.sqlite")
+    mk = lambda **kw: LLMPolicyBackend(OllamaClient(transport=down, retries=1), "brain",
+                                       resolve("prompts/teacher_v1.md"), cache=cache, **kw)
+    b = mk()
+    P = b.decide(qs)                                            # not strict: uniform for this decision only
+    assert np.allclose(P, 1 / len(ACTIONS)) and b.failures == len(qs)
+    assert len(cache) == 0 and not b._mem                       # ... and never remembered
+    with pytest.raises(RuntimeError):
+        mk(strict=True).decide(qs)
+    cfg = load_config("small", {"policy": {"model": "brain"}})
+    assert make_backend("llm", cfg, strict=True).strict and not make_backend("llm", cfg).strict
+
+
 def test_api_key_header_and_client_from_config(monkeypatch):
     seen = {}
 

@@ -13,6 +13,8 @@ Modes
             all K answers are cached, so that genome's later decisions mostly hit the cache.
 Every (genome, situation) result is also stored in a per-query cache (if given), so a
 situation seen in any earlier run or chunk is never asked again.
+A failed call (after the client's retries) raises with strict=True (simulations stop
+cleanly); otherwise that decision gets a uniform answer, which is never cached.
 `TeacherBackend` is kept as an alias: the same class labels data for distillation.
 """
 from __future__ import annotations
@@ -121,7 +123,8 @@ class LLMPolicyBackend:
         self.logprob_fallbacks = 0
 
     # --- single query ----------------------------------------------------------
-    def _one(self, q: Query) -> np.ndarray:
+    def _one(self, q: Query) -> np.ndarray | None:
+        """The model's distribution for one situation; None if the call failed (not strict)."""
         mode = "points" if self.mode == "table" else self.mode
         if mode == "logprobs":
             p = self._one_logprobs(q)
@@ -150,7 +153,7 @@ class LLMPolicyBackend:
             self.failures += 1
             if self.strict:
                 raise
-            return np.full(len(ACTIONS), 1.0 / len(ACTIONS))
+            return None
 
     def _one_logprobs(self, q: Query) -> np.ndarray | None:
         prompt = teacher_prompt(self.template, q.genes, render(q.obs, self.style), "logprobs")
@@ -249,9 +252,10 @@ class LLMPolicyBackend:
         with ThreadPoolExecutor(max(1, self.workers)) as ex:
             for idx, qs, probs in ex.map(run, jobs):
                 for q, p in zip(qs, probs):              # includes prefetched situations
-                    self._store(self._key(q), p)
+                    if p is not None:                    # a failed call is never remembered
+                        self._store(self._key(q), p)
                 for i, p in zip(idx, probs):
-                    out[i] = p
+                    out[i] = np.full(len(ACTIONS), 1.0 / len(ACTIONS)) if p is None else p
         return out
 
     @classmethod
@@ -265,7 +269,7 @@ class LLMPolicyBackend:
         return cls(client or client_from_config(cfg), model, resolve(pc.prompt),
                    mode=over.get("mode") or pc.mode, style=over.get("style") or cfg.backend.obs_style,
                    k=int(cfg.ollama.ksample_k), workers=int(over.get("workers") or pc.workers),
-                   table_k=int(pc.table_k),
+                   table_k=int(pc.table_k), strict=bool(over.get("strict", False)),
                    cache=KVCache(resolve(cfg.paths.cache_dir) / "policy.sqlite"))
 
 
