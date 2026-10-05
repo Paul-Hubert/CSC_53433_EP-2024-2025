@@ -4,8 +4,8 @@
 > `notes/archive.md`. Plan: `../Docs/redesign/08-phase0-spike-plan.md`.
 
 ## Position
-Session: S1.3 done locally, S4.3 gate run · Last updated: 2026-10-02 (mutation = one blind LLM
-operator, results/mutation_test.md; docs in ../Docs/prompt-genome/)
+Session: S1.3 done locally, S4.3 gate run · Last updated: 2026-10-05 (12 h LLM-brain run going;
+smoke_run safe for long runs: stop file, resume by replay; docs in ../Docs/prompt-genome/)
 
 ## Next action
 WAIT for owner decisions (../Docs/prompt-genome/09-status-and-roadmap.md §4): G2 handling
@@ -127,6 +127,7 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
 ## Background jobs
 | Job | Started | Log | Progress file | State |
 |---|---|---|---|---|
+| run_llm_long: one 12 h LLM-brain run (seed 1234, small; continues llm_60min; Docs/prompts/04) | 2026-10-05 19:40, PID 35844, ends ≈ 07:40 | logs/llm_long.log | logs/run_llm_long.progress.json | running. Stop: `touch logs/run_llm_long.stop` (never kill). Resume: same command, `--minutes` = what is left (the done part replays from the cache) |
 
 ## Open issues
 - Own git server mirror: waiting for the URL + auth from the owner (see
