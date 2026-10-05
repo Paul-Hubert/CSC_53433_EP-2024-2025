@@ -42,6 +42,8 @@ def main() -> None:
         eta = r.get("eta_s")
         eta_s = f"eta {eta/60:.0f}m" if isinstance(eta, (int, float)) else ""
         print(f"{r['job']:<28} {state:<8} {r.get('done')}/{tot} {eta_s:<10} upd {r.get('updated')}"
+              + (f" ends {r['ends'][11:]}" if r.get("ends") and state == "running" else "")
+              + (f" ({r['reason']})" if r.get("reason") else "")
               + (f" err={r['error'][:60]}" if r.get("error") else ""))
 
 

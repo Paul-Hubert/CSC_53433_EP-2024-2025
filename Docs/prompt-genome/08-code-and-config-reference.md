@@ -60,14 +60,14 @@ lives only in `prototype/`. A Unity version is on the roadmap
 | `backends/random_policy.py` | Uniform brain | `RandomBackend` |
 | `backends/rule_based.py` | Keyword brain | `RuleBasedBackend`; `default_logits`, `gene_weight`, `temperament_deltas` |
 | `backends/ollama_policy.py` | LLM brain | `LLMPolicyBackend` (modes points / table / ksample / logprobs, caches, workers, `from_config`); `TeacherBackend` (alias); `teacher_prompt`, `table_prompt`, `POINTS_SCHEMA`, `points_to_probs`, `logprobs_to_probs` |
-| `backends/factory.py` | Name → brain | `make_backend(name, cfg)`; `make_rewriter(cfg, check=False)` → `(llm, model)` for mutation, or `(None, None)` when mutation is off; with `check=True` it raises `MutatorUnavailable` if Ollama doesn't answer |
+| `backends/factory.py` | Name → brain | `make_backend(name, cfg, strict=False)` (strict: a failed LLM call raises instead of a one-off uniform answer; failures are never cached); `make_rewriter(cfg, check=False)` → `(llm, model)` for mutation, or `(None, None)` when mutation is off; with `check=True` it raises `MutatorUnavailable` if Ollama doesn't answer |
 | `backends/laya_backend.py` | Laya brain (parked) | `LayaBackend` |
 | `llm/ollama_client.py` | Ollama HTTP client | `OllamaClient` (`chat`, `chat_json`, `chat_raw`, `embed`, `models`, `digest`, retries, sqlite cache, base options, `think`); `client_from_config(cfg)`; `make_rewriter(client, model, temperature)` → `llm(prompt, seed)` |
 | `cache.py` | Persistent cache | `KVCache` (sqlite key → JSON value); `make_key(*parts)` (sha256 of the JSON) |
 | `metrics.py` | Measurement | `entropy`, `jsd`, `mi_genome`, `mi_obs`, `behaviour_distance`, `directed`, `spearman`, `locality`, `shannon_diversity`, `bootstrap_ci` |
-| `eventlog.py` | Run logs | `EventLog` (`events.jsonl` with a running hash, `stats.csv`) |
+| `eventlog.py` | Run logs | `EventLog` (`events.jsonl` with a running hash, `stats.csv`, `flush`); `replace_file` (a rename that waits out a reader on Windows) |
 | `render.py` | ASCII map | `ascii_map(world, agents)`, `LEGEND`, `ACTION_CHAR` |
-| `progress.py` | Job progress files | `Progress` → `logs/<job>.progress.json` |
+| `progress.py` | Job progress files | `Progress` → `logs/<job>.progress.json` (`deadline` for time-boxed jobs; states running, done, stopped, failed); `keep_awake()` (asks Windows not to sleep while a job runs) |
 
 ### Using the package from Python
 
@@ -233,7 +233,7 @@ and `peek` don't read it.
 
 | Script | Purpose | Options |
 |---|---|---|
-| `smoke_run` | Run a simulation, print ASCII snapshots and a summary, write the run files | `--ticks` (5000), `--backend` (config default `rule_based`; `random`, `llm`), `--seed`, `--out` (`results/runs/smoke`), `--snapshots` (3; 0 = none), `--world` (overlay from `configs/worlds/`), `--no-mutation` (crossover only, no model needed), `--minutes` (stop after N minutes of wall-clock time) |
+| `smoke_run` | Run a simulation, print ASCII snapshots and a summary, write the run files | `--ticks` (5000), `--backend` (config default `rule_based`; `random`, `llm`), `--seed`, `--out` (`results/runs/smoke`), `--snapshots` (3; 0 = none), `--world` (overlay from `configs/worlds/`), `--no-mutation` (crossover only, no model needed), `--minutes` (stop after N minutes of wall-clock time). Stop cleanly with `logs/run_<name>.stop`; run the same command again to resume ([03 §12](03-world-and-simulation.md#12-what-a-run-writes-to-disk)) |
 
 With `--backend llm` the summary also prints `llm_calls`, failures and the
 memo hit rate. Genes mutate through the mutator model with every brain, so
@@ -284,7 +284,7 @@ let the LLM decide directly. Their usage is in their docstrings and in
 
 ## 6. Tests
 
-`cd prototype && pytest -q` runs 44 offline tests in about 20 s, with no model
+`cd prototype && pytest -q` runs 50 offline tests in about 25 s, with no model
 needed. LLM calls are replaced by small fake servers. Two marked tests talk to
 real models: `pytest -m ollama` (needs Ollama and `policy.model`) and
 `pytest -m laya` (parked).
@@ -295,10 +295,11 @@ real models: `pytest -m ollama` (needs Ollama and `policy.model`) and
 | `test_world.py` | flat Lab 1 world, terrain fractions and connectivity, nobody enters blocked cells, unambiguous map symbols |
 | `test_behaviour.py` | flee increases distance, eating gains energy, invalid eat → wander, text styles, rule-based directed tests and gibberish |
 | `test_genome.py` | allele pools, registry dedup and genome keys, crossover |
-| `test_evolution.py` | guards and instruction list, the mutator sends only the instruction and the gene (fake LLM), rejected answers, no LLM → no mutation, determinism, population bounds, shuffled control, no mutation → no new alleles |
+| `test_evolution.py` | guards and instruction list, the mutator sends only the instruction and the gene (fake LLM), rejected answers, no LLM → no mutation, determinism, population bounds, shuffled control, no mutation → no new alleles, decisions per action in `stats.csv` |
 | `test_metrics.py` | entropy, JSD, mutual information, directed ΔP, Spearman |
-| `test_gene_report.py` | `gene_report` on a short run: fitness averages to 1.00 in every slot, frequencies add up to the population |
-| `test_llm_policy.py` | table mode vs points, malformed rows, persistent caches (incl. an empty cache file), API key header, factory (incl. mutation off and Ollama down), logprobs fallback |
+| `test_gene_report.py` | `gene_report` on a short run: fitness averages to 1.00 in every slot, frequencies add up to the population; an unfinished run is rebuilt from its events |
+| `test_long_run.py` | stop file, then resume by replay (same events, no model call asked twice); a failing model stops the run cleanly; `run_info.json`; progress time box |
+| `test_llm_policy.py` | table mode vs points, malformed rows, persistent caches (incl. an empty cache file), a failed call is never cached and strict brains raise, API key header, factory (incl. mutation off and Ollama down), logprobs fallback |
 | `test_adapters.py` | Laya request layouts and answer parsing (parked), Ollama client |
 | `test_dataset.py` | dataset splits, resumable labelling, gate with a fake model (parked pipeline) |
 | `test_local_models.py` | real-model smoke tests (`-m ollama`, `-m laya`) |
@@ -308,7 +309,7 @@ real models: `pytest -m ollama` (needs Ollama and `policy.model`) and
 | Path | Committed | Content |
 |---|---|---|
 | `results/*.md`, `results/*.json` | yes | probe, gate and E1 reports |
-| `results/runs/` | no | per-run files (events, stats, alleles, summary) |
+| `results/runs/` | no | per-run files (events, stats, alleles, summary, run info) |
 | `cache/` | no | sqlite caches of LLM answers. Never delete them unasked: they make reruns free. |
 | `logs/` | no | job logs and progress files |
 | `data/mutants_v*.jsonl`, `data/dataset_v*_*.jsonl` | no | regenerable (parked pipeline) |

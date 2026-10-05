@@ -283,10 +283,19 @@ brain survives only because of the floor (see §13).
 | File | Content |
 |---|---|
 | `events.jsonl` | one line per event: `founder`, `immigrant` (id, genome), `birth` (child id, parents, generation, genome, mutations with the locus, parent and new allele, instruction number and new text), `death` (cause, age, generation, food eaten, offspring, steals) |
-| `stats.csv` | every 100 ticks: `t, pop, mean_energy, mean_gen, max_gen, births, immigrants, deaths_starve, deaths_pred, deaths_age, decisions, backend_queries, invalid, alleles` (counts are cumulative) |
+| `stats.csv` | every 100 ticks: `t, pop, mean_energy, mean_gen, max_gen, births, immigrants, deaths_starve, deaths_pred, deaths_age, decisions, backend_queries, invalid, alleles`, then decisions per action `act_eat` … `act_attack` (counts are cumulative) |
 | `alleles.jsonl` | every allele seen in the run: id, locus, text, origin, parent allele, operator (`llm#<n>`: the mutation instruction drawn), model, seed (the lineage of every gene) |
 | `final_population.json` | the living animals at the end: id, generation, genome (allele ids) |
-| `summary.json` | totals: births, newcomers, deaths by cause, mean lifespan, maximum generation, decisions, brain queries, memo hit rate, brain time, invalid rate, share of each action, mutation counts per operator, number of alleles, event hash |
+| `run_info.json` | what ran: command, git commit, Ollama version and model digests, brain, seed, the main config sections |
+| `summary.json` | totals: births, newcomers, deaths by cause, mean lifespan, maximum generation, decisions, brain queries, memo hit rate, brain time, invalid rate, share of each action, mutation counts, number of alleles, event hash; why the run stopped, minutes, model calls not answered by the cache, failures |
+
+Long runs are safe to stop. `events.jsonl` and `stats.csv` are flushed every
+500 ticks and `alleles.jsonl` is saved every 5 000. Creating
+`logs/run_<name>.stop` stops a run cleanly within 100 ticks; Ctrl-C, a failed
+model call or any error also stop it cleanly, with every file written.
+Running the same command again resumes it: the part already done replays from
+the caches without model calls, then the run continues. `gene_report` also
+reads a run that is still going or was stopped hard.
 
 Genomes are stored as allele ids such as `eat:3`. `alleles.jsonl` maps ids to
 text. Look at the files with `python -m experiments.peek FILE -n 5` rather
