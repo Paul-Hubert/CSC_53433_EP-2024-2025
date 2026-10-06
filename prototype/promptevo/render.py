@@ -3,10 +3,9 @@ from __future__ import annotations
 
 from .world import MOUNTAIN, WATER
 
-ACTION_CHAR = {"eat": "E", "flee": "F", "follow": "L", "wander": "W",
-               "rest": "R", "mate": "M", "attack": "A"}
-LEGEND = ("animals by current action: E eat, F flee, L follow, W wander, R rest, M mate, "
-          "A attack, ? not decided yet | P predator | . food | ~ water | ^ mountain")
+ACTION_CHAR = {"eat": "E", "flee": "F", "follow": "L", "rest": "R", "mate": "M"}
+LEGEND = ("animals by current action: E eat, F flee, L follow, R rest, M mate, ? not decided yet | "
+          "P predator | . food | ~ water | ^ mountain")
 
 
 def ascii_map(world, agents=(), max_w: int = 48, max_h: int = 24) -> str:

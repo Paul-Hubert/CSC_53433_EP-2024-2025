@@ -33,8 +33,8 @@ def test_tiny_run_gives_known_numbers(tmp_path):
               {"kind": "founder", "t": 0, "id": 1, "genome": founder(1)},
               {"kind": "birth", "t": 200, "id": 2, "parents": [0, 1], "gen": 1, "genome": child,
                "mutations": [{"locus": "eat", "parent": "eat:0", "child": "eat:2", "prompt": 0, "text": "Eat rule fast."}]},
-              {"kind": "death", "t": 300, "id": 0, "cause": "predator", "age": 300, "gen": 0, "food": 1, "offspring": 1, "steals": 0},
-              {"kind": "death", "t": 400, "id": 1, "cause": "predator", "age": 400, "gen": 0, "food": 1, "offspring": 1, "steals": 0}]
+              {"kind": "death", "t": 300, "id": 0, "cause": "predator", "age": 300, "gen": 0, "food": 1, "offspring": 1},
+              {"kind": "death", "t": 400, "id": 1, "cause": "predator", "age": 400, "gen": 0, "food": 1, "offspring": 1}]
     write_run(tmp_path, events, alleles, ticks=500)
     b = build(tmp_path, every=250, window=500, drops=400)
     eat = {r["t"]: r for r in b["rows"] if r["slot"] == "eat"}
@@ -57,7 +57,8 @@ def test_tiny_run_gives_known_numbers(tmp_path):
     assert late["expected"] == 1                                # born before the start: real genome kept
     null = b["null"]                                            # one slot fixes per world, as in reality
     assert null["mutants that reached 50 %"]["real"] == 1 and null["mutants that reached 50 %"]["median"] == 1
-    assert null["founder texts that reached 90 %"]["real"] == 9 and null["founder texts that reached 90 %"]["median"] == 9
+    n = len(LOCI) - 1                                           # every slot but eat
+    assert null["founder texts that reached 90 %"]["real"] == n and null["founder texts that reached 90 %"]["median"] == n
 
 
 def test_timeline_invariants_on_a_short_run(tmp_path):
@@ -115,3 +116,21 @@ def test_judge_asks_once_per_gene_within_budget(tmp_path, monkeypatch):
     assert '"Never eat."' in asked[1] and "when and how to eat" in asked[1]
     usable, _ = gene_timeline.judge(run, ["eat:0", "eat:1"], load_config("small"), max_calls=10)
     assert usable == {"eat:0": True, "eat:1": False} and len(asked) == 2     # answered from the cache
+
+
+def test_a_run_is_read_with_its_own_slots(tmp_path):
+    """Runs made before 2026-10-07 had 10 slots; the analysis takes the slots from the run."""
+    old = ("eat", "flee", "wander", "risk")
+    alleles = [{"id": f"{l}:{n}", "locus": l, "text": f"{l.capitalize()} rule {n}.", "origin": "founder"}
+               for l in old for n in (0, 1)]
+    events = [{"kind": "founder", "t": 0, "id": i, "genome": [f"{l}:{i}" for l in old]} for i in (0, 1)]
+    events.append({"kind": "birth", "t": 200, "id": 2, "parents": [0, 1], "gen": 1,
+                   "genome": ["eat:0", "flee:1", "wander:0", "risk:1"], "mutations": []})
+    events += [{"kind": "death", "t": t, "id": i, "cause": "predator", "age": t, "gen": 0, "food": 1, "offspring": 1}
+               for t, i in ((300, 0), (400, 1))]
+    write_run(tmp_path, events, alleles, ticks=500)
+    b = build(tmp_path, every=250, window=500, drops=50)
+    assert b["run"].loci == old
+    assert {r["slot"] for r in b["rows"]} == set(old)
+    risk = {r["t"]: r for r in b["rows"] if r["slot"] == "risk"}
+    assert risk[500]["leader"] == "risk:1" and risk[500]["leader_share"] == 1

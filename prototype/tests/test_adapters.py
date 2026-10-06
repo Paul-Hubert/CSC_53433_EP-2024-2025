@@ -20,12 +20,12 @@ def test_build_request_placements(reg_pools):
     for p in ("P1", "P2", "P3", "P4"):
         state, q = build_request(genes, "Energy: low.", p)
         assert set(q["action"]["criteria"]) == set(ACTIONS) and "situation" in state
-    assert "Temperament" in build_request(genes, "x", "P4")[0]["animal"]
+    assert "Instincts" in build_request(genes, "x", "P2")[0]["animal"]
 
 
 def test_extract_probs_variants():
     p, exact = extract_probs({"probabilities": {a: 1.0 for a in ACTIONS}})
-    assert exact and np.allclose(p, 1 / 7)
+    assert exact and np.allclose(p, 1 / len(ACTIONS))
     p, exact = extract_probs({"choice": "flee", "confidence": 0.9})
     assert not exact and p.argmax() == ACTIONS.index("flee")
     with pytest.raises(ValueError):
@@ -79,7 +79,7 @@ def test_ollama_client_and_teacher(reg_pools):
     g = pools.neutral_genome()
     q = Query(reg.genome_key(g), reg.genes(g), O)
     for mode in ("points", "ksample"):
-        t = TeacherBackend(c, "teach", resolve("prompts/teacher_v1.md"), mode=mode, k=3)
+        t = TeacherBackend(c, "teach", resolve("prompts/teacher_v2.md"), mode=mode, k=3)
         p = t.decide([q])
         assert p[0].argmax() == ACTIONS.index("flee") and abs(p.sum() - 1) < 1e-9
     ask = make_rewriter(c, "teach", temperature=1.2)

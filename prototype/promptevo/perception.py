@@ -13,7 +13,6 @@ class Observation:
     predator: str               # none | far | near
     animal: str                 # none | far | near
     animal_ready: bool | None = None     # only when animal == near
-    animal_stronger: bool | None = None  # only when animal == near
     age: str = "adult"          # young | adult
 
     def tags(self) -> set[str]:
@@ -32,7 +31,7 @@ class Observation:
 
 # Directed-test relevance: action locus -> tag the observation must carry.
 RELEVANT_TAG = {"eat": "food_present", "flee": "predator_present", "follow": "animal_present",
-                "wander": "any", "rest": "any", "mate": "animal_near", "attack": "animal_near"}
+                "rest": "any", "mate": "animal_near"}
 
 
 def _bucket(d: int | None, near: int, vision: int) -> str:
@@ -66,9 +65,6 @@ def sense(agent, world, agents, cfg) -> Observation:
         if do is None or d < do:
             other, do = b, d
     animal = _bucket(do, near, vision)
-    ready = stronger = None
-    if animal == "near":
-        ready = mate_ready(other, ac)
-        stronger = other.energy > agent.energy
+    ready = mate_ready(other, ac) if animal == "near" else None
     age = "young" if agent.age < ac.maturity else "adult"
-    return Observation(energy, food, predator, animal, ready, stronger, age)
+    return Observation(energy, food, predator, animal, ready, age)

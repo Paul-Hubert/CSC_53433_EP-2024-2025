@@ -17,7 +17,7 @@ from typing import Callable
 import numpy as np
 
 from ..config import resolve
-from ..genome import ACTION_LOCI, LOCI, AlleleRegistry, Genome
+from ..genome import LOCI, AlleleRegistry, Genome
 
 TEMPLATE = '{instruction}\n\n"{text}"\n\nReply with the new sentence only.'
 
@@ -57,8 +57,7 @@ class Mutator:
                  instructions: list[str] | None = None):
         ec = cfg.evolution
         self.p_mut = float(ec.p_mut) if llm else 0.0          # no mutator LLM: no mutation
-        self.max_words = {l: int(ec.max_action_words if l in ACTION_LOCI else ec.max_temperament_words)
-                          for l in LOCI}
+        self.max_words = int(ec.max_words)
         self.instructions = instructions or load_instructions(ec.mutation_prompts)
         self.registry, self.llm, self.model = registry, llm, model
         self.stats = {"tried": 0, "ok": 0}
@@ -69,7 +68,7 @@ class Mutator:
         seed = int(rng.integers(2**31))
         answer = self.llm(TEMPLATE.format(instruction=self.instructions[k], text=text), seed)
         new = clean(answer)
-        return (new if valid(new, text, self.max_words[locus]) else None), k, seed
+        return (new if valid(new, text, self.max_words) else None), k, seed
 
     def mutate(self, g: Genome, rng: np.random.Generator) -> tuple[Genome, list[dict]]:
         events = []

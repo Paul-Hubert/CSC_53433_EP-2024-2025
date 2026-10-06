@@ -124,7 +124,7 @@ def main() -> None:
     ap.add_argument("--splits", default="val,test,train")
     ap.add_argument("--model", default=None)
     ap.add_argument("--mode", default=None, help="points | ksample (default: cfg.ollama.teacher_mode)")
-    ap.add_argument("--prompt", default="prompts/teacher_v1.md")
+    ap.add_argument("--prompt", default="prompts/teacher_v2.md")
     ap.add_argument("--workers", type=int, default=1)
     ap.add_argument("--limit", type=int, default=None, help="label at most N new rows (e.g. 50 for a first look)")
     ap.add_argument("--check", action="store_true", help="only print sanity stats of existing labels")

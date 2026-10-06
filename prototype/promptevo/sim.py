@@ -38,11 +38,9 @@ class Agent:
     heading: int = 0
     action: str | None = None
     invalid: bool = False
-    attacked: bool = False
     bred: bool = False
     food_eaten: int = 0
     offspring: int = 0
-    steals: int = 0
     immigrant: bool = False
     killed: bool = False
 
@@ -136,7 +134,7 @@ class Simulation:
         self.c.deaths[cause] += 1
         self.dead_lifespans.append(a.age)
         self.log.event("death", self.t, id=a.id, cause=cause, age=a.age, gen=a.generation,
-                       food=a.food_eaten, offspring=a.offspring, steals=a.steals)
+                       food=a.food_eaten, offspring=a.offspring)
 
     # --- decisions -----------------------------------------------------------
     def decide(self, agents: list[Agent] | None = None) -> None:
@@ -172,7 +170,7 @@ class Simulation:
                 p = p ** (1.0 / tau)
                 p = p / p.sum()
             a.action = ACTIONS[int(self.rng_sampling.choice(len(ACTIONS), p=p))]
-            a.invalid = a.attacked = a.bred = False
+            a.invalid = a.bred = False
             self.c.decisions += 1
             self.c.actions[a.action] += 1
 

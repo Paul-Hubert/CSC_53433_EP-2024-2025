@@ -23,7 +23,7 @@ from promptevo.backends.base import Query
 from promptevo.config import load_config, resolve
 from promptevo.evolution.mutation import Mutator
 from promptevo.founder import AllelePools
-from promptevo.genome import ACTION_LOCI, ACTIONS, LOCI, AlleleRegistry, Genome
+from promptevo.genome import ACTIONS, LOCI, AlleleRegistry, Genome
 from promptevo.perception import RELEVANT_TAG
 from promptevo.progress import Progress
 
@@ -67,7 +67,7 @@ def build_sets(cfg, reg: AlleleRegistry, pools: AllelePools, rng, size: dict, mu
             if child is not None:
                 edits.append((parent, child))
     return {"founders": founders, "controls": controls, "neutral": pools.neutral_genome(),
-            "pairs": {l: pools.contrast_pair(l) for l in ACTION_LOCI}, "edits": edits}
+            "pairs": {l: pools.contrast_pair(l) for l in ACTIONS}, "edits": edits}
 
 
 def evaluate(backend, reg: AlleleRegistry, sets: dict, obs: list, prog=None, chunk: int = 64):

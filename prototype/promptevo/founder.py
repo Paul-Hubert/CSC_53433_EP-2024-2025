@@ -7,17 +7,17 @@ from pathlib import Path
 import numpy as np
 
 from .config import resolve
-from .genome import ACTION_LOCI, LOCI, AlleleRegistry, Genome
+from .genome import LOCI, AlleleRegistry, Genome
 
 
 class AllelePools:
     def __init__(self, registry: AlleleRegistry, data_dir: str | Path = "data",
-                 version: str = "v1"):
+                 version: str = "v2", control_file: str = "control_alleles_v1.json"):
         d = resolve(data_dir)
         self.registry = registry
-        founder = json.loads((d / f"founder_pool_{version}.json").read_text())
-        contrast = json.loads((d / f"contrast_alleles_{version}.json").read_text())
-        control = json.loads((d / f"control_alleles_{version}.json").read_text())
+        founder = json.loads((d / f"founder_pool_{version}.json").read_text(encoding="utf-8"))
+        contrast = json.loads((d / f"contrast_alleles_{version}.json").read_text(encoding="utf-8"))
+        control = json.loads((d / control_file).read_text(encoding="utf-8"))
         self.founders: dict[str, list[str]] = {}
         self.neutral: dict[str, str] = {}
         for locus in LOCI:
@@ -28,7 +28,7 @@ class AllelePools:
         self.contrast: dict[str, tuple[str, str]] = {
             l: (registry.add(l, contrast[l]["pro"], "contrast").id,
                 registry.add(l, contrast[l]["anti"], "contrast").id)
-            for l in ACTION_LOCI}
+            for l in LOCI}
         self.control_texts: list[str] = control["shuffled"] + control["irrelevant"]
 
     # --- genome builders -------------------------------------------------

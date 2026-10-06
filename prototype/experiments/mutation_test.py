@@ -34,7 +34,7 @@ from promptevo.genome import AlleleRegistry
 from promptevo.llm.ollama_client import client_from_config, make_rewriter
 from promptevo.progress import Progress
 
-LINEAGE_LOCI = ("eat", "flee", "follow", "rest", "attack", "risk")
+LINEAGE_LOCI = ("eat", "flee", "follow", "rest", "mate")
 
 
 def words(t: str) -> list[str]:
@@ -261,7 +261,7 @@ def report(res: dict) -> list[str]:
                 prev = s["text"]
         L.append("")
     L += ["## Variety samples (first 3 founder sentences of eat, flee, risk)", ""]
-    for locus in ("eat", "flee", "risk"):
+    for locus in ("eat", "flee", "mate"):
         parent = next(r["parent"] for r in res["variety"] if r["locus"] == locus)
         L.append(f"### \"{parent}\"")
         L.append("")

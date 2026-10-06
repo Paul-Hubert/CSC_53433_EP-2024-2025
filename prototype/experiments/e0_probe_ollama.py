@@ -17,10 +17,8 @@ from promptevo.config import resolve
 from promptevo.llm.ollama_client import OllamaClient
 
 GENES = {"eat": "Eat whenever food is close.", "flee": "Always run away, whatever happens.",
-         "follow": "Stay close to other animals.", "wander": "Keep moving to new places.",
-         "rest": "Rest when you are tired.", "mate": "Look for a partner when energy is high.",
-         "attack": "Never fight.", "risk": "Cautious: safety comes before food.",
-         "social": "Social: feels safer in a group.", "place": "Prefers staying near water."}
+         "follow": "Stay close to other animals.", "rest": "Rest when you are tired.",
+         "mate": "Look for a partner when energy is high."}
 SITUATION = "Energy: low. Food: near. Predator: near. Animal: none. Age: adult."
 
 
@@ -49,7 +47,7 @@ def main() -> None:
             facts[title] = f"FAILED {e!r}"
 
     section("1. Version & models", lambda: {"version": c.version(), "models": c.models()})
-    prompt = teacher_prompt(open(resolve("prompts/teacher_v1.md")).read(), GENES, SITUATION, "points")
+    prompt = teacher_prompt(open(resolve("prompts/teacher_v2.md")).read(), GENES, SITUATION, "points")
     msgs = [{"role": "user", "content": prompt}]
 
     def structured():
@@ -68,7 +66,7 @@ def main() -> None:
     section("3. seed+temperature 0 determinism", determinism)
 
     def logprobs():
-        p = teacher_prompt(open(resolve("prompts/teacher_v1.md")).read(), GENES, SITUATION, "logprobs")
+        p = teacher_prompt(open(resolve("prompts/teacher_v2.md")).read(), GENES, SITUATION, "logprobs")
         res = c.chat_raw(a.teacher, [{"role": "user", "content": p}],
                          options={"seed": 1, "temperature": 0, "num_predict": 1},
                          extra={"logprobs": True, "top_logprobs": 10})
@@ -83,7 +81,7 @@ def main() -> None:
     def timing():
         out = {}
         for mode in ("points", "logprobs"):
-            p = teacher_prompt(open(resolve("prompts/teacher_v1.md")).read(), GENES, SITUATION, mode)
+            p = teacher_prompt(open(resolve("prompts/teacher_v2.md")).read(), GENES, SITUATION, mode)
             m = [{"role": "user", "content": p}]
             ts = []
             for i in range(3):

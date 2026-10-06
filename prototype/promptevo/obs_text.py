@@ -9,7 +9,6 @@ def render(o: Observation, style: str = "V1") -> str:
         animal = f"Animal: {o.animal}"
         if o.animal == "near":
             animal += (", ready to mate" if o.animal_ready else ", not ready to mate")
-            animal += (", stronger" if o.animal_stronger else ", weaker")
         return (f"Energy: {o.energy}. Food: {o.food}. Predator: {o.predator}. "
                 f"{animal}. Age: {o.age}.")
     if style == "V2":
@@ -23,7 +22,6 @@ def render(o: Observation, style: str = "V1") -> str:
              "near": "Another animal is next to me."}[o.animal]
         if o.animal == "near":
             a += " It is ready to mate." if o.animal_ready else " It is not ready to mate."
-            a += " It is stronger than me." if o.animal_stronger else " It is weaker than me."
         g = "I am young." if o.age == "young" else "I am an adult."
         return " ".join([e, f, p, a, g])
     raise ValueError(f"unknown obs style {style}")

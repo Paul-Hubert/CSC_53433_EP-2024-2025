@@ -20,18 +20,19 @@ SIZES = {"small": (32, 48), "full": (54, 150)}   # (synthetic, total)
 
 
 def synthetic() -> list[Observation]:
-    animals = [("none", None, None), ("near", True, False), ("near", False, True)]
+    animals = [("none", None), ("near", True), ("near", False)]
     out = []
-    for e, f, p, (an, ready, strong) in itertools.product(
+    for e, f, p, (an, ready) in itertools.product(
             ["low", "medium", "high"], ["none", "far", "near"], ["none", "near"], animals):
-        out.append(Observation(e, f, p, an, ready, strong, "adult"))
+        out.append(Observation(e, f, p, an, ready, "adult"))
     return out
 
 
 def load_obs(path=None) -> list[Observation]:
     path = resolve(path or "data/observations_v1.jsonl")
-    return [Observation(**{k: v for k, v in json.loads(l).items() if k in Observation.__annotations__})
-            for l in path.read_text().splitlines()]
+    obs = [Observation(**{k: v for k, v in json.loads(l).items() if k in Observation.__annotations__})
+           for l in path.read_text().splitlines()]
+    return list(dict.fromkeys(obs))       # older files also told whether the other animal was stronger
 
 
 def main() -> None:

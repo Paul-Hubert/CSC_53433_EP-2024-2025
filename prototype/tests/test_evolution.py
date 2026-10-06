@@ -6,7 +6,7 @@ import numpy as np
 from promptevo.backends.rule_based import RuleBasedBackend
 from promptevo.config import load_config
 from promptevo.evolution.mutation import TEMPLATE, Mutator, clean, load_instructions, valid
-from promptevo.genome import ACTIONS
+from promptevo.genome import ACTIONS, LOCI
 from promptevo.sim import Simulation
 
 
@@ -32,7 +32,7 @@ def test_mutator_sends_only_the_gene(reg_pools):
         m = Mutator(cfg2, reg, fake, "fake")
         return m, sent, m.mutate(g0, np.random.default_rng(2))
     m, sent, (g, events) = run()
-    assert len(events) == 10 and m.stats == {"tried": 10, "ok": 10}
+    assert len(events) == len(LOCI) and m.stats == {"tried": len(LOCI), "ok": len(LOCI)}
     for (prompt, seed), e in zip(sent, events):
         # the instruction and the gene sentence, nothing else: no world, no other genes
         assert prompt == TEMPLATE.format(instruction=m.instructions[e["prompt"]], text=genes[e["locus"]])
@@ -49,7 +49,7 @@ def test_mutator_rejects_bad_answers_and_needs_an_llm(reg_pools):
     g0 = pools.sample_founder(np.random.default_rng(1))
     too_long = Mutator(cfg2, reg, lambda prompt, seed: "word " * 30, "fake")
     assert too_long.mutate(g0, np.random.default_rng(3)) == (g0, [])
-    assert too_long.stats == {"tried": 10, "ok": 0}
+    assert too_long.stats == {"tried": len(LOCI), "ok": 0}
     unchanged = Mutator(cfg2, reg, lambda prompt, seed: re.search(r'"(.*)"', prompt).group(1), "fake")
     assert unchanged.mutate(g0, np.random.default_rng(3)) == (g0, [])
     off = Mutator(cfg2, reg)                                         # no mutator LLM: no mutation

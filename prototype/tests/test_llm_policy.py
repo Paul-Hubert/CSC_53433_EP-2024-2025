@@ -57,9 +57,9 @@ def test_table_mode_batches_and_matches_points(reg_pools):
     pro, anti = pools.contrast_pair("flee")
     qs = _queries(reg, pools, [pro, anti])
     log_t, log_p = [], []
-    table = LLMPolicyBackend(OllamaClient(transport=fake(log_t)), "brain", resolve("prompts/teacher_v1.md"),
+    table = LLMPolicyBackend(OllamaClient(transport=fake(log_t)), "brain", resolve("prompts/teacher_v2.md"),
                              mode="table", table_k=8, prefetch=False)
-    points = LLMPolicyBackend(OllamaClient(transport=fake(log_p)), "brain", resolve("prompts/teacher_v1.md"),
+    points = LLMPolicyBackend(OllamaClient(transport=fake(log_p)), "brain", resolve("prompts/teacher_v2.md"),
                               mode="points")
     Pt, Pp = table.decide(qs), points.decide(qs)
     assert len(log_t) == 2 and len(log_p) == len(qs)          # one call per genome vs per query
@@ -75,7 +75,7 @@ def test_table_malformed_row_falls_back_to_single_call(reg_pools):
     reg, pools = reg_pools
     log = []
     b = LLMPolicyBackend(OllamaClient(transport=fake(log, break_rows=("s2",))), "brain",
-                         resolve("prompts/teacher_v1.md"), mode="table", prefetch=False)
+                         resolve("prompts/teacher_v2.md"), mode="table", prefetch=False)
     P = b.decide(_queries(reg, pools, [pools.neutral_genome()]))
     assert len(log) == 2 and np.allclose(P.sum(1), 1)          # 1 table call + 1 repair call
 
@@ -85,7 +85,7 @@ def test_per_query_cache_survives_new_backend(reg_pools, tmp_path):
     qs = _queries(reg, pools, [pools.neutral_genome()])
     log = []
     mk = lambda: LLMPolicyBackend(OllamaClient(transport=fake(log)), "brain",
-                                  resolve("prompts/teacher_v1.md"), mode="table",
+                                  resolve("prompts/teacher_v2.md"), mode="table",
                                   cache=KVCache(tmp_path / "p.sqlite"))
     P1 = mk().decide(qs)
     n = len(log)
@@ -104,7 +104,7 @@ def test_failed_call_is_never_cached_and_strict_raises(reg_pools, tmp_path, monk
         raise ConnectionRefusedError("no server")
     cache = KVCache(tmp_path / "p.sqlite")
     mk = lambda **kw: LLMPolicyBackend(OllamaClient(transport=down, retries=1), "brain",
-                                       resolve("prompts/teacher_v1.md"), cache=cache, **kw)
+                                       resolve("prompts/teacher_v2.md"), cache=cache, **kw)
     b = mk()
     P = b.decide(qs)                                            # not strict: uniform for this decision only
     assert np.allclose(P, 1 / len(ACTIONS)) and b.failures == len(qs)
@@ -183,13 +183,13 @@ def test_logprobs_mode_and_fallback(reg_pools):
     log = []
     toks = [(" flee", np.log(0.6)), ("eat", np.log(0.3)), ("The", np.log(0.05))]
     b = LLMPolicyBackend(OllamaClient(transport=lp_transport(log, toks)), "brain",
-                         resolve("prompts/teacher_v1.md"), mode="logprobs")
+                         resolve("prompts/teacher_v2.md"), mode="logprobs")
     p = b.decide(q)[0]
     assert p.argmax() == ACTIONS.index("flee") and abs(p[ACTIONS.index("eat")] - 1 / 3) < 0.01
     assert log[0]["options"]["num_predict"] == 1 and b.logprob_fallbacks == 0
     log2 = []                                         # server without logprobs → points fallback
     b2 = LLMPolicyBackend(OllamaClient(transport=fake(log2)), "brain",
-                          resolve("prompts/teacher_v1.md"), mode="logprobs")
+                          resolve("prompts/teacher_v2.md"), mode="logprobs")
     p2 = b2.decide(q)[0]
     assert b2.logprob_fallbacks == 1 and abs(p2.sum() - 1) < 1e-9
 

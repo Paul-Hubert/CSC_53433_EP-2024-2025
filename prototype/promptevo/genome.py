@@ -8,10 +8,8 @@ from pathlib import Path
 
 import numpy as np
 
-ACTION_LOCI = ("eat", "flee", "follow", "wander", "rest", "mate", "attack")
-TEMPERAMENT_LOCI = ("risk", "social", "place")
-LOCI = ACTION_LOCI + TEMPERAMENT_LOCI
-ACTIONS = ACTION_LOCI  # action order used for every probability vector
+ACTIONS = ("eat", "flee", "follow", "rest", "mate")   # action order used for every probability vector
+LOCI = ACTIONS   # one gene per action (rev. 2026-10-07: risk, social, place, attack, wander removed)
 
 
 @dataclass(frozen=True)

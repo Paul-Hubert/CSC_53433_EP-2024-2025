@@ -43,6 +43,8 @@ def swap(run: Run, backend, tick: int, slot: str, texts: list[str], carrying: st
          n_genomes: int = 8, max_calls: int = 500, seed: int = 0) -> dict:
     """{"P": array (texts, genomes, actions), "genomes", "obs"}: mean action probabilities over the
     relevant situations, for each genome with each text in `slot`."""
+    if run.loci != LOCI:
+        raise SystemExit(f"{run.name} has the slots {run.loci}; gene_swap asks today's brain, which reads {LOCI}")
     li = LOCI.index(slot)
     gs = sorted({tuple(g) for g in genomes_at(run, tick) if carrying is None or run.text(g[li]) == carrying})
     gs = sorted(random.Random(seed).sample(gs, min(n_genomes, len(gs))))

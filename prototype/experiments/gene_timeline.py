@@ -37,7 +37,6 @@ from experiments.gene_report import words as content_words
 from experiments.mutation_test import compare
 from promptevo.config import load_config, resolve
 from promptevo.evolution.mutation import load_instructions
-from promptevo.genome import ACTIONS, LOCI
 
 SWEEP = 0.25        # a gene "swept" when it reached this share of its slot at a checkpoint
 SPREAD = 5          # a mutant "spread" when it had this many living carriers at once
@@ -45,10 +44,7 @@ RARE = 0.05         # charts: genes that never reached this share of their slot 
 JUDGE_MIN = 3       # --judge asks only about texts that had this many living carriers at once
 JUDGE_PROMPT = "prompts/judge_sense_v1.txt"
 TOPIC = {"eat": "when and how to eat", "flee": "when to run away", "follow": "when to follow other animals",
-         "wander": "when to move around and explore", "rest": "when to rest",
-         "mate": "when to look for a partner", "attack": "when to attack other animals",
-         "risk": "how much risk it takes", "social": "how it gets on with other animals",
-         "place": "how it relates to places"}
+         "rest": "when to rest", "mate": "when to look for a partner"}
 
 
 def mean(xs) -> float | None:
@@ -190,7 +186,7 @@ def gene_drop(run: Run, every: int, targets: list[str], drops: int, seed: int = 
     rng = np.random.default_rng(seed)
     code: dict[str, int] = {}
     c = lambda aid: code.setdefault(aid, len(code))
-    tg = [(LOCI.index(run.alleles[a]["locus"]), c(a), a) for a in targets]
+    tg = [(run.loci.index(run.alleles[a]["locus"]), c(a), a) for a in targets]
     arr, out, last_t = {}, {a: [] for a in targets}, None
     M = np.zeros((drops, 0))
     as_is = lambda g: np.tile(np.array([c(a) for a in g], np.int32), (drops, 1))    # the real genome
@@ -204,7 +200,7 @@ def gene_drop(run: Run, every: int, targets: list[str], drops: int, seed: int = 
             if maxima is not None:
                 K = len(code)
                 M = np.pad(M, ((0, 0), (0, K - M.shape[1])))
-                for li in range(len(LOCI)):
+                for li in range(len(run.loci)):
                     idx = (stack[:, :, li] + K * np.arange(drops)[None, :]).ravel()
                     share = np.bincount(idx, minlength=drops * K).reshape(drops, K) / len(ids)
                     np.maximum(M, share, out=M)
@@ -221,7 +217,7 @@ def gene_drop(run: Run, every: int, targets: list[str], drops: int, seed: int = 
             ps = [arr[p] if p in arr else as_is(run.genome[p]) for p in e["parents"]]
             child = np.where(rng.random(ps[0].shape) < 0.5, ps[0], ps[1]) if len(ps) == 2 else ps[0].copy()
             for m in e.get("mutations", []):
-                child[:, LOCI.index(m["locus"])] = c(m["child"])
+                child[:, run.loci.index(m["locus"])] = c(m["child"])
             arr[e["id"]] = child
         elif k == "death":
             arr.pop(e["id"], None)
@@ -261,7 +257,7 @@ def pool(run: Run, g: Genes, sc: dict, sense: dict) -> list[dict]:
     for s in sc["snaps"]:
         ids, pop = s["ids"], len(s["ids"])
         gens = [sc["gen"][i] for i in ids]
-        for li, locus in enumerate(LOCI):
+        for li, locus in enumerate(run.loci):
             n = Counter(run.genome[i][li] for i in ids)
             row = {"t": s["t"], "slot": locus, "pop": pop, "mean_gen": mean(gens), "max_gen": max(gens, default=0),
                    "families": s["families"], "distinct": len(n)}
@@ -288,7 +284,7 @@ def shares(run: Run, sc: dict) -> dict:
     out = defaultdict(dict)
     for s in sc["snaps"]:
         pop = len(s["ids"]) or 1
-        for li in range(len(LOCI)):
+        for li in range(len(run.loci)):
             for aid, m in Counter(run.genome[i][li] for i in s["ids"]).items():
                 out[aid][s["t"]] = m / pop
     return out
@@ -319,7 +315,7 @@ def sweeps(g: Genes, sc: dict, sh: dict, instructions: list[str]) -> list[dict]:
                     "peak": peak, "peak_t": ts[traj.index(peak)],
                     "fixed_t": next((t for t, v in zip(ts, traj) if v >= 1), None), "end": end, "fate": fate,
                     "lineage": g.run.lineage(aid, instructions)})
-    return sorted(out, key=lambda x: (LOCI.index(x["slot"]), x["first"], x["gene"]))
+    return sorted(out, key=lambda x: (g.run.loci.index(x["slot"]), x["first"], x["gene"]))
 
 
 def leaders(rows: list[dict]) -> dict:
@@ -377,10 +373,10 @@ def behaviour(run: Run, window: int) -> list[dict]:
         rows = [r for r in csv.DictReader(f) if (r.get("pop") or "").isdigit() and r.get("act_attack", "0") is not None]
     if not rows:
         return []
-    acts = all(f"act_{a}" in rows[0] for a in ACTIONS)
+    acts = [k[4:] for k in rows[0] if k.startswith("act_")]     # the run's own actions (none before 2026-10-05)
     deaths = [e for e in run.events if e["kind"] == "death"]
     cum = ["births", "immigrants", "deaths_starve", "deaths_pred", "deaths_age", "decisions"] + \
-          ([f"act_{a}" for a in ACTIONS] if acts else [])
+          [f"act_{a}" for a in acts]
     out, prev, prev_t = [], {k: 0 for k in cum}, 0
     last_t = int(rows[-1]["t"])
     ends = list(range(window, last_t + 1, window)) + ([last_t] if last_t % window else [])
@@ -398,7 +394,7 @@ def behaviour(run: Run, window: int) -> list[dict]:
                     "kills_per_1000": 1000 * d["deaths_pred"] / at if at else None,
                     "starved_per_1000": 1000 * d["deaths_starve"] / at if at else None,
                     "newcomers": d["immigrants"], "lifespan": mean(ages),
-                    "actions": ({a: d[f"act_{a}"] / d["decisions"] for a in ACTIONS} if acts and d["decisions"] else None)})
+                    "actions": ({a: d[f"act_{a}"] / d["decisions"] for a in acts} if acts and d["decisions"] else None)})
         prev, prev_t = r, end
     return out
 
@@ -415,7 +411,7 @@ def judge(run: Run, aids: list[str], cfg, max_calls: int) -> tuple[dict, int]:
         if client.cache.misses >= max_calls:
             break
         a = run.alleles[aid]
-        prompt = template.format(slot=a["locus"], topic=TOPIC[a["locus"]], text=a["text"])
+        prompt = template.format(slot=a["locus"], topic=TOPIC.get(a["locus"], a["locus"]), text=a["text"])
         r = client.chat_json(cfg.policy.model, [{"role": "user", "content": prompt}], schema,
                              options={"seed": 0, "temperature": 0})
         out[aid] = r.get("answer") == "yes"
@@ -457,7 +453,7 @@ def report(run: Run, g: Genes, sc, rows, sw, lead, sets, drop, fit, beh, sense, 
     nd = sum(deaths.values()) or 1
     ts = [x["t"] for x in sc["snaps"]]
     by = {(r["t"], r["slot"]): r for r in rows}
-    avg = lambda t, k: mean(by[(t, l)][k] for l in LOCI if by[(t, l)].get(k) is not None)
+    avg = lambda t, k: mean(by[(t, l)][k] for l in run.loci if by[(t, l)].get(k) is not None)
     L = [f"# How the genes developed — {run.name}", "",
          f"Run: {s['ticks']} ticks, {s.get('max_gen', '?')} generations, {s.get('births', '?')} births, "
          f"{sum(deaths.values())} deaths (predators {deaths.get('predator', 0) / nd:.0%}), "
@@ -474,7 +470,7 @@ def report(run: Run, g: Genes, sc, rows, sw, lead, sets, drop, fit, beh, sense, 
          "| tick | animals | generation | families | mutants | depth | words | world | distinct | effective | overlap |",
          "|---|---|---|---|---|---|---|---|---|---|---|"]
     for t in pick(ts):
-        r0 = by[(t, LOCI[0])]
+        r0 = by[(t, run.loci[0])]
         L.append(f"| {t} | {r0['pop']} | {num(r0['mean_gen'])} | {r0['families']} | {pct(avg(t, 'mutant_share'))} | "
                  f"{num(avg(t, 'depth'), 2)} | {num(avg(t, 'words'))} | {pct(avg(t, 'world'))} | {num(avg(t, 'distinct'))} | "
                  f"{num(avg(t, 'effective'))} | {num(avg(t, 'overlap'), 2)} |")
@@ -482,7 +478,7 @@ def report(run: Run, g: Genes, sc, rows, sw, lead, sets, drop, fit, beh, sense, 
     L += ["", f"Slot by slot at the end (tick {t_end}):", "",
           "| slot | distinct | effective | most common gene | share | mutants | depth | world |",
           "|---|---|---|---|---|---|---|---|"]
-    for l in LOCI:
+    for l in run.loci:
         r = by[(t_end, l)]
         if r["pop"]:
             L.append(f"| {l} | {r['distinct']} | {num(r['effective'])} | {r['leader_text']} | {pct(r['leader_share'])} | "
@@ -502,7 +498,7 @@ def report(run: Run, g: Genes, sc, rows, sw, lead, sets, drop, fit, beh, sense, 
         for x in muts:
             L += [f"**{x['slot']}: \"{x['text']}\"** (peak {x['peak']:.0%}, {x['fate']})", "", "```text", *x["lineage"], "```", ""]
     L += ["", "Leader of each slot over time (a row when it changes):", ""]
-    for l in LOCI:
+    for l in run.loci:
         seq = lead.get(l, [])
         fmt = lambda x: f"t={x[0]} \"{x[2]}\" ({x[3]:.0%})"
         shown = [fmt(x) for x in seq]
@@ -581,15 +577,15 @@ def report(run: Run, g: Genes, sc, rows, sw, lead, sets, drop, fit, beh, sense, 
     # 5
     L += ["", "## 5. Behaviour over time", ""]
     if beh:
-        acts = beh[0]["actions"] is not None
+        acts = list(beh[0]["actions"] or [])
         L += ["| ticks | animals | births | predator kills | starved | newcomers | lifespan | energy |"
-              + ("".join(f" {x} |" for x in ACTIONS) if acts else ""),
-              "|---|---|---|---|---|---|---|---|" + ("---|" * len(ACTIONS) if acts else "")]
+              + "".join(f" {x} |" for x in acts),
+              "|---|---|---|---|---|---|---|---|" + "---|" * len(acts)]
         step = max(1, len(beh) // 15)
         for w in beh[::step] + ([beh[-1]] if (len(beh) - 1) % step else []):
             L.append(f"| {w['from']}–{w['to']} | {num(w['pop'])} | {num(w['births_per_1000'], 2)} | {num(w['kills_per_1000'], 2)} | "
                      f"{num(w['starved_per_1000'], 2)} | {w['newcomers']} | {num(w['lifespan'], 0)} | {num(w['energy'], 0)} |"
-                     + ("".join(f" {pct(w['actions'][x])} |" for x in ACTIONS) if acts and w["actions"] else ""))
+                     + ("".join(f" {pct(w['actions'][x])} |" for x in acts) if w["actions"] else ""))
         L += ["", "Births, predator kills and starvation per 1 000 animal-ticks; action shares of all decisions"
               + ("." if acts else " are not in this run's stats.csv (runs before 2026-10-05).")]
     # 6
@@ -725,7 +721,7 @@ def lines(series: list[tuple[str, list, str]], ymax: float, ylab: tuple, w=460, 
 def page(run: Run, g: Genes, sc, rows, sh, sw, beh, md_lines, tag: str) -> str:
     ts = [s["t"] for s in sc["snaps"]]
     by = {(r["t"], r["slot"]): r for r in rows}
-    avg = lambda t, k: mean(by[(t, l)][k] for l in LOCI if by[(t, l)].get(k) is not None)
+    avg = lambda t, k: mean(by[(t, l)][k] for l in run.loci if by[(t, l)].get(k) is not None)
     s = run.summary
     body = [f"<h1>How the genes developed: {html.escape(run.name)}</h1>",
             f'<p class="lead">{html.escape(md_lines[2].replace("`", "").replace("**", ""))}</p>',
@@ -733,14 +729,14 @@ def page(run: Run, g: Genes, sc, rows, sh, sw, beh, md_lines, tag: str) -> str:
             '<p class="note">Each band is one gene text; its height is the share of the living animals carrying it. '
             "Genes of one family (descendants of one founder text) share a colour, mutants lighter with each "
             "mutation. Hover a band for its text. Listed: genes that reached 25 %.</p>", '<div class="grid">']
-    for l in LOCI:
+    for l in run.loci:
         svg, legend = muller(g, l, ts, {a: v for a, v in sh.items()})
         items = "".join(f'<li><span class="sw" style="background:{c}"></span><span>{html.escape(t)} '
                         f'<em>({p:.0%})</em></span></li>' for c, t, p in legend)
         body.append(f'<div class="card"><h3>{l}</h3>{svg}<ul class="legend">{items}</ul></div>')
     body += ["</div>", "<h2>Population and genes</h2>", '<div class="grid">']
-    pop = [(t, by[(t, LOCI[0])]["pop"]) for t in ts]
-    gen = [(t, by[(t, LOCI[0])]["mean_gen"]) for t in ts]
+    pop = [(t, by[(t, run.loci[0])]["pop"]) for t in ts]
+    gen = [(t, by[(t, run.loci[0])]["mean_gen"]) for t in ts]
     body.append('<div class="card"><h3>Animals and mean generation</h3>'
                 + lines([("animals", pop, "#2a7ab9"), ("mean generation", gen, "#c2571a")],
                         max(max(v for _, v in pop), max((v or 0) for _, v in gen), 1) * 1.1,
@@ -760,9 +756,9 @@ def page(run: Run, g: Genes, sc, rows, sh, sw, beh, md_lines, tag: str) -> str:
     if beh and beh[0]["actions"]:
         body += ["<h2>Behaviour</h2>", '<div class="card"><h3>Share of decisions per action, per window</h3>']
         acol = {"eat": "#2e8b57", "flee": "#c23b22", "follow": "#2a7ab9", "wander": "#9a8c2a",
-                "rest": "#7a7a7a", "mate": "#c2571a", "attack": "#7a3fb0"}
+                "rest": "#7a7a7a", "mate": "#c2571a", "attack": "#7a3fb0"}       # wander, attack: older runs
         series = [(a, [((w["from"] + w["to"]) / 2, w["actions"][a]) for w in beh if w["actions"]], acol[a])
-                  for a in ACTIONS]
+                  for a in beh[0]["actions"]]
         top = max(v for _, s_, _ in series for _, v in s_) * 1.1
         body.append(lines(series, top, ("0", "", f"{top:.0%}"), h=190) + "</div>")
     if sw:

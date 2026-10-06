@@ -24,7 +24,7 @@ from pathlib import Path
 
 import numpy as np
 
-from promptevo.backends.rule_based import ACTION_WORDS, CONDITIONS, INTENSITY, TEMPERAMENT
+from promptevo.backends.rule_based import ACTION_WORDS, CONDITIONS, INTENSITY
 from promptevo.config import load_config, resolve
 from promptevo.evolution.mutation import load_instructions
 from promptevo.genome import LOCI
@@ -69,11 +69,10 @@ def first_alt(pattern: str) -> str:
 
 
 def reading(locus: str, text: str) -> str:
-    """What the keyword brain reads in a gene (same rules as rule_based.gene_weight / temperament_deltas)."""
+    """What the keyword brain reads in a gene (same rules as rule_based.gene_weight)."""
     t = text.lower()
-    if locus not in ACTION_WORDS:
-        hits = [first_alt(p) for p, _ in TEMPERAMENT if re.search(p, t)]
-        return " + ".join(hits) if hits else "no effect"
+    if locus not in ACTION_WORDS:              # a slot the genome no longer has (runs before 2026-10-07)
+        return "not read (slot removed)"
     w = next((v for p, v in INTENSITY if re.search(p, t)), None)
     if w is None:
         w = 0.8 if re.search(ACTION_WORDS[locus], t) else 0.0
@@ -95,6 +94,8 @@ class Run:
     def __init__(self, path: Path):
         self.path, self.name = path, path.name
         self.events = jsonl(path / "events.jsonl")
+        first = next((e["genome"] for e in self.events if e["kind"] in ("founder", "immigrant", "birth")), None)
+        self.loci = tuple(a.split(":")[0] for a in first) if first else LOCI     # the run's own slots
         self.alleles = {a["id"]: a for a in jsonl(path / "alleles.jsonl")} if (path / "alleles.jsonl").exists() else {}
         info = path / "run_info.json"
         self.info = json.loads(info.read_text(encoding="utf-8")) if info.exists() else {}
@@ -189,13 +190,13 @@ class Run:
         """{(locus, reading): [(relative offspring, killed by a predator, text)]} over the animals that died."""
         out = defaultdict(list)
         for g, d, rel in self.dead():
-            for locus, aid in zip(LOCI, g):
+            for locus, aid in zip(self.loci, g):
                 out[(locus, self.read(aid))].append((rel, d["cause"] == "predator", self.text(aid)))
         return out
 
     def by_reading(self, min_carriers: int) -> dict:
         """Genes grouped by what the keyword brain reads in them: {locus: {reading: stats}}."""
-        return group_stats(self.reading_values(), min_carriers)
+        return group_stats(self.reading_values(), min_carriers, self.loci)
 
     def reading_shares(self, freq) -> list[tuple[int, dict]]:
         """[(t, {(locus, reading): share of the living animals})] at each checkpoint."""
@@ -245,9 +246,9 @@ def stats(rel: list[float]) -> dict:
     return {"n": len(x), "fitness": float(x.mean()), "lo": float(x.mean() - 1.96 * se), "hi": float(x.mean() + 1.96 * se)}
 
 
-def group_stats(values: dict, min_carriers: int) -> dict:
+def group_stats(values: dict, min_carriers: int, loci=LOCI) -> dict:
     """{locus: {reading: stats}} from {(locus, reading): [(rel, killed by predator, text)]}."""
-    out = {locus: {} for locus in LOCI}
+    out = {locus: {} for locus in loci}
     for (locus, rd), vs in values.items():
         if len(vs) < min_carriers:
             continue
@@ -298,9 +299,9 @@ def main() -> None:
     for r in runs:
         for k, v in r.reading_values().items():
             merged[k] += v
-    P = group_stats(merged, a.min_carriers)
+    P = group_stats(merged, a.min_carriers, main_run.loci)
     star, lead = {}, {}
-    for locus in LOCI:
+    for locus in main_run.loci:
         if P[locus]:
             best = max(P[locus], key=lambda r: P[locus][r]["fitness"])
             if P[locus][best]["lo"] > 1.0:
@@ -338,7 +339,7 @@ def main() -> None:
              f"above average in every run (a steady lead, too small to be sure of); **✗** clearly below average. "
              f"Readings carried by fewer than {a.min_carriers} animals are left out.", "",
              "## Marked genes", ""]
-    for locus in LOCI:
+    for locus in main_run.loci:
         pick = star.get(locus) or lead.get(locus)
         if pick:
             x = P[locus][pick]
@@ -366,7 +367,7 @@ def main() -> None:
     # readings, slot by slot
     lines += ["", "## Slot by slot: what the keyword brain reads in each gene", "",
               f"Living share: share of the living animals carrying that reading at the start, at tick {mid[0]} and at the end."]
-    for locus in LOCI:
+    for locus in main_run.loci:
         ranked = sorted(RM[locus], key=lambda r: -RM[locus][r]["fitness"])
         lines += ["", f"### {locus}", "", "| | reading | carriers | fitness | killed by predators | living share | different texts | most carried texts |",
                   "|---|---|---|---|---|---|---|---|"]
@@ -382,7 +383,7 @@ def main() -> None:
         lines += ["", "## Does it replicate? The same readings in every run", "",
                   "| slot | reading | " + " | ".join(r.name for r in runs) + " | all runs |",
                   "|---|---|" + "---|" * (len(runs) + 1)]
-        for locus in LOCI:
+        for locus in main_run.loci:
             for rd in sorted(P[locus], key=lambda r: -P[locus][r]["fitness"]):
                 cells = [fmt_fit(R[r.name][locus][rd]) if rd in R[r.name][locus] else "—" for r in runs]
                 mark = "★ " if star.get(locus) == rd else "▲ " if lead.get(locus) == rd else \
@@ -414,7 +415,7 @@ def main() -> None:
                                   "reading": r.read(aid)} for aid, v in fit[r.name]["alleles"].items()} for r in runs}},
         indent=1, ensure_ascii=False, default=float), encoding="utf-8")
     print("\n".join(lines[:3]))
-    for locus in LOCI:
+    for locus in main_run.loci:
         pick = star.get(locus) or lead.get(locus)
         if pick:
             x = P[locus][pick]

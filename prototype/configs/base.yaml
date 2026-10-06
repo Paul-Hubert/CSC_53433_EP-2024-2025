@@ -36,11 +36,9 @@ agents:
   max_age: 1500
   mate_energy: 50.0
   child_energy: 40.0
-  attack_steal: 10.0
-  attack_cost: 3.0
   energy_low: 30.0
   energy_high: 70.0
-  wander_turn_p: 0.25
+  wander_turn_p: 0.25         # random walk of an animal whose chosen action has nothing in sight
 sim:
   decision_period: 4
   sampling_temperature: 1.0
@@ -54,8 +52,7 @@ evolution:
   # instruction drawn at random from this file plus the gene sentence, nothing else.
   mutation_prompts: prompts/mutate_v2.txt
   temperature: 1.2            # mutator sampling temperature (results/mutation_test.md)
-  max_action_words: 12        # guard: longer answers are rejected (the gene doesn't mutate)
-  max_temperament_words: 15
+  max_words: 12               # guard: longer answers are rejected (the gene doesn't mutate)
 backend:
   name: rule_based            # random | rule_based | llm | laya (parked)
   obs_style: V1
@@ -66,7 +63,7 @@ policy:                       # LLM decision backend (default brain, rev. 2026-0
                               # generated answers via prefetch; only for request-limited cloud) | ksample
   table_k: 8
   workers: 2                  # parallel requests (match OLLAMA_NUM_PARALLEL / cloud limits)
-  prompt: prompts/teacher_v1.md
+  prompt: prompts/teacher_v2.md
 laya:
   checkpoint: convaiinnovations/laya   # or subfolder multilingual (decided in S1.5)
   subfolder: null

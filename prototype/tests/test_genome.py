@@ -1,6 +1,6 @@
 import numpy as np
 
-from promptevo.genome import ACTION_LOCI, LOCI, AlleleRegistry, crossover_uniform
+from promptevo.genome import LOCI, AlleleRegistry, crossover_uniform
 
 
 def test_pools_loaded(reg_pools, cfg):
@@ -8,10 +8,9 @@ def test_pools_loaded(reg_pools, cfg):
     for l in LOCI:
         assert len(pools.founders[l]) == 5                      # 4 alleles + neutral
         assert pools.neutral[l] in pools.founders[l]
-        limit = cfg.evolution.max_action_words if l in ACTION_LOCI else cfg.evolution.max_temperament_words
         for aid in pools.founders[l]:
-            assert len(reg.text(aid).split()) <= limit, reg.text(aid)
-    for l in ACTION_LOCI:
+            assert len(reg.text(aid).split()) <= cfg.evolution.max_words, reg.text(aid)
+    for l in LOCI:
         pro, anti = pools.contrast_pair(l)
         diff = [x for x, y in zip(pro.alleles, anti.alleles) if x != y]
         assert len(diff) == 1

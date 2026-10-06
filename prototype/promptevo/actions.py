@@ -1,7 +1,8 @@
 """Behaviour executors: each runs one tick of the chosen action (plan §A6).
 
-Returns True if the agent moved. Invalid choices (no target) fall back to wander
-and set agent.invalid = True for logging.
+Returns True if the agent moved. An action with nothing to act on in sight (no food,
+predator, animal or ready partner) makes the agent wander (a random walk) instead and
+sets agent.invalid = True for logging: eating with no food in sight means searching.
 """
 from __future__ import annotations
 
@@ -73,10 +74,6 @@ def do_follow(agent, world, agents, cfg, rng) -> bool:
     return _move(agent, *world.step_toward(agent.y, agent.x, b.y, b.x, rng))
 
 
-def do_wander(agent, world, agents, cfg, rng) -> bool:
-    return _wander(agent, world, cfg, rng)
-
-
 def do_rest(agent, world, agents, cfg, rng) -> bool:
     return False
 
@@ -91,24 +88,4 @@ def do_mate(agent, world, agents, cfg, rng) -> bool:
     return _move(agent, *world.step_toward(agent.y, agent.x, b.y, b.x, rng))
 
 
-def do_attack(agent, world, agents, cfg, rng) -> bool:
-    ac = cfg.agents
-    b, d = _nearest(agent, agents)
-    if b is None or d > ac.vision:
-        return _invalid(agent, world, cfg, rng)
-    if d <= 1:
-        if not agent.attacked:
-            agent.attacked = True
-            agent.energy -= ac.attack_cost
-            p = agent.energy / max(1e-6, agent.energy + b.energy)
-            if rng.random() < p:
-                stolen = min(ac.attack_steal, b.energy)
-                b.energy -= stolen
-                agent.energy = min(ac.energy_max, agent.energy + stolen)
-                agent.steals += 1
-        return False
-    return _move(agent, *world.step_toward(agent.y, agent.x, b.y, b.x, rng))
-
-
-EXECUTORS = {"eat": do_eat, "flee": do_flee, "follow": do_follow, "wander": do_wander,
-             "rest": do_rest, "mate": do_mate, "attack": do_attack}
+EXECUTORS = {"eat": do_eat, "flee": do_flee, "follow": do_follow, "rest": do_rest, "mate": do_mate}

@@ -23,30 +23,28 @@ log = logging.getLogger(__name__)
 QUESTION = "Which action does this animal take now?"
 NEUTRAL_OPTIONS = {
     "eat": "go to food and eat it", "flee": "run away from danger",
-    "follow": "move toward another animal", "wander": "explore the surroundings",
-    "rest": "stay still and save energy", "mate": "approach a partner to breed",
-    "attack": "fight another animal to take its energy",
+    "follow": "move toward another animal", "rest": "stay still and save energy",
+    "mate": "approach a partner to breed",
 }
 PLACEMENTS = ("P1", "P2", "P3", "P4")
 
 
 def build_request(genes: dict[str, str], situation: str, placement: str) -> tuple[dict, dict]:
     """(state, questions) for Laya. See plan §A7 for the four placements."""
-    temperament = f"Temperament: {genes['risk']} {genes['social']} {genes['place']}"
     instincts = " ".join(f"{a}: {genes[a]}" for a in ACTIONS)
     if placement == "P1":
         state = {"situation": situation}
         criteria = {a: genes[a] for a in ACTIONS}
         instr = QUESTION
     elif placement == "P2":
-        state = {"animal": f"Instincts: {instincts} {temperament}", "situation": situation}
+        state = {"animal": f"Instincts: {instincts}", "situation": situation}
         criteria, instr = dict(NEUTRAL_OPTIONS), QUESTION
     elif placement == "P3":
         state = {"situation": situation}
         criteria = dict(NEUTRAL_OPTIONS)
-        instr = f"This animal's instincts: {instincts} {temperament}. {QUESTION}"
+        instr = f"This animal's instincts: {instincts}. {QUESTION}"
     elif placement == "P4":
-        state = {"animal": temperament, "situation": situation}
+        state = {"situation": situation}
         criteria = {a: genes[a] for a in ACTIONS}
         instr = QUESTION
     else:

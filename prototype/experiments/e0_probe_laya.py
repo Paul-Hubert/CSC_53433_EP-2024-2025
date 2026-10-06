@@ -17,10 +17,8 @@ from promptevo.config import resolve
 
 SITUATION = "Energy: low. Food: near. Predator: far. Animal: none. Age: adult."
 GENES = {"eat": "Eat whenever food is close.", "flee": "Run from any predator you see.",
-         "follow": "Stay close to other animals.", "wander": "Keep moving to new places.",
-         "rest": "Rest when you are tired.", "mate": "Look for a partner when energy is high.",
-         "attack": "Never fight.", "risk": "Cautious: safety comes before food.",
-         "social": "Social: feels safer in a group.", "place": "Prefers staying near water."}
+         "follow": "Stay close to other animals.", "rest": "Rest when you are tired.",
+         "mate": "Look for a partner when energy is high."}
 
 
 def shorten(obj, depth=0):

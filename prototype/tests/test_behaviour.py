@@ -49,15 +49,15 @@ def test_invalid_eat_falls_back_to_wander(cfg):
 
 
 def test_obs_text_styles():
-    o = Observation("low", "near", "none", "near", True, False, "adult")
-    assert "ready to mate" in render(o, "V1") and "weaker" in render(o, "V1")
+    o = Observation("low", "near", "none", "near", True, "adult")
+    assert "ready to mate" in render(o, "V1") and "stronger" not in render(o, "V1")
     assert render(o, "V2").startswith("I am hungry")
 
 
 def test_rule_based_directed_and_gibberish(reg_pools):
     reg, pools = reg_pools
     b = RuleBasedBackend()
-    o = Observation("medium", "near", "near", "near", True, False, "adult")
+    o = Observation("medium", "near", "near", "near", True, "adult")
     for l in ACTIONS:
         pro, anti = pools.contrast_pair(l)
         p = b.decide([Query(reg.genome_key(g), reg.genes(g), o) for g in (pro, anti)])

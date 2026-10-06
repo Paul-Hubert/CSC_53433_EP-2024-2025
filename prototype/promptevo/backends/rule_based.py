@@ -26,10 +26,8 @@ ACTION_WORDS = {
     "eat": r"\b(eat|eating|food|feed|graze|forage)\b",
     "flee": r"\b(flee|run|escape|hide|danger|predator)\b",
     "follow": r"\b(follow|stay close|close to other|group|companion|herd)\b",
-    "wander": r"\b(explore|wander|roam|new places?|moving|travel)\b",
     "rest": r"\b(rest|sleep|stay still|save energy|stop)\b",
     "mate": r"\b(mate|partner|breed|offspring)\b",
-    "attack": r"\b(attack|fight|bite|steal)\b",
 }
 CONDITIONS = {  # phrase -> predicate on the observation
     r"hungry|starving|energy is low|low energy|weak": lambda o: o.energy == "low",
@@ -44,27 +42,18 @@ CONDITIONS = {  # phrase -> predicate on the observation
     r"old": lambda o: o.age == "adult",
     r"plentiful": lambda o: o.food in ("near", "here"),
 }
-TEMPERAMENT = [  # (pattern, {action: delta})
-    (r"cautious|careful|safety|nervous|shy", {"flee": 1.0, "attack": -1.0, "wander": -0.3}),
-    (r"bold|brave|risk|reckless", {"flee": -0.8, "attack": 0.6, "wander": 0.4}),
-    (r"social|group|together|friendly|curious", {"follow": 1.0, "mate": 0.3}),
-    (r"solitary|alone|wary|strangers", {"follow": -1.0, "attack": 0.2}),
-    (r"restless|somewhere new|explor|open ground", {"wander": 1.0, "rest": -0.5}),
-    (r"familiar|attached|home|water", {"wander": -0.6, "rest": 0.4}),
-]
-
-
 def default_logits(o: Observation) -> np.ndarray:
     l = dict.fromkeys(ACTIONS, 0.0)
-    l["eat"] = {"here": 3.0, "near": 2.0, "far": 1.0, "none": -2.0}[o.food]
-    l["eat"] += {"low": 1.5, "medium": 0.5, "high": -1.0}[o.energy]
+    if o.food == "none":         # no food in sight: eating means searching (a random walk)
+        l["eat"] = 1.5
+    else:
+        l["eat"] = {"here": 3.0, "near": 2.0, "far": 1.0}[o.food]
+        l["eat"] += {"low": 1.5, "medium": 0.5, "high": -1.0}[o.energy]
     l["flee"] = {"near": 3.0, "far": 0.5, "none": -3.0}[o.predator]
     l["follow"] = {"near": -0.5, "far": 0.3, "none": -2.5}[o.animal]
-    l["wander"] = 0.5 + (1.0 if o.food == "none" else 0.0)
     l["rest"] = -0.5 + (0.5 if o.energy == "high" and o.predator == "none" else 0.0)
     ready = o.animal == "near" and o.animal_ready and o.age == "adult" and o.energy != "low"
     l["mate"] = 2.5 if ready else -3.0
-    l["attack"] = -3.0 if o.animal != "near" else (0.5 if (o.energy == "low" and not o.animal_stronger) else -1.0)
     return np.array([l[a] for a in ACTIONS])
 
 
@@ -92,17 +81,6 @@ def gene_weight(text: str, action: str, o: Observation) -> float:
     return w
 
 
-def temperament_deltas(texts: list[str]) -> np.ndarray:
-    d = dict.fromkeys(ACTIONS, 0.0)
-    for text in texts:
-        t = text.lower()
-        for pat, deltas in TEMPERAMENT:
-            if re.search(pat, t):
-                for a, v in deltas.items():
-                    d[a] += v
-    return np.array([d[a] for a in ACTIONS])
-
-
 class RuleBasedBackend:
     name = "rule_based"
 
@@ -113,7 +91,6 @@ class RuleBasedBackend:
         o = q.obs
         l = default_logits(o)
         l += np.array([gene_weight(q.genes[a], a, o) for a in ACTIONS])
-        l += temperament_deltas([q.genes["risk"], q.genes["social"], q.genes["place"]])
         return l
 
     def decide(self, queries: list[Query]) -> np.ndarray:

@@ -43,25 +43,21 @@ ASK_WORD = ("Answer with exactly one word, the action this animal takes now: "
             + ", ".join(ACTIONS) + ".")
 
 
-def _genes_block(genes: dict) -> tuple[str, str]:
-    gene_lines = "\n".join(f'- {a}: "{genes[a]}"' for a in ACTIONS)
-    temperament = " ".join(f'"{genes[l]}"' for l in ("risk", "social", "place"))
-    return gene_lines, temperament
+def _genes_block(genes: dict) -> str:
+    return "\n".join(f'- {a}: "{genes[a]}"' for a in ACTIONS)
 
 
 def teacher_prompt(template: str, genes: dict, situation: str, mode: str) -> str:
-    gene_lines, temperament = _genes_block(genes)
     ask = {"points": ASK_POINTS, "logprobs": ASK_WORD}.get(mode, ASK_CHOICE)
-    return template.format(genes=gene_lines, temperament=temperament, situation=situation, ask=ask)
+    return template.format(genes=_genes_block(genes), situation=situation, ask=ask)
 
 
 def table_prompt(template: str, genes: dict, situations: list[str]) -> str:
-    gene_lines, temperament = _genes_block(genes)
     listing = "\n".join(f"s{i + 1}: {s}" for i, s in enumerate(situations))
     ask = (f"Consider each situation separately. For EACH one ({', '.join(f's{i + 1}' for i in range(len(situations)))}), "
            f"distribute 100 points across the actions according to how likely this animal is to choose each.\n"
            f"{listing}")
-    return template.format(genes=gene_lines, temperament=temperament,
+    return template.format(genes=_genes_block(genes),
                            situation="several possible situations, listed below.", ask=ask)
 
 

@@ -18,14 +18,11 @@ import numpy as np
 from promptevo.config import load_config, resolve
 from promptevo.evolution.mutation import Mutator, clean, valid
 from promptevo.founder import AllelePools
-from promptevo.genome import ACTION_LOCI, LOCI, AlleleRegistry
+from promptevo.genome import LOCI, AlleleRegistry
 
 TOPICS = {"eat": "when and how to eat", "flee": "when to run from danger",
           "follow": "how to behave toward other animals of its kind",
-          "wander": "when to explore or stay", "rest": "when to rest and save energy",
-          "mate": "when to look for a partner", "attack": "when to fight other animals",
-          "risk": "its attitude to risk (a temperament)", "social": "how sociable it is (a temperament)",
-          "place": "what kind of place it prefers (a temperament)"}
+          "rest": "when to rest and save energy", "mate": "when to look for a partner"}
 
 
 def make_mutants(cfg, reg, pools, rng, per_allele: int, llm=None, model=None) -> list[dict]:
@@ -56,7 +53,7 @@ def make_ood(cfg, reg, pools, rng, client, model, per_locus: int) -> list[dict]:
     template = resolve("prompts/novel_v1.md").read_text()
     rows = []
     for locus in LOCI:
-        max_words = int(cfg.evolution.max_action_words if locus in ACTION_LOCI else cfg.evolution.max_temperament_words)
+        max_words = int(cfg.evolution.max_words)
         known = {reg.text(a).lower() for a in pools.founders[locus]}
         examples = "; ".join(f'"{reg.text(a)}"' for a in pools.founders[locus][:4])
         made, tries = 0, 0
