@@ -38,7 +38,7 @@ cd prototype
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
-pytest -q                      # 44 passed, no model needed
+pytest -q                      # 55 passed, no model needed
 ```
 
 Windows (PowerShell):
@@ -57,10 +57,10 @@ In Git Bash on Windows, activate with `source .venv/Scripts/activate`, or call
 ## 3. Run with the rule-based brain
 
 Genes mutate through the mutator model (`ollama.mutator_model`, gemma4:12b) with
-every brain, so Ollama must be running: a 5 000-tick run makes about 130
-mutation calls, cached afterwards. If Ollama doesn't answer, `smoke_run` stops
-at the start and says so. `--no-mutation` runs with no model at all (crossover
-only).
+every brain, so Ollama must be running: a 5 000-tick run makes about 70
+mutation calls (5 genes × 3 % = 0.15 per birth), cached afterwards. If Ollama
+doesn't answer, `smoke_run` stops at the start and says so. `--no-mutation`
+runs with no model at all (crossover only).
 
 ```bash
 python -m experiments.smoke_run                          # Lab 1 world, rule-based brain, 5 000 ticks
@@ -73,17 +73,19 @@ python -m experiments.e1_sensitivity --backend rule_based   # gene-sensitivity s
 ```
 
 `smoke_run` prints a legend, a few ASCII snapshots, a one-line summary and the
-share of each action:
+share of each action (here `--no-mutation`, seed 1234, 2026-10-07):
 
 ```text
-animals by current action: E eat, F flee, L follow, W wander, R rest, M mate, A attack, ? not decided yet | P predator | . food | ~ water | ^ mountain
---- t=1666 pop=24
-     RL.       R  F  E F
-      ..  E     .     P
-          LR  L
+animals by current action: E eat, F flee, L follow, R rest, M mate, ? not decided yet | P predator | . food | ~ water | ^ mountain
+--- t=1666 pop=28
+ ...   . EE
+ .    .. R      .
+
+       E EL   E
+          ME
 ...
-{"ticks": 5000, "pop_final": 33, "births": 416, "immigrants": 0, "deaths": {"predator": 226, "starvation": 181}, "mean_lifespan": 301.2, "max_gen": 22, ...}
-actions: {'eat': 0.417, 'wander': 0.139, 'rest': 0.136, 'flee': 0.128, 'follow': 0.085, 'mate': 0.079, 'attack': 0.016}
+{"ticks": 5000, "pop_final": 29, "births": 470, "immigrants": 0, "deaths": {"predator": 266, "starvation": 199}, "mean_lifespan": 262.9, "max_gen": 24, ...}
+actions: {'eat': 0.62, 'rest': 0.107, 'flee': 0.098, 'follow': 0.092, 'mate': 0.084}
 ```
 
 The map is downsampled to fit the terminal, so one character can cover
@@ -97,7 +99,7 @@ Run these before trusting any model as a brain:
 ollama pull gemma4:12b
 python -m experiments.e0_probe_ollama --teacher gemma4:12b --mutator gemma4:12b   # ≈ 1–3 min
 pytest -m ollama                                                                  # two real decisions (a flee contrast pair)
-python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b   # 420 decisions, ≈ 5–15 min
+python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b   # 372 decisions, ≈ 5–15 min
 ```
 
 - **The probe** (`results/e0_ollama.md`) checks structured output,
@@ -124,7 +126,8 @@ Then set `policy.model` (and `ollama.mutator_model`) in `configs/base.yaml`.
 python -m experiments.smoke_run --backend llm --ticks 500 --snapshots 1
 ```
 
-The last lines report the cost:
+The last lines report the cost, here from the first run (2026-10-01, with the
+10-gene genome of the time):
 
 ```text
 llm_calls=761 failures=0 backend_queries=761 (memo hit rate 0.558)
@@ -195,7 +198,7 @@ python -c "import sqlite3; print(sqlite3.connect('cache/policy.sqlite').execute(
 | Answers come slowly and the model "thinks" | a thinking model with reasoning on | `ollama.think: false` |
 | A long run disappears; the system is low on memory | other applications use most of the RAM | close them, or use a smaller model |
 | `gene mutation uses the Ollama model … but the server didn't answer` | since 2026-10-02 every run mutates genes with the mutator model, whatever the brain | start Ollama and `ollama pull gemma4:12b`, or add `--no-mutation` |
-| A rerun asks the LLM again for everything | the cache key includes the model digest and the prompt's hash, so a new `ollama pull` or an edited prompt starts fresh. Before 2026-10-01 a bug kept the request cache (`cache/ollama.sqlite`) empty. | expected after a model or prompt change |
+| A rerun asks the LLM again for everything | the cache key includes the model digest and the prompt's hash, so a new `ollama pull` or an edited prompt starts fresh (the switch to `teacher_v2.md` on 2026-10-07 is such a change). Before 2026-10-01 a bug kept the request cache (`cache/ollama.sqlite`) empty. | expected after a model or prompt change |
 | `experiments.status` shows `DEAD?` for a running job | old liveness check on Windows: `os.kill(pid, 0)` sends Ctrl+C there (signal 0) instead of probing (fixed 2026-10-01) | update the code |
 | The gate's output got overwritten | `teacher_gate` always writes `results/teacher_gate.md` | copy it per model after each run |
 | `RuntimeError: Ollama /api/chat failed after 3 tries` | server not running, wrong host, or model not pulled | `ollama list`, `ollama serve`, check `ollama.host` |

@@ -6,6 +6,10 @@ genes did best. Code: `prototype/experiments/smoke_run.py` (the runs) and
 `prototype/experiments/gene_report.py` (the analysis). Full results:
 `prototype/results/long_1234_genes.md` (2026-10-02).
 
+> **Genome change (2026-10-07).** These runs used the 10-gene genome of the
+> time: 7 action genes, including wander and attack, plus 3 temperament genes
+> (risk, social, place). The current genome has 5 genes, one per action ([04 §1](04-genome-and-evolution.md#1-genes-are-sentences-in-fixed-slots)).
+
 ## Contents
 
 1. [The experiment](#1-the-experiment)

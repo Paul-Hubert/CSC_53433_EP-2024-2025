@@ -2,12 +2,12 @@
 
 ## The idea in one paragraph
 
-Each animal in a small simulated world carries a **genome of ten short English
-sentences**, for example *"Eat whenever food is close."* or *"Cautious: safety
-comes before food."*. Whenever an animal has to act, its sentences and a
-description of its situation are given to a **local LLM**. The LLM answers
-with how likely each of seven behaviours is (eat, flee, follow, wander, rest,
-mate, attack), and one behaviour is drawn from those probabilities.
+Each animal in a small simulated world carries a **genome of five short English
+sentences**, one per behaviour, for example *"Eat whenever food is close."* or
+*"Rest only when you feel safe."*. Whenever an animal has to act, its sentences
+and a description of its situation are given to a **local LLM**. The LLM answers
+with how likely each of five behaviours is (eat, flee, follow, rest, mate), and
+one behaviour is drawn from those probabilities.
 Animals that find food, avoid predators and mate leave children. A child takes
 each sentence from one parent or the other, and now and then a sentence is
 **mutated**: an LLM makes one random change to it, seeing nothing but that sentence.
@@ -22,8 +22,8 @@ neural networks:
 
 | | Previous lab | This project |
 |---|---|---|
-| Genome | weights of a 5-neuron network | 10 readable sentences in fixed slots |
-| Behaviour | one output: a turn angle | 7 behaviours with probabilities |
+| Genome | weights of a 5-neuron network | 5 readable sentences in fixed slots, one per behaviour |
+| Behaviour | one output: a turn angle | 5 behaviours with probabilities |
 | Reproduction | eating spawns a mutated copy (asexual) | two parents mate; gene-by-gene crossover |
 | Mutation | random noise on weights | blind random changes made by an LLM, logged with their lineage |
 | Selection | hard-wired into the agent's update | implicit: survival, food, mating |
@@ -37,7 +37,7 @@ neural networks:
              founder pool (frozen sentences)
                          │ sample one sentence per slot
                          ▼
-   ┌──────────►  GENOME: 10 sentences  ◄──────────────────────────────┐
+   ┌──────────►  GENOME: 5 sentences  ◄───────────────────────────────┐
    │                     │                                            │
    │   world ──► PERCEPTION ──► situation text                        │
    │                     │            │                               │
@@ -46,12 +46,12 @@ neural networks:
    │                                  │                               │
    │                                  ▼                               │
    │                 BRAIN (local LLM via Ollama, or rule-based)      │
-   │                                  │ points for 7 actions          │
+   │                                  │ points for 5 actions          │
    │                                  ▼                               │
    │                  probabilities ──► draw one action               │
    │                                  │                               │
    │                                  ▼                               │
-   │      EXECUTOR: move, eat, flee, mate, attack … for 4 ticks       │
+   │      EXECUTOR: eat, flee, follow, rest, mate … for 4 ticks       │
    │                                  │                               │
    │                                  ▼                               │
    │      energy, predators, ageing ──► who survives and mates        │
@@ -65,10 +65,10 @@ neural networks:
 
 | Choice | Reason | More |
 |---|---|---|
-| **Fixed gene slots** (7 action genes + 3 temperament genes) | crossover swaps like with like; position in the prompt is the same for everyone | [04 §1](04-genome-and-evolution.md#1-genes-are-sentences-in-fixed-slots) |
+| **Fixed gene slots**, one per behaviour (eat, flee, follow, rest, mate) | crossover swaps like with like; position in the prompt is the same for everyone | [04 §1](04-genome-and-evolution.md#1-genes-are-sentences-in-fixed-slots) |
 | **A frozen founder pool** of instinct-like sentences | random text gives random behaviour that mutation can't climb out of; a shared origin makes runs comparable | [04 §3](04-genome-and-evolution.md#3-the-founder-pool) |
 | **The LLM gives probabilities** (points per action), not a single choice | graded behaviour; selection can act on small differences | [05 §4](05-decision-backends.md#4-llm-the-llm-brain) |
-| **High-level decisions every 4 ticks**, executed by plain code | the LLM never does motor control; far fewer calls | [03 §6–7](03-world-and-simulation.md#6-actions-the-seven-behaviours) |
+| **High-level decisions every 4 ticks**, executed by plain code | the LLM never does motor control; far fewer calls | [03 §6–7](03-world-and-simulation.md#6-actions-the-five-behaviours) |
 | **Discrete observations** (low / near / far …) | short stable prompts; identical situations are cached | [03 §5](03-world-and-simulation.md#5-perception-what-an-animal-knows) |
 | **Lockstep simulation** that waits for the brain | a slower machine gives a slower run, never a different one | [03 §7](03-world-and-simulation.md#7-decisions) |
 | **Blind mutation**: the LLM gets one random-change instruction, drawn from a list of 16, and the gene sentence, nothing else | mutation must not know what helps; the instruction list, the seed and the temperature make it random, and a length guard stops genes growing | [04 §5](04-genome-and-evolution.md#5-mutation) |
@@ -123,11 +123,11 @@ ecology where selection is implicit rather than a scored fitness.
 
 | Term | Meaning here |
 |---|---|
-| **Locus** (plural loci) | one of the 10 fixed gene slots (eat, flee, …, place) |
+| **Locus** (plural loci) | one of the 5 fixed gene slots, one per behaviour (eat, flee, follow, rest, mate) |
 | **Allele** | one sentence that can occupy a locus |
-| **Genome** | the 10 alleles of one animal |
+| **Genome** | the 5 alleles of one animal |
 | **Founder pool** | the frozen sentences every run starts from: 4 per locus + neutral |
-| **Neutral allele** | "No preference." / "No particular temperament.": switches a drive off |
+| **Neutral allele** | "No preference.": switches a drive off |
 | **Contrast pair** | two genomes differing only at one locus ("Always eat…" vs "Never eat…"), for directed tests |
 | **Random-text genome** | genes taken from shuffled or irrelevant sentences; a control |
 | **Observation / situation** | what an animal senses, in discrete values, and its text |

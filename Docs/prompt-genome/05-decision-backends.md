@@ -1,7 +1,7 @@
 # 05 — The brain: decision backends
 
 The **brain** (decision backend) turns an animal's genes and its current
-situation into a probability for each of the seven actions. The simulation then
+situation into a probability for each of the five actions. The simulation then
 draws the action from those probabilities
 ([03 §7](03-world-and-simulation.md#7-decisions)). Code:
 `prototype/promptevo/backends/` and `prototype/promptevo/llm/`.
@@ -23,12 +23,12 @@ draws the action from those probabilities
 ```python
 class Backend(Protocol):
     name: str
-    def decide(self, queries: list[Query]) -> np.ndarray: ...   # shape [len(queries), 7], rows sum to 1
+    def decide(self, queries: list[Query]) -> np.ndarray: ...   # shape [len(queries), 5], rows sum to 1
 ```
 
-A `Query` holds the `genome_key` (hash of the 10 gene texts), the `genes`
-(locus → text) and the `obs` (an `Observation`). The seven columns follow
-`genome.ACTIONS`: eat, flee, follow, wander, rest, mate, attack.
+A `Query` holds the `genome_key` (hash of the 5 gene texts), the `genes`
+(locus → text) and the `obs` (an `Observation`). The five columns follow
+`genome.ACTIONS`: eat, flee, follow, rest, mate.
 
 Pick a brain by name with `--backend` or `backend.name` in the config:
 
@@ -41,9 +41,9 @@ Pick a brain by name with `--backend` or `backend.name` in the config:
 
 ## 2. `random`: the null model
 
-Every action gets probability 1/7, whatever the genes. In the Lab 1 world a
-random population can't sustain itself. It sits at the floor of 10 and depends
-on ≈ 250 newcomers per 5 000 ticks
+Every action gets probability 1/5, whatever the genes. In the Lab 1 world a
+random population can't sustain itself. It stays near the floor of 10 (11–16
+animals on average) and depends on 18–94 newcomers per 5 000 ticks
 ([03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)).
 So behaviour matters in this world.
 
@@ -54,11 +54,11 @@ computes a score (logit) per action, adds the effect of the genes, and applies
 a softmax:
 
 1. **Situation defaults** (`default_logits`), for example: eat is high when
-   food is here or near and higher when energy is low; flee is high when a
+   food is here or near and higher when energy is low; with no food in sight,
+   eat (which then means searching) gets a fixed 1.5; flee is high when a
    predator is near; mate is high only when another animal within 3 cells is
    ready, and this animal is adult with energy that isn't low.
-2. **Action genes** (`gene_weight`). Each action gene adds a weight to its own
-   action:
+2. **Genes** (`gene_weight`). Each gene adds a weight to its own action:
    - **intensity words:** *never / do not / avoid* −2.5, *rarely* −1.2,
      *always / whatever happens* +2.5, *whenever / often / quickly* +1.2,
      *sometimes* +0.3. With no intensity word, merely mentioning the action
@@ -67,9 +67,6 @@ a softmax:
      checked against the observation. An unmet condition keeps only 20 % of the
      weight.
    - **"unless …":** if the exception holds, the effect flips mildly.
-3. **Temperament genes** (`temperament_deltas`) shift several actions at once.
-   For example *cautious* gives flee +1, attack −1, wander −0.3, and *social*
-   gives follow +1, mate +0.3.
 
 Gibberish and neutral genes contribute nothing. That's why its gene-sensitivity
 reference is clean: directed tests 100 % correct, random text has no effect
@@ -84,7 +81,7 @@ served by [Ollama](https://ollama.com).
 
 ### The prompt
 
-Template `prompts/teacher_v1.md`:
+Template `prompts/teacher_v2.md` (since 2026-10-07; `teacher_v1.md` before):
 
 ```text
 You decide what a wild animal does next in a simple grid world.
@@ -93,31 +90,33 @@ Actions:
 - eat: go to the nearest visible food and eat it
 - flee: run away from the nearest predator
 - follow: move toward the nearest other animal
-- wander: explore the surroundings
 - rest: stay still to save energy
 - mate: approach a ready partner to breed
-- attack: fight the nearest animal to steal its energy
+If the chosen action has nothing to act on in sight (no food, predator, animal or
+ready partner), the animal searches the surroundings instead.
 
 This animal's instincts (its genes). They define its personality: follow them
 even when they seem unwise. Instincts that are meaningless have no effect.
 {genes}
-Temperament: {temperament}
 
 Situation: {situation}
 
 {ask}
 ```
 
-`{genes}` becomes one line per action gene (`- eat: "Eat whenever food is
-close."`). `{temperament}` holds the three temperament sentences in quotes.
+`{genes}` becomes one line per gene (`- eat: "Eat whenever food is close."`).
 `{situation}` is the observation text (V1 or V2), and `{ask}` is the mode's
 instruction. In points mode that is: *"Distribute 100 points across the
-actions according to how likely this animal is to choose each."* A full prompt
-is about 290 tokens.
+actions according to how likely this animal is to choose each."* The line
+after the actions tells the model what the simulation does with an action that
+has nothing to act on ([03 §6](03-world-and-simulation.md#6-actions-the-five-behaviours)).
+A full prompt is about 10 % shorter than with the 10 genes of
+`teacher_v1.md`: 971 characters against 1 096 for the same example genes.
+The old prompt was about 290 tokens.
 
 ### Points mode (default)
 
-- **Structured output:** the request carries a JSON schema with the seven
+- **Structured output:** the request carries a JSON schema with the five
   actions as required integer fields (0–100). Ollama constrains generation to
   that shape.
 - **Reproducible:** temperature 0 and a fixed seed (`seed` = 0). Three
@@ -128,14 +127,15 @@ is about 290 tokens.
 - **Answer → probabilities:** points are clipped at 0, a small 0.01 is added to
   each action, and the vector is divided by its sum.
 
-A real example (gemma4:12b, probe of 2026-10-01). Genes: eat *"Eat whenever
-food is close."*, flee *"Always run away, whatever happens."*, follow *"Stay
-close to other animals."*, wander *"Keep moving to new places."*, rest *"Rest
-when you are tired."*, mate *"Look for a partner when energy is high."*,
-attack *"Never fight."*, and temperament *"Cautious: safety comes before
-food." "Social: feels safer in a group." "Prefers staying near water."*
-Situation: *Energy: low. Food: near. Predator: near. Animal: none. Age:
-adult.*
+A real example (gemma4:12b, probe of 2026-10-01). It used the 10-gene genome
+and `teacher_v1.md` of the time, so the answer also has wander and attack.
+Genes: eat *"Eat whenever food is close."*, flee *"Always run away, whatever
+happens."*, follow *"Stay close to other animals."*, wander *"Keep moving to
+new places."*, rest *"Rest when you are tired."*, mate *"Look for a partner
+when energy is high."*, attack *"Never fight."*, and temperament *"Cautious:
+safety comes before food." "Social: feels safer in a group." "Prefers staying
+near water."* Situation: *Energy: low. Food: near. Predator: near. Animal:
+none. Age: adult.*
 
 ```json
 {"eat": 25, "flee": 45, "follow": 5, "wander": 5, "rest": 10, "mate": 0, "attack": 0}
@@ -144,17 +144,17 @@ adult.*
 That's 90 points. Normalised, flee ≈ 50 %, eat ≈ 28 %, rest ≈ 11 %, follow and
 wander ≈ 6 % each.
 
-**Why the points often don't add up to 100.** A JSON schema can require seven
+**Why the points often don't add up to 100.** A JSON schema can require five
 integers between 0 and 100, but it can't require that they sum to 100. The model
 writes the numbers one after another, without thinking first (thinking is
 off) and without tracking a running total. In 60 decisions from the gate
-sample, 44 (73 %) summed to exactly 100, 13 to 56–98 and 3 to 0; none went
-above 100. Normalising makes short totals harmless.
+sample (2026-10-01, 10 genes), 44 (73 %) summed to exactly 100, 13 to 56–98
+and 3 to 0; none went above 100. Normalising makes short totals harmless.
 
 **The exception: all-zero answers.** 3 of 17 answers for random-text genomes
 gave every action 0 points. The model seems to read *"Instincts that are
 meaningless have no effect"* as "give no points". The normalisation then
-turns all zeros into a uniform 1/7 distribution, a random animal rather than a
+turns all zeros into a uniform 1/5 distribution, a random animal rather than a
 "no effect" one. This probably exaggerates how much random text changes
 behaviour, which is the G2 problem
 ([06 §6](06-experiments-and-results.md#6-known-issues-and-open-questions)).
@@ -187,7 +187,8 @@ Each layer avoids asking the same question twice:
 | Request cache | `cache/ollama.sqlite` | the exact request: model, digest, messages, schema, options | across runs |
 
 Because of the model digest and the prompt hash, a new model version or an
-edited prompt never reuses old answers. Before 2026-10-01 a bug (an empty cache
+edited prompt never reuses old answers: answers given to `teacher_v1.md` are
+not reused with `teacher_v2.md`. Before 2026-10-01 a bug (an empty cache
 file counted as "no cache") meant the request cache was never written; the
 policy cache was not affected. It's fixed, so reruns of the same genomes in the
 same situations now cost nothing.
@@ -200,7 +201,7 @@ Every request sends `num_ctx` and `think`. The brain's requests also send
 
 | Setting | Value | Why |
 |---|---|---|
-| `options.num_ctx` | 4096 | Without it Ollama loaded gemma4 with its 256 k default context, which pushed 32 % of the model onto the CPU. Requests with different context sizes also make Ollama reload the model, which took 60–100 s each time. Prompts are ≈ 300 tokens, so 4 k is plenty. |
+| `options.num_ctx` | 4096 | Without it Ollama loaded gemma4 with its 256 k default context, which pushed 32 % of the model onto the CPU. Requests with different context sizes also make Ollama reload the model, which took 60–100 s each time. Prompts are under 300 tokens, so 4 k is plenty. |
 | `think` | false | gemma4 is a "thinking" model. Without this it reasons at length before answering. |
 | `keep_alive` (brain) | 30 min | keeps the model loaded between calls |
 | `temperature`, `seed` (brain, points mode) | 0, 0 | reproducible answers |
@@ -216,7 +217,8 @@ model tag through the local server.
 
 ## 5. Choosing the model
 
-Measured on 2026-10-01 on an RTX 5080 (16 GB) with Ollama 0.32.0:
+Measured on 2026-10-01 on an RTX 5080 (16 GB) with Ollama 0.32.0, with the
+10-gene genome and `teacher_v1.md` of the time:
 
 | | gemma4:26b | **gemma4:12b** (chosen) |
 |---|---|---|
@@ -249,7 +251,8 @@ the probe and the gate before trusting it
 ## 6. What the LLM brain costs
 
 First end-to-end run with the LLM brain on the Lab 1 world: small profile, seed
-1234, 500 ticks, gemma4:12b, free GPU, empty caches.
+1234, 500 ticks, gemma4:12b, free GPU, empty caches (2026-10-01). It used the
+10-gene genome of the time, with seven actions including wander and attack.
 
 | Measure | Value |
 |---|---|
@@ -274,6 +277,22 @@ genes give animals that attack far more and flee less than the keyword
 reading. Attacking costs energy, so these animals starve more, breed less and
 need newcomers. Whether evolution can repair this, by selecting genes that the
 LLM turns into better behaviour, is the central open question (gate G4).
+Attack was removed on 2026-10-07, so these numbers don't describe the current
+genome.
+
+**With 5 genes** (2026-10-07, same world and seed, `prompts/teacher_v2.md`):
+
+| | gemma4:12b brain, 5 genes |
+|---|---|
+| Decisions / LLM calls | 3 016 / 973 (0 failures) |
+| Time | 13 minutes, ≈ 0.83 s per call |
+| Population | 19–26, 25 at tick 500 |
+| Births / newcomers | 31 / 0 |
+| Deaths: predator / starvation | 19 / 11 |
+| Action shares | eat 28 %, rest 23 %, mate 23 %, follow 22 %, flee 4 % |
+
+One seed and 500 ticks, so only a first sign: as gemma4:12b reads them, the
+5-gene founders kept a population without newcomers.
 
 ## 7. Parked: Laya
 

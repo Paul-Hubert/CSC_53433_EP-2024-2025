@@ -1,6 +1,6 @@
 # 09 — Status, decisions and roadmap
 
-State on **2026-10-01**, branch `claude/ai-agents-course-redesign-71pc1u`.
+State on **2026-10-07**, branch `claude/ai-agents-course-redesign-71pc1u`.
 The live, step-by-step state of the spike is in `prototype/STATUS.md`, and the
 owner-facing log is in `Docs/redesign/09-progress-log.md`.
 
@@ -19,22 +19,23 @@ owner-facing log is in `Docs/redesign/09-progress-log.md`.
 
 | Part | State |
 |---|---|
-| World, simulation, logging, seeds | working and tested; **Lab 1 flat world** tuned |
+| World, simulation, logging, seeds | working and tested; **Lab 1 flat world** tuned; reference numbers measured again for the 5-gene genome (2026-10-07) |
+| Genome | 5 genes, one per action (eat, flee, follow, rest, mate) since 2026-10-07; founder pool v2 waiting for review (H1) |
 | Random and rule-based brains | working |
 | LLM brain (`--backend llm`, gemma4:12b, points mode) | working end to end; ≈ 4 decisions/s on a 16 GB GPU |
 | Mutation: one blind random change by the LLM (16 instructions, temperature) | working; gemma4:12b; pure-mutation test in `results/mutation_test.md` |
 | Metrics, E1 suite, decision-model gate | working; gate run on gemma4 12b and 26b |
 | Persistent answer caches | working (request-cache bug fixed 2026-10-01) |
-| Tests | 44 offline tests pass; real-model test passes on gemma4:12b |
-| Analysis tools | `gene_report` (gene fitness, frequency, mutant lineages) since 2026-10-02; frequency curves and diversity over time not written |
+| Tests | 55 offline tests pass; real-model test passed on gemma4:12b (10-gene genome) |
+| Analysis tools | `gene_report` (gene fitness, frequency, mutant lineages) since 2026-10-02; `gene_timeline` (the gene pool over time, gene dropping) and `gene_swap` since 2026-10-06 |
 | Evolution matrix (E4), common garden (E5), report | not written |
 | Unity version | not started |
 | Laya brain and distillation | parked |
 
 | Gate | Status |
 |---|---|
-| G1 Semantics | ✔ (gemma4 12b and 26b, small gate) |
-| G2 Information | ✘: random text moves behaviour as much as real genes |
+| G1 Semantics | ✔ (gemma4 12b and 26b, small gate, 10-gene genome) |
+| G2 Information | ✘: random text moves behaviour as much as real genes (10-gene genome) |
 | G3 Locality | not measured on the LLM brain |
 | G4 Evolution | not measured |
 | G5 Throughput | ≈ 4 decisions/s vs ≥ 50 targeted → fails at current settings |
@@ -49,6 +50,7 @@ owner-facing log is in `Docs/redesign/09-progress-log.md`.
 | 2026-10-01 | First local tests (Windows 11, RTX 5080, Ollama 0.32). gemma4:26b and 12b probed. Fixes: `think: false` and a fixed `num_ctx` (model reloads), Windows liveness check in `status`, request cache never written, `smoke_run` LLM mutation with every brain, ambiguous ASCII map symbols. Decision-model gate on both models (G1 ✔, G2 ✘). Brain switched to gemma4:12b. Point-total analysis (all-zero answers on random text). **Lab 1 = flat world with random food**, food regrowth retuned; noise terrain moved to `configs/worlds/terrain_preview.yaml`. First 500-tick run with the LLM brain. This documentation. |
 | 2026-10-02 | Mutation reviewed (`prototype/notes/mutation-review.md`), then replaced by one blind operator: the LLM gets a random-change instruction and the gene, nothing else. Mutation test (`results/mutation_test.md`). Three 50 000-tick runs with predators and the new `gene_report` ([10](10-natural-selection-runs.md)): no gene clearly best, careless temperaments clearly selected against. First hour-long LLM-brain run (5 269 ticks): the population escaped the floor after newcomers brought a workable gene set, and "Never fight." spread to 23 of 25 animals ([10 §7](10-natural-selection-runs.md#7-one-hour-with-the-llm-brain)). |
 | 2026-10-06 | `smoke_run` made safe for long runs (stop file, clean stops, resume by replay, failed brain calls never cached). One 12-hour LLM-brain run: the rescued population thrived about 60 generations, then died out; nonsense genes swept as often as random inheritance predicts; a predation trap below about 20 animals. New analysis: `gene_timeline` (gene dropping), `gene_swap` ([11](11-gene-development.md)). |
+| 2026-10-07 | Owner request: the genome cut to 5 genes, one per action (eat, flee, follow, rest, mate). The temperament genes (risk, social, place) and the attack and wander actions are gone, so animals no longer fight; an action with nothing to act on in sight makes the animal search. New prompt `teacher_v2.md`, founder pool v2, one length guard (`evolution.max_words`). Lab 1 reference numbers measured again: 25–31 animals (small), 50–55 (full) ([03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)). `gene_report` and `gene_timeline` still read the older 10-gene runs. |
 
 ## 3. Decisions taken
 
@@ -63,12 +65,13 @@ owner-facing log is in `Docs/redesign/09-progress-log.md`.
 | 2026-10-01 | **Lab 1 world is flat, food uniformly random, regrowth 0.0007** | owner: evolution is Lab 1; terrain and foliage labs come later. At 0.001 the flat world sat at the cap 25–68 % of the time; 0.0007 keeps it food-limited |
 | 2026-10-01 | `smoke_run` uses LLM mutation only with the LLM brain (superseded 2026-10-02) | matches the script's documentation; rule-based runs need no model |
 | 2026-10-02 | **Mutation = one blind random change by the LLM**: an instruction drawn from 16 "random change" variants + the gene, nothing else; the word operators, rewrite styles and founder reintroduction are gone; mutator = gemma4:12b; every run with mutation needs the model (`--no-mutation` otherwise) | owner: mutation doesn't care about state or success, pure random; review in `prototype/notes/mutation-review.md` |
+| 2026-10-07 | **Genome = 5 genes, one per action** (eat, flee, follow, rest, mate); the attack and wander actions removed (no fights between animals); temperament (risk, social, place) removed | owner request: genes kept to a minimum before predators become genetic animals in the same way |
 
 ## 4. Decisions waiting on the course owner
 
 | # | Decision | Context |
 |---|---|---|
-| 1 | Approve or edit the founder pool (H1) | `prototype/data/founder_pool_v1.json`, [04 §3](04-genome-and-evolution.md#3-the-founder-pool) |
+| 1 | Approve or edit the founder pool (H1) | `prototype/data/founder_pool_v2.json`, [04 §3](04-genome-and-evolution.md#3-the-founder-pool) |
 | 2 | How to handle G2: all-zero answers → neutral answer? rewrite the control sentences? prompt iterations? keep the MI_G ≥ 0.25 threshold? | [06 §6](06-experiments-and-results.md#6-known-issues-and-open-questions) |
 | 3 | Lab 1 platform (Python prototype or Unity) and format (sessions, deliverables, grading) | [02 §8](02-lab1.md#8-open-decisions-for-the-course-owner) |
 | 4 | Default brain in class and student hardware (lab server, cloud plan) | [02 §6](02-lab1.md#6-compute-budget) |
@@ -81,6 +84,10 @@ owner-facing log is in `Docs/redesign/09-progress-log.md`.
 ## 5. Roadmap
 
 ### Phase 0 — finish the spike (Python)
+
+**Next step: predators as genetic animals** (owner request, 2026-10-07; not
+started). Predators get genes and evolve in the same way as the animals. The
+animals' genome was cut to 5 genes first, to keep the genes to a minimum.
 
 1. Decide G2 handling (decision 2), apply it, and rerun the gate. Cached
    answers make reruns cheap.

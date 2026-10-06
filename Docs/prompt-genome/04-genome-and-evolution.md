@@ -20,27 +20,28 @@ generation to the next. Code: `prototype/promptevo/genome.py`, `founder.py`,
 
 ## 1. Genes are sentences, in fixed slots
 
-A **genome** has 10 **loci** (gene slots), always in the same order. Each locus
+A **genome** has 5 **loci** (gene slots), always in the same order. Each locus
 holds one short English sentence, its **allele**.
 
-| Locus | Kind | Role | Max words |
-|---|---|---|---|
-| `eat` | action | when and how much to go for food | 12 |
-| `flee` | action | reaction to predators | 12 |
-| `follow` | action | staying with other animals | 12 |
-| `wander` | action | exploring | 12 |
-| `rest` | action | saving energy | 12 |
-| `mate` | action | reproduction | 12 |
-| `attack` | action | fighting for energy | 12 |
-| `risk` | temperament | boldness vs caution | 15 |
-| `social` | temperament | attitude to other animals | 15 |
-| `place` | temperament | where it likes to be | 15 |
+| Locus | Role | Max words |
+|---|---|---|
+| `eat` | when and how much to go for food | 12 |
+| `flee` | reaction to predators | 12 |
+| `follow` | staying with other animals | 12 |
+| `rest` | saving energy | 12 |
+| `mate` | reproduction | 12 |
 
-Each of the seven **action genes** belongs to one of the seven behaviours the
-brain can choose ([03 §6](03-world-and-simulation.md#6-actions-the-seven-behaviours)).
-The three **temperament genes** colour every decision. The LLM brain sees the
-action genes as a labelled list and the temperament genes as one line
-([05](05-decision-backends.md#the-prompt)).
+There is one gene per behaviour: each gene belongs to the action of the same
+name, one of the five the brain can choose
+([03 §6](03-world-and-simulation.md#6-actions-the-five-behaviours)). The LLM
+brain sees the genes as a labelled list ([05](05-decision-backends.md#the-prompt)).
+
+Until 2026-10-07 the genome had 10 genes: 7 action genes (the five above plus
+`wander` and `attack`) and 3 temperament genes (`risk`, `social`, `place`).
+The owner asked to keep the genes to a minimum before predators become genetic
+animals too ([09](09-status-and-roadmap.md#3-decisions-taken)). The runs in
+[10](10-natural-selection-runs.md) and [11](11-gene-development.md) used the
+old genome.
 
 The slots are fixed for two reasons:
 
@@ -64,8 +65,8 @@ An **allele** (`genome.Allele`) records:
 
 The `AlleleRegistry` holds every allele seen in a run. The same text at the
 same locus is always the same allele, so if two mutations produce the same
-sentence they share one id. A **genome** is just the tuple of 10 allele ids. Its
-`genome_key` is a hash of the 10 texts, so the same genes have the same key in
+sentence they share one id. A **genome** is just the tuple of 5 allele ids. Its
+`genome_key` is a hash of the 5 texts, so the same genes have the same key in
 every run. The caches use this key.
 
 `parent_id` links form a **lineage**: you can follow any gene back through its
@@ -73,40 +74,35 @@ mutations to the founder sentence it came from.
 
 ## 3. The founder pool
 
-Every run starts from the same frozen pool, `data/founder_pool_v1.json`. Each
+Every run starts from the same frozen pool, `data/founder_pool_v2.json`. Each
 locus offers four instinct-like sentences plus a **neutral** allele that
 switches the drive off. A founder (and every later newcomer) draws one of the
-five options per locus uniformly at random, so there are 5^10 ≈ 9.8 million
-possible starting genomes. All runs share the same origin and can be compared.
+five options per locus uniformly at random, so there are 5^5 = 3 125 possible
+starting genomes. All runs share the same origin and can be compared.
 
-> **Status:** v1 is a draft written by Claude. It is waiting for the course
-> owner's review (checkpoint H1 in the spike plan). Rules used: imperative
-> voice, plain words, no numbers, action genes ≤ 12 words, temperament ≤ 15.
+> **Status:** the pool is a draft written by Claude. It is waiting for the
+> course owner's review (checkpoint H1 in the spike plan). v2 (2026-10-07)
+> keeps the v1 sentences of the five remaining slots. Rules used: imperative
+> voice, plain words, no numbers, at most 12 words.
 
 | Locus | Founder alleles | Neutral |
 |---|---|---|
 | eat | "Eat whenever food is close." · "Only look for food when energy is low." · "Always finish eating before doing anything else." · "Eat quickly, then move on." | "No preference." |
 | flee | "Run from any predator you see." · "Flee only when a predator is very close." · "Stay calm unless danger is right next to you." · "Run away from anything that attacks you." | "No preference." |
 | follow | "Stay close to other animals." · "Follow others when you are lost or hungry." · "Keep your distance from other animals." · "Follow the strongest animal nearby." | "No preference." |
-| wander | "Keep moving to new places." · "Explore when there is nothing else to do." · "Stay near where you last found food." · "Roam far when food is scarce." | "No preference." |
 | rest | "Rest when you are tired." · "Never stop moving." · "Rest only when you feel safe." · "Save energy by resting when food is far." | "No preference." |
 | mate | "Look for a partner when energy is high." · "Mate with any nearby adult." · "Mate only when food is plentiful." · "Seek a partner before growing old." | "No preference." |
-| attack | "Never fight." · "Attack weaker animals when you are hungry." · "Fight anyone who comes too close." · "Attack only to defend your food." | "No preference." |
-| risk | "Cautious: safety comes before food." · "Bold: take risks when the reward is food." · "Nervous: any movement nearby means danger." · "Reckless when starving, careful when fed." | "No particular temperament." |
-| social | "Social: feels safer in a group." · "Solitary: prefers to be alone." · "Curious about other animals." · "Wary of strangers, friendly to companions." | "No particular temperament." |
-| place | "Likes open ground where danger is easy to see." · "Prefers staying near water." · "Attached to familiar places." · "Restless: always wants somewhere new." | "No particular temperament." |
 
-Some founder sentences refer to features the Lab 1 world doesn't have yet
-("Prefers staying near water.", "Likes open ground…"). On the flat world they
-can only act through how the brain interprets them. Once the terrain lab adds
-water, they become testable hypotheses: will a water-loving allele spread when
-food grows faster near water?
+Some founder sentences refer to things an animal doesn't sense. "Follow the
+strongest animal nearby." is an example: the observation says nothing about
+the other animal's strength ([03 §5](03-world-and-simulation.md#5-perception-what-an-animal-knows)).
+Such genes can only act through how the brain interprets them.
 
 Two more allele files exist for **measurement and controls**. They never appear
 in a normal run; the control sentences become founder genes only in control C4
 (§7) ([06](06-experiments-and-results.md#3-test-material)):
 
-- `contrast_alleles_v1.json`: a "pro" and an "anti" sentence per action locus
+- `contrast_alleles_v2.json`: a "pro" and an "anti" sentence per locus
   ("Always eat, whatever happens." / "Never eat unless starving.") for directed
   tests.
 - `control_alleles_v1.json`: 20 shuffled-word sentences ("Needs bakery green
@@ -115,13 +111,12 @@ in a normal run; the control sentences become founder genes only in control C4
 
 ## 4. Crossover
 
-`genome.crossover_uniform`: for each of the 10 loci the child takes the allele
+`genome.crossover_uniform`: for each of the 5 loci the child takes the allele
 of one parent or the other with probability ½ each. Because loci are
 homologous, a child always has exactly one gene of each kind.
 
 Other schemes are natural student exercises: one-point crossover, blocks of
-loci (action vs temperament), or diploid genomes with dominant and recessive
-alleles.
+loci, or diploid genomes with dominant and recessive alleles.
 
 ## 5. Mutation
 
@@ -131,9 +126,9 @@ review behind it is `prototype/notes/mutation-review.md`).
 
 ### Rate
 
-After crossover, each of the child's 10 genes mutates with probability
-`evolution.p_mut` = 0.03. On average that's 0.3 mutations per child, and
-about 26 % of children (1 − 0.97¹⁰) get at least one.
+After crossover, each of the child's 5 genes mutates with probability
+`evolution.p_mut` = 0.03. On average that's 0.15 mutations per child, and
+about 14 % of children (1 − 0.97⁵) get at least one.
 
 ### One operator: the LLM makes a random change
 
@@ -165,10 +160,10 @@ recombine their parents' genes. To add an instruction, add a line to the file.
 
 The answer goes through `clean` (keep the quoted sentence if there is one,
 strip meta-text such as "Here is the new sentence:", keep the first sentence,
-capitalise, end with a full stop) and `valid` (1–12 words for an action gene,
-1–15 for a temperament gene, different from the old text, plain characters
-only). If it fails, the gene doesn't mutate this time. The guards check form,
-never meaning: 99 % of answers pass.
+capitalise, end with a full stop) and `valid` (1–12 words, set by
+`evolution.max_words`; different from the old text; plain characters only).
+If it fails, the gene doesn't mutate this time. The guards check form, never
+meaning: 99 % of answers pass.
 
 Every accepted mutation is logged in the child's `birth` event (locus, parent
 allele, new allele, instruction number, text) and registered as an allele with
@@ -178,7 +173,8 @@ its parent, `operator` = `llm#<instruction number>`, model and seed.
 
 `python -m experiments.mutation_test` mutates every founder sentence with 8
 seeds at four temperatures, with no selection (`results/mutation_test.md`,
-2026-10-02, gemma4:12b, 2 000 calls in about 4 minutes):
+2026-10-02, gemma4:12b, 2 000 calls in about 4 minutes, on the 10-slot
+founder pool of the time):
 
 | Temperature | 0.9 | 1.2 | 1.5 | 2.0 |
 |---|---|---|---|---|
@@ -204,8 +200,10 @@ seeds at four temperatures, with no selection (`results/mutation_test.md`,
 
 ### Many mutations, no selection: where genes go
 
-The test also mutates six founder sentences 30 times in a row at each
-temperature, keeping each new sentence (24 lineages):
+The test also mutates founder sentences 30 times in a row at each temperature,
+keeping each new sentence. On 2026-10-02 it took six (24 lineages), the first
+of the eat, flee, follow, rest, attack and risk slots (today: one per slot of
+the five):
 
 | Mutations so far | 0 | 1 | 3 | 5 | 10 | 15 | 20 | 30 |
 |---|---|---|---|---|---|---|---|---|
@@ -296,7 +294,14 @@ ranks every gene by the fitness of the animals that carried it (their mean
 number of offspring, relative to all animals), with lifespan, the share
 killed by predators, frequency at the start, peak and end, and the lineage of
 mutant genes; ★ marks the best gene of each slot when the difference is clear
-([08 §4](08-code-and-config-reference.md)). **Not built yet:** frequency
-curves, lineage trees with gene diffs, per-locus diversity over time. They
-would make a natural Lab 1 exercise; the building blocks exist
-(`metrics.shannon_diversity`, `metrics.bootstrap_ci`).
+([08 §4](08-code-and-config-reference.md)). **Timeline:**
+`python -m experiments.gene_timeline results/runs/<run>` adds share charts
+per slot, diversity over time, the genes that swept with their lineages,
+gene dropping to tell selection from drift, and behaviour over time
+([11](11-gene-development.md)). Whether Lab 1 students should write these
+themselves is an open decision
+([09 §4](09-status-and-roadmap.md#4-decisions-waiting-on-the-course-owner)).
+
+`gene_report` and `gene_timeline` take the slots from the run itself, so runs
+made before 2026-10-07, with 10 slots, stay readable. `gene_swap` needs a run
+made with the current 5 genes.

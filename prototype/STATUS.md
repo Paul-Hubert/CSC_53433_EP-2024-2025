@@ -4,11 +4,12 @@
 > `notes/archive.md`. Plan: `../Docs/redesign/08-phase0-spike-plan.md`.
 
 ## Position
-Session: S1.3 done locally, S4.3 gate run · Last updated: 2026-10-06 (12 h LLM-brain run done and
-analysed: experiments/gene_timeline.py, gene_swap.py; ../Docs/prompt-genome/11-gene-development.md)
+Session: S1.3 done locally, S4.3 gate run · Last updated: 2026-10-07 (genome = 5 genes, one per action;
+attack, wander and temperament removed; next owner step: predators as genetic animals, not started)
 
 ## Next action
-WAIT for owner decisions (../Docs/prompt-genome/09-status-and-roadmap.md §4): G2 handling
+Owner's next step (2026-10-07): predators become genetic animals the same way — NOT started, wait for go.
+Otherwise WAIT for owner decisions (../Docs/prompt-genome/09-status-and-roadmap.md §4): G2 handling
 (all-zero answers → neutral answer? cleaner control sentences? prompt iteration 1/3?), founder
 pool H1; Lab 1 small world vs the LLM brain (predation trap, ../Docs/prompt-genome/11 §9 levers). Then rerun
 `python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b` (cached, cheap),
@@ -28,9 +29,6 @@ at the top of plan 08. Implemented (offline-tested with fake Ollama, 38 tests):
   smoke_run --backend llm also mutates genes with ollama.mutator_model.
 - Ollama Cloud: ollama.host https://ollama.com + key in env OLLAMA_API_KEY
   (client_from_config); or cloud tags through the local server after `ollama signin`.
-- Measured with a fake near-random LLM (small, 2 000 ticks): 5 349 decisions →
-  2 211 LLM queries with points (0.41/decision). Table+prefetch k=8: 1 185 requests
-  but 9 342 generated answers (4×) → only for request-limited cloud, not for speed.
 Parked (kept, not deleted): laya_backend.py, e0_probe_laya.py, e0_budget.py,
 make_dataset.py, label_teacher.py, S5 distillation.
 
@@ -44,7 +42,7 @@ make_dataset.py, label_teacher.py, S5 distillation.
 - [ ] S7 report, go/no-go · H5 decision
 
 ## Environment
-Windows 11 Pro, Python 3.13.5 (.venv), RTX 5080 16 GB, Ollama 0.35.0 (0.32 until 2026-10-02). Offline suite 54 passed.
+Windows 11 Pro, Python 3.13.5 (.venv), RTX 5080 16 GB, Ollama 0.35.0 (0.32 until 2026-10-02). Offline suite 55 passed.
 Windows: experiments.status used os.kill(pid, 0); signal 0 is CTRL_C_EVENT on Windows, so live jobs
 showed as DEAD? → fixed (OpenProcess + GetExitCodeProcess).
 
@@ -91,6 +89,7 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
 | 2026-09-28 | Invalid action → wander (logged) | plan §A6 |
 | 2026-10-01 | Brain (policy.model) = gemma4:12b; mutator stays gemma4:26b | gate: reads genes as well as 26b (sign acc 0.96 vs 0.99, ΔP 0.75 vs 0.62), ~3× less compute per decision (0.9 vs 2.8 s), fits 100 % in 16 GB VRAM |
 | 2026-10-02 | **Mutation = one blind LLM operator**: instruction drawn from prompts/mutate_v2.txt (16 "random change" variants) + the gene, nothing else; temperature 1.2; word operators, styles, founder_reintroduce removed; mutator_model gemma4:12b; every run with mutation needs Ollama (`--no-mutation` otherwise) | owner: "evolution and mutation does not care about state and success, pure random"; review notes/mutation-review.md; test results/mutation_test.md |
+| 2026-10-07 | **Genome = 5 genes, one per action** (eat, flee, follow, rest, mate): risk, social, place (temperament) and the attack and wander genes AND actions removed; no fights between animals; an action with nothing in sight still wanders (eat = search); founder_pool_v2 (same texts); prompts/teacher_v2.md; evolution.max_words | owner: "simplify the genes to a minimum"; predators become genetic animals next |
 | 2026-10-01 | **Lab 1 world = flat**: water/mountain fractions 0, food uniformly random, food_regrow_p 0.0007; old noise terrain kept as configs/worlds/terrain_preview.yaml (food 0.001), `smoke_run --world terrain_preview` | Owner: the evolution lab becomes Lab 1; the terrain and foliage labs come later and change the world. Flat at 0.001 sat at the cap 25-68 % of the time. At 0.0007 (rule_based, 5k ticks, 3 seeds): small mean pop 25-28 (cap 40, never reached), deaths predator ≈ 230 / starvation ≈ 185, lifespan ≈ 290, 22-25 generations; full mean pop 47-49 (cap 60); random brain collapses to the floor (≈ 250 immigrants) |
 
 ## Key numbers
@@ -118,7 +117,11 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
   82 → 54 %. Sweeps = drift (gene dropping: 16 mutants to 50 % vs 18 (13-24) by inheritance alone);
   "Never fight." not confirmed after t 5 269. Salad mate gene: P(mate) −7.7 points (gene_swap).
   results/llm_long_timeline.md/.html, Docs/prompt-genome/11.
-- E1 rule_based reference (small, 48 obs): MI_G founders 0.23, MI_G random 0.00,
+- 5-gene genome (2026-10-07), rule_based, no mutation, 5 000 ticks, seeds 1234/7/42: small mean pop 25-31 (was 25-28),
+  full 50-55 (was 47-49), 24 generations, invalid 11-13 %, eat (incl. search) 54-63 % of decisions. LLM brain
+  500 ticks (small, seed 1234): pop 25 at the end (19-26), births 31, no newcomers (10-gene run: floor 10, 9
+  newcomers); decisions eat .28 rest .23 mate .23 follow .22 flee .04; 973 calls in 13 min, 0 failures.
+- E1 rule_based reference (small, 48 obs, 10-gene genome): MI_G founders 0.23, MI_G random 0.00,
   MI_O 0.83, directed sign acc 1.00, ΔP 0.48, gibberish→neutral 0.00.
   Note for H2: even the "ideal" keyword interpreter scores MI_G 0.23 < G2 threshold 0.25
   → consider whether G2's MI_G threshold is too strict (decide before S6).

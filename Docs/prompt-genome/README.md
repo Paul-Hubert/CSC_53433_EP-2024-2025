@@ -17,6 +17,10 @@ world the animals live in.
 > still moves behaviour too much (G2 ✘), and it is slow (≈ 4 decisions/s).
 > Evolution experiments and the Unity version are next.
 > [09 — Status and roadmap](09-status-and-roadmap.md).
+>
+> **2026-10-07:** the genome now has 5 genes, one per behaviour (eat, flee,
+> follow, rest, mate). The temperament genes and the attack and wander actions
+> are gone ([04 §1](04-genome-and-evolution.md#1-genes-are-sentences-in-fixed-slots)).
 
 ## Documents
 
@@ -46,7 +50,7 @@ world the animals live in.
 cd prototype
 python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
-pytest -q                                              # 41 tests, no model needed
+pytest -q                                              # 55 tests, no model needed
 python -m experiments.smoke_run                        # Lab 1 world, rule-based brain, ≈ 12 s
 ollama pull gemma4:12b
 python -m experiments.smoke_run --backend llm --ticks 500   # the LLM brain, ≈ 7 min on a 16 GB GPU

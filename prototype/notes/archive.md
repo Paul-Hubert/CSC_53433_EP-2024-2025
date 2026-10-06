@@ -39,3 +39,8 @@ contrast 50 %, regular 40 %, random-text 10 %; 0 leaks; every val/test row has �
   deaths predator 22 / starvation 11; actions eat .33 wander .20 attack .16 follow .09 mate .09 rest .08
   flee .05. Rule-based, same 500 ticks: pop 17, births 23, immigrants 0, deaths 25 / 5, attack .02.
   results/runs/lab1_llm_500 (not committed).
+
+## Moved from STATUS.md › Revision 2026-09-30 (2026-10-07)
+- Measured with a fake near-random LLM (small, 2 000 ticks): 5 349 decisions →
+  2 211 LLM queries with points (0.41/decision). Table+prefetch k=8: 1 185 requests
+  but 9 342 generated answers (4×) → only for request-limited cloud, not for speed.

@@ -68,12 +68,12 @@ nohup python -m experiments.label_teacher --workers 4 > logs/label_teacher.log 2
 | Path | What |
 |---|---|
 | `promptevo/world.py` | grid world (flat in Lab 1; optional noise terrain with water/mountains), food regrowth, scripted predators |
-| `promptevo/genome.py`, `founder.py` | alleles, genomes, crossover; founder/contrast/control pools |
-| `promptevo/perception.py`, `obs_text.py`, `actions.py` | discretised observations, text styles V1/V2, 7 behaviours |
+| `promptevo/genome.py`, `founder.py` | alleles, genomes of 5 genes (one per behaviour), crossover; founder/contrast/control pools |
+| `promptevo/perception.py`, `obs_text.py`, `actions.py` | discretised observations, text styles V1/V2, 5 behaviours (eat, flee, follow, rest, mate; with nothing to act on, the animal searches) |
 | `promptevo/sim.py` | lockstep loop, decision memo, reproduction, deaths, logging |
 | `promptevo/backends/` | `random`, `rule_based`, `llm` (ollama_policy: points/logprobs/table/ksample), `laya` (parked); `factory.py` |
 | `promptevo/evolution/mutation.py` | blind mutation: the LLM gets a random-change instruction (`prompts/mutate_v2.txt`) + the gene, nothing else; guards |
 | `promptevo/llm/ollama_client.py` | stdlib Ollama client with sqlite cache |
 | `promptevo/metrics.py` | MI_G, MI_O, JSD, directed ΔP, locality, Spearman, bootstrap |
 | `experiments/` | probes, smoke run, observation set, E1 suite, status/peek helpers |
-| `data/` | founder pool v1 (draft, needs owner review H1), contrast & control alleles |
+| `data/` | founder pool v2 (5 slots since 2026-10-07; draft, needs owner review H1), contrast alleles v2, control alleles v1 |

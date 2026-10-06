@@ -6,6 +6,11 @@ explains how that is measured, which pass/fail **gates** were fixed in advance,
 and every result so far, dated. The full plan with sessions and budgets is
 `Docs/redesign/08-phase0-spike-plan.md`.
 
+> **Genome change (2026-10-07).** Every result on this page used the 10-gene
+> genome of before that date: 7 action genes, including wander and attack, plus
+> 3 temperament genes (risk, social, place). The current genome has 5 genes,
+> one per action ([04 §1](04-genome-and-evolution.md#1-genes-are-sentences-in-fixed-slots)).
+
 ## Contents
 
 1. [Why measure before building](#1-why-measure-before-building)
@@ -179,6 +184,9 @@ Flat world, rule-based brain, 5 000 ticks, 3 seeds, 2026-10-01. Food
 regrowth 0.0007 keeps the population food-limited and below the cap. Details:
 [03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world).
 
+> 03 §13 now gives the numbers for the 5-gene genome (2026-10-07); the
+> 10-gene runs of this section gave 25–28 animals (small) and 47–49 (full).
+
 ### 5.6 First run with the LLM brain
 
 Flat world, small profile, 500 ticks, gemma4:12b, 2026-10-01: 1 722
@@ -260,6 +268,15 @@ Details: [10 §7](10-natural-selection-runs.md#7-one-hour-with-the-llm-brain).
 
 Details: [11](11-gene-development.md).
 
+### 5.11 First LLM-brain check with 5 genes
+
+`results/runs/check_5genes_llm` (not committed), 2026-10-07.
+
+- **Run:** small Lab 1 world, seed 1234, 500 ticks, gemma4:12b deciding and mutating, the 5-gene genome and `prompts/teacher_v2.md`: 3 016 decisions, 973 LLM calls, no failures, 13 minutes.
+- **Population:** 19–26 animals, 25 at tick 500; 31 births, no newcomers. The 10-gene run of §5.6 fell to the floor with 9 newcomers in the same 500 ticks.
+- **Behaviour:** eat 28 %, rest 23 %, mate 23 %, follow 22 %, flee 4 % of decisions; 5 % of decisions had nothing in sight and searched instead.
+- **Caveat:** one seed and 500 ticks.
+
 ### Summary
 
 | Gate | Status (2026-10-01) |
@@ -331,7 +348,8 @@ In the order of the plan (`prototype/STATUS.md` holds the live position):
 
 ## 8. Reproducing the results
 
-From `prototype/`:
+From `prototype/`. Since 2026-10-07 these commands run the 5-gene genome, so
+their numbers differ from the ones above.
 
 ```bash
 python -m experiments.e1_sensitivity --backend rule_based                       # 5.1

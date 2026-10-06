@@ -12,7 +12,7 @@ and the two size profiles, `small.yaml` and `full.yaml`.
 3. [Predators](#3-predators)
 4. [Animals](#4-animals)
 5. [Perception: what an animal knows](#5-perception-what-an-animal-knows)
-6. [Actions: the seven behaviours](#6-actions-the-seven-behaviours)
+6. [Actions: the five behaviours](#6-actions-the-five-behaviours)
 7. [Decisions](#7-decisions)
 8. [Reproduction](#8-reproduction)
 9. [Population limits: cap and floor](#9-population-limits-cap-and-floor)
@@ -32,7 +32,7 @@ The world is a 2D grid of square cells with hard borders (no wrap-around).
 | Size | 64 × 64 cells | 48 × 48 cells |
 
 - **Movement** is one cell per tick to any of the 8 neighbours (king moves).
-- **Distance** for perception, chasing, mating and attacking is the Chebyshev
+- **Distance** for perception, chasing and mating is the Chebyshev
   distance `max(|dy|, |dx|)`, so a diagonal step counts as 1. Greedy movement
   picks the neighbour that best reduces the straight-line distance (§6).
 - **Cell types:** ground (walkable), water and mountain. Water and mountain are
@@ -103,8 +103,8 @@ dies (cause `predator`) and the predator rests for 20 ticks.
 
 ### State
 
-Position, energy, age (in ticks), heading (for wandering), genome, generation,
-parent ids and a few counters (food eaten, offspring, energy steals).
+Position, energy, age (in ticks), heading (for the random walk, §6), genome,
+generation, parent ids and a few counters (food eaten, offspring).
 
 ### Life cycle
 
@@ -124,7 +124,6 @@ parent ids and a few counters (food eaten, offspring, energy steals).
 | Any other tick without moving | −0.7 (`cost_base`) |
 | Any tick with a move | −1.2 (`cost_base` + `cost_move` 0.5) |
 | Eating a food item | +25 (`eat_gain`) |
-| Attack attempt | −3 (`attack_cost`); on success, steal up to 10 (`attack_steal`) |
 | Having a child | −20 per parent in sexual mode (half of `child_energy` = 40) |
 
 ### Death
@@ -146,15 +145,15 @@ let identical situations be cached.
 | `predator` | none, far, near | nearest predator: `near` ≤ 3, `far` ≤ 12, else `none` |
 | `animal` | none, far, near | nearest other animal, same distance buckets |
 | `animal_ready` | true / false | only when `animal` = near: is it ready to mate (adult, energy ≥ 50)? |
-| `animal_stronger` | true / false | only when `animal` = near: does it have more energy? |
 | `age` | young, adult | young before 150 ticks |
 
-`vision` = 12 and `near` = 3 set the distance buckets. That gives 3 × 4 × 3 × 6 × 2
-= **432 possible observations**: energy × food × predator × animal (none, far
-or one of four "near" combinations) × age.
+`vision` = 12 and `near` = 3 set the distance buckets. That gives 3 × 4 × 3 × 4 × 2
+= **288 possible observations**: energy × food × predator × animal (none, far,
+near and ready to mate, near and not ready) × age.
 
 Animals don't sense directions, terrain, the number of predators, how much food
-there is, or anything about the other animal's genes.
+there is, or anything about the other animal beyond whether it is ready to
+mate.
 
 ### Observation text
 
@@ -166,40 +165,47 @@ styles set by `backend.obs_style`:
 | **V1** (default, terse) | `Energy: low. Food: near. Predator: near. Animal: none. Age: adult.` |
 | **V2** (first person) | `I am hungry and weak. Food is close. A predator is very close! I am alone. I am an adult.` |
 
-When another animal is near, V1 adds for example `Animal: near, ready to mate,
-weaker.`
+When another animal is near, V1 says whether it is ready to mate, for example
+`Energy: low. Food: near. Predator: none. Animal: near, ready to mate. Age: adult.`
 
-## 6. Actions: the seven behaviours
+## 6. Actions: the five behaviours
 
-The brain picks one of seven behaviours. An **executor** in `actions.py`
-carries the chosen behaviour out, one tick at a time, until the next decision.
-The LLM never handles movement itself.
+The brain picks one of five behaviours, one per gene. An **executor** in
+`actions.py` carries the chosen behaviour out, one tick at a time, until the
+next decision. The LLM never handles movement itself.
 
 | Action | What the executor does each tick | Invalid when |
 |---|---|---|
 | `eat` | On a food cell: eat (no move). Otherwise step toward the nearest visible food and eat on arrival in the same tick. | no food within 12 cells |
 | `flee` | Step away from the nearest visible predator. | no predator within 12 cells |
 | `follow` | Step toward the nearest other animal; stay put once adjacent. | no animal within 12 cells |
-| `wander` | Persistent random walk: keep the heading, turn ±45° or ±90° with probability 0.25 (`wander_turn_p`), pick a new random heading when blocked. | never |
 | `rest` | Stay still; costs only 0.2 energy per tick. | never |
 | `mate` | Step toward the nearest mate-ready animal; stay put once adjacent (the simulation then resolves breeding). | no mate-ready animal within 12 cells |
-| `attack` | Step toward the nearest animal. Once adjacent, attack once per decision period: pay 3 energy, and with probability `own / (own + target)` energy steal up to 10 energy from it. | no animal within 12 cells |
 
-**Invalid choices fall back to `wander`** and are counted (`invalid` in
-`stats.csv`, `invalid_rate` in `summary.json`). For example, "eat" with no food
-in sight makes the animal wander instead.
+**An action with nothing to act on makes the animal search.** If there is no
+food, predator, animal or ready partner in sight for the chosen action, the
+animal wanders instead: a persistent random walk that keeps its heading, turns
+±45° or ±90° with probability 0.25 (`wander_turn_p`) and picks a new random
+heading when blocked. So "eat" with no food in sight means searching for food.
+These choices are counted as invalid (`invalid` in `stats.csv`, `invalid_rate`
+in `summary.json`): 11–13 % of decisions in the reference runs (§13). The LLM
+brain's prompt states the same rule ([05](05-decision-backends.md#the-prompt)).
 
 Movement is greedy: each step goes to the neighbouring cell that most reduces
 (or, for flee, increases) the straight-line distance, with random tie-breaks.
 If no neighbour improves the distance, for example behind a lake, the animal
 takes a random step.
 
+Animals never fight each other. Until 2026-10-07 there were seven behaviours:
+`wander` was an action of its own, and `attack` tried to steal energy from a
+neighbour ([09](09-status-and-roadmap.md#3-decisions-taken)).
+
 ## 7. Decisions
 
 - **When:** every `sim.decision_period` = 4 ticks, all animals decide at once.
   A newborn or newcomer decides on its first tick. Between decisions the
   chosen behaviour is repeated every tick.
-- **What the brain returns:** a probability for each of the seven actions,
+- **What the brain returns:** a probability for each of the five actions,
   given the animal's genome and its current observation
   ([05 — The brain](05-decision-backends.md)).
 - **Sampling:** the action is drawn from those probabilities. With
@@ -207,8 +213,9 @@ takes a random step.
   (τ < 1) or flattened (τ > 1) as p^(1/τ). The default is 1.
 - **Memo:** within one run, the distribution for each (genome, observation)
   pair is computed once and reused. Several animals share a genome and
-  situations repeat, so only about 40 % of decisions need the brain at all. The
-  memo hit rate was 0.58–0.63 in the Lab 1 tuning runs.
+  situations repeat, so many decisions don't need the brain at all. The memo
+  hit rate was 0.58–0.63 in the Lab 1 tuning runs (2026-10-01, 10 genes) and
+  0.77–0.89 in the reference runs of §13 (5 genes, no mutation).
 
 All decisions due on the same tick are sent to the brain as one batch. The
 simulation waits for the answers before moving on (**lockstep**), so a slow
@@ -282,8 +289,8 @@ brain survives only because of the floor (see §13).
 
 | File | Content |
 |---|---|
-| `events.jsonl` | one line per event: `founder`, `immigrant` (id, genome), `birth` (child id, parents, generation, genome, mutations with the locus, parent and new allele, instruction number and new text), `death` (cause, age, generation, food eaten, offspring, steals) |
-| `stats.csv` | every 100 ticks: `t, pop, mean_energy, mean_gen, max_gen, births, immigrants, deaths_starve, deaths_pred, deaths_age, decisions, backend_queries, invalid, alleles`, then decisions per action `act_eat` … `act_attack` (counts are cumulative) |
+| `events.jsonl` | one line per event: `founder`, `immigrant` (id, genome), `birth` (child id, parents, generation, genome, mutations with the locus, parent and new allele, instruction number and new text), `death` (cause, age, generation, food eaten, offspring) |
+| `stats.csv` | every 100 ticks: `t, pop, mean_energy, mean_gen, max_gen, births, immigrants, deaths_starve, deaths_pred, deaths_age, decisions, backend_queries, invalid, alleles`, then decisions per action `act_eat` … `act_mate` (counts are cumulative) |
 | `alleles.jsonl` | every allele seen in the run: id, locus, text, origin, parent allele, operator (`llm#<n>`: the mutation instruction drawn), model, seed (the lineage of every gene) |
 | `final_population.json` | the living animals at the end: id, generation, genome (allele ids) |
 | `run_info.json` | what ran: command, git commit, Ollama version and model digests, brain, seed, the main config sections |
@@ -301,23 +308,36 @@ Genomes are stored as allele ids such as `eat:3`. `alleles.jsonl` maps ids to
 text. Look at the files with `python -m experiments.peek FILE -n 5` rather
 than opening large logs.
 
+Runs made before 2026-10-07 have 10 genes per genome, a `steals` count in
+`death` events and, if they count decisions per action (since 2026-10-05),
+`act_wander` and `act_attack` columns. `gene_report` and `gene_timeline` still
+read them ([08 §4](08-code-and-config-reference.md#4-scripts-experiments)).
+
 ## 13. Reference numbers for the Lab 1 world
 
-Measured on 2026-10-01 with the rule-based brain, 5 000 ticks, statistics from
-tick 1 000 onward, seeds 1234, 7 and 42.
+Measured on 2026-10-07 with the rule-based brain and no mutation, 5 000 ticks,
+statistics from tick 1 000 onward, seeds 1234, 7 and 42.
 
-| | small (48 × 48, cap 40) | full (64 × 64, cap 60) |
+| | small (48 × 48, 2 predators, cap 40) | full (64 × 64, 3 predators, cap 60) |
 |---|---|---|
-| Mean population | 25–28 | 47–49 |
-| Time at the cap | 0 % | 0 % |
-| Deaths (5 000 ticks): predator / starvation | ≈ 226–242 / 181–190 | ≈ 338–390 / 410–413 |
-| Mean lifespan | 271–301 ticks | 281–291 ticks |
-| Generations reached | 22–25 | 24 |
+| Mean population | 25–31 (26.0 / 30.8 / 25.1) | 50–55 (50.2 / 49.8 / 55.0) |
+| Time at the cap | 0–3 % (only seed 7 reaches it) | 1–15 % |
+| Deaths (5 000 ticks): predator / starvation | 249–266 / 167–268 | 374–403 / 437–490 |
+| Mean lifespan | 263–280 ticks | 274–292 ticks |
+| Generations reached | 24 | 24–25 |
 | Newcomers needed | 0 | 0 |
-| **Random brain** instead | collapses to the floor of 10; ≈ 250 newcomers | same |
+| Invalid actions (the animal searches instead, §6) | 12–13 % | 11–12 % |
+| **Random brain** instead | stays near the floor of 10 (11–13 animals); 46–91 newcomers | 11–16 animals; 18–94 newcomers |
 
-Food regrowth was tuned to 0.0007 so that the population stays limited by food,
-below the cap. At the earlier 0.001 the flat world sat at the cap 25–68 % of
-the time, and births then depend on free slots rather than on finding food.
-One simulated tick with the rule-based brain takes about 2–3 ms on a desktop
-CPU (5 000 ticks ≈ 12 s).
+Decisions in the small world: eat 54–62 %, rest 9–13 %, flee 10–11 %, follow
+9–12 %, mate 8–9 %. Before 2026-10-07, with the 10-gene genome, the same runs
+gave 25–28 animals in the small world (never at the cap) and 47–49 in the full
+world.
+
+Food regrowth was tuned to 0.0007 (2026-10-01, with the 10-gene genome) so
+that the population stays limited by food, below the cap. At the earlier 0.001
+the flat world sat at the cap 25–68 % of the time, and births then depend on
+free slots rather than on finding food. With 5 genes the small world still
+stays below the cap almost all the time, while the full world reaches it now
+and then. One simulated tick with the rule-based brain takes about 2–3 ms on a
+desktop CPU (5 000 ticks ≈ 12 s).
