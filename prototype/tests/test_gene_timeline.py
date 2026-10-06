@@ -53,6 +53,11 @@ def test_tiny_run_gives_known_numbers(tmp_path):
     assert drop["eat:2"][-1]["expected"] == 1                   # the mutation happened in the child
     end = drop["flee:0"][-1]                                    # the child got flee from founder 0
     assert end["share"] == 1 and 0.4 < end["expected"] < 0.6 and 0.4 < end["p_hi"] < 0.6
+    late = gene_drop(b["run"], 250, ["flee:0"], 400, start=300)["flee:0"][-1]
+    assert late["expected"] == 1                                # born before the start: real genome kept
+    null = b["null"]                                            # one slot fixes per world, as in reality
+    assert null["mutants that reached 50 %"]["real"] == 1 and null["mutants that reached 50 %"]["median"] == 1
+    assert null["founder texts that reached 90 %"]["real"] == 9 and null["founder texts that reached 90 %"]["median"] == 9
 
 
 def test_timeline_invariants_on_a_short_run(tmp_path):

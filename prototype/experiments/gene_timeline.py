@@ -41,6 +41,7 @@ from promptevo.genome import ACTIONS, LOCI
 
 SWEEP = 0.25        # a gene "swept" when it reached this share of its slot at a checkpoint
 SPREAD = 5          # a mutant "spread" when it had this many living carriers at once
+RARE = 0.05         # charts: genes that never reached this share of their slot share one grey band
 JUDGE_MIN = 3       # --judge asks only about texts that had this many living carriers at once
 JUDGE_PROMPT = "prompts/judge_sense_v1.txt"
 TOPIC = {"eat": "when and how to eat", "flee": "when to run away", "follow": "when to follow other animals",
@@ -177,21 +178,36 @@ def scan(run: Run, every: int) -> dict:
     return {"snaps": snaps, "gen": gen, "peak": peak, "first": first, "roots": roots, "contrib": dict(total)}
 
 
-def gene_drop(run: Run, every: int, targets: list[str], drops: int, seed: int = 0) -> dict:
+def gene_drop(run: Run, every: int, targets: list[str], drops: int, seed: int = 0, start: int = 0,
+              maxima: dict | None = None) -> dict:
     """{gene: [{t, share, expected, p_hi, p_lo}]}: its real share of the living animals, the mean share
     over `drops` worlds where genes went down the same family tree at random, and the chance of a
-    share at least (p_hi) or at most (p_lo) as high by inheritance alone."""
+    share at least (p_hi) or at most (p_lo) as high by inheritance alone.
+    start: genes go down at random only from that tick on (before it, every animal has its real
+    genome), to test a hypothesis made at that tick on what came after.
+    maxima: if given, receives {"code": {gene: column}, "max": (drops, genes) highest share of each
+    gene in each world}, to count the sweeps that inheritance alone gives on this family tree."""
     rng = np.random.default_rng(seed)
     code: dict[str, int] = {}
     c = lambda aid: code.setdefault(aid, len(code))
     tg = [(LOCI.index(run.alleles[a]["locus"]), c(a), a) for a in targets]
-    arr, out = {}, {a: [] for a in targets}
+    arr, out, last_t = {}, {a: [] for a in targets}, None
+    M = np.zeros((drops, 0))
+    as_is = lambda g: np.tile(np.array([c(a) for a in g], np.int32), (drops, 1))    # the real genome
     for t, e in checkpoints(run, every):
         if e is None:
-            if not arr or (out and targets and out[targets[0]] and out[targets[0]][-1]["t"] == t):
+            if not arr or t == last_t:
                 continue
+            last_t = t
             ids = list(arr)
             stack = np.stack([arr[i] for i in ids])                     # (animals, drops, slots)
+            if maxima is not None:
+                K = len(code)
+                M = np.pad(M, ((0, 0), (0, K - M.shape[1])))
+                for li in range(len(LOCI)):
+                    idx = (stack[:, :, li] + K * np.arange(drops)[None, :]).ravel()
+                    share = np.bincount(idx, minlength=drops * K).reshape(drops, K) / len(ids)
+                    np.maximum(M, share, out=M)
             for li, cc, a in tg:
                 sims = (stack[:, :, li] == cc).mean(axis=0)
                 real = float(np.mean([run.genome[i][li] == a for i in ids]))
@@ -199,17 +215,36 @@ def gene_drop(run: Run, every: int, targets: list[str], drops: int, seed: int = 
                                "p_hi": float((sims >= real - 1e-9).mean()), "p_lo": float((sims <= real + 1e-9).mean())})
             continue
         k = e["kind"]
-        if k in ("founder", "immigrant"):
-            arr[e["id"]] = np.tile(np.array([c(a) for a in e["genome"]], np.int32), (drops, 1))
+        if k in ("founder", "immigrant") or (k == "birth" and e["t"] < start):
+            arr[e["id"]] = as_is(e["genome"])
         elif k == "birth":
-            ps = [arr.get(p) if p in arr else np.tile(np.array([c(a) for a in run.genome[p]], np.int32), (drops, 1))
-                  for p in e["parents"]]
+            ps = [arr[p] if p in arr else as_is(run.genome[p]) for p in e["parents"]]
             child = np.where(rng.random(ps[0].shape) < 0.5, ps[0], ps[1]) if len(ps) == 2 else ps[0].copy()
             for m in e.get("mutations", []):
                 child[:, LOCI.index(m["locus"])] = c(m["child"])
             arr[e["id"]] = child
         elif k == "death":
             arr.pop(e["id"], None)
+    if maxima is not None:
+        maxima.update(code=dict(code), max=np.pad(M, ((0, 0), (0, len(code) - M.shape[1]))))
+    return out
+
+
+def null_sweeps(run: Run, g: Genes, sh: dict, mx: dict) -> dict:
+    """Sweeps in reality against the random-inheritance worlds of gene_drop(maxima=...): how many
+    mutants reached 50 % and 90 % of their slot, and how many founder texts reached 90 %. Unlike a
+    P-value of a gene picked because it swept, these counts are not biased by the picking."""
+    code, M = mx["code"], mx["max"]
+    top = {a: max(v.values()) for a, v in sh.items()}
+    out = {}
+    for name, pick, q in (("mutants that reached 50 %", g.mutant, 0.5),
+                          ("mutants that reached 90 %", g.mutant, 0.9),
+                          ("founder texts that reached 90 %", lambda a: not g.mutant(a), 0.9)):
+        cols = [j for a, j in code.items() if a in g.al and pick(a)]
+        null = (M[:, cols] >= q - 1e-9).sum(axis=1)
+        real = sum(1 for a, m in top.items() if pick(a) and m >= q - 1e-9)
+        out[name] = {"real": real, "median": float(np.median(null)), "lo": float(np.percentile(null, 5)),
+                     "hi": float(np.percentile(null, 95)), "p_hi": float((null >= real).mean())}
     return out
 
 
@@ -314,10 +349,13 @@ def describe(aids, g: Genes, edit=None, words_of=None, world_of=None, kind_of=No
 
 def mutation_sets(run: Run, g: Genes, sc: dict, mt: dict | None) -> dict:
     produced = [a for a in run.alleles if g.mutant(a)]
-    final_ids = sc["snaps"][-1]["ids"]
+    living = lambda s: sorted({a for i in s["ids"] for a in run.genome[i] if g.mutant(a)})
+    most = max(sc["snaps"], key=lambda s: sum(g.mutant(a) for i in s["ids"] for a in run.genome[i])
+               / max(1, len(s["ids"])))                  # the checkpoint where mutants were most common
     out = {"produced": describe(produced, g),
            "spread": describe([a for a in produced if sc["peak"][a] >= SPREAD], g),
-           "alive": describe(sorted({a for i in final_ids for a in run.genome[i] if g.mutant(a)}), g)}
+           "most": {**describe(living(most), g), "t": most["t"]},
+           "alive": describe(living(sc["snaps"][-1]), g)}
     if mt:                                       # the mutation test: same instructions, no selection
         rows = [r for r in mt["variety"] if r["temp"] == 1.2 and r["new"]]
         out["no_selection"] = describe(
@@ -385,6 +423,17 @@ def judge(run: Run, aids: list[str], cfg, max_calls: int) -> tuple[dict, int]:
 
 
 # --- report ----------------------------------------------------------------------------------
+def rounded(x, d: int = 4):
+    """Floats rounded to d decimals, in nested lists and dicts (smaller JSON)."""
+    if isinstance(x, float):
+        return round(x, d)
+    if isinstance(x, dict):
+        return {k: rounded(v, d) for k, v in x.items()}
+    if isinstance(x, (list, tuple)):
+        return [rounded(v, d) for v in x]
+    return x
+
+
 def pct(x, d: int = 0) -> str:
     return "—" if x is None else f"{x:.{d}%}"
 
@@ -402,7 +451,7 @@ def pick(ts: list[int], n: int = 12) -> list[int]:
 
 
 def report(run: Run, g: Genes, sc, rows, sw, lead, sets, drop, fit, beh, sense, judged_calls, a,
-           tag: str) -> list[str]:
+           tag: str, null: dict | None = None, test: dict | None = None) -> list[str]:
     s = run.summary
     deaths = s.get("deaths", {})
     nd = sum(deaths.values()) or 1
@@ -462,15 +511,18 @@ def report(run: Run, g: Genes, sc, rows, sw, lead, sets, drop, fit, beh, sense, 
         L.append(f"- **{l}** ({len(seq) - 1} changes): " + " → ".join(shown))
     # 3
     L += ["", "## 3. What mutation offers, and what selection keeps", "",
-          f"Mutants: all produced; those that had at least {SPREAD} living carriers at once; those alive at the end. "
+          f"Mutants: all produced; those that had at least {SPREAD} living carriers at once; those alive when "
+          "mutants were most common, and at the end. "
           "*Small* / *big*: share made by small-edit or big-change instructions (mean words changed ≤ 2 or ≥ 4 "
           "in the mutation test). *Words changed* and *jumps* (similarity below 0.3) compare each mutant with its "
           "parent. *Depth*: mutations since the founder text; the mutation test changes founder texts once.", "",
           "| mutants | n | depth | small-edit instr. | big-change instr. | words changed | jumps | words | world words |",
           "|---|---|---|---|---|---|---|---|---|"]
-    names = {"produced": "all produced", "spread": f"{SPREAD}+ carriers at once", "alive": "alive at the end",
+    names = {"produced": "all produced", "spread": f"{SPREAD}+ carriers at once",
+             "most": f"alive when mutants were most common (t={sets['most'].get('t')})", "alive": "alive at the end",
              "no_selection": "mutation test (no selection, T = 1.2)"}
-    for k in ("produced", "spread", "alive", "no_selection"):
+    keys = ["produced", "spread", "most"] + (["alive"] if sets["alive"]["n"] != sets["most"]["n"] else []) + ["no_selection"]
+    for k in keys:
         d = sets.get(k)
         if d and d["n"]:
             L.append(f"| {names[k]} | {d['n']} | {num(d['depth'])} | {pct(d['small'])} | {pct(d['big'])} | {num(d['words_changed'])} | "
@@ -481,11 +533,27 @@ def report(run: Run, g: Genes, sc, rows, sw, lead, sets, drop, fit, beh, sense, 
     # 4
     L += ["", "## 4. Selection or drift?", "",
           f"Gene dropping: the real family tree, with genes handed down at random ({a.drops} times: each child takes "
-          "each slot from a random parent; real mutations kept). *Expected*: the gene's mean share in those "
-          "worlds, i.e. what inheritance alone gives. *P(≥)*: share of those worlds where it did at least as well "
-          "as in reality; small values point to selection on that gene (many genes are tested: expect a few "
-          "small values by chance). Fitness: offspring relative to contemporaries (gene_report), over the "
-          "carriers that died.", "",
+          "each slot from a random parent; real mutations kept). It separates two kinds of luck: which families "
+          "do well (kept as it happened) and which genes a child gets from its parents (made random).", ""]
+    if null:
+        L += ["**Sweeps, real against inheritance alone.** How many genes reached a share of their slot, in "
+              "reality and in the random-inheritance worlds (median and 90 % range). *P*: share of those worlds "
+              "with at least as many.", "",
+              "| genes | real | inheritance alone | P |", "|---|---|---|---|"]
+        L += [f"| {k} | {v['real']} | {v['median']:.0f} ({v['lo']:.0f}–{v['hi']:.0f}) | {v['p_hi']:.3f} |"
+              for k, v in null.items()]
+        L.append("")
+    if test and test["points"]:
+        L += [f"**A gene singled out earlier.** \"{test['text']}\" was singled out at tick {test['from']}. Here "
+              f"genes go down at random only after that tick, so this tests the idea on what came after.", "",
+              "| tick | real share | expected | P(≥) |", "|---|---|---|---|"]
+        L += [f"| {v['t']} | {v['share']:.0%} | {v['expected']:.0%} | {v['p_hi']:.3f} |"
+              for v in test["points"] if v["t"] in pick([p["t"] for p in test["points"]], 10)]
+        L.append("")
+    L += ["**Gene by gene.** *Expected*: the gene's mean share in the random-inheritance worlds. *P(≥)*: share "
+          "of those worlds where it did at least as well as in reality. These genes are listed *because* they "
+          "swept, so their P(≥) is biased towards small values even under pure chance; use the counts above to "
+          "judge. Fitness: offspring relative to contemporaries (gene_report), over the carriers that died.", "",
           "| slot | gene | at its peak: real / expected / P(≥) | at the end: real / expected / P(≥) | fitness [95 %] (carriers) |",
           "|---|---|---|---|---|"]
     for x in sw:
@@ -616,17 +684,22 @@ def muller(g: Genes, locus: str, ts: list[int], sh: dict, w=460, h=150, pad=30) 
             dfs(k)
     for r in sorted({g.root[a] for a in present}, key=lambda r: (first(r), r)):
         dfs(r)
-    order = [a for a in order if a in sh]
+    rare = [a for a in order if a in sh and max(sh[a].values()) < RARE]       # one grey band on top
+    order = [a for a in order if a in sh and a not in rare]
     col = colours(g, order)
     t0, t1 = ts[0], ts[-1]
     y = lambda v: h - pad - v * (h - 2 * pad)
     parts, base = svg_axes(t0, t1, w, h, pad), [0.0] * len(ts)
-    for a in order:
-        top = [b + sh[a].get(t, 0.0) for b, t in zip(base, ts)]
-        pts = [f"{_x(t, t0, t1, w, pad):.1f},{y(v):.1f}" for t, v in zip(ts, top)]
-        pts += [f"{_x(t, t0, t1, w, pad):.1f},{y(v):.1f}" for t, v in reversed(list(zip(ts, base)))]
-        parts.append(f'<polygon points="{" ".join(pts)}" fill="{col[a]}"><title>{html.escape(g.text(a))} '
-                     f'(peak {max(sh[a].values()):.0%})</title></polygon>')
+    bands = [(a, [sh[a].get(t, 0.0) for t in ts], col[a], f"{g.text(a)} (peak {max(sh[a].values()):.0%})")
+             for a in order]
+    if rare:
+        bands.append((None, [sum(sh[a].get(t, 0.0) for a in rare) for t in ts], "#9a9a94",
+                      f"{len(rare)} rare genes (never {RARE:.0%} of the slot)"))
+    for _, v, c, label in bands:
+        top = [b + x for b, x in zip(base, v)]
+        pts = [f"{_x(t, t0, t1, w, pad):.0f},{y(u):.0f}" for t, u in zip(ts, top)]          # whole pixels
+        pts += [f"{_x(t, t0, t1, w, pad):.0f},{y(u):.0f}" for t, u in reversed(list(zip(ts, base)))]
+        parts.append(f'<polygon points="{" ".join(pts)}" fill="{c}"><title>{html.escape(label)}</title></polygon>')
         base = top
     legend = [(col[a], g.text(a), max(sh[a].values())) for a in order if max(sh[a].values()) >= SWEEP]
     return f'<svg viewBox="0 0 {w} {h}" role="img" aria-label="gene shares in slot {locus}">{"".join(parts)}</svg>', legend
@@ -705,7 +778,7 @@ def page(run: Run, g: Genes, sc, rows, sh, sw, beh, md_lines, tag: str) -> str:
 
 # --- main ------------------------------------------------------------------------------------
 def build(run_dir: Path, every: int, window: int, drops: int, judge_on: bool = False, judge_max: int = 3000,
-          cfg=None) -> dict:
+          cfg=None, test: str | None = None, test_from: int = 0) -> dict:
     cfg = cfg or load_config("small")
     instructions = load_instructions(cfg.evolution.mutation_prompts)
     mt_path = resolve(cfg.paths.results_dir) / "mutation_test.json"
@@ -719,11 +792,18 @@ def build(run_dir: Path, every: int, window: int, drops: int, judge_on: bool = F
     rows = pool(run, g, sc, sense)
     sh = shares(run, sc)
     sw = sweeps(g, sc, sh, instructions)
-    drop = gene_drop(run, every, [x["gene"] for x in sw], drops)
+    mx = {}
+    drop = gene_drop(run, every, [x["gene"] for x in sw], drops, maxima=mx)
+    hyp = None
+    if test:                                  # a gene singled out at tick test_from, tested on what came after
+        aid = next(a for a in run.alleles if run.alleles[a]["text"] == test)
+        hyp = {"gene": aid, "text": test, "from": test_from,
+               "points": [v for v in gene_drop(run, every, [aid], drops, seed=1, start=test_from)[aid]
+                          if v["t"] > test_from]}
     fit = run.fitness(min_carriers=1)["alleles"] if run.death else {}
     return {"run": run, "genes": g, "scan": sc, "rows": rows, "shares": sh, "sweeps": sw, "leaders": leaders(rows),
-            "sets": mutation_sets(run, g, sc, mt), "drop": drop, "fitness": fit, "behaviour": behaviour(run, window),
-            "sense": sense, "judge_calls": calls}
+            "sets": mutation_sets(run, g, sc, mt), "drop": drop, "null": null_sweeps(run, g, sh, mx), "test": hyp,
+            "fitness": fit, "behaviour": behaviour(run, window), "sense": sense, "judge_calls": calls}
 
 
 def main() -> None:
@@ -735,13 +815,15 @@ def main() -> None:
     ap.add_argument("--tag", default=None)
     ap.add_argument("--judge", action="store_true", help="ask gemma4:12b whether genes still make sense")
     ap.add_argument("--judge-max", type=int, default=3000, help="most new model calls for --judge")
+    ap.add_argument("--test", default=None, help="a gene text singled out earlier, to test on what came after")
+    ap.add_argument("--test-from", type=int, default=0, help="tick at which --test was singled out")
     a = ap.parse_args()
     cfg = load_config("small")
-    b = build(resolve(a.run), a.every, a.window, a.drops, a.judge, a.judge_max, cfg)
+    b = build(resolve(a.run), a.every, a.window, a.drops, a.judge, a.judge_max, cfg, a.test, a.test_from)
     run, tag = b["run"], a.tag or b["run"].name
     out = resolve(cfg.paths.results_dir)
     md = report(run, b["genes"], b["scan"], b["rows"], b["sweeps"], b["leaders"], b["sets"], b["drop"],
-                b["fitness"], b["behaviour"], b["sense"], b["judge_calls"], a, tag)
+                b["fitness"], b["behaviour"], b["sense"], b["judge_calls"], a, tag, null=b["null"], test=b["test"])
     (out / f"{tag}_timeline.md").write_text("\n".join(md) + "\n", encoding="utf-8")
     cols = ["t", "slot", "pop", "mean_gen", "max_gen", "families", "distinct", "effective", "leader", "leader_text",
             "leader_share", "mutant_share", "depth", "words", "world", "overlap", "sense"]
@@ -750,13 +832,16 @@ def main() -> None:
         w.writeheader()
         w.writerows(b["rows"])
     sc = b["scan"]
-    (out / f"{tag}_timeline.json").write_text(json.dumps({
+    (out / f"{tag}_timeline.json").write_text(json.dumps(rounded({
         "run": run.name, "finished": run.finished, "every": a.every, "window": a.window, "drops": a.drops,
         "summary": run.summary, "checkpoints": [{k: v for k, v in s.items() if k != "ids"} | {"pop": len(s["ids"])}
                                                  for s in sc["snaps"]],
-        "sweeps": b["sweeps"], "leaders": b["leaders"], "mutants": b["sets"], "gene_drop": b["drop"],
+        "sweeps": b["sweeps"], "leaders": b["leaders"], "mutants": b["sets"],
+        "gene_drop": {a: {k: [v[k] for v in vs] for k in ("t", "share", "expected", "p_hi", "p_lo")}
+                      for a, vs in b["drop"].items()},
+        "sweeps_vs_inheritance_alone": b["null"], "singled_out": b["test"],
         "families": {"roots": sc["roots"], "contribution_at_end": sc["contrib"]},
-        "behaviour": b["behaviour"], "judge": {"calls": b["judge_calls"], "usable": b["sense"]}},
+        "behaviour": b["behaviour"], "judge": {"calls": b["judge_calls"], "usable": b["sense"]}}),
         indent=1, ensure_ascii=False, default=float), encoding="utf-8")
     (out / f"{tag}_timeline.html").write_text(page(run, b["genes"], sc, b["rows"], b["shares"], b["sweeps"],
                                                    b["behaviour"], md, tag), encoding="utf-8")
