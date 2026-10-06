@@ -4,13 +4,13 @@
 > `notes/archive.md`. Plan: `../Docs/redesign/08-phase0-spike-plan.md`.
 
 ## Position
-Session: S1.3 done locally, S4.3 gate run · Last updated: 2026-10-05 (12 h LLM-brain run going;
-smoke_run safe for long runs: stop file, resume by replay; docs in ../Docs/prompt-genome/)
+Session: S1.3 done locally, S4.3 gate run · Last updated: 2026-10-06 (12 h LLM-brain run done and
+analysed: experiments/gene_timeline.py, gene_swap.py; ../Docs/prompt-genome/11-gene-development.md)
 
 ## Next action
 WAIT for owner decisions (../Docs/prompt-genome/09-status-and-roadmap.md §4): G2 handling
 (all-zero answers → neutral answer? cleaner control sentences? prompt iteration 1/3?), founder
-pool H1. Then rerun
+pool H1; Lab 1 small world vs the LLM brain (predation trap, ../Docs/prompt-genome/11 §9 levers). Then rerun
 `python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b` (cached, cheap),
 then E1 on the LLM brain in the background:
 `nohup python -m experiments.e1_sensitivity --backend llm --tag llm_points > logs/e1_llm.log 2>&1 &`
@@ -44,7 +44,7 @@ make_dataset.py, label_teacher.py, S5 distillation.
 - [ ] S7 report, go/no-go · H5 decision
 
 ## Environment
-Windows 11 Pro, Python 3.13.5 (.venv), RTX 5080 16 GB, Ollama 0.32.0. Offline suite 44 passed on Windows.
+Windows 11 Pro, Python 3.13.5 (.venv), RTX 5080 16 GB, Ollama 0.35.0 (0.32 until 2026-10-02). Offline suite 54 passed.
 Windows: experiments.status used os.kill(pid, 0); signal 0 is CTRL_C_EVENT on Windows, so live jobs
 showed as DEAD? → fixed (OpenProcess + GetExitCodeProcess).
 
@@ -95,11 +95,6 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
 
 ## Key numbers
 - Sim speed (small, rule_based): 5 000 ticks ≈ 12 s CPU; decision memo hit rate ≈ 0.6 (Lab 1 world).
-- LLM brain run (Lab 1 world, small, seed 1234, 500 ticks, gemma4:12b, 2026-10-01): 1 722 decisions,
-  761 LLM calls (memo 0.56), 425 s, 0 failures. Pop fell to the floor (10): births 10, immigrants 9,
-  deaths predator 22 / starvation 11; actions eat .33 wander .20 attack .16 follow .09 mate .09 rest .08
-  flee .05. Rule-based, same 500 ticks: pop 17, births 23, immigrants 0, deaths 25 / 5, attack .02.
-  results/runs/lab1_llm_500 (not committed).
 - Mutation test (2026-10-02, gemma4:12b, 2 000 calls, 223 s, no selection): single mutations 99 % valid,
   7.0-7.3 distinct of 8 per sentence (T 0.9 → 2.0: temperature barely matters; the instruction sets
   the step: 1-2 words vs 6-7 for the 4 "big" ones), +0.1 word, 50-55 % neutral for rule_based.
@@ -116,6 +111,13 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
   grew to 25-29; 4 immigrants (t 2 982-3 228) = 84 % of final ancestry; "Never fight." 23/25 at the end
   (≈ 30 % expected from ancestry). Predators 71 % of deaths; flee 4.5 %, attack 9.5 % of decisions.
   results/llm_60min_genes.md, Docs/prompt-genome/10 §7.
+- LLM brain, 12 h (2026-10-05/06, seed 1234 continues llm_60min): 57 061 ticks, 79 667 calls, 0 failures, 812
+  mutations, peak generation 114. Rescued line thrived (29 animals, t 6-20k), then died out (t 27 337); 874
+  newcomers in 30k ticks, no second rescue. Predation trap: kills ≈ constant → 1.9 vs 3.8 per 1 000
+  animal-ticks at 29 vs 11 animals. Mutants 75 % of genes at t 24k, world words 97 → 78 %, judged usable
+  82 → 54 %. Sweeps = drift (gene dropping: 16 mutants to 50 % vs 18 (13-24) by inheritance alone);
+  "Never fight." not confirmed after t 5 269. Salad mate gene: P(mate) −7.7 points (gene_swap).
+  results/llm_long_timeline.md/.html, Docs/prompt-genome/11.
 - E1 rule_based reference (small, 48 obs): MI_G founders 0.23, MI_G random 0.00,
   MI_O 0.83, directed sign acc 1.00, ΔP 0.48, gibberish→neutral 0.00.
   Note for H2: even the "ideal" keyword interpreter scores MI_G 0.23 < G2 threshold 0.25
@@ -127,7 +129,6 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
 ## Background jobs
 | Job | Started | Log | Progress file | State |
 |---|---|---|---|---|
-| run_llm_long: one 12 h LLM-brain run (seed 1234, small; continues llm_60min; Docs/prompts/04) | 2026-10-05 19:40, PID 35844, ends ≈ 07:40 | logs/llm_long.log | logs/run_llm_long.progress.json | running. Stop: `touch logs/run_llm_long.stop` (never kill). Resume: same command, `--minutes` = what is left (the done part replays from the cache) |
 
 ## Open issues
 - Own git server mirror: waiting for the URL + auth from the owner (see
@@ -140,6 +141,7 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
 - G2 fails for gemma4 12b/26b; all-zero answers on random-text genomes become uniform (see Gate
   results).
 - Blind mutation leaves the animal's world after 10-15 mutations without selection (mutation test);
-  a gene meets ≈ 1.4 mutations per 10 000-tick run, so watch long runs (rule_based: nonsense is
-  mostly neutral → drift).
+  with selection too: nonsense drifts to fixation under both brains (Docs/prompt-genome/10, 11).
+- Lab 1 small world + LLM-read founders: viable only above ≈ 20 animals (predation trap); the floor
+  of 10 + newcomers hides extinction. Owner levers: world/cap, predators, p_mut / v3 prompts.
 - (parked) Laya answer schema unknown; `extract_probs` falls back to choice+confidence.

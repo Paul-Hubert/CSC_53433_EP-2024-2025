@@ -48,6 +48,7 @@ owner-facing log is in `Docs/redesign/09-progress-log.md`.
 | 2026-09-30 | Decision: no Laya fine-tuning; Ollama LLMs decide and mutate. Laya parked. |
 | 2026-10-01 | First local tests (Windows 11, RTX 5080, Ollama 0.32). gemma4:26b and 12b probed. Fixes: `think: false` and a fixed `num_ctx` (model reloads), Windows liveness check in `status`, request cache never written, `smoke_run` LLM mutation with every brain, ambiguous ASCII map symbols. Decision-model gate on both models (G1 ✔, G2 ✘). Brain switched to gemma4:12b. Point-total analysis (all-zero answers on random text). **Lab 1 = flat world with random food**, food regrowth retuned; noise terrain moved to `configs/worlds/terrain_preview.yaml`. First 500-tick run with the LLM brain. This documentation. |
 | 2026-10-02 | Mutation reviewed (`prototype/notes/mutation-review.md`), then replaced by one blind operator: the LLM gets a random-change instruction and the gene, nothing else. Mutation test (`results/mutation_test.md`). Three 50 000-tick runs with predators and the new `gene_report` ([10](10-natural-selection-runs.md)): no gene clearly best, careless temperaments clearly selected against. First hour-long LLM-brain run (5 269 ticks): the population escaped the floor after newcomers brought a workable gene set, and "Never fight." spread to 23 of 25 animals ([10 §7](10-natural-selection-runs.md#7-one-hour-with-the-llm-brain)). |
+| 2026-10-06 | `smoke_run` made safe for long runs (stop file, clean stops, resume by replay, failed brain calls never cached). One 12-hour LLM-brain run: the rescued population thrived about 60 generations, then died out; nonsense genes swept as often as random inheritance predicts; a predation trap below about 20 animals. New analysis: `gene_timeline` (gene dropping), `gene_swap` ([11](11-gene-development.md)). |
 
 ## 3. Decisions taken
 
@@ -74,6 +75,8 @@ owner-facing log is in `Docs/redesign/09-progress-log.md`.
 | 5 | Budget for the evolution matrix: run length, decision period, seeds | at ≈ 4 decisions/s, 5 000 ticks ≈ 1 h per run on one GPU |
 | 6 | Details of the terrain and foliage labs | `Docs/redesign/06-world-terrain-foliage.md` |
 | 7 | URL of your own git server for mirroring | `Docs/redesign/09-progress-log.md` |
+| 8 | Lab 1 small world against the LLM brain: populations survive only above about 20 animals. Keep it, or change the world size or cap, the predators, or the mutation (`p_mut`, prompts that keep to the gene's world)? | [11 §9](11-gene-development.md#9-what-it-means) |
+| 9 | `gene_timeline` does what Lab 1 activity D asks students to write (frequency curves per slot, diversity, instructions of the genes that spread): keep it as the teacher's solution, or change the activity to interpreting it (selection against drift, `gene_swap`)? | [02 activity D](02-lab1.md#d-watch-evolution), [11 §10](11-gene-development.md#10-reproduce-it-and-use-it-in-lab-1) |
 
 ## 5. Roadmap
 

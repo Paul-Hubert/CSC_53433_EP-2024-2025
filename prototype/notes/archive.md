@@ -33,3 +33,9 @@ Not started: finetune_laya, e3_eval, run_matrix, common_garden, analyze, report.
 Offline dataset check (word mutants only): 3 000 rows; train 2 400 / val 300 / test 300;
 contrast 50 %, regular 40 %, random-text 10 %; 0 leaks; every val/test row has ≥ 1 unseen gene.
 
+## Moved from STATUS.md › Key numbers (2026-10-06)
+- LLM brain run (Lab 1 world, small, seed 1234, 500 ticks, gemma4:12b, 2026-10-01): 1 722 decisions,
+  761 LLM calls (memo 0.56), 425 s, 0 failures. Pop fell to the floor (10): births 10, immigrants 9,
+  deaths predator 22 / starvation 11; actions eat .33 wander .20 attack .16 follow .09 mate .09 rest .08
+  flee .05. Rule-based, same 500 ticks: pop 17, births 23, immigrants 0, deaths 25 / 5, attack .02.
+  results/runs/lab1_llm_500 (not committed).

@@ -246,6 +246,20 @@ Full write-up, method and tables: [10](10-natural-selection-runs.md).
 
 Details: [10 §7](10-natural-selection-runs.md#7-one-hour-with-the-llm-brain).
 
+### 5.10 Twelve hours with the LLM brain
+
+`results/llm_long_timeline.md`, 2026-10-05/06.
+
+- **Run:** the hour-long run continued (seed 1234) for 12 hours: 57 061 ticks, 79 667 brain calls, no failures, 812 mutations, peak generation 114.
+- **Population:** the rescued line thrived at about 29 animals for 60 generations, then died out at tick 27 337. 874 newcomers in the last 30 000 ticks never rescued it again.
+- **Predation trap:** predators kill at a nearly steady pace, so each animal's risk doubles at the floor (1.9 against 3.8 kills per 1 000 animal-ticks).
+- **Genes:** mutants reached 75 % of the genes and the share using a world word fell from 97 % to 78 %. Nonsense genes such as "No banana." and "A salad is hiding under a bicycle." took over slots.
+- **Selection or drift:** gene dropping shows the sweeps are what random inheritance gives on the same family tree (16 mutants reached 50 %, against 18 expected). "Never fight." was not confirmed after tick 5 269.
+- **One harmful gene:** the salad mate gene lowered the brain's mating probability by 7.7 points (`gene_swap`).
+- **Caveat:** one seed only.
+
+Details: [11](11-gene-development.md).
+
 ### Summary
 
 | Gate | Status (2026-10-01) |

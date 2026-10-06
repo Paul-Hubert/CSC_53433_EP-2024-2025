@@ -349,3 +349,13 @@ python -m experiments.smoke_run --backend llm --minutes 60 --seed 1234 --ticks 2
        --out results/runs/llm_60min > logs/llm_60min.log 2>&1 &
 python -m experiments.gene_report results/runs/llm_60min --min-carriers 25 --every 1000 --tag llm_60min
 ```
+
+**Follow-up, 2026-10-06.** The run was continued for 12 hours
+([11](11-gene-development.md)).
+
+- The rescued population thrived for about 60 generations, then died out
+  at tick 27 337. 874 newcomers over the next 30 000 ticks never rescued it
+  again.
+- Tested only on what came after tick 5 269, "Never fight." did no better
+  than inheritance predicts ([11 §6](11-gene-development.md#6-selection-or-drift)).
+  Its rise here stays a lead.

@@ -32,6 +32,7 @@ world the animals live in.
 | 08 | [Code and configuration reference](08-code-and-config-reference.md) | modules, every configuration key, every script, tests, data, how to extend |
 | 09 | [Status, decisions and roadmap](09-status-and-roadmap.md) | where things stand, timeline, decisions taken and pending, roadmap |
 | 10 | [Natural selection in long runs](10-natural-selection-runs.md) | 230-generation runs with predators, how the gene report measures which genes did best, marked genes, drift |
+| 11 | [How genes develop in one long run](11-gene-development.md) | 12 hours with the LLM brain: five phases from rescue to extinction, lineages of nonsense genes, gene dropping (selection or drift), the predation trap, whether genes stay meaningful |
 
 ## Where to start
 

@@ -1,0 +1,3241 @@
+{
+ "runs": [
+  "llm_long"
+ ],
+ "min_carriers": 25,
+ "stars": {},
+ "readings": {
+  "llm_long": {
+   "eat": {
+    "eat +2.5 (always)": {
+     "n": 409,
+     "fitness": 0.9350284303688389,
+     "lo": 0.7477932711394872,
+     "hi": 1.1222635895981905,
+     "predator": 0.7750611246943765,
+     "texts": 4,
+     "examples": [
+      [
+       "Always finish eating before doing anything else.",
+       406
+      ],
+      [
+       "Anything else finish eating before doing always.",
+       1
+      ],
+      [
+       "Always finish eating quickly before doing anything else.",
+       1
+      ]
+     ]
+    },
+    "eat +1.2 (often)": {
+     "n": 323,
+     "fitness": 0.9557201213777162,
+     "lo": 0.7437470181962539,
+     "hi": 1.1676932245591787,
+     "predator": 0.7739938080495357,
+     "texts": 8,
+     "examples": [
+      [
+       "Eat quickly, then move on.",
+       311
+      ],
+      [
+       "Eat whenever food is loud.",
+       4
+      ],
+      [
+       "Eat quickly, then sit down.",
+       2
+      ]
+     ]
+    },
+    "no effect": {
+     "n": 1854,
+     "fitness": 1.0178356023748865,
+     "lo": 0.9385352898052992,
+     "hi": 1.0971359149444737,
+     "predator": 0.61596548004315,
+     "texts": 48,
+     "examples": [
+      [
+       "Only look for water when energy is low.",
+       1267
+      ],
+      [
+       "No preference.",
+       402
+      ],
+      [
+       "Only look for gold when energy is low.",
+       63
+      ]
+     ]
+    },
+    "eat +1.2 (often), when food is close": {
+     "n": 343,
+     "fitness": 0.9408356298104688,
+     "lo": 0.7359830795406614,
+     "hi": 1.145688180080276,
+     "predator": 0.8017492711370262,
+     "texts": 2,
+     "examples": [
+      [
+       "Eat whenever food is close.",
+       342
+      ],
+      [
+       "Food is close whenever eat.",
+       1
+      ]
+     ]
+    },
+    "eat +0.8 (names the action), when hungry": {
+     "n": 808,
+     "fitness": 1.0320296421229855,
+     "lo": 0.9124981977397408,
+     "hi": 1.1515610865062302,
+     "predator": 0.6831683168316832,
+     "texts": 5,
+     "examples": [
+      [
+       "Only look for food when energy is low.",
+       802
+      ],
+      [
+       "Only look for food when energy is low today.",
+       3
+      ],
+      [
+       "Look only for food when energy is low.",
+       1
+      ]
+     ]
+    },
+    "eat +0.8 (names the action)": {
+     "n": 28,
+     "fitness": 1.1951517011381012,
+     "lo": 0.23245459282990744,
+     "hi": 2.157848809446295,
+     "predator": 0.6428571428571429,
+     "texts": 8,
+     "examples": [
+      [
+       "Only seek for food when power is low.",
+       16
+      ],
+      [
+       "Only look for food when energy is very low.",
+       5
+      ],
+      [
+       "Only look for food when energy is radioactive.",
+       2
+      ]
+     ]
+    }
+   },
+   "flee": {
+    "no effect": {
+     "n": 2111,
+     "fitness": 1.0124391457264637,
+     "lo": 0.9419961272019126,
+     "hi": 1.0828821642510147,
+     "predator": 0.6167693036475604,
+     "texts": 38,
+     "examples": [
+      [
+       "No preference.",
+       1859
+      ],
+      [
+       "No preference, really.",
+       97
+      ],
+      [
+       "Any preference.",
+       31
+      ]
+     ]
+    },
+    "flee +0.8 (names the action), when predator & very close": {
+     "n": 400,
+     "fitness": 0.9177658039899171,
+     "lo": 0.721678612706891,
+     "hi": 1.1138529952729432,
+     "predator": 0.7975,
+     "texts": 2,
+     "examples": [
+      [
+       "Flee only when a predator is very close.",
+       399
+      ],
+      [
+       "Flee predator when a only is very close.",
+       1
+      ]
+     ]
+    },
+    "flee +0.8 (names the action), unless predator & very close": {
+     "n": 304,
+     "fitness": 0.9304493090433233,
+     "lo": 0.7099966035147873,
+     "hi": 1.1509020145718594,
+     "predator": 0.7796052631578947,
+     "texts": 1,
+     "examples": [
+      [
+       "Stay calm unless danger is right next to you.",
+       304
+      ]
+     ]
+    },
+    "flee +0.8 (names the action), when predator": {
+     "n": 909,
+     "fitness": 1.0429431478503142,
+     "lo": 0.9123819656974853,
+     "hi": 1.173504330003143,
+     "predator": 0.7447744774477447,
+     "texts": 8,
+     "examples": [
+      [
+       "Run from any predator you see.",
+       452
+      ],
+      [
+       "Run away from anything that attacks you.",
+       417
+      ],
+      [
+       "Anything that attacks you run away from.",
+       31
+      ]
+     ]
+    },
+    "flee -2.5 (never)": {
+     "n": 25,
+     "fitness": 0.8899622641509433,
+     "lo": 0.35845471581958166,
+     "hi": 1.4214698124823049,
+     "predator": 0.44,
+     "texts": 2,
+     "examples": [
+      [
+       "I don't mind at all.",
+       13
+      ],
+      [
+       "I don't care either way.",
+       12
+      ]
+     ]
+    }
+   },
+   "follow": {
+    "follow +0.8 (names the action)": {
+     "n": 1904,
+     "fitness": 1.017071529182416,
+     "lo": 0.9421536239443834,
+     "hi": 1.0919894344204486,
+     "predator": 0.6113445378151261,
+     "texts": 30,
+     "examples": [
+      [
+       "Follow the largest vehicle nearby.",
+       695
+      ],
+      [
+       "Follow the smallest vehicle nearby.",
+       444
+      ],
+      [
+       "Follow the smallest red vehicle nearby.",
+       401
+      ]
+     ]
+    },
+    "no effect": {
+     "n": 944,
+     "fitness": 0.930321860003536,
+     "lo": 0.8164976833770677,
+     "hi": 1.0441460366300042,
+     "predator": 0.7764830508474576,
+     "texts": 29,
+     "examples": [
+      [
+       "Keep your distance from other animals.",
+       424
+      ],
+      [
+       "No preference.",
+       391
+      ],
+      [
+       "The tiny nearby car should be trailed.",
+       97
+      ]
+     ]
+    },
+    "follow +0.8 (names the action), when hungry & alone": {
+     "n": 599,
+     "fitness": 1.1458874581665726,
+     "lo": 0.9666862184460246,
+     "hi": 1.3250886978871204,
+     "predator": 0.7028380634390651,
+     "texts": 8,
+     "examples": [
+      [
+       "Follow others when you are lost or hungry.",
+       483
+      ],
+      [
+       "Follow others when you are hungry or lost, unless they are ghosts.",
+       109
+      ],
+      [
+       "Follow others when you are lost or hungry now.",
+       2
+      ]
+     ]
+    },
+    "follow +0.8 (names the action), when energy is high": {
+     "n": 312,
+     "fitness": 0.8412912902073167,
+     "lo": 0.6487954499225319,
+     "hi": 1.0337871304921016,
+     "predator": 0.75,
+     "texts": 1,
+     "examples": [
+      [
+       "Follow the strongest animal nearby.",
+       312
+      ]
+     ]
+    }
+   },
+   "wander": {
+    "wander +0.8 (names the action), when food is far": {
+     "n": 820,
+     "fitness": 1.0466704753260492,
+     "lo": 0.9068578636186316,
+     "hi": 1.1864830870334666,
+     "predator": 0.7804878048780488,
+     "texts": 2,
+     "examples": [
+      [
+       "Roam far when food is scarce.",
+       431
+      ],
+      [
+       "Explore when there is nothing else to do.",
+       389
+      ]
+     ]
+    },
+    "wander +0.8 (names the action)": {
+     "n": 391,
+     "fitness": 0.9090633277114377,
+     "lo": 0.7288390199889976,
+     "hi": 1.0892876354338779,
+     "predator": 0.7902813299232737,
+     "texts": 12,
+     "examples": [
+      [
+       "Keep moving to new places.",
+       375
+      ],
+      [
+       "Keep moving to new colors.",
+       3
+      ],
+      [
+       "Keep places to new moving.",
+       3
+      ]
+     ]
+    },
+    "no effect": {
+     "n": 2558,
+     "fitness": 0.9989391904212147,
+     "lo": 0.9323507937419966,
+     "hi": 1.0655275871004328,
+     "predator": 0.6282251759186864,
+     "texts": 60,
+     "examples": [
+      [
+       "Stay near where you last found food.",
+       1097
+      ],
+      [
+       "Stay near where you last found bicycle.",
+       734
+      ],
+      [
+       "No preference.",
+       394
+      ]
+     ]
+    }
+   },
+   "rest": {
+    "rest +0.8 (names the action), when safe": {
+     "n": 580,
+     "fitness": 0.995554038476519,
+     "lo": 0.8546104720308912,
+     "hi": 1.136497604922147,
+     "predator": 0.7189655172413794,
+     "texts": 4,
+     "examples": [
+      [
+       "Rest only when you feel safe.",
+       577
+      ],
+      [
+       "You only feel safe when you rest.",
+       1
+      ],
+      [
+       "Rest only when you feel truly safe.",
+       1
+      ]
+     ]
+    },
+    "rest +0.8 (names the action), when food is far": {
+     "n": 349,
+     "fitness": 0.7781821104047928,
+     "lo": 0.6140601286895784,
+     "hi": 0.9423040921200072,
+     "predator": 0.8166189111747851,
+     "texts": 3,
+     "examples": [
+      [
+       "Save energy by resting when food is far.",
+       347
+      ],
+      [
+       "When food is far, rest to save energy.",
+       1
+      ],
+      [
+       "Save energy by resting when food is scarce.",
+       1
+      ]
+     ]
+    },
+    "rest +0.8 (names the action), when tired": {
+     "n": 344,
+     "fitness": 0.9144671858409967,
+     "lo": 0.6909964047625461,
+     "hi": 1.1379379669194474,
+     "predator": 0.7790697674418605,
+     "texts": 2,
+     "examples": [
+      [
+       "Rest when you are tired.",
+       343
+      ],
+      [
+       "Tired when you are Rest.",
+       1
+      ]
+     ]
+    },
+    "rest -2.5 (never)": {
+     "n": 378,
+     "fitness": 0.9263483324591599,
+     "lo": 0.7529308724233993,
+     "hi": 1.0997657924949205,
+     "predator": 0.7486772486772487,
+     "texts": 5,
+     "examples": [
+      [
+       "Never stop moving.",
+       368
+      ],
+      [
+       "Never stop lasagna.",
+       6
+      ],
+      [
+       "Moving never stop.",
+       2
+      ]
+     ]
+    },
+    "no effect": {
+     "n": 2079,
+     "fitness": 1.0646446997494354,
+     "lo": 0.9862198863447839,
+     "hi": 1.143069513154087,
+     "predator": 0.6132756132756133,
+     "texts": 48,
+     "examples": [
+      [
+       "No banana.",
+       955
+      ],
+      [
+       "No preference.",
+       526
+      ],
+      [
+       "The moon is allergic to geometry.",
+       170
+      ]
+     ]
+    },
+    "rest +0.8 (names the action)": {
+     "n": 27,
+     "fitness": 1.137334714500331,
+     "lo": 0.6266576392875052,
+     "hi": 1.6480117897131568,
+     "predator": 0.8518518518518519,
+     "texts": 4,
+     "examples": [
+      [
+       "Rest only when you feel happy.",
+       14
+      ],
+      [
+       "Rest only when you feel toaster.",
+       7
+      ],
+      [
+       "Sleep is for those who are secure.",
+       5
+      ]
+     ]
+    }
+   },
+   "mate": {
+    "mate +0.8 (names the action), when energy is high": {
+     "n": 1927,
+     "fitness": 1.0687077161621104,
+     "lo": 0.9857904118352747,
+     "hi": 1.151625020488946,
+     "predator": 0.6144265697976129,
+     "texts": 9,
+     "examples": [
+      [
+       "Look for a partner when energy is high.",
+       1327
+      ],
+      [
+       "Look partner for a when energy is high.",
+       532
+      ],
+      [
+       "Look partner for a quick when energy is high.",
+       32
+      ]
+     ]
+    },
+    "no effect": {
+     "n": 708,
+     "fitness": 0.9367537693589818,
+     "lo": 0.8100275781533582,
+     "hi": 1.0634799605646055,
+     "predator": 0.730225988700565,
+     "texts": 39,
+     "examples": [
+      [
+       "No preference.",
+       302
+      ],
+      [
+       "A salad is hiding under a bicycle.",
+       155
+      ],
+      [
+       "Look for a teammate when energy is high.",
+       118
+      ]
+     ]
+    },
+    "mate +0.8 (names the action), when plentiful": {
+     "n": 380,
+     "fitness": 0.8981777518023322,
+     "lo": 0.7258664554113637,
+     "hi": 1.0704890481933007,
+     "predator": 0.7684210526315789,
+     "texts": 5,
+     "examples": [
+      [
+       "Mate only when food is plentiful.",
+       376
+      ],
+      [
+       "Mate when food is plentiful.",
+       1
+      ],
+      [
+       "Plentiful food is only for mate.",
+       1
+      ]
+     ]
+    },
+    "mate +0.8 (names the action), when old": {
+     "n": 326,
+     "fitness": 1.0061698739868896,
+     "lo": 0.786002400741782,
+     "hi": 1.2263373472319974,
+     "predator": 0.7791411042944786,
+     "texts": 2,
+     "examples": [
+      [
+       "Seek a partner before growing old.",
+       325
+      ],
+      [
+       "Seek a partner growing old.",
+       1
+      ]
+     ]
+    },
+    "mate +0.8 (names the action)": {
+     "n": 412,
+     "fitness": 0.887645316110134,
+     "lo": 0.7338226420748964,
+     "hi": 1.0414679901453714,
+     "predator": 0.7281553398058253,
+     "texts": 19,
+     "examples": [
+      [
+       "Mate with any nearby adult.",
+       321
+      ],
+      [
+       "High energy is the time to find a partner.",
+       23
+      ],
+      [
+       "When high is partner for look a energy.",
+       15
+      ]
+     ]
+    }
+   },
+   "attack": {
+    "attack +0.8 (names the action), when very close": {
+     "n": 350,
+     "fitness": 0.8473880535192104,
+     "lo": 0.6667084015225542,
+     "hi": 1.0280677055158667,
+     "predator": 0.6742857142857143,
+     "texts": 1,
+     "examples": [
+      [
+       "Fight anyone who comes too close.",
+       350
+      ]
+     ]
+    },
+    "attack +0.8 (names the action)": {
+     "n": 405,
+     "fitness": 0.9391808650044174,
+     "lo": 0.7617471797019183,
+     "hi": 1.1166145503069167,
+     "predator": 0.8074074074074075,
+     "texts": 5,
+     "examples": [
+      [
+       "Attack only to defend your food.",
+       400
+      ],
+      [
+       "Attack only to provide your neighbors with a feast.",
+       2
+      ],
+      [
+       "Attack only to protect your food.",
+       1
+      ]
+     ]
+    },
+    "attack +0.8 (names the action), when hungry": {
+     "n": 366,
+     "fitness": 1.0479724829389154,
+     "lo": 0.8344155064407062,
+     "hi": 1.2615294594371247,
+     "predator": 0.7486338797814208,
+     "texts": 1,
+     "examples": [
+      [
+       "Attack weaker animals when you are hungry.",
+       366
+      ]
+     ]
+    },
+    "attack -2.5 (never)": {
+     "n": 2239,
+     "fitness": 1.0401564217709804,
+     "lo": 0.9697737293475927,
+     "hi": 1.1105391141943683,
+     "predator": 0.6342117016525235,
+     "texts": 20,
+     "examples": [
+      [
+       "Never fight.",
+       2154
+      ],
+      [
+       "Fight never.",
+       17
+      ],
+      [
+       "Never dance.",
+       11
+      ]
+     ]
+    },
+    "no effect": {
+     "n": 382,
+     "fitness": 0.9348151319572503,
+     "lo": 0.720484727708063,
+     "hi": 1.1491455362064376,
+     "predator": 0.7486910994764397,
+     "texts": 14,
+     "examples": [
+      [
+       "No preference.",
+       361
+      ],
+      [
+       "The blue muffins smell like algebra during the winter.",
+       5
+      ],
+      [
+       "Combat is forbidden.",
+       3
+      ]
+     ]
+    }
+   },
+   "risk": {
+    "cautious": {
+     "n": 924,
+     "fitness": 1.0123143255203233,
+     "lo": 0.8875837660742332,
+     "hi": 1.1370448849664134,
+     "predator": 0.685064935064935,
+     "texts": 15,
+     "examples": [
+      [
+       "Cautious: safety comes before food.",
+       433
+      ],
+      [
+       "Nervous: any movement nearby means danger.",
+       371
+      ],
+      [
+       "Cautious: safety comes before explosions.",
+       92
+      ]
+     ]
+    },
+    "cautious + bold": {
+     "n": 279,
+     "fitness": 0.7900472971482905,
+     "lo": 0.606372730661435,
+     "hi": 0.9737218636351459,
+     "predator": 0.7992831541218638,
+     "texts": 6,
+     "examples": [
+      [
+       "Reckless when starving, careful when fed.",
+       274
+      ],
+      [
+       "Reckless when hungry, careful when fed.",
+       1
+      ],
+      [
+       "When fed, careful; when starving, reckless.",
+       1
+      ]
+     ]
+    },
+    "no effect": {
+     "n": 2231,
+     "fitness": 1.0478018587376245,
+     "lo": 0.973481783783067,
+     "hi": 1.122121933692182,
+     "predator": 0.6405199462124608,
+     "texts": 43,
+     "examples": [
+      [
+       "No particular temperament.",
+       1874
+      ],
+      [
+       "The temperament is not particularly.",
+       83
+      ],
+      [
+       "No temperament.",
+       47
+      ]
+     ]
+    },
+    "bold": {
+     "n": 335,
+     "fitness": 0.8225445387200213,
+     "lo": 0.6424487010709536,
+     "hi": 1.002640376369089,
+     "predator": 0.808955223880597,
+     "texts": 4,
+     "examples": [
+      [
+       "Bold: take risks when the reward is food.",
+       329
+      ],
+      [
+       "Risk is food when bold take reward.",
+       4
+      ],
+      [
+       "No particular bold temperament.",
+       1
+      ]
+     ]
+    }
+   },
+   "social": {
+    "social": {
+     "n": 737,
+     "fitness": 1.0215113980195505,
+     "lo": 0.8785368296628209,
+     "hi": 1.16448596637628,
+     "predator": 0.7584803256445047,
+     "texts": 6,
+     "examples": [
+      [
+       "Social: feels safer in a group.",
+       366
+      ],
+      [
+       "Curious about other animals.",
+       364
+      ],
+      [
+       "Curious about animals.",
+       4
+      ]
+     ]
+    },
+    "solitary": {
+     "n": 1271,
+     "fitness": 0.9455077319614787,
+     "lo": 0.8555738590476556,
+     "hi": 1.035441604875302,
+     "predator": 0.6758457907159717,
+     "texts": 22,
+     "examples": [
+      [
+       "Solitary: prefers to be alone.",
+       699
+      ],
+      [
+       "Solitary: desires to be hidden.",
+       445
+      ],
+      [
+       "Solitary: desires to be a skyscraper.",
+       47
+      ]
+     ]
+    },
+    "no effect": {
+     "n": 1447,
+     "fitness": 1.0451177969361314,
+     "lo": 0.9505752157973222,
+     "hi": 1.1396603780749406,
+     "predator": 0.6192121630960609,
+     "texts": 42,
+     "examples": [
+      [
+       "Loner: enjoys community.",
+       680
+      ],
+      [
+       "No particular temperament.",
+       578
+      ],
+      [
+       "Loner: enjoys solitude.",
+       40
+      ]
+     ]
+    },
+    "social + solitary": {
+     "n": 314,
+     "fitness": 0.9621666247451262,
+     "lo": 0.7547746963274007,
+     "hi": 1.1695585531628516,
+     "predator": 0.7707006369426752,
+     "texts": 3,
+     "examples": [
+      [
+       "Wary of strangers, friendly to companions.",
+       302
+      ],
+      [
+       "Solitary: prefers to be together.",
+       11
+      ],
+      [
+       "Hostile to strangers, friendly to companions.",
+       1
+      ]
+     ]
+    }
+   },
+   "place": {
+    "no effect": {
+     "n": 2141,
+     "fitness": 1.019829341993894,
+     "lo": 0.9497989068714974,
+     "hi": 1.0898597771162906,
+     "predator": 0.6179355441382531,
+     "texts": 65,
+     "examples": [
+      [
+       "No particular temperament.",
+       1408
+      ],
+      [
+       "Not a specific disposition.",
+       277
+      ],
+      [
+       "No particular temperature.",
+       237
+      ]
+     ]
+    },
+    "restless": {
+     "n": 851,
+     "fitness": 0.9818584778991603,
+     "lo": 0.8522868290182116,
+     "hi": 1.111430126780109,
+     "predator": 0.7438307873090482,
+     "texts": 9,
+     "examples": [
+      [
+       "Likes open ground where danger is easy to see.",
+       523
+      ],
+      [
+       "Restless: always wants somewhere new.",
+       318
+      ],
+      [
+       "Likes open ground where danger is easy to smell like blueberries.",
+       3
+      ]
+     ]
+    },
+    "familiar": {
+     "n": 777,
+     "fitness": 0.9652301339754019,
+     "lo": 0.8213620478834474,
+     "hi": 1.1090982200673565,
+     "predator": 0.7722007722007722,
+     "texts": 5,
+     "examples": [
+      [
+       "Attached to familiar places.",
+       394
+      ],
+      [
+       "Prefers staying near water.",
+       375
+      ],
+      [
+       "Prefers staying near the water.",
+       6
+      ]
+     ]
+    }
+   }
+  }
+ },
+ "readings_all_runs": {
+  "eat": {
+   "eat +2.5 (always)": {
+    "n": 409,
+    "fitness": 0.9350284303688389,
+    "lo": 0.7477932711394872,
+    "hi": 1.1222635895981905,
+    "predator": 0.7750611246943765,
+    "texts": 4,
+    "examples": [
+     [
+      "Always finish eating before doing anything else.",
+      406
+     ],
+     [
+      "Anything else finish eating before doing always.",
+      1
+     ],
+     [
+      "Always finish eating quickly before doing anything else.",
+      1
+     ]
+    ]
+   },
+   "eat +1.2 (often)": {
+    "n": 323,
+    "fitness": 0.9557201213777162,
+    "lo": 0.7437470181962539,
+    "hi": 1.1676932245591787,
+    "predator": 0.7739938080495357,
+    "texts": 8,
+    "examples": [
+     [
+      "Eat quickly, then move on.",
+      311
+     ],
+     [
+      "Eat whenever food is loud.",
+      4
+     ],
+     [
+      "Eat quickly, then sit down.",
+      2
+     ]
+    ]
+   },
+   "no effect": {
+    "n": 1854,
+    "fitness": 1.0178356023748865,
+    "lo": 0.9385352898052992,
+    "hi": 1.0971359149444737,
+    "predator": 0.61596548004315,
+    "texts": 48,
+    "examples": [
+     [
+      "Only look for water when energy is low.",
+      1267
+     ],
+     [
+      "No preference.",
+      402
+     ],
+     [
+      "Only look for gold when energy is low.",
+      63
+     ]
+    ]
+   },
+   "eat +1.2 (often), when food is close": {
+    "n": 343,
+    "fitness": 0.9408356298104688,
+    "lo": 0.7359830795406614,
+    "hi": 1.145688180080276,
+    "predator": 0.8017492711370262,
+    "texts": 2,
+    "examples": [
+     [
+      "Eat whenever food is close.",
+      342
+     ],
+     [
+      "Food is close whenever eat.",
+      1
+     ]
+    ]
+   },
+   "eat +0.8 (names the action), when hungry": {
+    "n": 808,
+    "fitness": 1.0320296421229855,
+    "lo": 0.9124981977397408,
+    "hi": 1.1515610865062302,
+    "predator": 0.6831683168316832,
+    "texts": 5,
+    "examples": [
+     [
+      "Only look for food when energy is low.",
+      802
+     ],
+     [
+      "Only look for food when energy is low today.",
+      3
+     ],
+     [
+      "Look only for food when energy is low.",
+      1
+     ]
+    ]
+   },
+   "eat +0.8 (names the action)": {
+    "n": 28,
+    "fitness": 1.1951517011381012,
+    "lo": 0.23245459282990744,
+    "hi": 2.157848809446295,
+    "predator": 0.6428571428571429,
+    "texts": 8,
+    "examples": [
+     [
+      "Only seek for food when power is low.",
+      16
+     ],
+     [
+      "Only look for food when energy is very low.",
+      5
+     ],
+     [
+      "Only look for food when energy is radioactive.",
+      2
+     ]
+    ]
+   }
+  },
+  "flee": {
+   "no effect": {
+    "n": 2111,
+    "fitness": 1.0124391457264637,
+    "lo": 0.9419961272019126,
+    "hi": 1.0828821642510147,
+    "predator": 0.6167693036475604,
+    "texts": 38,
+    "examples": [
+     [
+      "No preference.",
+      1859
+     ],
+     [
+      "No preference, really.",
+      97
+     ],
+     [
+      "Any preference.",
+      31
+     ]
+    ]
+   },
+   "flee +0.8 (names the action), when predator & very close": {
+    "n": 400,
+    "fitness": 0.9177658039899171,
+    "lo": 0.721678612706891,
+    "hi": 1.1138529952729432,
+    "predator": 0.7975,
+    "texts": 2,
+    "examples": [
+     [
+      "Flee only when a predator is very close.",
+      399
+     ],
+     [
+      "Flee predator when a only is very close.",
+      1
+     ]
+    ]
+   },
+   "flee +0.8 (names the action), unless predator & very close": {
+    "n": 304,
+    "fitness": 0.9304493090433233,
+    "lo": 0.7099966035147873,
+    "hi": 1.1509020145718594,
+    "predator": 0.7796052631578947,
+    "texts": 1,
+    "examples": [
+     [
+      "Stay calm unless danger is right next to you.",
+      304
+     ]
+    ]
+   },
+   "flee +0.8 (names the action), when predator": {
+    "n": 909,
+    "fitness": 1.0429431478503142,
+    "lo": 0.9123819656974853,
+    "hi": 1.173504330003143,
+    "predator": 0.7447744774477447,
+    "texts": 8,
+    "examples": [
+     [
+      "Run from any predator you see.",
+      452
+     ],
+     [
+      "Run away from anything that attacks you.",
+      417
+     ],
+     [
+      "Anything that attacks you run away from.",
+      31
+     ]
+    ]
+   },
+   "flee -2.5 (never)": {
+    "n": 25,
+    "fitness": 0.8899622641509433,
+    "lo": 0.35845471581958166,
+    "hi": 1.4214698124823049,
+    "predator": 0.44,
+    "texts": 2,
+    "examples": [
+     [
+      "I don't mind at all.",
+      13
+     ],
+     [
+      "I don't care either way.",
+      12
+     ]
+    ]
+   }
+  },
+  "follow": {
+   "follow +0.8 (names the action)": {
+    "n": 1904,
+    "fitness": 1.017071529182416,
+    "lo": 0.9421536239443834,
+    "hi": 1.0919894344204486,
+    "predator": 0.6113445378151261,
+    "texts": 30,
+    "examples": [
+     [
+      "Follow the largest vehicle nearby.",
+      695
+     ],
+     [
+      "Follow the smallest vehicle nearby.",
+      444
+     ],
+     [
+      "Follow the smallest red vehicle nearby.",
+      401
+     ]
+    ]
+   },
+   "no effect": {
+    "n": 944,
+    "fitness": 0.930321860003536,
+    "lo": 0.8164976833770677,
+    "hi": 1.0441460366300042,
+    "predator": 0.7764830508474576,
+    "texts": 29,
+    "examples": [
+     [
+      "Keep your distance from other animals.",
+      424
+     ],
+     [
+      "No preference.",
+      391
+     ],
+     [
+      "The tiny nearby car should be trailed.",
+      97
+     ]
+    ]
+   },
+   "follow +0.8 (names the action), when hungry & alone": {
+    "n": 599,
+    "fitness": 1.1458874581665726,
+    "lo": 0.9666862184460246,
+    "hi": 1.3250886978871204,
+    "predator": 0.7028380634390651,
+    "texts": 8,
+    "examples": [
+     [
+      "Follow others when you are lost or hungry.",
+      483
+     ],
+     [
+      "Follow others when you are hungry or lost, unless they are ghosts.",
+      109
+     ],
+     [
+      "Follow others when you are lost or hungry now.",
+      2
+     ]
+    ]
+   },
+   "follow +0.8 (names the action), when energy is high": {
+    "n": 312,
+    "fitness": 0.8412912902073167,
+    "lo": 0.6487954499225319,
+    "hi": 1.0337871304921016,
+    "predator": 0.75,
+    "texts": 1,
+    "examples": [
+     [
+      "Follow the strongest animal nearby.",
+      312
+     ]
+    ]
+   }
+  },
+  "wander": {
+   "wander +0.8 (names the action), when food is far": {
+    "n": 820,
+    "fitness": 1.0466704753260492,
+    "lo": 0.9068578636186316,
+    "hi": 1.1864830870334666,
+    "predator": 0.7804878048780488,
+    "texts": 2,
+    "examples": [
+     [
+      "Roam far when food is scarce.",
+      431
+     ],
+     [
+      "Explore when there is nothing else to do.",
+      389
+     ]
+    ]
+   },
+   "wander +0.8 (names the action)": {
+    "n": 391,
+    "fitness": 0.9090633277114377,
+    "lo": 0.7288390199889976,
+    "hi": 1.0892876354338779,
+    "predator": 0.7902813299232737,
+    "texts": 12,
+    "examples": [
+     [
+      "Keep moving to new places.",
+      375
+     ],
+     [
+      "Keep moving to new colors.",
+      3
+     ],
+     [
+      "Keep places to new moving.",
+      3
+     ]
+    ]
+   },
+   "no effect": {
+    "n": 2558,
+    "fitness": 0.9989391904212147,
+    "lo": 0.9323507937419966,
+    "hi": 1.0655275871004328,
+    "predator": 0.6282251759186864,
+    "texts": 60,
+    "examples": [
+     [
+      "Stay near where you last found food.",
+      1097
+     ],
+     [
+      "Stay near where you last found bicycle.",
+      734
+     ],
+     [
+      "No preference.",
+      394
+     ]
+    ]
+   }
+  },
+  "rest": {
+   "rest +0.8 (names the action), when safe": {
+    "n": 580,
+    "fitness": 0.995554038476519,
+    "lo": 0.8546104720308912,
+    "hi": 1.136497604922147,
+    "predator": 0.7189655172413794,
+    "texts": 4,
+    "examples": [
+     [
+      "Rest only when you feel safe.",
+      577
+     ],
+     [
+      "You only feel safe when you rest.",
+      1
+     ],
+     [
+      "Rest only when you feel truly safe.",
+      1
+     ]
+    ]
+   },
+   "rest +0.8 (names the action), when food is far": {
+    "n": 349,
+    "fitness": 0.7781821104047928,
+    "lo": 0.6140601286895784,
+    "hi": 0.9423040921200072,
+    "predator": 0.8166189111747851,
+    "texts": 3,
+    "examples": [
+     [
+      "Save energy by resting when food is far.",
+      347
+     ],
+     [
+      "When food is far, rest to save energy.",
+      1
+     ],
+     [
+      "Save energy by resting when food is scarce.",
+      1
+     ]
+    ]
+   },
+   "rest +0.8 (names the action), when tired": {
+    "n": 344,
+    "fitness": 0.9144671858409967,
+    "lo": 0.6909964047625461,
+    "hi": 1.1379379669194474,
+    "predator": 0.7790697674418605,
+    "texts": 2,
+    "examples": [
+     [
+      "Rest when you are tired.",
+      343
+     ],
+     [
+      "Tired when you are Rest.",
+      1
+     ]
+    ]
+   },
+   "rest -2.5 (never)": {
+    "n": 378,
+    "fitness": 0.9263483324591599,
+    "lo": 0.7529308724233993,
+    "hi": 1.0997657924949205,
+    "predator": 0.7486772486772487,
+    "texts": 5,
+    "examples": [
+     [
+      "Never stop moving.",
+      368
+     ],
+     [
+      "Never stop lasagna.",
+      6
+     ],
+     [
+      "Moving never stop.",
+      2
+     ]
+    ]
+   },
+   "no effect": {
+    "n": 2079,
+    "fitness": 1.0646446997494354,
+    "lo": 0.9862198863447839,
+    "hi": 1.143069513154087,
+    "predator": 0.6132756132756133,
+    "texts": 48,
+    "examples": [
+     [
+      "No banana.",
+      955
+     ],
+     [
+      "No preference.",
+      526
+     ],
+     [
+      "The moon is allergic to geometry.",
+      170
+     ]
+    ]
+   },
+   "rest +0.8 (names the action)": {
+    "n": 27,
+    "fitness": 1.137334714500331,
+    "lo": 0.6266576392875052,
+    "hi": 1.6480117897131568,
+    "predator": 0.8518518518518519,
+    "texts": 4,
+    "examples": [
+     [
+      "Rest only when you feel happy.",
+      14
+     ],
+     [
+      "Rest only when you feel toaster.",
+      7
+     ],
+     [
+      "Sleep is for those who are secure.",
+      5
+     ]
+    ]
+   }
+  },
+  "mate": {
+   "mate +0.8 (names the action), when energy is high": {
+    "n": 1927,
+    "fitness": 1.0687077161621104,
+    "lo": 0.9857904118352747,
+    "hi": 1.151625020488946,
+    "predator": 0.6144265697976129,
+    "texts": 9,
+    "examples": [
+     [
+      "Look for a partner when energy is high.",
+      1327
+     ],
+     [
+      "Look partner for a when energy is high.",
+      532
+     ],
+     [
+      "Look partner for a quick when energy is high.",
+      32
+     ]
+    ]
+   },
+   "no effect": {
+    "n": 708,
+    "fitness": 0.9367537693589818,
+    "lo": 0.8100275781533582,
+    "hi": 1.0634799605646055,
+    "predator": 0.730225988700565,
+    "texts": 39,
+    "examples": [
+     [
+      "No preference.",
+      302
+     ],
+     [
+      "A salad is hiding under a bicycle.",
+      155
+     ],
+     [
+      "Look for a teammate when energy is high.",
+      118
+     ]
+    ]
+   },
+   "mate +0.8 (names the action), when plentiful": {
+    "n": 380,
+    "fitness": 0.8981777518023322,
+    "lo": 0.7258664554113637,
+    "hi": 1.0704890481933007,
+    "predator": 0.7684210526315789,
+    "texts": 5,
+    "examples": [
+     [
+      "Mate only when food is plentiful.",
+      376
+     ],
+     [
+      "Mate when food is plentiful.",
+      1
+     ],
+     [
+      "Plentiful food is only for mate.",
+      1
+     ]
+    ]
+   },
+   "mate +0.8 (names the action), when old": {
+    "n": 326,
+    "fitness": 1.0061698739868896,
+    "lo": 0.786002400741782,
+    "hi": 1.2263373472319974,
+    "predator": 0.7791411042944786,
+    "texts": 2,
+    "examples": [
+     [
+      "Seek a partner before growing old.",
+      325
+     ],
+     [
+      "Seek a partner growing old.",
+      1
+     ]
+    ]
+   },
+   "mate +0.8 (names the action)": {
+    "n": 412,
+    "fitness": 0.887645316110134,
+    "lo": 0.7338226420748964,
+    "hi": 1.0414679901453714,
+    "predator": 0.7281553398058253,
+    "texts": 19,
+    "examples": [
+     [
+      "Mate with any nearby adult.",
+      321
+     ],
+     [
+      "High energy is the time to find a partner.",
+      23
+     ],
+     [
+      "When high is partner for look a energy.",
+      15
+     ]
+    ]
+   }
+  },
+  "attack": {
+   "attack +0.8 (names the action), when very close": {
+    "n": 350,
+    "fitness": 0.8473880535192104,
+    "lo": 0.6667084015225542,
+    "hi": 1.0280677055158667,
+    "predator": 0.6742857142857143,
+    "texts": 1,
+    "examples": [
+     [
+      "Fight anyone who comes too close.",
+      350
+     ]
+    ]
+   },
+   "attack +0.8 (names the action)": {
+    "n": 405,
+    "fitness": 0.9391808650044174,
+    "lo": 0.7617471797019183,
+    "hi": 1.1166145503069167,
+    "predator": 0.8074074074074075,
+    "texts": 5,
+    "examples": [
+     [
+      "Attack only to defend your food.",
+      400
+     ],
+     [
+      "Attack only to provide your neighbors with a feast.",
+      2
+     ],
+     [
+      "Attack only to protect your food.",
+      1
+     ]
+    ]
+   },
+   "attack +0.8 (names the action), when hungry": {
+    "n": 366,
+    "fitness": 1.0479724829389154,
+    "lo": 0.8344155064407062,
+    "hi": 1.2615294594371247,
+    "predator": 0.7486338797814208,
+    "texts": 1,
+    "examples": [
+     [
+      "Attack weaker animals when you are hungry.",
+      366
+     ]
+    ]
+   },
+   "attack -2.5 (never)": {
+    "n": 2239,
+    "fitness": 1.0401564217709804,
+    "lo": 0.9697737293475927,
+    "hi": 1.1105391141943683,
+    "predator": 0.6342117016525235,
+    "texts": 20,
+    "examples": [
+     [
+      "Never fight.",
+      2154
+     ],
+     [
+      "Fight never.",
+      17
+     ],
+     [
+      "Never dance.",
+      11
+     ]
+    ]
+   },
+   "no effect": {
+    "n": 382,
+    "fitness": 0.9348151319572503,
+    "lo": 0.720484727708063,
+    "hi": 1.1491455362064376,
+    "predator": 0.7486910994764397,
+    "texts": 14,
+    "examples": [
+     [
+      "No preference.",
+      361
+     ],
+     [
+      "The blue muffins smell like algebra during the winter.",
+      5
+     ],
+     [
+      "Combat is forbidden.",
+      3
+     ]
+    ]
+   }
+  },
+  "risk": {
+   "cautious": {
+    "n": 924,
+    "fitness": 1.0123143255203233,
+    "lo": 0.8875837660742332,
+    "hi": 1.1370448849664134,
+    "predator": 0.685064935064935,
+    "texts": 15,
+    "examples": [
+     [
+      "Cautious: safety comes before food.",
+      433
+     ],
+     [
+      "Nervous: any movement nearby means danger.",
+      371
+     ],
+     [
+      "Cautious: safety comes before explosions.",
+      92
+     ]
+    ]
+   },
+   "cautious + bold": {
+    "n": 279,
+    "fitness": 0.7900472971482905,
+    "lo": 0.606372730661435,
+    "hi": 0.9737218636351459,
+    "predator": 0.7992831541218638,
+    "texts": 6,
+    "examples": [
+     [
+      "Reckless when starving, careful when fed.",
+      274
+     ],
+     [
+      "Reckless when hungry, careful when fed.",
+      1
+     ],
+     [
+      "When fed, careful; when starving, reckless.",
+      1
+     ]
+    ]
+   },
+   "no effect": {
+    "n": 2231,
+    "fitness": 1.0478018587376245,
+    "lo": 0.973481783783067,
+    "hi": 1.122121933692182,
+    "predator": 0.6405199462124608,
+    "texts": 43,
+    "examples": [
+     [
+      "No particular temperament.",
+      1874
+     ],
+     [
+      "The temperament is not particularly.",
+      83
+     ],
+     [
+      "No temperament.",
+      47
+     ]
+    ]
+   },
+   "bold": {
+    "n": 335,
+    "fitness": 0.8225445387200213,
+    "lo": 0.6424487010709536,
+    "hi": 1.002640376369089,
+    "predator": 0.808955223880597,
+    "texts": 4,
+    "examples": [
+     [
+      "Bold: take risks when the reward is food.",
+      329
+     ],
+     [
+      "Risk is food when bold take reward.",
+      4
+     ],
+     [
+      "No particular bold temperament.",
+      1
+     ]
+    ]
+   }
+  },
+  "social": {
+   "social": {
+    "n": 737,
+    "fitness": 1.0215113980195505,
+    "lo": 0.8785368296628209,
+    "hi": 1.16448596637628,
+    "predator": 0.7584803256445047,
+    "texts": 6,
+    "examples": [
+     [
+      "Social: feels safer in a group.",
+      366
+     ],
+     [
+      "Curious about other animals.",
+      364
+     ],
+     [
+      "Curious about animals.",
+      4
+     ]
+    ]
+   },
+   "solitary": {
+    "n": 1271,
+    "fitness": 0.9455077319614787,
+    "lo": 0.8555738590476556,
+    "hi": 1.035441604875302,
+    "predator": 0.6758457907159717,
+    "texts": 22,
+    "examples": [
+     [
+      "Solitary: prefers to be alone.",
+      699
+     ],
+     [
+      "Solitary: desires to be hidden.",
+      445
+     ],
+     [
+      "Solitary: desires to be a skyscraper.",
+      47
+     ]
+    ]
+   },
+   "no effect": {
+    "n": 1447,
+    "fitness": 1.0451177969361314,
+    "lo": 0.9505752157973222,
+    "hi": 1.1396603780749406,
+    "predator": 0.6192121630960609,
+    "texts": 42,
+    "examples": [
+     [
+      "Loner: enjoys community.",
+      680
+     ],
+     [
+      "No particular temperament.",
+      578
+     ],
+     [
+      "Loner: enjoys solitude.",
+      40
+     ]
+    ]
+   },
+   "social + solitary": {
+    "n": 314,
+    "fitness": 0.9621666247451262,
+    "lo": 0.7547746963274007,
+    "hi": 1.1695585531628516,
+    "predator": 0.7707006369426752,
+    "texts": 3,
+    "examples": [
+     [
+      "Wary of strangers, friendly to companions.",
+      302
+     ],
+     [
+      "Solitary: prefers to be together.",
+      11
+     ],
+     [
+      "Hostile to strangers, friendly to companions.",
+      1
+     ]
+    ]
+   }
+  },
+  "place": {
+   "no effect": {
+    "n": 2141,
+    "fitness": 1.019829341993894,
+    "lo": 0.9497989068714974,
+    "hi": 1.0898597771162906,
+    "predator": 0.6179355441382531,
+    "texts": 65,
+    "examples": [
+     [
+      "No particular temperament.",
+      1408
+     ],
+     [
+      "Not a specific disposition.",
+      277
+     ],
+     [
+      "No particular temperature.",
+      237
+     ]
+    ]
+   },
+   "restless": {
+    "n": 851,
+    "fitness": 0.9818584778991603,
+    "lo": 0.8522868290182116,
+    "hi": 1.111430126780109,
+    "predator": 0.7438307873090482,
+    "texts": 9,
+    "examples": [
+     [
+      "Likes open ground where danger is easy to see.",
+      523
+     ],
+     [
+      "Restless: always wants somewhere new.",
+      318
+     ],
+     [
+      "Likes open ground where danger is easy to smell like blueberries.",
+      3
+     ]
+    ]
+   },
+   "familiar": {
+    "n": 777,
+    "fitness": 0.9652301339754019,
+    "lo": 0.8213620478834474,
+    "hi": 1.1090982200673565,
+    "predator": 0.7722007722007722,
+    "texts": 5,
+    "examples": [
+     [
+      "Attached to familiar places.",
+      394
+     ],
+     [
+      "Prefers staying near water.",
+      375
+     ],
+     [
+      "Prefers staying near the water.",
+      6
+     ]
+    ]
+   }
+  }
+ },
+ "predation": {
+  "llm_long": [
+   {
+    "from": 0,
+    "to": 2000,
+    "predator": 75,
+    "starvation": 32,
+    "pop": 11.7,
+    "kill_rate": 3.2051282051282053
+   },
+   {
+    "from": 2000,
+    "to": 4000,
+    "predator": 74,
+    "starvation": 26,
+    "pop": 12.2,
+    "kill_rate": 3.0327868852459017
+   },
+   {
+    "from": 4000,
+    "to": 6000,
+    "predator": 100,
+    "starvation": 48,
+    "pop": 25.15,
+    "kill_rate": 1.9880715705765408
+   },
+   {
+    "from": 6000,
+    "to": 8000,
+    "predator": 110,
+    "starvation": 76,
+    "pop": 31.9,
+    "kill_rate": 1.7241379310344827
+   },
+   {
+    "from": 8000,
+    "to": 10000,
+    "predator": 107,
+    "starvation": 88,
+    "pop": 30.3,
+    "kill_rate": 1.7656765676567656
+   },
+   {
+    "from": 10000,
+    "to": 12000,
+    "predator": 113,
+    "starvation": 98,
+    "pop": 29.4,
+    "kill_rate": 1.9217687074829932
+   },
+   {
+    "from": 12000,
+    "to": 14000,
+    "predator": 113,
+    "starvation": 97,
+    "pop": 27.8,
+    "kill_rate": 2.0323741007194243
+   },
+   {
+    "from": 14000,
+    "to": 16000,
+    "predator": 111,
+    "starvation": 104,
+    "pop": 27.7,
+    "kill_rate": 2.003610108303249
+   },
+   {
+    "from": 16000,
+    "to": 18000,
+    "predator": 110,
+    "starvation": 99,
+    "pop": 28.3,
+    "kill_rate": 1.9434628975265018
+   },
+   {
+    "from": 18000,
+    "to": 20000,
+    "predator": 107,
+    "starvation": 96,
+    "pop": 27.0,
+    "kill_rate": 1.9814814814814814
+   },
+   {
+    "from": 20000,
+    "to": 22000,
+    "predator": 98,
+    "starvation": 51,
+    "pop": 20.4,
+    "kill_rate": 2.4019607843137254
+   },
+   {
+    "from": 22000,
+    "to": 24000,
+    "predator": 100,
+    "starvation": 37,
+    "pop": 19.85,
+    "kill_rate": 2.5188916876574305
+   },
+   {
+    "from": 24000,
+    "to": 26000,
+    "predator": 64,
+    "starvation": 11,
+    "pop": 11.3,
+    "kill_rate": 2.831858407079646
+   },
+   {
+    "from": 26000,
+    "to": 28000,
+    "predator": 82,
+    "starvation": 24,
+    "pop": 10.3,
+    "kill_rate": 3.9805825242718447
+   },
+   {
+    "from": 28000,
+    "to": 30000,
+    "predator": 77,
+    "starvation": 27,
+    "pop": 10.35,
+    "kill_rate": 3.7198067632850242
+   },
+   {
+    "from": 30000,
+    "to": 32000,
+    "predator": 75,
+    "starvation": 16,
+    "pop": 11.0,
+    "kill_rate": 3.409090909090909
+   },
+   {
+    "from": 32000,
+    "to": 34000,
+    "predator": 89,
+    "starvation": 17,
+    "pop": 10.15,
+    "kill_rate": 4.384236453201971
+   },
+   {
+    "from": 34000,
+    "to": 36000,
+    "predator": 82,
+    "starvation": 24,
+    "pop": 10.6,
+    "kill_rate": 3.8679245283018866
+   },
+   {
+    "from": 36000,
+    "to": 38000,
+    "predator": 77,
+    "starvation": 31,
+    "pop": 10.8,
+    "kill_rate": 3.564814814814815
+   },
+   {
+    "from": 38000,
+    "to": 40000,
+    "predator": 93,
+    "starvation": 14,
+    "pop": 10.4,
+    "kill_rate": 4.471153846153846
+   },
+   {
+    "from": 40000,
+    "to": 42000,
+    "predator": 79,
+    "starvation": 24,
+    "pop": 10.75,
+    "kill_rate": 3.6744186046511627
+   },
+   {
+    "from": 42000,
+    "to": 44000,
+    "predator": 88,
+    "starvation": 17,
+    "pop": 10.35,
+    "kill_rate": 4.251207729468599
+   },
+   {
+    "from": 44000,
+    "to": 46000,
+    "predator": 80,
+    "starvation": 25,
+    "pop": 11.8,
+    "kill_rate": 3.389830508474576
+   },
+   {
+    "from": 46000,
+    "to": 48000,
+    "predator": 77,
+    "starvation": 25,
+    "pop": 10.85,
+    "kill_rate": 3.5483870967741935
+   },
+   {
+    "from": 48000,
+    "to": 50000,
+    "predator": 81,
+    "starvation": 27,
+    "pop": 10.6,
+    "kill_rate": 3.8207547169811322
+   },
+   {
+    "from": 50000,
+    "to": 52000,
+    "predator": 91,
+    "starvation": 10,
+    "pop": 10.5,
+    "kill_rate": 4.333333333333333
+   },
+   {
+    "from": 52000,
+    "to": 54000,
+    "predator": 79,
+    "starvation": 31,
+    "pop": 11.25,
+    "kill_rate": 3.511111111111111
+   },
+   {
+    "from": 54000,
+    "to": 56000,
+    "predator": 81,
+    "starvation": 21,
+    "pop": 11.35,
+    "kill_rate": 3.5682819383259914
+   },
+   {
+    "from": 56000,
+    "to": 58000,
+    "predator": 43,
+    "starvation": 9,
+    "pop": 10.4,
+    "kill_rate": 2.0673076923076925
+   }
+  ]
+ },
+ "texts": {
+  "llm_long": {
+   "eat:3": {
+    "n": 406,
+    "fitness": 0.9390547399837713,
+    "lo": 0.7505465246999886,
+    "hi": 1.127562955267554,
+    "lifespan": 206.76600985221674,
+    "predator": 0.7758620689655172,
+    "text": "Always finish eating before doing anything else.",
+    "locus": "eat",
+    "origin": "founder",
+    "reading": "eat +2.5 (always)"
+   },
+   "flee:0": {
+    "n": 1859,
+    "fitness": 1.0276046677274246,
+    "lo": 0.951397323685252,
+    "hi": 1.1038120117695973,
+    "lifespan": 274.78859601936523,
+    "predator": 0.628294782140936,
+    "text": "No preference.",
+    "locus": "flee",
+    "origin": "neutral",
+    "reading": "no effect"
+   },
+   "follow:1": {
+    "n": 309,
+    "fitness": 0.8492010062284704,
+    "lo": 0.6587699339826933,
+    "hi": 1.0396320784742474,
+    "lifespan": 188.83171521035598,
+    "predator": 0.7411003236245954,
+    "text": "Stay close to other animals.",
+    "locus": "follow",
+    "origin": "founder",
+    "reading": "follow +0.8 (names the action)"
+   },
+   "wander:2": {
+    "n": 389,
+    "fitness": 1.0118646616769564,
+    "lo": 0.8215797138685723,
+    "hi": 1.2021496094853406,
+    "lifespan": 214.54241645244215,
+    "predator": 0.794344473007712,
+    "text": "Explore when there is nothing else to do.",
+    "locus": "wander",
+    "origin": "founder",
+    "reading": "wander +0.8 (names the action), when food is far"
+   },
+   "rest:3": {
+    "n": 577,
+    "fitness": 0.9973561174082733,
+    "lo": 0.8557202216286173,
+    "hi": 1.1389920131879294,
+    "lifespan": 255.88041594454072,
+    "predator": 0.7192374350086655,
+    "text": "Rest only when you feel safe.",
+    "locus": "rest",
+    "origin": "founder",
+    "reading": "rest +0.8 (names the action), when safe"
+   },
+   "mate:1": {
+    "n": 1327,
+    "fitness": 1.1015144121547347,
+    "lo": 0.9947232150999579,
+    "hi": 1.2083056092095115,
+    "lifespan": 257.74529012810854,
+    "predator": 0.6382818387339865,
+    "text": "Look for a partner when energy is high.",
+    "locus": "mate",
+    "origin": "founder",
+    "reading": "mate +0.8 (names the action), when energy is high"
+   },
+   "attack:3": {
+    "n": 350,
+    "fitness": 0.8473880535192104,
+    "lo": 0.6667084015225542,
+    "hi": 1.0280677055158667,
+    "lifespan": 176.26285714285714,
+    "predator": 0.6742857142857143,
+    "text": "Fight anyone who comes too close.",
+    "locus": "attack",
+    "origin": "founder",
+    "reading": "attack +0.8 (names the action), when very close"
+   },
+   "risk:1": {
+    "n": 433,
+    "fitness": 1.0521831995784838,
+    "lo": 0.8743869460901481,
+    "hi": 1.2299794530668196,
+    "lifespan": 227.9445727482679,
+    "predator": 0.6928406466512702,
+    "text": "Cautious: safety comes before food.",
+    "locus": "risk",
+    "origin": "founder",
+    "reading": "cautious"
+   },
+   "social:3": {
+    "n": 364,
+    "fitness": 0.8729765796342733,
+    "lo": 0.6941928479188176,
+    "hi": 1.051760311349729,
+    "lifespan": 199.58516483516485,
+    "predator": 0.7417582417582418,
+    "text": "Curious about other animals.",
+    "locus": "social",
+    "origin": "founder",
+    "reading": "social"
+   },
+   "place:0": {
+    "n": 1408,
+    "fitness": 1.034899119810117,
+    "lo": 0.9480739363372713,
+    "hi": 1.1217243032829625,
+    "lifespan": 274.28125,
+    "predator": 0.6115056818181818,
+    "text": "No particular temperament.",
+    "locus": "place",
+    "origin": "neutral",
+    "reading": "no effect"
+   },
+   "eat:4": {
+    "n": 311,
+    "fitness": 0.9608968881065523,
+    "lo": 0.7417728484071298,
+    "hi": 1.1800209278059748,
+    "lifespan": 206.04823151125402,
+    "predator": 0.77491961414791,
+    "text": "Eat quickly, then move on.",
+    "locus": "eat",
+    "origin": "founder",
+    "reading": "eat +1.2 (often)"
+   },
+   "flee:2": {
+    "n": 399,
+    "fitness": 0.9200659689121975,
+    "lo": 0.7235386769418287,
+    "hi": 1.1165932608825664,
+    "lifespan": 198.02756892230576,
+    "predator": 0.7994987468671679,
+    "text": "Flee only when a predator is very close.",
+    "locus": "flee",
+    "origin": "founder",
+    "reading": "flee +0.8 (names the action), when predator & very close"
+   },
+   "wander:1": {
+    "n": 375,
+    "fitness": 0.9039330021706324,
+    "lo": 0.7260788393071105,
+    "hi": 1.0817871650341544,
+    "lifespan": 213.07733333333334,
+    "predator": 0.7893333333333333,
+    "text": "Keep moving to new places.",
+    "locus": "wander",
+    "origin": "founder",
+    "reading": "wander +0.8 (names the action)"
+   },
+   "rest:4": {
+    "n": 347,
+    "fitness": 0.782667309888394,
+    "lo": 0.6177161143217764,
+    "hi": 0.9476185054550115,
+    "lifespan": 198.5014409221902,
+    "predator": 0.8184438040345822,
+    "text": "Save energy by resting when food is far.",
+    "locus": "rest",
+    "origin": "founder",
+    "reading": "rest +0.8 (names the action), when food is far"
+   },
+   "mate:0": {
+    "n": 302,
+    "fitness": 0.7641479942129974,
+    "lo": 0.5812696735255969,
+    "hi": 0.9470263149003979,
+    "lifespan": 200.1158940397351,
+    "predator": 0.8079470198675497,
+    "text": "No preference.",
+    "locus": "mate",
+    "origin": "neutral",
+    "reading": "no effect"
+   },
+   "attack:4": {
+    "n": 400,
+    "fitness": 0.9490262596197896,
+    "lo": 0.7696131963869801,
+    "hi": 1.128439322852599,
+    "lifespan": 224.64,
+    "predator": 0.8075,
+    "text": "Attack only to defend your food.",
+    "locus": "attack",
+    "origin": "founder",
+    "reading": "attack +0.8 (names the action)"
+   },
+   "risk:4": {
+    "n": 274,
+    "fitness": 0.8044642186290988,
+    "lo": 0.6178685945762534,
+    "hi": 0.9910598426819441,
+    "lifespan": 192.16788321167883,
+    "predator": 0.7956204379562044,
+    "text": "Reckless when starving, careful when fed.",
+    "locus": "risk",
+    "origin": "founder",
+    "reading": "cautious + bold"
+   },
+   "place:1": {
+    "n": 523,
+    "fitness": 0.9466910123974782,
+    "lo": 0.7958824907637481,
+    "hi": 1.0974995340312084,
+    "lifespan": 220.55831739961758,
+    "predator": 0.7323135755258127,
+    "text": "Likes open ground where danger is easy to see.",
+    "locus": "place",
+    "origin": "founder",
+    "reading": "restless"
+   },
+   "eat:0": {
+    "n": 402,
+    "fitness": 1.0053505470308335,
+    "lo": 0.7957327374839058,
+    "hi": 1.2149683565777611,
+    "lifespan": 198.0721393034826,
+    "predator": 0.7213930348258707,
+    "text": "No preference.",
+    "locus": "eat",
+    "origin": "neutral",
+    "reading": "no effect"
+   },
+   "flee:3": {
+    "n": 304,
+    "fitness": 0.9304493090433233,
+    "lo": 0.7099966035147873,
+    "hi": 1.1509020145718594,
+    "lifespan": 210.875,
+    "predator": 0.7796052631578947,
+    "text": "Stay calm unless danger is right next to you.",
+    "locus": "flee",
+    "origin": "founder",
+    "reading": "flee +0.8 (names the action), unless predator & very close"
+   },
+   "follow:0": {
+    "n": 391,
+    "fitness": 0.9474654808725687,
+    "lo": 0.75971610972741,
+    "hi": 1.1352148520177272,
+    "lifespan": 207.17135549872123,
+    "predator": 0.8081841432225064,
+    "text": "No preference.",
+    "locus": "follow",
+    "origin": "neutral",
+    "reading": "no effect"
+   },
+   "wander:0": {
+    "n": 394,
+    "fitness": 0.9809938263336199,
+    "lo": 0.7772277937518435,
+    "hi": 1.1847598589153963,
+    "lifespan": 212.34263959390864,
+    "predator": 0.7614213197969543,
+    "text": "No preference.",
+    "locus": "wander",
+    "origin": "neutral",
+    "reading": "no effect"
+   },
+   "attack:2": {
+    "n": 366,
+    "fitness": 1.0479724829389154,
+    "lo": 0.8344155064407062,
+    "hi": 1.2615294594371247,
+    "lifespan": 216.50273224043715,
+    "predator": 0.7486338797814208,
+    "text": "Attack weaker animals when you are hungry.",
+    "locus": "attack",
+    "origin": "founder",
+    "reading": "attack +0.8 (names the action), when hungry"
+   },
+   "risk:3": {
+    "n": 371,
+    "fitness": 0.9991971161222899,
+    "lo": 0.7800561177356213,
+    "hi": 1.2183381145089585,
+    "lifespan": 203.71967654986523,
+    "predator": 0.7223719676549866,
+    "text": "Nervous: any movement nearby means danger.",
+    "locus": "risk",
+    "origin": "founder",
+    "reading": "cautious"
+   },
+   "place:3": {
+    "n": 394,
+    "fitness": 0.9584712925004338,
+    "lo": 0.756676121947962,
+    "hi": 1.1602664630529056,
+    "lifespan": 209.7994923857868,
+    "predator": 0.766497461928934,
+    "text": "Attached to familiar places.",
+    "locus": "place",
+    "origin": "founder",
+    "reading": "familiar"
+   },
+   "eat:1": {
+    "n": 342,
+    "fitness": 0.9435866111841836,
+    "lo": 0.7382053790994478,
+    "hi": 1.1489678432689194,
+    "lifespan": 211.14619883040936,
+    "predator": 0.8011695906432749,
+    "text": "Eat whenever food is close.",
+    "locus": "eat",
+    "origin": "founder",
+    "reading": "eat +1.2 (often), when food is close"
+   },
+   "flee:1": {
+    "n": 452,
+    "fitness": 1.1066998484328365,
+    "lo": 0.8985789641208298,
+    "hi": 1.3148207327448433,
+    "lifespan": 219.98893805309734,
+    "predator": 0.7477876106194691,
+    "text": "Run from any predator you see.",
+    "locus": "flee",
+    "origin": "founder",
+    "reading": "flee +0.8 (names the action), when predator"
+   },
+   "rest:1": {
+    "n": 343,
+    "fitness": 0.9171332709309121,
+    "lo": 0.6930713013164514,
+    "hi": 1.141195240545373,
+    "lifespan": 190.268221574344,
+    "predator": 0.7784256559766763,
+    "text": "Rest when you are tired.",
+    "locus": "rest",
+    "origin": "founder",
+    "reading": "rest +0.8 (names the action), when tired"
+   },
+   "attack:1": {
+    "n": 2154,
+    "fitness": 1.0637741381106602,
+    "lo": 0.9912015817228269,
+    "hi": 1.1363466944984935,
+    "lifespan": 281.5937790157846,
+    "predator": 0.6411327762302693,
+    "text": "Never fight.",
+    "locus": "attack",
+    "origin": "founder",
+    "reading": "attack -2.5 (never)"
+   },
+   "social:1": {
+    "n": 366,
+    "fitness": 1.1804902716886345,
+    "lo": 0.9555587467413529,
+    "hi": 1.4054217966359162,
+    "lifespan": 207.34699453551912,
+    "predator": 0.7759562841530054,
+    "text": "Social: feels safer in a group.",
+    "locus": "social",
+    "origin": "founder",
+    "reading": "social"
+   },
+   "place:2": {
+    "n": 375,
+    "fitness": 0.9477617092873294,
+    "lo": 0.7461981053783779,
+    "hi": 1.1493253131962808,
+    "lifespan": 213.23733333333334,
+    "predator": 0.7813333333333333,
+    "text": "Prefers staying near water.",
+    "locus": "place",
+    "origin": "founder",
+    "reading": "familiar"
+   },
+   "follow:3": {
+    "n": 424,
+    "fitness": 0.9767783478615346,
+    "lo": 0.8022039825093139,
+    "hi": 1.1513527132137553,
+    "lifespan": 216.02358490566039,
+    "predator": 0.8089622641509434,
+    "text": "Keep your distance from other animals.",
+    "locus": "follow",
+    "origin": "founder",
+    "reading": "no effect"
+   },
+   "rest:2": {
+    "n": 368,
+    "fitness": 0.9270540843228273,
+    "lo": 0.7504213038492351,
+    "hi": 1.1036868647964195,
+    "lifespan": 218.82608695652175,
+    "predator": 0.7608695652173914,
+    "text": "Never stop moving.",
+    "locus": "rest",
+    "origin": "founder",
+    "reading": "rest -2.5 (never)"
+   },
+   "risk:0": {
+    "n": 1874,
+    "fitness": 1.0763716377582486,
+    "lo": 0.992544345388664,
+    "hi": 1.1601989301278333,
+    "lifespan": 273.5458911419424,
+    "predator": 0.6590181430096052,
+    "text": "No particular temperament.",
+    "locus": "risk",
+    "origin": "neutral",
+    "reading": "no effect"
+   },
+   "social:2": {
+    "n": 699,
+    "fitness": 0.8790219616084277,
+    "lo": 0.7609115260904422,
+    "hi": 0.9971323971264132,
+    "lifespan": 249.89699570815452,
+    "predator": 0.7081545064377682,
+    "text": "Solitary: prefers to be alone.",
+    "locus": "social",
+    "origin": "founder",
+    "reading": "solitary"
+   },
+   "place:4": {
+    "n": 318,
+    "fitness": 1.0443220112288976,
+    "lo": 0.8035083666093639,
+    "hi": 1.2851356558484313,
+    "lifespan": 201.57232704402514,
+    "predator": 0.7672955974842768,
+    "text": "Restless: always wants somewhere new.",
+    "locus": "place",
+    "origin": "founder",
+    "reading": "restless"
+   },
+   "eat:2": {
+    "n": 802,
+    "fitness": 1.0378952833625468,
+    "lo": 0.9175824884921413,
+    "hi": 1.1582080782329522,
+    "lifespan": 273.6571072319202,
+    "predator": 0.6845386533665836,
+    "text": "Only look for food when energy is low.",
+    "locus": "eat",
+    "origin": "founder",
+    "reading": "eat +0.8 (names the action), when hungry"
+   },
+   "wander:3": {
+    "n": 1097,
+    "fitness": 0.9711399426253501,
+    "lo": 0.873586244462813,
+    "hi": 1.0686936407878873,
+    "lifespan": 270.489516864175,
+    "predator": 0.601640838650866,
+    "text": "Stay near where you last found food.",
+    "locus": "wander",
+    "origin": "founder",
+    "reading": "no effect"
+   },
+   "rest:0": {
+    "n": 526,
+    "fitness": 1.2026204839684542,
+    "lo": 1.004395897247029,
+    "hi": 1.4008450706898794,
+    "lifespan": 241.60266159695817,
+    "predator": 0.7072243346007605,
+    "text": "No preference.",
+    "locus": "rest",
+    "origin": "neutral",
+    "reading": "no effect"
+   },
+   "mate:3": {
+    "n": 376,
+    "fitness": 0.9049231225318698,
+    "lo": 0.730969006239078,
+    "hi": 1.0788772388246617,
+    "lifespan": 231.52659574468086,
+    "predator": 0.7712765957446809,
+    "text": "Mate only when food is plentiful.",
+    "locus": "mate",
+    "origin": "founder",
+    "reading": "mate +0.8 (names the action), when plentiful"
+   },
+   "risk:2": {
+    "n": 329,
+    "fitness": 0.8203740944309771,
+    "lo": 0.6380410860612394,
+    "hi": 1.0027071028007146,
+    "lifespan": 195.64133738601825,
+    "predator": 0.8145896656534954,
+    "text": "Bold: take risks when the reward is food.",
+    "locus": "risk",
+    "origin": "founder",
+    "reading": "bold"
+   },
+   "social:0": {
+    "n": 578,
+    "fitness": 1.0914375853952654,
+    "lo": 0.9169330208027084,
+    "hi": 1.2659421499878223,
+    "lifespan": 251.46712802768167,
+    "predator": 0.7387543252595156,
+    "text": "No particular temperament.",
+    "locus": "social",
+    "origin": "neutral",
+    "reading": "no effect"
+   },
+   "wander:4": {
+    "n": 431,
+    "fitness": 1.078084539153189,
+    "lo": 0.874791757238359,
+    "hi": 1.281377321068019,
+    "lifespan": 205.86542923433873,
+    "predator": 0.7679814385150812,
+    "text": "Roam far when food is scarce.",
+    "locus": "wander",
+    "origin": "founder",
+    "reading": "wander +0.8 (names the action), when food is far"
+   },
+   "flee:4": {
+    "n": 417,
+    "fitness": 0.9834063504942007,
+    "lo": 0.8144267086759611,
+    "hi": 1.1523859923124402,
+    "lifespan": 221.08393285371702,
+    "predator": 0.762589928057554,
+    "text": "Run away from anything that attacks you.",
+    "locus": "flee",
+    "origin": "founder",
+    "reading": "flee +0.8 (names the action), when predator"
+   },
+   "follow:2": {
+    "n": 483,
+    "fitness": 1.210552242386451,
+    "lo": 0.9962872789910382,
+    "hi": 1.4248172057818638,
+    "lifespan": 237.3271221532091,
+    "predator": 0.7412008281573499,
+    "text": "Follow others when you are lost or hungry.",
+    "locus": "follow",
+    "origin": "founder",
+    "reading": "follow +0.8 (names the action), when hungry & alone"
+   },
+   "follow:4": {
+    "n": 312,
+    "fitness": 0.8412912902073167,
+    "lo": 0.6487954499225319,
+    "hi": 1.0337871304921016,
+    "lifespan": 194.0897435897436,
+    "predator": 0.75,
+    "text": "Follow the strongest animal nearby.",
+    "locus": "follow",
+    "origin": "founder",
+    "reading": "follow +0.8 (names the action), when energy is high"
+   },
+   "mate:4": {
+    "n": 325,
+    "fitness": 1.0092657812914647,
+    "lo": 0.788503716844386,
+    "hi": 1.2300278457385434,
+    "lifespan": 197.1476923076923,
+    "predator": 0.7784615384615384,
+    "text": "Seek a partner before growing old.",
+    "locus": "mate",
+    "origin": "founder",
+    "reading": "mate +0.8 (names the action), when old"
+   },
+   "attack:0": {
+    "n": 361,
+    "fitness": 0.938767618093981,
+    "lo": 0.7143516780626711,
+    "hi": 1.163183558125291,
+    "lifespan": 200.9224376731302,
+    "predator": 0.7534626038781164,
+    "text": "No preference.",
+    "locus": "attack",
+    "origin": "neutral",
+    "reading": "no effect"
+   },
+   "social:4": {
+    "n": 302,
+    "fitness": 0.961669099034448,
+    "lo": 0.7512852471450343,
+    "hi": 1.1720529509238615,
+    "lifespan": 204.40728476821192,
+    "predator": 0.7781456953642384,
+    "text": "Wary of strangers, friendly to companions.",
+    "locus": "social",
+    "origin": "founder",
+    "reading": "social + solitary"
+   },
+   "mate:2": {
+    "n": 321,
+    "fitness": 0.8991561710549254,
+    "lo": 0.7163697112111242,
+    "hi": 1.0819426308987266,
+    "lifespan": 207.5264797507788,
+    "predator": 0.7570093457943925,
+    "text": "Mate with any nearby adult.",
+    "locus": "mate",
+    "origin": "founder",
+    "reading": "mate +0.8 (names the action)"
+   },
+   "follow:8": {
+    "n": 444,
+    "fitness": 1.0244558549618434,
+    "lo": 0.8795194591719016,
+    "hi": 1.1693922507517853,
+    "lifespan": 299.20045045045043,
+    "predator": 0.5833333333333334,
+    "text": "Follow the smallest vehicle nearby.",
+    "locus": "follow",
+    "origin": "mutant (llm#6)",
+    "reading": "follow +0.8 (names the action)"
+   },
+   "follow:9": {
+    "n": 109,
+    "fitness": 0.9027670224396733,
+    "lo": 0.6486479499502953,
+    "hi": 1.1568860949290514,
+    "lifespan": 321.6880733944954,
+    "predator": 0.5321100917431193,
+    "text": "Follow others when you are hungry or lost, unless they are ghosts.",
+    "locus": "follow",
+    "origin": "mutant (llm#12)",
+    "reading": "follow +0.8 (names the action), when hungry & alone"
+   },
+   "risk:7": {
+    "n": 92,
+    "fitness": 0.9954759580880068,
+    "lo": 0.7208959439212204,
+    "hi": 1.2700559722547933,
+    "lifespan": 328.69565217391306,
+    "predator": 0.5,
+    "text": "Cautious: safety comes before explosions.",
+    "locus": "risk",
+    "origin": "mutant (llm#12)",
+    "reading": "cautious"
+   },
+   "follow:10": {
+    "n": 97,
+    "fitness": 0.8898419725371225,
+    "lo": 0.6365236200996239,
+    "hi": 1.143160324974621,
+    "lifespan": 325.83505154639175,
+    "predator": 0.5360824742268041,
+    "text": "The tiny nearby car should be trailed.",
+    "locus": "follow",
+    "origin": "mutant (llm#15)",
+    "reading": "no effect"
+   },
+   "social:11": {
+    "n": 40,
+    "fitness": 1.0844945599779643,
+    "lo": 0.6675739124848054,
+    "hi": 1.5014152074711231,
+    "lifespan": 362.575,
+    "predator": 0.55,
+    "text": "Loner: enjoys solitude.",
+    "locus": "social",
+    "origin": "mutant (llm#1)",
+    "reading": "no effect"
+   },
+   "risk:8": {
+    "n": 47,
+    "fitness": 0.7789995490649408,
+    "lo": 0.44681016718216515,
+    "hi": 1.1111889309477165,
+    "lifespan": 238.12765957446808,
+    "predator": 0.5106382978723404,
+    "text": "No temperament.",
+    "locus": "risk",
+    "origin": "mutant (llm#8)",
+    "reading": "no effect"
+   },
+   "eat:15": {
+    "n": 1267,
+    "fitness": 1.069479215708793,
+    "lo": 0.9775418104237001,
+    "hi": 1.1614166209938857,
+    "lifespan": 286.292817679558,
+    "predator": 0.5880031570639306,
+    "text": "Only look for water when energy is low.",
+    "locus": "eat",
+    "origin": "mutant (llm#11)",
+    "reading": "no effect"
+   },
+   "wander:14": {
+    "n": 58,
+    "fitness": 0.9992089461004635,
+    "lo": 0.5995237158872087,
+    "hi": 1.3988941763137184,
+    "lifespan": 312.2068965517241,
+    "predator": 0.6724137931034483,
+    "text": "Stay near where you last found elephant.",
+    "locus": "wander",
+    "origin": "mutant (llm#5)",
+    "reading": "no effect"
+   },
+   "rest:13": {
+    "n": 124,
+    "fitness": 0.9570289666972784,
+    "lo": 0.7296352667179977,
+    "hi": 1.1844226666765592,
+    "lifespan": 314.64516129032256,
+    "predator": 0.5564516129032258,
+    "text": "No choice.",
+    "locus": "rest",
+    "origin": "mutant (llm#4)",
+    "reading": "no effect"
+   },
+   "flee:16": {
+    "n": 31,
+    "fitness": 0.9822732012513031,
+    "lo": 0.4912244849729375,
+    "hi": 1.4733219175296688,
+    "lifespan": 289.4193548387097,
+    "predator": 0.5161290322580645,
+    "text": "Anything that attacks you run away from.",
+    "locus": "flee",
+    "origin": "mutant (llm#2)",
+    "reading": "flee +0.8 (names the action), when predator"
+   },
+   "social:15": {
+    "n": 680,
+    "fitness": 1.039575817256559,
+    "lo": 0.916528759569603,
+    "hi": 1.162622874943515,
+    "lifespan": 279.0176470588235,
+    "predator": 0.5426470588235294,
+    "text": "Loner: enjoys community.",
+    "locus": "social",
+    "origin": "mutant (llm#13)",
+    "reading": "no effect"
+   },
+   "mate:25": {
+    "n": 54,
+    "fitness": 0.95552575220665,
+    "lo": 0.582032080624693,
+    "hi": 1.329019423788607,
+    "lifespan": 325.1666666666667,
+    "predator": 0.6296296296296297,
+    "text": "Look for a singer when energy is high.",
+    "locus": "mate",
+    "origin": "mutant (llm#11)",
+    "reading": "no effect"
+   },
+   "rest:16": {
+    "n": 955,
+    "fitness": 1.0860831566889462,
+    "lo": 0.9751939843819515,
+    "hi": 1.1969723289959409,
+    "lifespan": 287.3130890052356,
+    "predator": 0.581151832460733,
+    "text": "No banana.",
+    "locus": "rest",
+    "origin": "mutant (llm#5)",
+    "reading": "no effect"
+   },
+   "flee:18": {
+    "n": 31,
+    "fitness": 0.8276687463421507,
+    "lo": 0.35791977179718204,
+    "hi": 1.2974177208871194,
+    "lifespan": 269.61290322580646,
+    "predator": 0.4838709677419355,
+    "text": "Any preference.",
+    "locus": "flee",
+    "origin": "mutant (llm#0)",
+    "reading": "no effect"
+   },
+   "wander:21": {
+    "n": 61,
+    "fitness": 1.1192787362596421,
+    "lo": 0.7349911518927268,
+    "hi": 1.5035663206265575,
+    "lifespan": 312.6885245901639,
+    "predator": 0.5409836065573771,
+    "text": "Elephant was found last near where stay.",
+    "locus": "wander",
+    "origin": "mutant (llm#15)",
+    "reading": "no effect"
+   },
+   "follow:18": {
+    "n": 695,
+    "fitness": 1.0835058318855424,
+    "lo": 0.9557453026662671,
+    "hi": 1.2112663611048176,
+    "lifespan": 292.9971223021583,
+    "predator": 0.6086330935251798,
+    "text": "Follow the largest vehicle nearby.",
+    "locus": "follow",
+    "origin": "mutant (llm#6)",
+    "reading": "follow +0.8 (names the action)"
+   },
+   "rest:22": {
+    "n": 32,
+    "fitness": 0.8706341623510094,
+    "lo": 0.46732020316336387,
+    "hi": 1.273948121538655,
+    "lifespan": 268.75,
+    "predator": 0.65625,
+    "text": "No apple.",
+    "locus": "rest",
+    "origin": "mutant (llm#0)",
+    "reading": "no effect"
+   },
+   "follow:25": {
+    "n": 401,
+    "fitness": 1.0682099962787646,
+    "lo": 0.9009368280125742,
+    "hi": 1.2354831645449549,
+    "lifespan": 267.571072319202,
+    "predator": 0.5386533665835411,
+    "text": "Follow the smallest red vehicle nearby.",
+    "locus": "follow",
+    "origin": "mutant (llm#7)",
+    "reading": "follow +0.8 (names the action)"
+   },
+   "flee:20": {
+    "n": 97,
+    "fitness": 1.0500032127063472,
+    "lo": 0.7148147786069743,
+    "hi": 1.3851916468057202,
+    "lifespan": 303.1958762886598,
+    "predator": 0.5567010309278351,
+    "text": "No preference, really.",
+    "locus": "flee",
+    "origin": "mutant (llm#3)",
+    "reading": "no effect"
+   },
+   "rest:27": {
+    "n": 35,
+    "fitness": 0.8309561304836894,
+    "lo": 0.3562114268546397,
+    "hi": 1.3057008341127392,
+    "lifespan": 269.0285714285714,
+    "predator": 0.8,
+    "text": "No toaster.",
+    "locus": "rest",
+    "origin": "mutant (llm#5)",
+    "reading": "no effect"
+   },
+   "mate:34": {
+    "n": 532,
+    "fitness": 1.0164969209400954,
+    "lo": 0.8842407925176974,
+    "hi": 1.1487530493624933,
+    "lifespan": 272.29887218045116,
+    "predator": 0.5582706766917294,
+    "text": "Look partner for a when energy is high.",
+    "locus": "mate",
+    "origin": "mutant (llm#9)",
+    "reading": "mate +0.8 (names the action), when energy is high"
+   },
+   "wander:27": {
+    "n": 734,
+    "fitness": 1.0908583994949954,
+    "lo": 0.966452367099196,
+    "hi": 1.2152644318907948,
+    "lifespan": 289.65803814713894,
+    "predator": 0.6049046321525886,
+    "text": "Stay near where you last found bicycle.",
+    "locus": "wander",
+    "origin": "mutant (llm#5)",
+    "reading": "no effect"
+   },
+   "risk:31": {
+    "n": 46,
+    "fitness": 1.0428692673401216,
+    "lo": 0.5576071339937254,
+    "hi": 1.5281314006865179,
+    "lifespan": 275.5652173913044,
+    "predator": 0.5434782608695652,
+    "text": "Temperament No.",
+    "locus": "risk",
+    "origin": "mutant (llm#2)",
+    "reading": "no effect"
+   },
+   "social:33": {
+    "n": 445,
+    "fitness": 1.0768798034658325,
+    "lo": 0.9161866537352992,
+    "hi": 1.2375729531963657,
+    "lifespan": 293.7797752808989,
+    "predator": 0.6247191011235955,
+    "text": "Solitary: desires to be hidden.",
+    "locus": "social",
+    "origin": "mutant (llm#6)",
+    "reading": "solitary"
+   },
+   "rest:31": {
+    "n": 170,
+    "fitness": 0.926868747607792,
+    "lo": 0.7100199179867583,
+    "hi": 1.1437175772288257,
+    "lifespan": 252.1529411764706,
+    "predator": 0.4823529411764706,
+    "text": "The moon is allergic to geometry.",
+    "locus": "rest",
+    "origin": "mutant (llm#14)",
+    "reading": "no effect"
+   },
+   "risk:33": {
+    "n": 36,
+    "fitness": 0.9600811185825595,
+    "lo": 0.5055969293421206,
+    "hi": 1.4145653078229983,
+    "lifespan": 267.3888888888889,
+    "predator": 0.4444444444444444,
+    "text": "No specific weather.",
+    "locus": "risk",
+    "origin": "mutant (llm#6)",
+    "reading": "no effect"
+   },
+   "mate:39": {
+    "n": 118,
+    "fitness": 1.0460932284797866,
+    "lo": 0.7232601321129235,
+    "hi": 1.3689263248466497,
+    "lifespan": 270.7881355932203,
+    "predator": 0.5084745762711864,
+    "text": "Look for a teammate when energy is high.",
+    "locus": "mate",
+    "origin": "mutant (llm#3)",
+    "reading": "no effect"
+   },
+   "place:37": {
+    "n": 277,
+    "fitness": 0.9879973640505061,
+    "lo": 0.8027317393775066,
+    "hi": 1.1732629887235055,
+    "lifespan": 276.37906137184115,
+    "predator": 0.5812274368231047,
+    "text": "Not a specific disposition.",
+    "locus": "place",
+    "origin": "mutant (llm#1)",
+    "reading": "no effect"
+   },
+   "place:38": {
+    "n": 237,
+    "fitness": 1.1297261687727327,
+    "lo": 0.9081169162245553,
+    "hi": 1.3513354213209101,
+    "lifespan": 321.1223628691983,
+    "predator": 0.7257383966244726,
+    "text": "No particular temperature.",
+    "locus": "place",
+    "origin": "mutant (llm#13)",
+    "reading": "no effect"
+   },
+   "mate:43": {
+    "n": 32,
+    "fitness": 0.8332132564841499,
+    "lo": 0.38071452002849687,
+    "hi": 1.2857119929398029,
+    "lifespan": 224.28125,
+    "predator": 0.59375,
+    "text": "Look partner for a quick when energy is high.",
+    "locus": "mate",
+    "origin": "mutant (llm#7)",
+    "reading": "mate +0.8 (names the action), when energy is high"
+   },
+   "risk:39": {
+    "n": 83,
+    "fitness": 0.9518188025878731,
+    "lo": 0.6588888411873314,
+    "hi": 1.2447487639884147,
+    "lifespan": 273.3614457831325,
+    "predator": 0.5662650602409639,
+    "text": "The temperament is not particularly.",
+    "locus": "risk",
+    "origin": "mutant (llm#15)",
+    "reading": "no effect"
+   },
+   "social:41": {
+    "n": 33,
+    "fitness": 1.0473612202718832,
+    "lo": 0.5234261631750095,
+    "hi": 1.5712962773687569,
+    "lifespan": 277.90909090909093,
+    "predator": 0.5757575757575758,
+    "text": "Wants to stay concealed: lonely.",
+    "locus": "social",
+    "origin": "mutant (llm#15)",
+    "reading": "no effect"
+   },
+   "rest:36": {
+    "n": 44,
+    "fitness": 0.9471197027801442,
+    "lo": 0.5624072867001615,
+    "hi": 1.331832118860127,
+    "lifespan": 261.1136363636364,
+    "predator": 0.5909090909090909,
+    "text": "The moon is allergic to toaster.",
+    "locus": "rest",
+    "origin": "mutant (llm#5)",
+    "reading": "no effect"
+   },
+   "rest:37": {
+    "n": 119,
+    "fitness": 1.0181071915934223,
+    "lo": 0.7412137570729791,
+    "hi": 1.2950006261138656,
+    "lifespan": 279.94117647058823,
+    "predator": 0.6134453781512605,
+    "text": "Geometry makes the moon sneeze.",
+    "locus": "rest",
+    "origin": "mutant (llm#15)",
+    "reading": "no effect"
+   },
+   "eat:44": {
+    "n": 63,
+    "fitness": 0.9237767949515436,
+    "lo": 0.5700918497848555,
+    "hi": 1.2774617401182318,
+    "lifespan": 263.6825396825397,
+    "predator": 0.6190476190476191,
+    "text": "Only look for gold when energy is low.",
+    "locus": "eat",
+    "origin": "mutant (llm#11)",
+    "reading": "no effect"
+   },
+   "place:42": {
+    "n": 27,
+    "fitness": 1.0783620187085963,
+    "lo": 0.40403953965027084,
+    "hi": 1.7526844977669218,
+    "lifespan": 306.3333333333333,
+    "predator": 0.7037037037037037,
+    "text": "No specific personality.",
+    "locus": "place",
+    "origin": "mutant (llm#10)",
+    "reading": "no effect"
+   },
+   "mate:49": {
+    "n": 31,
+    "fitness": 0.9121269016793556,
+    "lo": 0.37941981146325754,
+    "hi": 1.4448339918954538,
+    "lifespan": 244.90322580645162,
+    "predator": 0.5806451612903226,
+    "text": "Look partner for a giraffe energy is high.",
+    "locus": "mate",
+    "origin": "mutant (llm#5)",
+    "reading": "mate +0.8 (names the action), when energy is high"
+   },
+   "mate:57": {
+    "n": 155,
+    "fitness": 1.3166742866819068,
+    "lo": 0.990934339132619,
+    "hi": 1.6424142342311945,
+    "lifespan": 352.89032258064515,
+    "predator": 0.8258064516129032,
+    "text": "A salad is hiding under a bicycle.",
+    "locus": "mate",
+    "origin": "mutant (llm#14)",
+    "reading": "no effect"
+   },
+   "wander:45": {
+    "n": 28,
+    "fitness": 1.111586051743532,
+    "lo": 0.5843721333792392,
+    "hi": 1.6387999701078249,
+    "lifespan": 303.2142857142857,
+    "predator": 0.75,
+    "text": "Stay far away from where you last found the bicycle.",
+    "locus": "wander",
+    "origin": "mutant (llm#13)",
+    "reading": "no effect"
+   },
+   "social:51": {
+    "n": 47,
+    "fitness": 0.94447981236388,
+    "lo": 0.4713251761394676,
+    "hi": 1.4176344485882924,
+    "lifespan": 278.06382978723406,
+    "predator": 0.7021276595744681,
+    "text": "Solitary: desires to be a skyscraper.",
+    "locus": "social",
+    "origin": "mutant (llm#12)",
+    "reading": "solitary"
+   }
+  }
+ }
+}
