@@ -239,7 +239,7 @@ lists. The Experiment Runner window and the CLI run
 |---|---|
 | `seed` | `SimulationProfile.simulationSeed` / `worldSeed` |
 | `world.*` | `GridWorldDefinition` (or `TerrainWorldDefinition`) |
-| `predators.*` | Predator species prefab (`count` → its `FloorAndCapPolicy`), `PredationSystem` (`kill_p`, rest after kill), `ScriptedChaseBackend` (`chase_radius`, `turn_p`) |
+| `predators.*` | Predator species prefab (`count` → its `FixedCountPolicy`), `PredationSystem` (`kill_p`, rest after kill), `ScriptedChaseBackend` (`chase_radius`, `turn_p`) |
 | `agents.vision/near/energy_low/high` | sense components on the prefab |
 | `agents.energy_*`, `cost_*`, `maturity`, `max_age` | `Metabolism` on the prefab |
 | `agents.eat_gain`, `attack_*` | `EatAction`, `AttackAction` fields |
