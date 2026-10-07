@@ -82,9 +82,13 @@ evolution:
   random_founders: false      # C4 control
   # Mutation (rev. 2026-10-02): one operator. The mutator LLM (ollama.mutator_model) gets one
   # instruction drawn at random from this file plus the gene sentence, nothing else.
-  mutation_prompts: prompts/mutate_v2.txt
+  # Rev. 2026-10-08: small edits of the rule (v3, v2 = random word edits) and two more guards.
+  mutation_prompts: prompts/mutate_v3.txt
   temperature: 1.2            # mutator sampling temperature (results/mutation_test.md)
-  max_words: 12               # guard: longer answers are rejected (the gene doesn't mutate)
+  max_words: 12               # guard: longer answers are rejected
+  max_changed_words: 3        # guard: a mutant differs from its parent in at most 3 words (null: any size)
+  vocabulary: data/world_vocabulary_v1.txt   # guard: only words of the animal's world (null: any word)
+  mutation_tries: 5           # a rejected answer is drawn again (new instruction and seed), up to 5 attempts (3: 26 % of mutations failed)
 backend:
   name: rule_based            # random | rule_based | llm | laya (parked)
   obs_style: V1

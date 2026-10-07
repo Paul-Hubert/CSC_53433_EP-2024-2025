@@ -1,0 +1,49 @@
+# World vocabulary v1 (2026-10-08): the words a mutated gene may use (evolution.vocabulary).
+# A mutant with any other word is rejected and the mutation is drawn again; the mutator
+# never sees this list. Words of the founder genes, the decision prompts and the situation
+# texts, plus everyday words for rules about them. Objects, foods, colours, people and
+# other species are left out on purpose ("toaster", "pancakes", "bird").
+# Matching ignores case and simple endings: -s, -es, -ed, -d, -ing, -ly, -er, -est
+# ("chases", "chasing", "quickly"). Lines starting with # are ignored; add a word to allow it.
+
+# things in the animal's world
+food grass meal prey predator animal creature beast hunter partner mate companion group herd pack
+other carcass body remains leftovers energy stamina breath strength belly stomach hunger danger
+threat safety risk distance cell place spot area ground surroundings territory sight view age adult
+young youth child offspring baby family life chance time moment step turn way path side edge border
+rival competitor enemy leader member crowd space room movement motion effort pace speed
+
+# what animals do
+eat feed graze forage flee run escape hide dodge avoid chase hunt stalk pounce attack strike kill
+catch follow join gather stay keep remain move walk wander roam go come approach leave return rest
+sleep wait stop pause lie sit stand breed seek search find look watch see notice sense spot check try
+choose decide act do need want like prefer care matter mind save spend use recover regain grow live
+survive die starve share finish start begin continue hurry rush slow linger explore defend protect
+guard ignore fear trust dare let make get take give help lead stick settle tire feel think know
+remember happen reach close fill hold caught ate eaten fled ran hid kept left went gone came found
+conserve waste cease retreat charge ambush lurk pursue evade ensure appear seem become
+
+# qualities and states
+hungry starving full fed satisfied strong weak tired exhausted weary fresh rested winded healthy safe
+unsafe dangerous calm nervous careful cautious brave bold shy curious alert eager lazy patient quick
+fast slow quiet near nearby far distant scarce plentiful plenty abundant rare ready old alone lonely
+lost together big small large little open low high medium good bad best worst easy hard wise unwise
+sure free busy new same different nearest closest last next first second own fine able whole well
+better worse available necessary imminent hostile aggressive threatening
+
+# amounts, time and manner
+always never often usually sometimes rarely seldom hardly occasionally maybe perhaps once twice again
+soon later then now early late long short still already quickly slowly carefully gently eagerly
+calmly immediately right away back around ahead behind toward towards enough more less most least
+much many few lot all every each some any none nothing anything everything something whatever
+whenever wherever very too quite rather almost only just even also else instead no not yes one two
+three several half both either neither really truly honestly simply actually preference choice
+priority else otherwise forward within beside apart aside
+
+# grammar words
+a an the is are am be been being was were do does did done doing have has had will would can could
+may might must should shall to of in on at for with by from into onto out up down off over under
+about after before until unless while when if then than as because since so but and or nor that this
+these those it its it's you your yours you're yourself i i'm me my we our they them their themselves
+itself there here where what which who whom whose how why don't doesn't isn't aren't can't won't
+let's

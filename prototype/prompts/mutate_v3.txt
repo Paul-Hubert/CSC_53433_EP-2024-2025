@@ -1,0 +1,15 @@
+# Mutation instructions v3 (2026-10-08): small random edits to what the rule says.
+# For each mutation one line is drawn at random and sent to the mutator LLM with the gene
+# sentence, and nothing else: no world, no other genes, no fitness. Lines starting with #
+# are ignored. Add a line to add one. v2 (prompts/mutate_v2.txt) asked for random word edits,
+# including big and "unexpected" ones. Dropped after the first test: "Make this rule about
+# something else close to its subject." (it moved genes to another slot's topic).
+Make the rule in this sentence a little stronger.
+Make the rule in this sentence a little weaker.
+Change when this rule applies.
+Add a short condition to this rule.
+Remove a condition from this rule, or make it simpler.
+Change how near, how far or how much this rule is about.
+Make this rule say the opposite.
+Change one word of this rule into a related word.
+Say this rule in slightly different words.

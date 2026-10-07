@@ -1,15 +1,25 @@
 """Mutation test: how random is the LLM mutation, and where do genes go when they are
 mutated again and again? Pure mutation, no selection (a mutation-accumulation experiment).
 
-    python -m experiments.mutation_test [--temps 0.9,1.2,1.5,2.0] [--seeds 8] [--steps 30]
-                                        [--workers 4] [--model gemma4:12b]
+    python -m experiments.mutation_test [--rules current|old] [--temps 0.9,1.2,1.5,2.0] [--seeds 8]
+                                        [--steps 30] [--lineages all|first] [--no-judge] [--max-changed N] [--tries N]
+                                        [--workers 4] [--model gemma4:12b] [--tag mutation_test]
 
-Part 1, variety: every founder sentence x seeds x temperatures, one mutation each. For a
-given (sentence, seed index) the instruction and the seed are the same at every temperature.
-Part 2, lineages: one founder sentence of six slots, mutated step after step at each
-temperature (a rejected answer keeps the sentence: the mutation didn't happen).
-Each mutant is also read by the keyword brain (other genes neutral): behaviour distance d.
-Writes results/mutation_test.json + .md; progress in logs/mutation_test.progress.json.
+--rules: current = the config (since 2026-10-08: small edits of the rule, prompts/mutate_v3.txt,
+with the size and vocabulary guards and redraws); old = the mutation of 2026-10-02 to 10-07
+(prompts/mutate_v2.txt, no size or vocabulary guard, one attempt).
+Part 1, variety: every founder sentence of both species x seeds x temperatures, one mutation
+each (with its redraws). For a given (sentence, seed index) the random draws are the same at
+every temperature.
+Part 2, lineages: founder sentences mutated step after step at each temperature (a rejected
+mutation keeps the sentence): every founder sentence of both species (--lineages all, default)
+or the first one of each prey slot (first, as on 2026-10-02).
+Meaning: gemma4 judges whether a mutant still gives a usable rule for its slot (the question of
+gene_timeline --judge, prompts/judge_sense_v1.txt; single mutations and lineage steps 1, 5, 10,
+20, 30), whether it uses a word of the animal's world (gene_report's world words) and whether
+all its words are in data/world_vocabulary_v1.txt. Prey mutants are also read by the keyword
+brain (other genes neutral): behaviour distance d.
+Writes results/<tag>.json + .md; progress in logs/<tag>.progress.json.
 """
 from __future__ import annotations
 
@@ -23,22 +33,25 @@ from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 
+from experiments.gene_report import SITUATION_WORDS
+from experiments.gene_report import words as content_words
 from experiments.make_obs import load_obs
 from promptevo import metrics as M
 from promptevo.backends.base import Query
 from promptevo.backends.rule_based import RuleBasedBackend
 from promptevo.config import load_config, resolve
-from promptevo.evolution.mutation import TEMPLATE, Mutator, clean
+from promptevo.evolution.mutation import Mutator, load_vocabulary, unknown_words, words
 from promptevo.founder import AllelePools
 from promptevo.genome import AlleleRegistry
 from promptevo.llm.ollama_client import client_from_config, make_rewriter
 from promptevo.progress import Progress
+from promptevo.species import PREDATOR, PREY
 
-LINEAGE_LOCI = ("eat", "flee", "follow", "rest", "mate")
-
-
-def words(t: str) -> list[str]:
-    return t.lower().rstrip(".!?").replace(",", " ").replace(":", " ").split()
+LINEAGE_LOCI = ("eat", "flee", "follow", "rest", "mate")       # --lineages first
+OLD_RULES = {"mutation_prompts": "prompts/mutate_v2.txt", "max_changed_words": None, "vocabulary": None,
+             "mutation_tries": 1}                              # mutation from 2026-10-02 to 2026-10-07
+VOCABULARY = "data/world_vocabulary_v1.txt"                    # "only world words" is measured with it for both rules
+JUDGE_STEPS = (1, 5, 10, 20, 30)
 
 
 def compare(old: str, new: str) -> dict:
@@ -52,20 +65,8 @@ def compare(old: str, new: str) -> dict:
             "sim": round(difflib.SequenceMatcher(None, a, b).ratio(), 3), "dlen": len(b) - len(a), **where}
 
 
-def reason(raw: str, old: str, max_words: int) -> str:
-    new = clean(raw)
-    n = len(new.split())
-    if n == 0:
-        return "empty"
-    if n > max_words:
-        return "too long"
-    if new.lower() == old.lower():
-        return "unchanged"
-    return "characters"
-
-
 class KeywordJudge:
-    """Behaviour distance read by the keyword brain, with every other gene neutral."""
+    """Behaviour distance read by the keyword brain, with every other gene neutral (prey genes only)."""
 
     def __init__(self, reg: AlleleRegistry, pools: AllelePools):
         self.reg, self.pools, self.obs, self.rb = reg, pools, load_obs(), RuleBasedBackend()
@@ -80,31 +81,78 @@ class KeywordJudge:
                 self._p[key] = self.rb.decide([Query(self.reg.genome_key(g), self.reg.genes(g), o) for o in self.obs])
             return self._p[key]
 
-    def d(self, locus: str, a: str, b: str) -> float:
+    def d(self, locus: str, a: str, b: str) -> float | None:
+        if locus not in PREY.loci:
+            return None
         return round(M.behaviour_distance(self.probs(locus, a), self.probs(locus, b)), 4)
+
+
+class SenseJudge:
+    """Does a gene still give a usable rule for its slot? gemma4 answers yes or no (the question of
+    gene_timeline --judge); every answer is cached, so reruns cost nothing."""
+
+    def __init__(self, cfg, client):
+        from experiments.gene_timeline import JUDGE_PROMPT, TOPIC, slot_name   # (gene_timeline imports this module)
+        self.template = resolve(JUDGE_PROMPT).read_text(encoding="utf-8")
+        self.topic, self.slot_name, self.client, self.model = TOPIC, slot_name, client, cfg.policy.model
+        self.schema = {"type": "object", "properties": {"answer": {"type": "string", "enum": ["yes", "no"]}},
+                       "required": ["answer"]}
+
+    def usable(self, locus: str, text: str) -> bool:
+        prompt = self.template.format(slot=self.slot_name(locus), topic=self.topic.get(locus, locus), text=text)
+        r = self.client.chat_json(self.model, [{"role": "user", "content": prompt}], self.schema,
+                                  options={"seed": 0, "temperature": 0})
+        return r.get("answer") == "yes"
+
+
+def mutate(mut: Mutator, locus: str, text: str, rng) -> tuple[str | None, int, int, list[str]]:
+    """Like Mutator.mutate_text, also returning the outcome of every attempt ("ok" or why it was rejected)."""
+    tries = []
+    for _ in range(mut.tries):
+        new, k, seed, why = mut.attempt(locus, text, rng)
+        tries.append(why or "ok")
+        if new is not None:
+            break
+    return new, k, seed, tries
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--profile", default="small")
+    ap.add_argument("--rules", default="current", choices=["current", "old"])
     ap.add_argument("--temps", default="0.9,1.2,1.5,2.0")
     ap.add_argument("--seeds", type=int, default=8)
     ap.add_argument("--steps", type=int, default=30)
+    ap.add_argument("--lineages", default="all", choices=["all", "first"])
+    ap.add_argument("--no-judge", action="store_true", help="skip the usable-rule question (no extra calls)")
+    ap.add_argument("--max-changed", type=int, default=None, help="override evolution.max_changed_words")
+    ap.add_argument("--tries", type=int, default=None, help="override evolution.mutation_tries")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--model", default=None)
     ap.add_argument("--tag", default="mutation_test")
     a = ap.parse_args()
-    cfg = load_config(a.profile)
+    over = dict(OLD_RULES) if a.rules == "old" else {}
+    if a.max_changed is not None:
+        over["max_changed_words"] = a.max_changed
+    if a.tries is not None:
+        over["mutation_tries"] = a.tries
+    cfg = load_config(a.profile, {"evolution": over})
     temps = [float(t) for t in a.temps.split(",")]
     model = a.model or cfg.ollama.mutator_model
     client = client_from_config(cfg)
     reg = AlleleRegistry()
-    pools = AllelePools(reg, cfg.paths.data_dir)
-    judge = KeywordJudge(reg, pools)
+    pools = {sp.name: AllelePools(reg, cfg.paths.data_dir, species=sp) for sp in (PREY, PREDATOR)}
+    kw = KeywordJudge(reg, pools["prey"])
+    sense = None if a.no_judge else SenseJudge(cfg, client)
+    vocab = load_vocabulary(VOCABULARY)
+    founders = [(l, reg.text(x)) for p in pools.values() for l in p.founders for x in p.founders[l]
+                if reg.get(x).origin == "founder"]
+    world = set(SITUATION_WORDS) | {w for _, t in founders for w in content_words(t)}
     muts = {t: Mutator(cfg, reg, make_rewriter(client, model, temperature=t), model) for t in temps}
     instructions = muts[temps[0]].instructions
-    founders = [(l, reg.text(x)) for l in pools.founders for x in pools.founders[l] if reg.get(x).origin == "founder"]
-    total = len(founders) * a.seeds * len(temps) + len(LINEAGE_LOCI) * a.steps * len(temps)
+    starts = (founders if a.lineages == "all"
+              else [(l, reg.text(pools["prey"].founders[l][0])) for l in LINEAGE_LOCI])
+    total = len(founders) * a.seeds * len(temps) + len(starts) * a.steps * len(temps)
     prog = Progress(resolve(cfg.paths.logs_dir), a.tag, total=total)
     done, lock, t0 = [0], threading.Lock(), time.time()
 
@@ -114,32 +162,35 @@ def main() -> None:
             if done[0] % 20 == 0:
                 prog.update(done[0])
 
+    def meaning(locus: str, text: str, judge: bool) -> dict:
+        out = {"world": bool(content_words(text) & world), "in_vocab": not unknown_words(text, vocab)}
+        if judge and sense:
+            out["usable"] = sense.usable(locus, text)
+        return out
+
     def one(job):
         t, (locus, text), i, s = job
-        mut = muts[t]
-        new, k, seed = mut.mutate_text(locus, text, np.random.default_rng([i, s]))
-        row = {"temp": t, "locus": locus, "parent": text, "seed_index": s, "prompt": k, "seed": seed, "new": new}
-        if new is None:          # ask again (a cache hit, no new call) to see why the guard said no
-            raw = mut.llm(TEMPLATE.format(instruction=mut.instructions[k], text=text), seed)
-            row.update(raw=raw.strip()[:160], reason=reason(raw, text, mut.max_words[locus]))
+        new, k, seed, tries = mutate(muts[t], locus, text, np.random.default_rng([i, s]))
+        row = {"temp": t, "locus": locus, "parent": text, "seed_index": s, "prompt": k, "seed": seed, "new": new,
+               "tries": tries}
+        if new is None:
+            row["reason"] = tries[-1]
         else:
-            row.update(compare(text, new), d=judge.d(locus, text, new))
+            row.update(compare(text, new), d=kw.d(locus, text, new), **meaning(locus, new, True))
         tick()
         return row
 
     def lineage(job):
-        t, li, locus = job
-        mut = muts[t]
-        rng = np.random.default_rng([100 + li, 7])           # same instructions and seeds at every temperature
-        start = cur = reg.text(pools.founders[locus][0])
-        steps = []
+        t, li, (locus, start) = job
+        rng = np.random.default_rng([100 + li, 7])           # same draws at every temperature
+        cur, steps = start, []
         for step in range(1, a.steps + 1):
-            new, k, seed = mut.mutate_text(locus, cur, rng)
+            new, k, seed, tries = mutate(muts[t], locus, cur, rng)
             if new is not None:
                 cur = new
-            steps.append({"step": step, "prompt": k, "accepted": new is not None, "text": cur,
+            steps.append({"step": step, "prompt": k, "accepted": new is not None, "tries": len(tries), "text": cur,
                           "words": len(cur.split()), "sim_to_start": compare(start, cur)["sim"],
-                          "d_to_start": judge.d(locus, start, cur)})
+                          "d_to_start": kw.d(locus, start, cur), **meaning(locus, cur, step in JUDGE_STEPS)})
             tick()
         return {"temp": t, "locus": locus, "start": start, "steps": steps}
 
@@ -147,20 +198,24 @@ def main() -> None:
     try:
         with ThreadPoolExecutor(a.workers) as ex:
             variety = list(ex.map(one, jobs))
-            lineages = list(ex.map(lineage, [(t, li, l) for t in temps for li, l in enumerate(LINEAGE_LOCI)]))
+            lineages = list(ex.map(lineage, [(t, li, st) for t in temps for li, st in enumerate(starts)]))
     except Exception as e:
         prog.fail(done[0], repr(e))
         raise
-    res = {"model": model, "digest": client.digest(model), "temps": temps, "seeds": a.seeds, "steps": a.steps,
-           "instructions": instructions, "variety": variety, "lineages": lineages,
+    ec = cfg.evolution
+    res = {"model": model, "digest": client.digest(model), "rules": a.rules, "prompts": ec.mutation_prompts,
+           "guards": {"max_changed_words": ec.get("max_changed_words"), "vocabulary": ec.get("vocabulary"),
+                      "tries": muts[temps[0]].tries},
+           "temps": temps, "seeds": a.seeds, "steps": a.steps, "instructions": instructions,
+           "variety": variety, "lineages": lineages, "judge_model": None if a.no_judge else cfg.policy.model,
            "elapsed_s": round(time.time() - t0, 1), "date": time.strftime("%Y-%m-%d")}
     res["summary"] = summarise(res)
     out = resolve(cfg.paths.results_dir)
     (out / f"{a.tag}.json").write_text(json.dumps(res, indent=1, ensure_ascii=False), encoding="utf-8")
     lines = report(res)
-    (out / f"{a.tag}.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (out / f"{a.tag}.md").write_bytes(("\n".join(lines) + "\n").encode("utf-8"))
     prog.finish(done[0])
-    print("\n".join(lines[:14]))
+    print("\n".join(lines[:16]))
     print(f"details: {out / (a.tag + '.md')}")
 
 
@@ -172,6 +227,11 @@ def revisits(lineage: dict) -> int:
             n += s["text"] in seen
             seen.add(s["text"])
     return n
+
+
+def share(rows, key) -> float | None:
+    xs = [r[key] for r in rows if r.get(key) is not None]
+    return float(np.mean(xs)) if xs else None
 
 
 def summarise(res: dict) -> dict:
@@ -187,21 +247,28 @@ def summarise(res: dict) -> dict:
         fin = [x["steps"][-1]["text"] for x in lin]
         sims = lambda texts: float(np.mean([difflib.SequenceMatcher(None, words(p), words(q)).ratio()
                                             for i, p in enumerate(texts) for q in texts[i + 1:]]))
+        ds = [r["d"] for r in ok if r.get("d") is not None]
         by_t[t] = {
             "valid": len(ok) / len(rows), "reasons": dict(Counter(r["reason"] for r in rows if not r["new"])),
+            "attempts": float(np.mean([len(r["tries"]) for r in rows])),
+            "rejected": dict(Counter(x for r in rows for x in r["tries"] if x != "ok")),
+            "usable": share(ok, "usable"), "world": share(ok, "world"), "in_vocab": share(ok, "in_vocab"),
             "distinct_per_sentence": sum(len(v) for v in distinct.values()) / n_parents,
             "edit_words": float(np.mean([r["size"] for r in ok])), "one_word": float(np.mean([r["size"] == 1 for r in ok])),
             "big": float(np.mean([r["size"] >= 4 for r in ok])),
             "first": float(np.mean([r["first"] for r in ok])), "middle": float(np.mean([r["middle"] for r in ok])),
             "last": float(np.mean([r["last"] for r in ok])), "dlen": float(np.mean([r["dlen"] for r in ok])),
             "longer3": float(np.mean([r["dlen"] >= 3 for r in ok])), "sim": float(np.mean([r["sim"] for r in ok])),
-            "jump": float(np.mean([r["sim"] < 0.3 for r in ok])), "neutral": float(np.mean([r["d"] < 1e-4 for r in ok])),
-            "d_mean": float(np.mean([r["d"] for r in ok])), "d_max": float(np.max([r["d"] for r in ok])),
+            "jump": float(np.mean([r["sim"] < 0.3 for r in ok])), "neutral": float(np.mean([d < 1e-4 for d in ds])),
+            "d_mean": float(np.mean(ds)), "d_max": float(np.max(ds)),
             "lineage_accepted": float(np.mean([s["accepted"] for x in lin for s in x["steps"]])),
             "lineage_words_end": float(np.mean([x["steps"][-1]["words"] for x in lin])),
             "lineage_words_start": float(np.mean([len(x["start"].split()) for x in lin])),
             "lineage_sim_end": float(np.mean([x["steps"][-1]["sim_to_start"] for x in lin])),
             "lineage_revisits": float(np.mean([revisits(x) for x in lin])),
+            "lineage_meaning": {n: {k: share([x["steps"][n - 1] for x in lin if len(x["steps"]) >= n], k)
+                                    for k in ("usable", "world", "in_vocab")}
+                                for n in JUDGE_STEPS if n <= res["steps"]},
             "finals_alike": sims(fin), "starts_alike": sims([x["start"] for x in lin])}
     per_prompt = {}
     for k, ins in enumerate(res["instructions"]):
@@ -211,26 +278,52 @@ def summarise(res: dict) -> dict:
             per_prompt[ins] = {"n": len(rows), "valid": len(ok) / len(rows),
                                "edit_words": float(np.mean([r["size"] for r in ok])) if ok else float("nan"),
                                "dlen": float(np.mean([r["dlen"] for r in ok])) if ok else float("nan"),
-                               "jump": float(np.mean([r["sim"] < 0.3 for r in ok])) if ok else float("nan")}
+                               "jump": float(np.mean([r["sim"] < 0.3 for r in ok])) if ok else float("nan"),
+                               "usable": share(ok, "usable")}
     return {"by_temp": by_t, "per_prompt": per_prompt}
+
+
+def pct(x) -> str:
+    return "—" if x is None else f"{x:.0%}"
 
 
 def report(res: dict) -> list[str]:
     S = res["summary"]
     T = res["temps"]
     n_par = len({(r["locus"], r["parent"]) for r in res["variety"]})
+    n_lin = len(res["lineages"]) // len(T)
+    g = res.get("guards", {})
+    rules = (f"`{res.get('prompts', 'prompts/mutate_v2.txt')}`, at most {g.get('max_changed_words') or 'any'} words "
+             f"changed, vocabulary {g.get('vocabulary') or 'any word'}, up to {g.get('tries', 1)} attempts")
     L = [f"# Mutation test — {res['model']} (digest {res['digest']}), {res['date']}", "",
-         f"Pure mutation, no selection. Variety: {n_par} founder sentences × {res['seeds']} seeds × "
-         f"{len(T)} temperatures. Lineages: {len(LINEAGE_LOCI)} sentences × {res['steps']} steps per temperature. "
-         f"{len(res['instructions'])} instructions (`prompts/mutate_v2.txt`). {res['elapsed_s']:.0f} s.", "",
-         "| temperature | " + " | ".join(str(t) for t in T) + " |", "|---|" + "---|" * len(T)]
-    rows = [("valid answers", "valid", "{:.0%}"), (f"distinct mutants per sentence (of {res['seeds']})", "distinct_per_sentence", "{:.1f}"),
+         f"Pure mutation, no selection. Rules: {res.get('rules', 'old')} ({rules}). Variety: {n_par} founder "
+         f"sentences × {res['seeds']} seeds × {len(T)} temperature(s). Lineages: {n_lin} sentences × {res['steps']} "
+         f"steps per temperature. {len(res['instructions'])} instructions. {res['elapsed_s']:.0f} s.", ""]
+    if res.get("judge_model") or any("in_vocab" in r for r in res["variety"]):
+        L += [f"**Meaning** (usable: {res.get('judge_model') or '—'} says the gene still gives a usable rule for its slot; "
+              "world word: uses a word of the animal's world; only world words: every word in "
+              f"`{VOCABULARY}`).", "",
+              "| temperature | " + " | ".join(str(t) for t in T) + " |", "|---|" + "---|" * len(T)]
+        B = S["by_temp"]
+        L.append("| single mutations: usable | " + " | ".join(pct(B[t]["usable"]) for t in T) + " |")
+        L.append("| … use a world word | " + " | ".join(pct(B[t]["world"]) for t in T) + " |")
+        L.append("| … only world words | " + " | ".join(pct(B[t]["in_vocab"]) for t in T) + " |")
+        L.append("| attempts per mutation | " + " | ".join(f"{B[t]['attempts']:.2f}" for t in T) + " |")
+        L.append("| rejected attempts | " + " | ".join(", ".join(f"{k} {v}" for k, v in B[t]["rejected"].items()) or "none"
+                                                       for t in T) + " |")
+        for n in B[T[0]]["lineage_meaning"]:
+            m = {t: B[t]["lineage_meaning"][n] for t in T}
+            L.append(f"| lineages after {n} steps: usable / world word / only world words | "
+                     + " | ".join(f"{pct(m[t]['usable'])} / {pct(m[t]['world'])} / {pct(m[t]['in_vocab'])}" for t in T) + " |")
+        L.append("")
+    L += ["| temperature | " + " | ".join(str(t) for t in T) + " |", "|---|" + "---|" * len(T)]
+    rows = [("valid answers (after redraws)", "valid", "{:.0%}"), (f"distinct mutants per sentence (of {res['seeds']})", "distinct_per_sentence", "{:.1f}"),
             ("words changed per mutation", "edit_words", "{:.1f}"), ("one-word edits", "one_word", "{:.0%}"),
             ("big edits (≥ 4 words)", "big", "{:.0%}"), ("edit touches the first word", "first", "{:.0%}"),
             ("… a middle word", "middle", "{:.0%}"), ("… the last word", "last", "{:.0%}"),
             ("length change (words)", "dlen", "{:+.2f}"), ("≥ 3 words longer", "longer3", "{:.0%}"),
             ("similarity to parent", "sim", "{:.2f}"), ("jumps (similarity < 0.3)", "jump", "{:.0%}"),
-            ("keyword brain: no effect", "neutral", "{:.0%}"), ("keyword brain: mean d", "d_mean", "{:.4f}"),
+            ("keyword brain: no effect (prey genes)", "neutral", "{:.0%}"), ("keyword brain: mean d", "d_mean", "{:.4f}"),
             ("keyword brain: max d", "d_max", "{:.3f}"), ("lineages: steps accepted", "lineage_accepted", "{:.0%}"),
             ("lineages: words start → end", None, None), ("lineages: similarity to start at the end", "lineage_sim_end", "{:.2f}"),
             ("lineages: returns to an earlier sentence", "lineage_revisits", "{:.1f}"),
@@ -245,11 +338,13 @@ def report(res: dict) -> list[str]:
             L.append(f"| {label} | " + " | ".join(f"{S['by_temp'][t]['finals_alike']:.2f} "
                                                    f"({S['by_temp'][t]['starts_alike']:.2f})" for t in T) + " |")
     reasons = {t: S["by_temp"][t]["reasons"] for t in T}
-    L += ["", "Rejected answers by reason: " + "; ".join(f"T {t}: {r or 'none'}" for t, r in reasons.items()), "",
-          "## Per instruction (all temperatures)", "", "| instruction | n | valid | words changed | length change | jumps |",
-          "|---|---|---|---|---|---|"]
+    L += ["", "Mutations that failed (every attempt rejected), by the last reason: "
+          + "; ".join(f"T {t}: {r or 'none'}" for t, r in reasons.items()), "",
+          "## Per instruction (all temperatures)", "",
+          "| instruction | n | valid | words changed | length change | jumps | usable |", "|---|---|---|---|---|---|---|"]
     for ins, p in S["per_prompt"].items():
-        L.append(f"| {ins} | {p['n']} | {p['valid']:.0%} | {p['edit_words']:.1f} | {p['dlen']:+.1f} | {p['jump']:.0%} |")
+        L.append(f"| {ins} | {p['n']} | {p['valid']:.0%} | {p['edit_words']:.1f} | {p['dlen']:+.1f} | {p['jump']:.0%} "
+                 f"| {pct(p.get('usable'))} |")
     L += ["", "## Lineages (each line: a step where the gene changed)", ""]
     for x in res["lineages"]:
         L.append(f"### {x['locus']}, T {x['temp']}: \"{x['start']}\"")
@@ -257,10 +352,11 @@ def report(res: dict) -> list[str]:
         prev = x["start"]
         for s in x["steps"]:
             if s["text"] != prev:
-                L.append(f"- {s['step']:>2}. {s['text']}  (d {s['d_to_start']:.3f})")
+                d = "" if s.get("d_to_start") is None else f"  (d {s['d_to_start']:.3f})"
+                L.append(f"- {s['step']:>2}. {s['text']}{d}")
                 prev = s["text"]
         L.append("")
-    L += ["## Variety samples (first 3 founder sentences of eat, flee, risk)", ""]
+    L += ["## Variety samples (one founder sentence of eat, flee, mate)", ""]
     for locus in ("eat", "flee", "mate"):
         parent = next(r["parent"] for r in res["variety"] if r["locus"] == locus)
         L.append(f"### \"{parent}\"")

@@ -96,6 +96,15 @@ def reading(locus: str, text: str) -> str:
     return label
 
 
+def run_instructions(path: Path) -> list[str]:
+    """The mutation instructions a run used, from its run_info.json (config.evolution.mutation_prompts);
+    prompts/mutate_v2.txt for runs that don't say (all runs before 2026-10-08)."""
+    f, info = "prompts/mutate_v2.txt", path / "run_info.json"
+    if info.exists():
+        f = json.loads(info.read_text(encoding="utf-8")).get("config", {}).get("evolution", {}).get("mutation_prompts", f)
+    return load_instructions(f)
+
+
 class Run:
     def __init__(self, path: Path, species: str = "prey"):
         self.path, self.name, self.species = path, path.name, species
@@ -292,9 +301,9 @@ def main() -> None:
     ap.add_argument("--species", default="prey", choices=sorted(SPECIES))
     a = ap.parse_args()
     cfg = load_config("small")
-    instructions = load_instructions(cfg.evolution.mutation_prompts)
     runs = [Run(resolve(p), a.species) for p in a.runs]
     main_run = runs[0]
+    instructions = run_instructions(main_run.path)
     tag = a.tag or (main_run.name if a.species == "prey" else f"{main_run.name}_{a.species}")
     fit = {r.name: r.fitness(a.min_carriers) for r in runs}
     F = fit[main_run.name]

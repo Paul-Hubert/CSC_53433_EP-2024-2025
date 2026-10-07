@@ -33,11 +33,10 @@ from pathlib import Path
 
 import numpy as np
 
-from experiments.gene_report import Run
+from experiments.gene_report import Run, run_instructions
 from experiments.gene_report import words as content_words
 from experiments.mutation_test import compare
 from promptevo.config import load_config, resolve
-from promptevo.evolution.mutation import load_instructions
 from promptevo.species import SPECIES, species_of_locus
 
 SWEEP = 0.25        # a gene "swept" when it reached this share of its slot at a checkpoint
@@ -788,13 +787,21 @@ def page(run: Run, g: Genes, sc, rows, sh, sw, beh, md_lines, tag: str) -> str:
 
 
 # --- main ------------------------------------------------------------------------------------
+def mutation_test_for(cfg, instructions: list[str]) -> dict | None:
+    """The mutation test made with the run's instructions (results/mutation_test*.json), or None."""
+    for p in sorted(resolve(cfg.paths.results_dir).glob("mutation_test*.json")):
+        mt = json.loads(p.read_text(encoding="utf-8"))
+        if mt.get("instructions") == instructions:
+            return mt
+    return None
+
+
 def build(run_dir: Path, every: int, window: int, drops: int, judge_on: bool = False, judge_max: int = 3000,
           cfg=None, test: str | None = None, test_from: int = 0, species: str = "prey") -> dict:
     cfg = cfg or load_config("small")
-    instructions = load_instructions(cfg.evolution.mutation_prompts)
-    mt_path = resolve(cfg.paths.results_dir) / "mutation_test.json"
-    mt = json.loads(mt_path.read_text(encoding="utf-8")) if mt_path.exists() else None
     run = Run(run_dir, species)
+    instructions = run_instructions(run.path)
+    mt = mutation_test_for(cfg, instructions)
     g = Genes(run, instructions, mt["summary"]["per_prompt"] if mt else None)
     sc = scan(run, every)
     sense, calls = {}, 0

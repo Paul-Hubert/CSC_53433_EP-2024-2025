@@ -75,7 +75,7 @@ def test_run_info_and_progress_time_box(tmp_path):
     write_info(tmp_path, a, load_config("small"), "rule_based", 3, None)
     info = json.loads((tmp_path / "run_info.json").read_text(encoding="utf-8"))
     assert info["seed"] == 3 and info["git"]["commit"] and "ollama" not in info
-    assert info["config"]["evolution"]["mutation_prompts"] == "prompts/mutate_v2.txt"
+    assert info["config"]["evolution"]["mutation_prompts"] == "prompts/mutate_v3.txt"
     with keep_awake():
         p = Progress(tmp_path, "job", total=10**6, deadline=time.time() + 60)
         p.update(10)

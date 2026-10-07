@@ -151,7 +151,7 @@ def test_factory_and_llm_simulation(reg_pools):
 
     def rewriter(prompt, seed):
         calls.append(prompt)
-        return "Run from every shadow."
+        return re.search(r'"(.*)"', prompt).group(1).rstrip(".") + " quickly."   # a small edit in the world
     rw, model = make_rewriter(cfg, client)
     assert rw is not None and model == "brain"
     sim = Simulation(cfg, backend, seed=3, rewriter=rewriter, rewriter_model="fake")
@@ -164,7 +164,7 @@ def test_factory_and_llm_simulation(reg_pools):
     assert backend.prefetched > 0
     sim._birth(sim.agents[:2])                                  # force one birth: genes via LLM
     child = sim.agents[-1]
-    assert calls and "Run from every shadow." in sim.registry.genes(child.genome).values()
+    assert calls and any(t.endswith(" quickly.") for t in sim.registry.genes(child.genome).values())
 
 
 def lp_transport(log, tokens):
