@@ -10,7 +10,7 @@ with how likely each of five behaviours is (eat, flee, follow, rest, mate), and
 one behaviour is drawn from those probabilities.
 Animals that find food, avoid predators and mate leave children. A child takes
 each sentence from one parent or the other, and now and then a sentence is
-**mutated**: an LLM makes one random change to it, seeing nothing but that sentence.
+**mutated**: an LLM makes one small random change to it, seeing nothing but that sentence.
 Nobody scores the genomes; survival does. Because genes are sentences, what
 evolves can be **read**.
 

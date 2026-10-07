@@ -89,3 +89,11 @@ make_dataset.py, label_teacher.py, S5 distillation.
   average even pooled; steady leaders +1-2 % (cautious, solitary, familiar, flee when predator very close, never
   attack, rest when food far); clearly worse: attack always 0.77, restless 0.79 (60 % killed by predators), risk
   no effect 0.89 (53 %). Living genes 92-100 % mutants, 62-79 % use a world word. results/long_1234_genes.md.
+
+## Moved from STATUS.md › Key numbers (2026-10-08, mutation v3)
+- Mutation test (2026-10-02, gemma4:12b, 2 000 calls, 223 s, no selection): single mutations 99 % valid,
+  7.0-7.3 distinct of 8 per sentence (T 0.9 → 2.0: temperature barely matters; the instruction sets
+  the step: 1-2 words vs 6-7 for the 4 "big" ones), +0.1 word, 50-55 % neutral for rule_based.
+  Lineages (24 × 30 steps): genes using a world word 83 % after 1, 58 % after 10, 21 % after 15,
+  12 % after 30; 4.7 → 6.5-7.8 words; "toaster" in 18/24 lineages. ≈ 270 mutation calls per
+  10 000 ticks (rule_based, small).

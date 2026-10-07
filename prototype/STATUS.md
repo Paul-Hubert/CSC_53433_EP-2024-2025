@@ -4,16 +4,17 @@
 > `notes/archive.md`. Plan: `../Docs/redesign/08-phase0-spike-plan.md`.
 
 ## Position
-Session: S1.3 done locally, S4.3 gate run · Last updated: 2026-10-07 (predators = genetic animals with 4 genes;
-96 x 96 default world; stamina + speed + carcasses (bb61a30); LLM check done)
+Session: S1.3 done locally, S4.3 gate run · Last updated: 2026-10-08 (stamina + speed + carcasses; mutation v3:
+small edits of the rule + size and vocabulary checks, measured)
 
 ## Next action
-Stamina, speed, carcasses done 2026-10-07 (bb61a30 code, ab6a1ad docs; LLM check in 06 §5.16). WAIT for owner
+Mutation v3 done 2026-10-08 (owner chose options 2 + 3; 06 §5.17, 04 §5). Stamina etc. done 2026-10-07 (06 §5.16).
+Not yet run: an LLM run with mutation v3 (selection + small mutations). WAIT for owner
 (../Docs/prompt-genome/09 §4): #10 keep the values (predators at their cap with both brains) or let food limit
 them; cost ≈ 12 calls per tick (5 000 ticks ≈ 6.5 h); G2 handling
 (all-zero answers → neutral answer? cleaner control sentences? prompt iteration 1/3?); founder pools H1
 (prey v2 + predator v2). Then longer LLM runs with both species + `gene_timeline --species prey|predator`. Rerun
-`python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b` (teacher_v4 + obs v2: new
+`python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b` (teacher_v5 + obs v2: new
 answers, ≈ 420 calls), then E1 on the LLM brain in the background:
 `nohup python -m experiments.e1_sensitivity --backend llm --tag llm_points > logs/e1_llm.log 2>&1 &`
 (≈ 5 500 decisions, ≈ 50 min). Then several-seed LLM runs on the Lab 1 world (S6 prep).
@@ -28,7 +29,7 @@ answers, ≈ 420 calls), then E1 on the LLM brain in the background:
 - [ ] S7 report, go/no-go · H5 decision
 
 ## Environment
-Windows 11 Pro, Python 3.13.5 (.venv), RTX 5080 16 GB, Ollama 0.35.1 (0.32 until 2026-10-02). Offline suite 75 passed.
+Windows 11 Pro, Python 3.13.5 (.venv), RTX 5080 16 GB, Ollama 0.35.1 (0.32 until 2026-10-02). Offline suite 77 passed.
 Edit scripts: write files with write_bytes (Path.write_text writes CRLF here; most files are LF) and never put
 backslashes in Bash heredocs (they lose one level): use the Write tool for scripts.
 Windows: experiments.status used os.kill(pid, 0); signal 0 is CTRL_C_EVENT on Windows, so live jobs
@@ -79,17 +80,15 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
 | 2026-10-02 | **Mutation = one blind LLM operator**: instruction drawn from prompts/mutate_v2.txt (16 "random change" variants) + the gene, nothing else; temperature 1.2; word operators, styles, founder_reintroduce removed; mutator_model gemma4:12b; every run with mutation needs Ollama (`--no-mutation` otherwise) | owner: "evolution and mutation does not care about state and success, pure random"; review notes/mutation-review.md; test results/mutation_test.md |
 | 2026-10-07 | **Genome = 5 genes, one per action** (eat, flee, follow, rest, mate): risk, social, place (temperament) and the attack and wander genes AND actions removed; no fights between animals; an action with nothing in sight still wanders (eat = search); founder_pool_v2 (same texts); prompts/teacher_v2.md; evolution.max_words | owner: "simplify the genes to a minimum"; predators become genetic animals next |
 | 2026-10-07 | **Predators = genetic animals** (species.py: genes hunt, rest, mate; loci `predator.<action>`; same LLM brain with prompts/predator_v1.md; energy, breeding, mutation; floor 3, cap 15 / small 10). hunt = step toward prey, strike when adjacent: kill_p 0.1, kill_gain 60, then digest 50 ticks (no decision). **Vision 20 + distance bands [1, 4, 10] for both**, text in cells; same speed (≤ 1 cell/tick); prompts/teacher_v3.md; data/observations_v2.jsonl; rule_based predators seek far partners when well fed | owner: "gene-based actor with an LLM exactly like the prey", limited actions, longer vision + some distance observation, same speed. Tuned with rule_based (4 seeds, 8 000 ticks): kill_p 0.2 or cheaper predators push the prey to the floor |
+| 2026-10-08 | **Mutation v3**: prompts/mutate_v3.txt (9 small edits of the rule); guards max_changed_words 3, vocabulary data/world_vocabulary_v1.txt (493 words, endings ok); redraw up to mutation_tries 5; still blind | owner: random but small, meaningful most of the time (options 2 + 3). Drafts: 3 tries → 26 % failed; ≤ 5 words → more variety, less meaning; "something else close to its subject" moved genes to other slots (dropped) |
 | 2026-10-07 | **Stamina + speed + carcasses**: 1 stamina per cell (prey 60, predators 30), +2 per still tick at 0.3 energy until full; hunt/flee run at `speed` (predators 2, prey 1), other moves walk 1; a kill leaves a carcass, 1 portion (30 energy, digest 25) for each of up to 2 other predators, rots after 100 ticks; obs: stamina (both), carcass (predators); teacher_v5 / predator_v3; keyword brain rests when out of breath, "tired" = stamina low | owner request. Keyword sweeps (3 seeds): portions 20 or kill_p 0.07 + portions 20 → predators below cap but starving in waves, prey at the floor up to 10 %; kill_p 0.07, digest 80, regen 1.5 → predators at cap; first values kept |
 | 2026-10-01 | **Lab 1 world = flat**: water/mountain fractions 0, food uniformly random, food_regrow_p 0.0007; old noise terrain kept as configs/worlds/terrain_preview.yaml (food 0.001), `smoke_run --world terrain_preview` | Owner: the evolution lab becomes Lab 1; the terrain and foliage labs come later and change the world. Flat at 0.001 sat at the cap 25-68 % of the time. At 0.0007 (rule_based, 5k ticks, 3 seeds): small mean pop 25-28 (cap 40, never reached), deaths predator ≈ 230 / starvation ≈ 185, lifespan ≈ 290, 22-25 generations; full mean pop 47-49 (cap 60); random brain collapses to the floor (≈ 250 immigrants) |
 
 ## Key numbers
 - Sim speed (small, rule_based): 5 000 ticks ≈ 12 s CPU; decision memo hit rate ≈ 0.6 (Lab 1 world).
-- Mutation test (2026-10-02, gemma4:12b, 2 000 calls, 223 s, no selection): single mutations 99 % valid,
-  7.0-7.3 distinct of 8 per sentence (T 0.9 → 2.0: temperature barely matters; the instruction sets
-  the step: 1-2 words vs 6-7 for the 4 "big" ones), +0.1 word, 50-55 % neutral for rule_based.
-  Lineages (24 × 30 steps): genes using a world word 83 % after 1, 58 % after 10, 21 % after 15,
-  12 % after 30; 4.7 → 6.5-7.8 words; "toaster" in 18/24 lineages. ≈ 270 mutation calls per
-  10 000 ticks (rule_based, small).
+- Mutation v3 vs old rules (2026-10-08, 36 founders x 8 seeds + 36 lineages x 30, T 1.2, gemma4 judge): succeed 88 %
+  (2.4 attempts) vs 99 %; words changed 1.8 vs 2.7; usable after 1/10/30 mutations 92/67/44 % vs 61/8/0 %; world word
+  after 30: 83 % vs 22 %; distinct mutants 4.6 vs 7.2 of 8. results/mutation_test_v3.md, _old_rules.md, _v3_draft*.md.
 - LLM brain, 12 h (2026-10-05/06, seed 1234 continues llm_60min): 57 061 ticks, 79 667 calls, 0 failures, 812
   mutations, peak generation 114. Rescued line thrived (29 animals, t 6-20k), then died out (t 27 337); 874
   newcomers in 30k ticks, no second rescue. Predation trap: kills ≈ constant → 1.9 vs 3.8 per 1 000
