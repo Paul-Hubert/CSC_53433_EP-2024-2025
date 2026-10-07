@@ -22,9 +22,9 @@ Genes mutate through the mutator LLM (`ollama.mutator_model`, gemma4:12b) with e
 so these runs need Ollama; add `--no-mutation` to run fully offline (crossover only).
 
 ```bash
-python -m experiments.smoke_run --ticks 5000              # Lab 1 flat world + rule-based agents, ASCII snapshots
+python -m experiments.smoke_run --ticks 5000              # Lab 1 flat world (64 x 64) + rule-based prey and predators, ASCII snapshots
 python -m experiments.smoke_run --no-mutation             # the same with no model at all
-python -m experiments.smoke_run --backend random          # null model: the population collapses to the floor
+python -m experiments.smoke_run --backend random          # null model: predators live on newcomers only
 python -m experiments.smoke_run --world terrain_preview   # preview of the terrain labs (water, mountains)
 python -m experiments.make_obs                              # data/observations_v2.jsonl
 python -m experiments.e1_sensitivity --backend rule_based   # gene-sensitivity suite (reference numbers)
@@ -40,7 +40,7 @@ python -m experiments.peek results/runs/smoke/events.jsonl -n 3
 python -m experiments.e0_probe_ollama --teacher gemma4:12b --mutator gemma4:12b  # speed, determinism, logprobs
 python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b  # do genes steer it? (G1/G2)
 python -m experiments.e1_sensitivity --backend llm --tag llm_points               # full E1 suite
-python -m experiments.smoke_run --backend llm --ticks 500                         # ≈ 7 min on a 16 GB GPU; read llm_calls
+python -m experiments.smoke_run --backend llm --ticks 500                         # ≈ 11 min on a 16 GB GPU; read llm_calls
 # cloud: export OLLAMA_API_KEY=...; set ollama.host: https://ollama.com (or use cloud tags via local server)
 ```
 

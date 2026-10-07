@@ -56,9 +56,9 @@ cd prototype
 python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
 pytest -q                                              # 67 tests, no model needed
-python -m experiments.smoke_run                        # Lab 1 world, rule-based brain, ≈ 12 s
+python -m experiments.smoke_run                        # Lab 1 world (64 × 64), rule-based brain, ≈ 9 s
 ollama pull gemma4:12b
-python -m experiments.smoke_run --backend llm --ticks 500   # the LLM brain, ≈ 7 min on a 16 GB GPU
+python -m experiments.smoke_run --backend llm --ticks 500   # the LLM brain for both species, ≈ 11 min on a 16 GB GPU
 ```
 
 ## Related material

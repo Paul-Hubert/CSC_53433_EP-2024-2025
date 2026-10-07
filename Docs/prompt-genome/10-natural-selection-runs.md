@@ -355,7 +355,7 @@ the genes (`prototype/results/llm_60min_genes.md`, 2026-10-02).
   background or on a lab server.
 
 ```bash
-python -m experiments.smoke_run --backend llm --minutes 60 --seed 1234 --ticks 20000 --snapshots 10 \
+python -m experiments.smoke_run --profile small --backend llm --minutes 60 --seed 1234 --ticks 20000 --snapshots 10 \
        --out results/runs/llm_60min > logs/llm_60min.log 2>&1 &
 python -m experiments.gene_report results/runs/llm_60min --min-carriers 25 --every 1000 --tag llm_60min
 ```

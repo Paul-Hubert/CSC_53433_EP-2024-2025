@@ -356,8 +356,14 @@ species):
 | Time from an empty cache | ≈ 10 minutes | ≈ 32 minutes (0.41 s per call, 2 parallel requests) |
 | Memo hit rate: prey / predators | 0.39 / 0.67 | 0.40 / 0.71 |
 
+In the 64 × 64 world, with partners seen across the vision (the default
+since 2026-10-07), 2 000 ticks took 5 344 questions (4 988 prey, 356 predator),
+about 5 300 calls and 35 minutes (500 ticks ≈ 11 minutes); the memo answered
+55 % of prey and 66 % of predator decisions
+([06 §5.13](06-experiments-and-results.md#513-llm-brain-in-the-64--64-world-partners-seen-across-the-vision)).
+
 The distance bands make more situations distinct: the memo answered about 40 %
-of prey decisions, against 68 % in the 5-gene run above. Predators add few
+of prey decisions in the small world, against 68 % in the 5-gene run above. Predators add few
 calls: there are only 3–5 of them, and a digesting predator doesn't decide. At
 about 2.2 calls per tick after the start, a 5 000-tick run needs roughly
 11 000 calls, about 1.3 hours on this machine. What happened in the world:

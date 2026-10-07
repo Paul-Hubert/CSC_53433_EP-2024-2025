@@ -136,8 +136,10 @@ The last lines report the cost, here from the first run (2026-10-01, with the
 llm_calls=761 failures=0 backend_queries=761 (memo hit rate 0.558)
 ```
 
-On the measured setup this took 425 s. Extrapolate before launching anything
-longer: 5 000 ticks ≈ 1 hour. Answers are cached in `cache/`, so repeating a
+On the measured setup this took 425 s. Today, with both species in the
+64 × 64 world, 500 ticks take about 1 600 calls and 11 minutes, 2 000 ticks
+about 5 300 calls and 35 minutes. Extrapolate before launching anything
+longer: 5 000 ticks ≈ 1.5 hours. Answers are cached in `cache/`, so repeating a
 run with the same genomes costs almost nothing.
 
 **Cloud instead of a local GPU:**

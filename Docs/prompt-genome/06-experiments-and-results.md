@@ -318,6 +318,37 @@ Details: [11](11-gene-development.md).
   predator births in 2 000 ticks are too few for their genes to evolve yet.
 - **Caveat:** one seed.
 
+### 5.13 LLM brain in the 64 × 64 world, partners seen across the vision
+
+`results/runs/check_predators_llm_full` (not committed), 2026-10-07, after the
+owner asked for a bigger world and for partners seen farther away: animals see
+whether the nearest other animal of their kind is ready to mate up to 20 cells
+(`perception.partner_range`; 4 before), and `smoke_run` runs the full world.
+
+- **Run:** 64 × 64 world, seed 1234, 2 000 ticks, gemma4:12b deciding for both
+  species and mutating: 12 142 decisions (11 109 prey, 1 033 predator), about
+  5 300 calls, 0 failures, 35 minutes (500 ticks ≈ 11 minutes).
+- **Prey:** 30 at the start, down to 12 at tick 1 000 against 5 predators
+  (6–7 killed and about 5 born per 100 ticks), at their floor from tick 1 100
+  to 1 400 (8 newcomers), then up to 57 at tick 2 000 once only 3 predators were
+  left. 146 births; 103 killed by predators, 24 starved.
+- **Predators:** 6 founders, **no births** in 2 000 ticks; 4 starved and 2 died
+  of old age, 3 newcomers; 3 at tick 2 000. They chose `mate` in 9 % of
+  decisions.
+- **Why predators don't breed:** asked directly (8 founder genomes, well fed,
+  29 calls), the brain gives `mate` 0.60 when a ready partner is next to the
+  predator, 0.34 at 2–4 cells and 0.13 at 11–20 cells, where `hunt` gets 0.69.
+  Seeing a far partner rarely makes it walk over. Breeding needs two adjacent
+  predators that both chose `mate`, and 3–6 predators in 64 × 64 cells seldom
+  meet.
+- **Behaviour:** prey eat 29 %, mate 25 %, follow 22 %, rest 17 %, flee 7 %;
+  predators hunt 64 %, rest 27 %, mate 9 %.
+- **Reading:** the bigger world helps the prey (8 newcomers here, 35 in the
+  small world of §5.12), but while 5 predators hunt, the LLM-read prey still
+  decline: they flee in only 7 % of decisions, against 17 % with the keyword
+  brain. Predator genes can't evolve without births.
+- **Caveat:** one seed.
+
 ### Summary
 
 | Gate | Status (2026-10-01) |
@@ -398,11 +429,13 @@ ones above. The E1 commands read `data/observations_v2.jsonl`; the results of
 python -m experiments.e1_sensitivity --backend rule_based                       # 5.1
 python -m experiments.e0_probe_ollama --teacher gemma4:12b --mutator gemma4:12b # 5.2
 python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b # 5.3
-python -m experiments.smoke_run --ticks 5000 --snapshots 0 --seed 7             # 5.5, one seed
-python -m experiments.smoke_run --backend llm --ticks 500 --snapshots 1         # 5.6
+python -m experiments.smoke_run --profile small --ticks 5000 --snapshots 0 --seed 7       # 5.5, one seed
+python -m experiments.smoke_run --profile small --backend llm --ticks 500 --snapshots 1   # 5.6
 python -m experiments.mutation_test                                             # 5.7 (≈ 4 min, cached afterwards)
 python -m experiments.smoke_run --profile full --ticks 50000 --seed 1234 --snapshots 5 --out results/runs/long_1234   # 5.8 (also seeds 7, 42)
 python -m experiments.gene_report results/runs/long_1234 results/runs/long_7 results/runs/long_42 --tag long_1234
+python -m experiments.smoke_run --profile small --backend llm --ticks 2000 --seed 1234 --out results/runs/check_predators_llm_2000   # 5.12
+python -m experiments.smoke_run --backend llm --ticks 2000 --seed 1234 --out results/runs/check_predators_llm_full                  # 5.13
 ```
 
 The gate writes `results/teacher_gate.md`. Rename it per model to keep both,

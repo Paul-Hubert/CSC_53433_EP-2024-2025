@@ -4,12 +4,13 @@
 > `notes/archive.md`. Plan: `../Docs/redesign/08-phase0-spike-plan.md`.
 
 ## Position
-Session: S1.3 done locally, S4.3 gate run · Last updated: 2026-10-07 (predators = genetic animals: genes hunt,
-rest, mate; same LLM brain, energy, breeding, mutation; vision 20 + distance bands for both; same speed)
+Session: S1.3 done locally, S4.3 gate run · Last updated: 2026-10-07 (predators = genetic animals; vision 20 +
+distance bands; partners seen across the vision; smoke_run default world 64 x 64; LLM predators don't breed)
 
 ## Next action
-Predators done 2026-10-07 (611890b, 865c2c5, d332b08 LF fix, docs). WAIT for owner decisions
-(../Docs/prompt-genome/09-status-and-roadmap.md §4): #10 predator rules, LLM predators rarely mate; G2 handling
+Predators done 2026-10-07 (611890b, 865c2c5, d332b08 LF fix, 08e0c57 partners + 64 x 64, docs). WAIT for owner
+(../Docs/prompt-genome/09-status-and-roadmap.md §4): #10 LLM predators don't breed (options: one partner's mate is
+enough, follow action, 96 x 96 world, prompt line); G2 handling
 (all-zero answers → neutral answer? cleaner control sentences? prompt iteration 1/3?); founder pools H1
 (prey v2 + predator v1); #8 small world vs the LLM brain (prey at the floor against 4 predators). Then longer
 LLM runs with both species (≈ 1.3 h per 5 000 ticks, small) + `gene_timeline --species prey|predator`. Rerun
@@ -112,6 +113,10 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
   results/runs/check_predators_llm_2000): ≈ 4 600 calls ≈ 32 min fresh, 0 failures; prey at the floor t 600-1 500
   (35 newcomers), 28 at the end after the founder predators died of old age; predators 3 births, mate 11 %;
   prey flee 9 % (rule_based 21 %). Docs: ../Docs/prompt-genome/03 §3, §13; 05 §6; 06 §5.12.
+- Partners seen across the vision (partner_range 20) + 64 x 64 default (08e0c57). rule_based 5 000 ticks: 64 x 64 prey
+  35-48, predators 4.4-8.9 (33-69 births, ≤ 13 gens); 96 x 96: 96-118 / 7.7-18.4. LLM 64 x 64, 2 000 ticks (seed 1234,
+  results/runs/check_predators_llm_full): ≈ 5 300 calls, 35 min, 0 failures; prey 30 → 12 (t 1 000), floor t 1 100-1 400
+  (8 newcomers), 57 at the end; predators 0 births (P(mate) 0.60 with a ready partner adjacent, 0.13 at 11-20 cells).
 - E1 rule_based reference (small, 48 obs, 10-gene genome): MI_G founders 0.23, MI_G random 0.00,
   MI_O 0.83, directed sign acc 1.00, ΔP 0.48, gibberish→neutral 0.00.
   Note for H2: even the "ideal" keyword interpreter scores MI_G 0.23 < G2 threshold 0.25
@@ -128,8 +133,8 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
 - Own git server mirror: waiting for the URL + auth from the owner (see
   ../Docs/redesign/09-progress-log.md › Mirroring).
 - Founder pools (prey v2, predator v1) are drafts by Claude — need owner review (H1).
-- Predators are few (3-7): their genes mostly drift. LLM predators rarely mate (3 births in 2 000 ticks) and
-  the LLM-read prey of the small world sit at the floor against 4 predators (09 §4 #8, #10).
+- Predators are few (3-9): their genes mostly drift. LLM predators don't breed (3 births small, 0 in 64 x 64 per
+  2 000 ticks) and LLM-read prey decline while 4-5 predators hunt, flee 7-9 % (09 §4 #8, #10).
 - LLM cost dominates E4: measured ≈ 4 decisions/s (gemma4:12b, RTX 5080) → 5 000 ticks ≈ 1 h
   (small). Decide run length / D / seeds before S6.
 - Logprobs: Ollama 0.32 returns them, but unusable with gemma4 (first token "f" = flee/follow,
