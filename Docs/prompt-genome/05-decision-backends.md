@@ -65,16 +65,19 @@ a softmax:
      food in sight, eat (which then means searching) gets a fixed 1.5. Flee is
      high when a predator is adjacent or close (3.5, 3.0), weak at medium range
      (1.0) and 0 when it is far.
-   - **predators:** hunt is higher the nearer the prey (adjacent 3.5 … far
-     1.0; with no prey in sight, searching gets 1.5) and when energy is low.
-     Follow uses the prey's values (−0.5 next to another predator, 0.3 at
-     5–20 cells, −2.5 with none in sight). Rest gains 1.0 when energy is high.
+   - **predators:** hunt is higher the nearer the prey or a carcass it may
+     eat from (adjacent 3.5 … far 1.0; with neither in sight, searching gets
+     1.5) and when energy is low. Follow uses the prey's values (−0.5 next to
+     another predator, 0.3 at 5–20 cells, −2.5 with none in sight). Rest gains
+     1.0 when energy is high.
    - **both:** mate is high when the nearest animal of its kind is ready and
      this animal is an adult that isn't hungry: 2.5 up to 4 cells away, 1.5 at
      5–10 cells, 1.0 at 11–20. Otherwise it is −3.0. Readiness is seen across
      the whole vision since 2026-10-07; before, only within 4 cells, and the
      few predators rarely met
      ([03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)).
+   - **both, since the stamina change:** rest gains 2.0 when stamina is low and
+     0.3 when it is medium, so an animal out of breath stops to recover.
 2. **Genes** (`gene_weight`). Each gene adds a weight to its own action:
    - **intensity words:** *never / do not / avoid* −2.5, *rarely* −1.2,
      *always / whatever happens* +2.5, *whenever / often / quickly* +1.2,
@@ -82,8 +85,10 @@ a softmax:
      gives +0.8.
    - **conditions** such as *hungry*, *food is close*, *safe*, *alone* are
      checked against the observation. Each species has its own list: a predator
-     reads *prey is close* or *no prey*, a prey animal *food is close* or
-     *predator*. An unmet condition keeps only 20 % of the weight.
+     reads *prey is close*, *no prey* or *carcass*, a prey animal *food is
+     close* or *predator*. *Tired* (or *out of breath*, *exhausted*) means low
+     stamina; before the stamina change it meant low energy. An unmet condition
+     keeps only 20 % of the weight.
    - **"unless …":** if the exception holds, the effect flips mildly.
 
 Gibberish and neutral genes contribute nothing. That's why its gene-sensitivity
@@ -100,9 +105,9 @@ served by [Ollama](https://ollama.com).
 ### The prompt
 
 Each species has its template (`policy.prompt` and `policy.predator_prompt`).
-For the prey, `prompts/teacher_v4.md` (since 2026-10-07; before it, `teacher_v3.md`
-without the breeding lines, `teacher_v2.md` for the 12-cell vision, `teacher_v1.md`
-for the 10-gene genome):
+For the prey, `prompts/teacher_v5.md` (since 2026-10-07; before it, `teacher_v4.md`
+without speed and stamina, `teacher_v3.md` without the breeding lines,
+`teacher_v2.md` for the 12-cell vision, `teacher_v1.md` for the 10-gene genome):
 
 ```text
 You decide what a wild animal does next in a simple grid world.
@@ -111,11 +116,14 @@ Actions:
 - eat: go to the nearest visible food and eat it
 - flee: run away from the nearest predator
 - follow: move toward the nearest other animal
-- rest: stay still to save energy
+- rest: stay still to catch your breath and save energy
 - mate: walk to the nearest ready partner in sight and breed with it
 If the chosen action has nothing to act on in sight (no food, predator, animal or
 ready partner), the animal searches the surroundings instead.
-Animals and predators move at the same speed: at most one cell per step.
+Animals move one cell per step. Predators run two cells per step when they
+hunt, but they have half an animal's stamina, so a long chase tires them first.
+Every cell moved costs stamina. Standing still brings it back, which costs some
+energy until stamina is full. Without stamina an animal cannot move.
 Breeding needs only one of the two to choose mate: an adult that chooses mate
 breeds as soon as it reaches a ready partner, whatever the partner is doing.
 
@@ -128,20 +136,26 @@ Situation: {situation}
 {ask}
 ```
 
-For predators, `prompts/predator_v2.md` has the same layout (`predator_v1.md`
-had no follow and no breeding lines):
+For predators, `prompts/predator_v3.md` has the same layout (`predator_v2.md`
+had no speed, stamina or carcasses, `predator_v1.md` no follow and no breeding
+lines):
 
 ```text
 You decide what a predator does next in a simple grid world.
 
 Actions:
-- hunt: chase the nearest visible prey animal; next to it, try to kill and eat it
+- hunt: chase the nearest visible prey animal or carcass; next to a prey animal,
+  try to kill and eat it; next to a carcass, eat from it
 - follow: move toward the nearest other predator
-- rest: stay still to save energy
+- rest: stay still to catch your breath and save energy
 - mate: walk to the nearest ready partner (another predator) in sight and breed with it
-If the chosen action has nothing to act on in sight (no prey, other predator or
-ready partner), the predator searches the surroundings instead.
-Predators and their prey move at the same speed: at most one cell per step.
+If the chosen action has nothing to act on in sight (no prey, carcass, other
+predator or ready partner), the predator searches the surroundings instead.
+Predators run two cells per step when they hunt and walk one cell otherwise.
+Prey animals move one cell per step but have twice a predator's stamina.
+Every cell moved costs stamina. Standing still brings it back, which costs some
+energy until stamina is full. Without stamina a predator cannot move.
+A kill leaves a carcass that up to two other predators can eat from.
 Breeding needs only one of the two to choose mate: an adult that chooses mate
 breeds as soon as it reaches a ready partner, whatever the partner is doing.
 
@@ -156,23 +170,25 @@ Situation: {situation}
 
 `{genes}` becomes one line per gene (`- eat: "Eat whenever food is close."`,
 `- hunt: "Chase any prey you see."`). `{situation}` is the observation text (V1
-or V2) with distances in cells, for example `Energy: low. Prey: 2-4 cells
-away. Other predator: none within 20 cells. Age: adult.`
+or V2) with distances in cells, for example `Energy: low. Stamina: high.
+Prey: 2-4 cells away. Carcass: none within 20 cells. Other predator: none
+within 20 cells. Age: adult.`
 ([03 §5](03-world-and-simulation.md#5-perception-what-an-animal-knows)). `{ask}`
 is the mode's instruction. In points mode that is: *"Distribute 100 points
 across the actions according to how likely this animal is to choose each."*
 The line after the actions tells the model what the simulation does with an
 action that has nothing to act on
 ([03 §6](03-world-and-simulation.md#6-actions-five-for-prey-four-for-predators)).
-The last lines of the world description state the equal speed and the
-breeding rule (since 2026-10-07). They are facts about the world, like the
+The last lines of the world description state the speeds, stamina,
+carcasses (for predators) and the breeding rule (all since 2026-10-07). They are facts about the world, like the
 actions, and say nothing about what is wise. The breeding lines were added
 because LLM predators chose `mate` mostly when a ready partner was already next
 to them ([06 §5.13](06-experiments-and-results.md#513-llm-brain-in-the-64--64-world-partners-seen-across-the-vision)).
 
-With founder genes and a typical situation, a full prey prompt has 1 258
-characters (1 076 with `teacher_v3.md`, 967 with `teacher_v2.md` and the old
-situation text) and a predator prompt 1 207. The 10-gene prompt of `teacher_v1.md` was about 290
+With founder genes and a typical situation, a full prey prompt has 1 527
+characters (1 258 with `teacher_v4.md`, 1 076 with `teacher_v3.md`, 967 with
+`teacher_v2.md` and the old situation text) and a predator prompt 1 633 (1 207
+with `predator_v2.md`). The 10-gene prompt of `teacher_v1.md` was about 290
 tokens.
 
 ### Points mode (default)
@@ -250,7 +266,7 @@ Each layer avoids asking the same question twice:
 
 Because of the model digest and the prompt hash, a new model version or an
 edited prompt never reuses old answers: answers given to `teacher_v2.md` are
-not reused with `teacher_v4.md`, and prey and predator answers never mix. Before 2026-10-01 a bug (an empty cache
+not reused with `teacher_v5.md`, and prey and predator answers never mix. Before 2026-10-01 a bug (an empty cache
 file counted as "no cache") meant the request cache was never written; the
 policy cache was not affected. It's fixed, so reruns of the same genomes in the
 same situations now cost nothing.

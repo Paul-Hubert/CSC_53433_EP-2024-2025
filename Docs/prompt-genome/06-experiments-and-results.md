@@ -375,6 +375,57 @@ predators can `follow`, a 96 × 96 world, and a breeding line in both prompts
   would take about 9 hours.
 - **Caveat:** one seed, 1 673 ticks.
 
+### 5.15 Stamina, speed and carcasses
+
+2026-10-07, owner request: moving costs stamina and energy; standing still
+brings stamina back, which costs energy until it is full; predators are faster
+but have less stamina than the prey; a kill leaves part of the carcass for up to
+two more predators. The rules are in [03 §4](03-world-and-simulation.md#4-animals)
+and [§6](03-world-and-simulation.md#6-actions-five-for-prey-four-for-predators):
+stamina 60 cells for prey and 30 for predators, 2 back per tick standing still
+(0.3 energy per tick until full); predators run 2 cells per tick when hunting,
+prey 1 when fleeing, and every other move walks one cell; a carcass holds one
+portion (30 energy) for each of up to two other predators and rots after 100
+ticks. Prompts `teacher_v5.md` and `predator_v3.md`.
+
+- **Keyword brain** (5 000 ticks, 3 seeds, no mutation;
+  [03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)): in the full world the predators went from 15–21
+  to 28–34, at their cap 66–97 % of the time, and rarely starve; the prey stayed
+  at 81–94 (74–93 before). Predators ate about 1.5 carcass portions per kill. In
+  the small world: prey 28–31 (22–25 before), predators 5.6–5.8, at their cap
+  84–90 % of the time.
+- **Tuning:** smaller portions (20 energy), with or without `kill_p` 0.07, kept
+  the predators below their cap but starving in waves, and the prey sat at their
+  floor up to 10 % of the time; `kill_p` 0.07, a digestion of 80 ticks or a
+  slower recovery (1.5 per tick) left the predators at their cap. The first
+  values were kept.
+- **LLM probe** (gemma4:12b, 8 founder genomes per species, energy medium, no
+  other animal in sight): mean probabilities.
+
+  | Predator's situation | hunt | follow | rest | mate |
+  |---|---|---|---|---|
+  | prey 2–4 cells away, rested | 0.82 | 0.01 | 0.04 | 0.13 |
+  | prey 2–4 cells away, out of breath | 0.25 | 0.00 | 0.69 | 0.06 |
+  | prey 11–20 cells away, rested | 0.62 | 0.01 | 0.19 | 0.18 |
+  | prey 11–20 cells away, out of breath | 0.14 | 0.03 | 0.77 | 0.06 |
+  | no prey, a carcass 2–4 cells away | 0.44 | 0.00 | 0.19 | 0.37 |
+  | no prey, no carcass | 0.09 | 0.09 | 0.43 | 0.38 |
+
+  | Prey's situation (food 2–4 cells away) | eat | flee | follow | rest | mate |
+  |---|---|---|---|---|---|
+  | predator 2–4 cells away, rested | 0.34 | 0.46 | 0.00 | 0.09 | 0.11 |
+  | predator 2–4 cells away, out of breath | 0.13 | 0.68 | 0.01 | 0.18 | 0.01 |
+  | no predator, rested | 0.55 | 0.00 | 0.01 | 0.10 | 0.34 |
+  | no predator, out of breath | 0.17 | 0.00 | 0.01 | 0.79 | 0.03 |
+
+  The brain reads both new senses. Out of breath, predators and prey stop to
+  recover, except prey with a predator close, which flee even more. A carcass
+  in sight makes a predator hunt five times as often as with nothing in sight.
+- **Cost:** the prompts grew to 1 527 characters (prey) and 1 633 (predators),
+  and situations repeat less often (stamina triples the possible observations;
+  the keyword runs' memo answered 52–67 % of prey decisions against 61–81 %
+  before), so an LLM run needs more calls per tick.
+
 ### Summary
 
 | Gate | Status (2026-10-01) |
@@ -462,11 +513,12 @@ python -m experiments.smoke_run --profile full --ticks 50000 --seed 1234 --snaps
 python -m experiments.gene_report results/runs/long_1234 results/runs/long_7 results/runs/long_42 --tag long_1234
 python -m experiments.smoke_run --profile small --backend llm --ticks 2000 --seed 1234 --out results/runs/check_predators_llm_2000   # 5.12 (code of 865c2c5)
 python -m experiments.smoke_run --backend llm --ticks 2000 --seed 1234 --out results/runs/check_predators_llm_full                  # 5.13 (code of 08e0c57)
-python -m experiments.smoke_run --backend llm --ticks 2000 --minutes 180 --seed 1234 --out results/runs/check_all4_llm              # 5.14
+python -m experiments.smoke_run --backend llm --ticks 2000 --minutes 180 --seed 1234 --out results/runs/check_all4_llm              # 5.14 (code of 9aaac2d)
+python -m experiments.smoke_run --ticks 5000 --no-mutation --snapshots 0 --seed 1234 --out results/runs/stamina_1234                # 5.15, keyword brain (also seeds 7, 42; --profile small)
 ```
 
-§5.12 and §5.13 ran the code of the commits in brackets (smaller worlds, older
-rules): check them out to rerun those exactly.
+§5.12–5.14 ran the code of the commits in brackets (smaller worlds, older
+rules, no stamina): check them out to rerun those exactly.
 
 The gate writes `results/teacher_gate.md`. Rename it per model to keep both,
 as was done for the committed files.

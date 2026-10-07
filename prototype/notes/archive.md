@@ -77,3 +77,10 @@ make_dataset.py, label_teacher.py, S5 distillation.
   35-48, predators 4.4-8.9 (33-69 births, ≤ 13 gens); 96 x 96: 96-118 / 7.7-18.4. LLM 64 x 64, 2 000 ticks (seed 1234,
   results/runs/check_predators_llm_full): ≈ 5 300 calls, 35 min, 0 failures; prey 30 → 12 (t 1 000), floor t 1 100-1 400
   (8 newcomers), 57 at the end; predators 0 births (P(mate) 0.60 with a ready partner adjacent, 0.13 at 11-20 cells).
+
+## Moved from STATUS.md › Key numbers (2026-10-07, stamina change)
+- LLM brain, 60 min (2026-10-02, small, seed 1234, gemma4:12b decides + mutates): 5 269 ticks, 19 211
+  decisions (5.3/s), 6 784 calls, 0 failures. Pop at the floor (10) for 3 400 ticks (65 immigrants), then
+  grew to 25-29; 4 immigrants (t 2 982-3 228) = 84 % of final ancestry; "Never fight." 23/25 at the end
+  (≈ 30 % expected from ancestry). Predators 71 % of deaths; flee 4.5 %, attack 9.5 % of decisions.
+  results/llm_60min_genes.md, Docs/prompt-genome/10 §7.

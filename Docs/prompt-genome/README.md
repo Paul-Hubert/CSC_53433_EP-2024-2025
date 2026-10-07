@@ -23,9 +23,11 @@ world the animals live in.
 > are gone ([04 §1](04-genome-and-evolution.md#1-genes-are-sentences-in-fixed-slots)).
 > The same day the **predators became genetic animals**: 4 genes (hunt, follow,
 > rest, mate), the same LLM brain, energy, breeding and mutation. Both species see 20
-> cells, with distances in bands, see a partner's readiness as far, and move at
-> the same speed ([03 §3](03-world-and-simulation.md#3-predators)). Runs use the
-> 96 × 96 world by default, and one partner's choice is enough to breed.
+> cells, with distances in bands, and see a partner's readiness as far. Both
+> have stamina: predators run 2 cells per tick when hunting but tire twice as
+> fast, and a kill leaves a carcass for two more predators
+> ([03 §3](03-world-and-simulation.md#3-predators)). Runs use the 96 × 96 world
+> by default, and one partner's choice is enough to breed.
 
 ## Documents
 

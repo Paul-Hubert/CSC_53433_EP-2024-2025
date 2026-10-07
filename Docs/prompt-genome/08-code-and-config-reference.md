@@ -49,14 +49,14 @@ lives only in `prototype/`. A Unity version is on the roadmap
 | `config.py` | Load YAML configuration | `load_config(profile, overrides, extra_files)` deep-merges `base.yaml`, the profile, optional extra files (world overlays) and overrides; `Cfg` (dict with attribute access); `resolve(path)` (paths relative to `prototype/`); `CONFIG_DIR` |
 | `rng.py` | Reproducible randomness | `Streams(seed).get(name)`: one independent generator per name; `fresh(name)` |
 | `species.py` | The two species | `Species(name, actions, prefix, config)` with `loci`; `PREY` (eat, flee, follow, rest, mate; config section `agents`), `PREDATOR` (hunt, follow, rest, mate; loci `predator.<action>`; section `predators`); `SPECIES`, `ALL_LOCI`, `species_of_locus`, `species_cfg(cfg, species)` |
-| `world.py` | Grid and food | `World(cfg, rng_world)` (terrain, walkability, food, regrowth, `step_toward`, `step_heading`, `nearest_food`); `value_noise`; `largest_component`; `cheb` (Chebyshev distance); cell codes `GRASS, WATER, MOUNTAIN` |
-| `perception.py` | What an animal senses | `Observation` (prey) and `PredatorObservation` (frozen dataclasses with a `scale` of band edges, `tags()` for directed tests); `sense(agent, world, prey, predators, cfg)`; distance bands `DIST`, `NEAR`, `band(d, scale)`, `make_scale(cfg, species)`, `DEFAULT_SCALE`; `mate_ready`; `RELEVANT_TAG` |
+| `world.py` | Grid, food and carcasses | `World(cfg, rng_world)` (terrain, walkability, food, regrowth, `carcasses` and `age_carcasses`, `step_toward`, `step_heading`, `nearest_food`); `Carcass` (portions, killer, rot, `edible_by`); `value_noise`; `largest_component`; `cheb` (Chebyshev distance); cell codes `GRASS, WATER, MOUNTAIN` |
+| `perception.py` | What an animal senses | `Observation` (prey) and `PredatorObservation` (frozen dataclasses with a `scale` of band edges, `tags()` for directed tests); `sense(agent, world, prey, predators, cfg)`; `stamina_level`, `edible_carcass`; `stamina_level`, `edible_carcass`; distance bands `DIST`, `NEAR`, `band(d, scale)`, `make_scale(cfg, species)`, `DEFAULT_SCALE`; `mate_ready`; `RELEVANT_TAG` |
 | `obs_text.py` | Observation → text | `render(obs, style)` for both species, styles `V1`, `V2`; `distance(band, scale)` ("2-4 cells away") |
-| `actions.py` | Behaviour executors | `EXECUTORS[action](agent, world, prey, predators, cfg, rng) -> moved` for both species, including `do_hunt` (step, strike, kill, digest); an action with nothing to act on in sight calls `_invalid`: a random walk (`_wander`), counted as invalid |
+| `actions.py` | Behaviour executors | `EXECUTORS[action](agent, world, prey, predators, cfg, rng) -> cells moved` for both species, including `do_hunt` (run, strike, kill, leave a carcass, eat from one, digest); `cells` (1 walking, the species' `speed` running, never beyond stamina); an action with nothing to act on in sight calls `_invalid`: a random walk (`_wander`), counted as invalid |
 | `genome.py` | Genes | `ACTIONS`, `LOCI` (the prey's: one gene per action); `Allele`; `Genome(alleles, species)`; `AlleleRegistry` for both species (dedup, `genes()` → action → text, `genome_key()`, `make_genome(genes, origin, species)`, `dump_jsonl`); `crossover_uniform` |
 | `founder.py` | Allele files → genomes | `AllelePools(registry, data_dir, version=None, control_file="control_alleles_v1.json", species=PREY)`: `sample_founder`, `sample_control`, `neutral_genome`, `contrast_pair(locus or action)`; the predator files start with `predator_` |
 | `evolution/mutation.py` | Mutation | one blind random change by the mutator LLM: `TEMPLATE`, `load_instructions(path)`, guards (`clean`, `valid`), `Mutator` (`mutate(genome, rng) -> (genome, events)`, `mutate_text(locus, text, rng) -> (text or None, instruction index, seed)`, `stats`) |
-| `sim.py` | The simulation | `Agent` (`species` from its genome, `digest`, `killer`), `Counters`, `Simulation` (`agents` = prey, `predators`, `members(species)`, counters per species in `cs` with `c` = prey; `step`, `decide(agents)` one batch per species, `run`, `finish`, `summary`, `stats_row`) |
+| `sim.py` | The simulation | `Agent` (`species` from its genome, `stamina`, `digest`, `killer`), `Counters`, `Simulation` (`agents` = prey, `predators`, `members(species)`, counters per species in `cs` with `c` = prey; `step`, `decide(agents)` one batch per species, `run`, `finish`, `summary`, `stats_row`) |
 | `backends/base.py` | Brain protocol | `Query(genome_key, genes, obs, species)`; `Backend` protocol (`name`, `decide(queries) -> [n, actions of the species]`); `batch_actions` (one species per batch); `normalise` |
 | `backends/random_policy.py` | Uniform brain | `RandomBackend` |
 | `backends/rule_based.py` | Keyword brain | `RuleBasedBackend`; `default_logits` (`prey_logits`, `predator_logits`), `gene_weight`; `CONDITIONS` (prey), `PREDATOR_CONDITIONS` |
@@ -142,8 +142,13 @@ cfg = load_config("small", overrides={"world": {"food_regrow_p": 0.0005},
 | `energy_max` | 100 | energy cap |
 | `energy_start` | 60 | energy of founders and newcomers |
 | `cost_base` | 0.7 | energy cost per tick |
-| `cost_move` | 0.5 | extra cost on ticks with a move |
+| `cost_move` | 0.5 | extra cost per cell moved |
 | `cost_rest` | 0.2 | cost of a resting tick (replaces `cost_base`) |
+| `speed` | 1 | cells per tick when running (`flee`); every other move walks one cell ([03 §4](03-world-and-simulation.md#4-animals)) |
+| `stamina_max` | 60 | full stamina: cells an animal can move before it must stop, one point per cell |
+| `stamina_regen` | 2 | stamina back per tick without moving |
+| `cost_regen` | 0.3 | extra energy per tick without moving, until stamina is full |
+| `stamina_low`, `stamina_high` | 20, 40 | thresholds of the low / medium / high stamina levels |
 | `eat_gain` | 25 | energy per food item |
 | `maturity` | 150 | age at which an animal becomes adult |
 | `max_age` | 1500 | age at which it dies |
@@ -164,9 +169,15 @@ listed here:
 | `floor` | 3 | minimum number of predators; newcomers from the predator founder pool fill the gap |
 | `cap` | 34 (small: 6) | maximum number of predators |
 | `vision` | 20 | perception radius in cells |
-| `kill_p` | 0.1 | chance that a strike kills; a hunting predator strikes when it is next to its prey after its step |
+| `speed` | 2 | cells per tick when hunting |
+| `stamina_max` | 30 | half the prey's |
+| `stamina_low`, `stamina_high` | 10, 20 | thresholds of the stamina levels |
+| `kill_p` | 0.1 | chance that a strike kills; a hunting predator strikes when it is next to its prey after its move |
 | `kill_gain` | 60 | energy from one kill |
-| `digest_ticks` | 50 | ticks a predator stays still after a kill, without deciding |
+| `digest_ticks` | 50 | ticks a predator stays still after a kill, without deciding; after a carcass portion, in proportion to the energy (25 ticks) |
+| `carcass_portions` | 2 | portions a kill leaves for other predators, one each (0: no carcass) |
+| `carcass_gain` | 30 | energy from one portion |
+| `carcass_ticks` | 100 | ticks before a carcass rots away |
 
 The scripted predators' keys (`count`, `chase_radius`, `turn_p`,
 `rest_after_kill`) were removed on 2026-10-07.
@@ -206,8 +217,8 @@ The scripted predators' keys (`count`, `chase_radius`, `turn_p`,
 | `mode` | points | `points`, `table`, `ksample` or `logprobs` ([05](05-decision-backends.md#other-modes)) |
 | `table_k` | 8 | situations per call in table mode |
 | `workers` | 2 | parallel requests to Ollama |
-| `prompt` | prompts/teacher_v4.md | prompt template of the prey |
-| `predator_prompt` | prompts/predator_v2.md | prompt template of the predators |
+| `prompt` | prompts/teacher_v5.md | prompt template of the prey |
+| `predator_prompt` | prompts/predator_v3.md | prompt template of the predators |
 
 ### `ollama`
 
@@ -298,8 +309,8 @@ let the LLM decide directly. Their usage is in their docstrings and in
 | `data/control_alleles_v1.json` | 20 shuffled-word + 20 irrelevant sentences for random-text genomes (both species) |
 | `data/observations_v2.jsonl` | 48 prey observations with distance bands (32 synthetic + 16 frequent in a rule-based run), with directed-test tags |
 | `data/observations_v1.jsonl` | the near / far observation set of the code before 2026-10-07 (E1 results in [06](06-experiments-and-results.md)); today's brains can't read it |
-| `prompts/teacher_v4.md` | decision prompt of the prey ([05](05-decision-backends.md#the-prompt)) |
-| `prompts/predator_v2.md` | decision prompt of the predators |
+| `prompts/teacher_v5.md` | decision prompt of the prey ([05](05-decision-backends.md#the-prompt)) |
+| `prompts/predator_v3.md` | decision prompt of the predators |
 | `prompts/mutate_v2.txt` | the 16 mutation instructions, one per line ([04 §5](04-genome-and-evolution.md#5-mutation)) |
 | `prompts/novel_v1.md` | prompt for brand-new alleles (parked dataset pipeline) |
 
@@ -310,7 +321,7 @@ history.
 
 ## 6. Tests
 
-`cd prototype && pytest -q` runs 69 offline tests in about 30 s, with no model
+`cd prototype && pytest -q` runs 75 offline tests in about 30 s, with no model
 needed. LLM calls are replaced by small fake servers. Two marked tests talk to
 real models: `pytest -m ollama` (needs Ollama and `policy.model`) and
 `pytest -m laya` (parked).
@@ -320,7 +331,8 @@ real models: `pytest -m ollama` (needs Ollama and `policy.model`) and
 | `test_core.py` | config merge, random streams, cache round-trip, progress files |
 | `test_world.py` | flat Lab 1 world, terrain fractions and connectivity, nobody enters blocked cells, unambiguous map symbols |
 | `test_behaviour.py` | flee increases distance, eating gains energy, eat with no food in sight → a random walk, counted invalid; distance bands and the same vision for both species; a partner's readiness seen 15 cells away (and not with `partner_range` 4); text styles of both species; rule-based directed tests and gibberish, the keyword brain reads predator genes |
-| `test_predators.py` | hunt steps, strikes and feeds; hunt with no prey in sight searches; a kill removes the prey (cause, killer id) and the predator digests without moving or deciding; predators breed with their own genes; newcomers below each floor; everyone moves at most one cell per tick; one registry holds both species |
+| `test_stamina.py` | moving costs stamina and energy, standing still brings stamina back at a price until it is full; no stamina, no move (a predator with 1.5 points runs 1 cell); a carcass feeds two other predators, not the killer, then rots; no carcass with 0 portions; stamina and carcasses sensed and written; the keyword brain rests when out of breath, goes for carcasses, reads "tired" as out of breath |
+| `test_predators.py` | hunt runs 2 cells, strikes, feeds and leaves a carcass; hunt with no prey in sight searches; a kill removes the prey (cause, killer id) and the predator digests without moving or deciding; predators breed with their own genes; newcomers below each floor; prey move at most 1 cell per tick and predators 2, never beyond their stamina; one registry holds both species |
 | `test_genome.py` | allele pools, registry dedup and genome keys, crossover |
 | `test_evolution.py` | guards and instruction list, the mutator sends only the instruction and the gene (fake LLM), rejected answers, no LLM → no mutation, determinism, population bounds, shuffled control (each species uses its own genomes), no mutation → no new alleles, decisions per action in `stats.csv` (both species) |
 | `test_metrics.py` | entropy, JSD, mutual information, directed ΔP, Spearman |
@@ -352,7 +364,7 @@ student exercises ([02 §5](02-lab1.md#5-suggested-activities)).
 |---|---|---|
 | A brain | a class with `name` and `decide(queries) -> [n, k]` in `backends/`; register it in `factory.make_backend` | a batch holds one species (`base.batch_actions`); return rows that sum to 1 in that species' action order |
 | A sense | a field in `perception.Observation` or `PredatorObservation`, computed in `sense`, rendered in `obs_text.render` | keep values discrete (cache hits); update the rule-based brain if it should react |
-| An action | a name in the species' action tuple in `species.py` (one gene per action, so this also adds a locus), an executor in `actions.EXECUTORS`, a line in the species' prompt (`prompts/teacher_v3.md` or `predator_v1.md`), alleles in its founder and contrast files, keywords in `rule_based.ACTION_WORDS` (and a default in `prey_logits` or `predator_logits`), a relevance tag in `perception.RELEVANT_TAG`, a letter in `render.ACTION_CHAR` (prey) | the action list is part of the JSON schema (`points_schema(actions)`); the founder and contrast files need the new slot; the rule-based brain and E1 fail with a `KeyError` without the keywords and the relevance tag; without a letter the map shows `?` |
+| An action | a name in the species' action tuple in `species.py` (one gene per action, so this also adds a locus), an executor in `actions.EXECUTORS`, a line in the species' prompt (`prompts/teacher_v5.md` or `predator_v3.md`), alleles in its founder and contrast files, keywords in `rule_based.ACTION_WORDS` (and a default in `prey_logits` or `predator_logits`), a relevance tag in `perception.RELEVANT_TAG`, a letter in `render.ACTION_CHAR` (prey) | the action list is part of the JSON schema (`points_schema(actions)`); the founder and contrast files need the new slot; the rule-based brain and E1 fail with a `KeyError` without the keywords and the relevance tag; without a letter the map shows `?` |
 | A mutation instruction | a line in `prompts/mutate_v2.txt` | it is drawn at random like the others; measure it with `experiments.mutation_test` |
 | A crossover scheme | a function like `crossover_uniform`, called in `Simulation._birth` | keep loci homologous |
 | A world feature | `world.py` (generation, `regrow_food`, movement) plus keys in `world:` | keep randomness in the world's streams; add a test |

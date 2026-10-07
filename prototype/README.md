@@ -71,7 +71,7 @@ nohup python -m experiments.label_teacher --workers 4 > logs/label_teacher.log 2
 | `promptevo/world.py` | grid world (flat in Lab 1; optional noise terrain with water/mountains), food regrowth |
 | `promptevo/genome.py`, `founder.py` | alleles, genomes of either species (one gene per action), crossover; founder/contrast/control pools per species |
 | `promptevo/perception.py`, `obs_text.py`, `actions.py` | discretised observations of both species (vision 20, distance bands), text styles V1/V2 with distances in cells, actions incl. hunt (with nothing to act on, the animal searches) |
-| `promptevo/sim.py` | lockstep loop for prey and predators, decision memo, reproduction, kills and digestion, deaths, logging |
+| `promptevo/sim.py` | lockstep loop for prey and predators, decision memo, stamina, reproduction, kills and digestion, deaths, logging |
 | `promptevo/backends/` | `random`, `rule_based`, `llm` (ollama_policy: points/logprobs/table/ksample), `laya` (parked); `factory.py` |
 | `promptevo/evolution/mutation.py` | blind mutation: the LLM gets a random-change instruction (`prompts/mutate_v2.txt`) + the gene, nothing else; guards |
 | `promptevo/llm/ollama_client.py` | stdlib Ollama client with sqlite cache |

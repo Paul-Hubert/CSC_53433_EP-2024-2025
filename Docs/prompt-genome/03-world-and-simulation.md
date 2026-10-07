@@ -33,8 +33,10 @@ The world is a 2D grid of square cells with hard borders (no wrap-around).
 |---|---|---|
 | Size | 96 × 96 cells (64 × 64 until 2026-10-07) | 48 × 48 cells |
 
-- **Movement** is at most one cell per tick to any of the 8 neighbours (king
-  moves). Prey and predators have the same speed.
+- **Movement** goes to any of the 8 neighbours (king moves). Walking covers
+  one cell per tick; running (`hunt`, `flee`) covers up to `speed` cells: 2 for
+  predators, 1 for prey. Every cell costs stamina (§4). Until the stamina
+  change of 2026-10-07 both species moved at most one cell per tick.
 - **Distance** for perception, chasing, striking and mating is the Chebyshev
   distance `max(|dy|, |dx|)`, so a diagonal step counts as 1. Greedy movement
   picks the neighbour that best reduces the straight-line distance (§6).
@@ -99,14 +101,21 @@ What is specific to predators (`predators.*`):
 
 | Parameter | Value | Meaning |
 |---|---|---|
-| `kill_p` | 0.1 | chance that a strike kills; a hunting predator strikes when it is next to its prey (distance ≤ 1) after its step |
+| `speed` | 2 | cells per tick when hunting, against 1 for a fleeing prey animal; every other move walks one cell (§4) |
+| `stamina_max` | 30 | half the prey's 60: 15 ticks of running from full (§4) |
+| `kill_p` | 0.1 | chance that a strike kills; a hunting predator strikes when it is next to its prey (distance ≤ 1) after its move |
 | `kill_gain` | 60 | energy from one kill, up to `energy_max` = 100 |
-| `digest_ticks` | 50 | after a kill the predator stays still for 50 ticks, pays only `cost_rest` and doesn't decide |
+| `digest_ticks` | 50 | after a kill the predator stays still for 50 ticks, pays only `cost_rest` (plus `cost_regen` while its stamina comes back) and doesn't decide; after a carcass portion, 25 ticks (in proportion to the energy) |
+| `carcass_portions` | 2 | a kill leaves a carcass on the prey's cell with one portion each for up to 2 other predators, never the killer (0: no carcass, the rule before) |
+| `carcass_gain` | 30 | energy from one portion |
+| `carcass_ticks` | 100 | a carcass rots away after 100 ticks, eaten or not |
 | `init_pop` / `floor` / `cap` | 14 / 3 / 34 (`small`: 4 / 3 / 6) | population limits (§9) |
 
-Everything else uses the same values as the prey: energy, costs, maturity, age
-limit, mating energy, vision (20 cells) and speed. A predator eats only prey:
-kills are its only food, and `food` in its `death` event counts kills.
+Everything else uses the same values as the prey: energy, costs, stamina
+recovery, maturity, age limit, mating energy and vision (20 cells). A predator
+eats only prey, its own kills and other predators' leftovers: `food` in its
+`death` event counts both kinds of meal. It finds a carcass with `hunt` (§6)
+and senses the nearest one it may eat from (§5).
 
 The values come from tuning sweeps with the keyword brain on 2026-10-07 (small
 world, 4 seeds, 8 000 ticks):
@@ -118,6 +127,22 @@ world, 4 seeds, 8 000 ticks):
 - A digestion of 30 ticks with `kill_p` 0.15–0.2 let the predators overshoot
   (prey at their floor 65–93 % of the time).
 
+Speed, stamina and carcasses came later the same day, on the owner's request.
+Their values were checked with the keyword brain (5 000 ticks, 3 seeds, both
+worlds; §13). Smaller portions (20 energy), alone or with `kill_p` 0.07, kept
+the predators below their cap but let them starve in waves, and the prey then
+sat at their floor up to 10 % of the time in the full world. `kill_p` 0.07, a
+digestion of 80 ticks or a slower recovery (1.5 per tick) left the predators at
+their cap and the prey at 96–120.
+
+Speed, stamina and carcasses came later the same day, on the owner's request.
+Their values were checked with the keyword brain (5 000 ticks, 3 seeds, both
+worlds; §13). Smaller portions (20 energy), alone or with `kill_p` 0.07, kept
+the predators below their cap but let them starve in waves, and the prey then
+sat at their floor up to 10 % of the time in the full world. `kill_p` 0.07, a
+digestion of 80 ticks or a slower recovery (1.5 per tick) left the predators at
+their cap and the prey at 96–120.
+
 ## 4. Animals
 
 "Animal" means either species here. Prey and predators have the same state and
@@ -126,9 +151,9 @@ life cycle, each with its own parameters: `agents.*` for the prey and
 
 ### State
 
-Position, energy, age (in ticks), heading (for the random walk, §6), genome,
-generation, parent ids and a few counters (food eaten or prey killed,
-offspring). Predators also count down their digestion (§3).
+Position, energy, stamina (below), age (in ticks), heading (for the random
+walk, §6), genome, generation, parent ids and a few counters (food eaten or a
+predator's meals, offspring). Predators also count down their digestion (§3).
 
 ### Life cycle
 
@@ -140,6 +165,26 @@ offspring). Predators also count down their digestion (§3).
 | `maturity` | 150 | 150 | ticks before an animal is an adult and can mate |
 | `max_age` | 1 500 | 1 500 | an animal dies of old age after this many ticks |
 
+### Stamina and speed
+
+Since 2026-10-07 every animal has **stamina**: the number of cells it can move
+before it must stop. Each cell moved costs one point. A tick without moving
+brings back `stamina_regen` points and costs `cost_regen` extra energy, until
+stamina is full again. An animal without stamina for one cell can't move: it
+stays where it is, whatever it chose. Newborns and newcomers start with full
+stamina.
+
+| Parameter | Prey | Predators | Meaning |
+|---|---|---|---|
+| `speed` | 1 | 2 | cells per tick when running: `flee` (prey), `hunt` (predators); every other move walks one cell |
+| `stamina_max` | 60 | 30 | full stamina, in cells |
+| `stamina_regen` | 2 | 2 | stamina back per tick without moving |
+| `cost_regen` | 0.3 | 0.3 | extra energy per tick without moving, until stamina is full |
+| `stamina_low` / `stamina_high` | 20 / 40 | 10 / 20 | thresholds of the sensed level (§5) |
+
+So predators win short chases and prey long ones (§6). Running costs a
+predator 2 points per tick: 15 ticks from full.
+
 ### Energy budget per tick
 
 The same for both species:
@@ -147,11 +192,13 @@ The same for both species:
 | Situation | Energy change |
 |---|---|
 | Chose `rest` and did not move | −0.2 (`cost_rest`) |
-| Digesting a kill (predators) | −0.2 per tick for 50 ticks |
+| Digesting a meal (predators) | −0.2 per tick: 50 ticks after a kill, 25 after a carcass portion |
 | Any other tick without moving | −0.7 (`cost_base`) |
-| Any tick with a move | −1.2 (`cost_base` + `cost_move` 0.5) |
+| A tick without moving while stamina isn't full (added to the lines above) | −0.3 (`cost_regen`) |
+| A tick with a move | −0.7 (`cost_base`) and −0.5 (`cost_move`) per cell: −1.2 walking, −1.7 for a predator running 2 cells |
 | Eating a food item (prey) | +25 (`eat_gain`) |
 | A kill (predators) | +60 (`kill_gain`) |
+| A carcass portion (predators) | +30 (`carcass_gain`) |
 | Having a child | −20 per parent (half of `child_energy` = 40) |
 
 ### Death
@@ -185,6 +232,7 @@ Until then animals saw 12 cells, with two bands: near (≤ 3) and far.
 | Field | Values | Rule |
 |---|---|---|
 | `energy` | low, medium, high | low < 30 ≤ medium ≤ 70 < high (`energy_low`, `energy_high`) |
+| `stamina` | low, medium, high | low < 20 ≤ medium ≤ 40 < high, of 60 (`stamina_low`, `stamina_high`) |
 | `food` | here, adjacent, close, medium, far, none | nearest food item; `here` = on its cell |
 | `predator` | adjacent, close, medium, far, none | nearest predator |
 | `animal` | adjacent, close, medium, far, none | nearest other prey animal |
@@ -196,15 +244,19 @@ Until then animals saw 12 cells, with two bands: near (≤ 3) and far.
 | Field | Values | Rule |
 |---|---|---|
 | `energy` | low, medium, high | same thresholds |
+| `stamina` | low, medium, high | low < 10 ≤ medium ≤ 20 < high, of 30 |
 | `prey` | adjacent, close, medium, far, none | nearest prey animal |
+| `carcass` | adjacent, close, medium, far, none | nearest carcass it may eat from: portions left, not its own kill, not eaten from yet |
 | `animal` | adjacent, close, medium, far, none | nearest other predator |
 | `animal_ready` | true / false | is that predator ready to mate? Seen up to 20 cells |
 | `age` | young, adult | young before 150 ticks |
 
-That gives 3 × 6 × 5 × 9 × 2 = **1 620 possible prey observations**: energy ×
-food × predator × animal (none, or one of the 4 bands, ready to mate or not) ×
-age. Predators have 3 × 5 × 9 × 2 = **270**. Before 2026-10-07 the prey had
-288.
+That gives 3 × 3 × 6 × 5 × 9 × 2 = **4 860 possible prey observations**:
+energy × stamina × food × predator × animal (none, or one of the 4 bands, ready
+to mate or not) × age. Predators have 3 × 3 × 5 × 5 × 9 × 2 = **4 050**.
+Without stamina and carcasses (until later on 2026-10-07) they had 1 620 and
+270; before the distance bands the prey had 288. Situations repeat less often
+now, so the memo and the caches answer fewer decisions (§7).
 
 **Seeing a partner.** Until 2026-10-07 an animal saw whether another was ready
 to mate only within 4 cells (`partner_range` 4), so far partners were
@@ -213,7 +265,8 @@ back that rule.
 
 Animals don't sense directions, terrain, how many animals or how much food
 there is, or anything about another animal beyond whether it is ready to mate.
-A prey animal doesn't know whether a predator is hunting or digesting.
+A prey animal doesn't know whether a predator is hunting or digesting, nor how
+much stamina it has left.
 
 ### Observation text
 
@@ -224,11 +277,14 @@ can see:
 
 | Style | Prey | Predator |
 |---|---|---|
-| **V1** (default, terse) | `Energy: low. Food: 2-4 cells away. Predator: 5-10 cells away. Animal: none within 20 cells. Age: adult.` | `Energy: medium. Prey: 2-4 cells away. Other predator: none within 20 cells. Age: adult.` |
-| **V2** (first person) | `I am hungry and weak. The nearest food is 2-4 cells away. The nearest predator is 5-10 cells away. No other animal within 20 cells. I am an adult.` | `I have some energy. The nearest prey is 2-4 cells away. No other predator within 20 cells. I am an adult.` |
+| **V1** (default, terse) | `Energy: low. Stamina: high. Food: 2-4 cells away. Predator: 5-10 cells away. Animal: none within 20 cells. Age: adult.` | `Energy: medium. Stamina: low. Prey: 2-4 cells away. Carcass: none within 20 cells. Other predator: none within 20 cells. Age: adult.` |
+| **V2** (first person) | `I am hungry and weak. I am rested. The nearest food is 2-4 cells away. The nearest predator is 5-10 cells away. No other animal within 20 cells. I am an adult.` | `I have some energy. I am out of breath. The nearest prey is 2-4 cells away. No carcass within 20 cells. No other predator within 20 cells. I am an adult.` |
 
 On a food cell V1 says `Food: here.` V1 also says whether the other animal is
-ready to mate, for example `Animal: 11-20 cells away, ready to mate.`
+ready to mate, for example `Animal: 11-20 cells away, ready to mate.` In V2 the
+stamina levels read *I am out of breath.*, *I am getting tired.* and *I am
+rested.* Observation sets made before the stamina change
+(`data/observations_v2.jsonl`) have no stamina, and their text stays as it was.
 
 ## 6. Actions: five for prey, four for predators
 
@@ -238,12 +294,12 @@ LLM never handles movement itself.
 
 | Species | Action | What the executor does each tick | Searches instead when |
 |---|---|---|---|
-| prey | `eat` | On a food cell: eat (no move). Otherwise step toward the nearest visible food and eat on arrival in the same tick. | no food within 20 cells |
-| prey | `flee` | Step away from the nearest predator. | no predator within 20 cells |
-| both | `follow` | Step toward the nearest other animal of its species; stay put once adjacent. Predators have it since 2026-10-07. | no other animal of its kind within 20 cells |
-| both | `rest` | Stay still; costs only 0.2 energy per tick. | never |
-| both | `mate` | Step toward the nearest mate-ready animal of its species; next to it, they breed (§8), whatever the partner chose. | no mate-ready partner within 20 cells |
-| predator | `hunt` | Step toward the nearest prey animal. Next to it after the step (distance ≤ 1), strike: the prey dies with probability `kill_p` = 0.1. A kill feeds the predator (+60) and starts its digestion (§3). | no prey within 20 cells |
+| prey | `eat` | On a food cell: eat (no move). Otherwise walk one cell toward the nearest visible food and eat on arrival in the same tick. | no food within 20 cells |
+| prey | `flee` | Run away from the nearest predator, `speed` cells per tick (1 for prey). | no predator within 20 cells |
+| both | `follow` | Walk toward the nearest other animal of its species; stay put once adjacent. Predators have it since 2026-10-07. | no other animal of its kind within 20 cells |
+| both | `rest` | Stay still; costs only 0.2 energy per tick, plus 0.3 while stamina comes back. | never |
+| both | `mate` | Walk toward the nearest mate-ready animal of its species; next to it, they breed (§8), whatever the partner chose. | no mate-ready partner within 20 cells |
+| predator | `hunt` | Run toward the nearest prey animal or carcass it may eat from, up to 2 cells per tick, stopping next to it. Next to a carcass: eat a portion (+30, then 25 ticks of digestion). Next to a prey animal (distance ≤ 1), strike: the prey dies with probability `kill_p` = 0.1. A kill feeds the predator (+60), starts its digestion (§3) and leaves a carcass for up to two other predators. | no prey or carcass it may eat from within 20 cells |
 
 **An action with nothing to act on makes the animal search.** If there is
 nothing in sight for the chosen action, the animal wanders instead: a
@@ -256,12 +312,19 @@ prey in sight means searching for prey. These choices are counted as invalid
 the reference runs (§13), against 11–13 % with the 12-cell vision. The LLM
 brain's prompts state the same rule ([05](05-decision-backends.md#the-prompt)).
 
-**Same speed.** Both species move at most one cell per tick. A prey animal
-that flees keeps its distance from a hunting predator. It gets caught when it
-stops (to eat, rest or mate), moves toward the predator or reaches a border.
-Animals decide only every 4 ticks (§7), so a predator can close in between two
-decisions. A predator strikes in the same tick it arrives next to its prey, so
-fleeing has to start before the predator is adjacent.
+**Speed and stamina.** Nobody moves more cells than its stamina allows (§4).
+A hunting predator runs 2 cells per tick and a fleeing prey animal 1, so the
+predator gains a cell per tick for as long as its stamina lasts: 15 ticks from
+full. After that it alternates a tick standing still (2 points back) and a tick
+of running (2 cells): one cell per tick on average, no faster than a fleeing
+prey animal, which keeps its distance while its own stamina lasts (60 ticks of
+flight). A prey animal gets caught when the predator starts close, or when it
+stops (to eat, rest or mate), runs out of stamina, moves toward the predator or
+reaches a border. Animals decide only every 4 ticks (§7), so a predator can
+close in between two decisions. A predator strikes in the same tick it arrives
+next to its prey, so fleeing has to start before the predator is adjacent.
+Until the stamina change both species moved at most one cell per tick, and a
+prey animal that fled kept its distance.
 
 Movement is greedy: each step goes to the neighbouring cell that most reduces
 (or, for flee, increases) the straight-line distance, with random tie-breaks.
@@ -289,8 +352,9 @@ steal energy from a neighbour
 - **Memo:** within one run, the distribution for each (species, genome,
   observation) is computed once and reused. Situations repeat, so many
   decisions don't need the brain at all. In the reference runs of §13 the memo
-  answered 61–81 % of prey decisions and 75–84 % of predator decisions. Before
-  the distance bands (5 genes, 12-cell vision, no mutation) it was 77–89 %.
+  answered 52–67 % of prey decisions and 60–78 % of predator decisions (61–81 %
+  and 75–84 % before stamina and carcasses were sensed). Before the distance
+  bands (5 genes, 12-cell vision, no mutation) it was 77–89 %.
 
 All decisions due on the same tick are sent to the brain in one batch per
 species. The simulation waits for the answers before moving on (**lockstep**),
@@ -334,15 +398,18 @@ random brain survive only because of their floor (§13).
 1. **Decide:** every 4th tick all animals of both species decide, one batch per
    species; on other ticks only animals without an action (newborns, newcomers,
    predators done digesting). Digesting predators don't decide.
-2. **Prey act** in a random order, then pay the tick's energy cost.
+2. **Prey act** in a random order, then pay the tick's energy cost and spend
+   or recover stamina (§4).
 3. **Prey breed:** an animal that chose `mate` and a ready partner next to it produce a child (§8).
 4. **Predators act** in a random order and pay their energy cost. A hunting
-   predator can kill (§6); a digesting one stays still.
+   predator can kill, which leaves a carcass, or eat from a carcass (§6); a
+   digesting one stays still.
 5. **Predators breed.**
 6. **Killed prey are removed**, with cause `predator` and the killer's id.
 7. **Age and die:** ages increase by 1; animals with energy ≤ 0 starve, animals
    older than 1 500 ticks die of old age.
-8. **Food regrows** (§2).
+8. **Food regrows** (§2) and **carcasses rot**: eaten-up ones and those 100
+   ticks old are removed.
 9. **Floors:** newcomers are added to each species below its floor.
 10. Every `sim.stats_every` = 100 ticks, a row is written to `stats.csv`.
 
@@ -369,12 +436,12 @@ random brain survive only because of their floor (§13).
 
 | File | Content |
 |---|---|
-| `events.jsonl` | one line per event: `founder`, `immigrant` (id, genome), `birth` (child id, parents, generation, genome, mutations with the locus, parent and new allele, instruction number and new text), `death` (cause, age, generation, food eaten or prey killed, offspring; `killer` when a predator killed it). Predator events carry `"species": "predator"`; prey events have no `species` field. |
-| `stats.csv` | every 100 ticks: `t, pop, mean_energy, mean_gen, max_gen, births, immigrants, deaths_starve, deaths_pred, deaths_age, decisions, backend_queries, invalid, alleles`, decisions per action `act_eat` … `act_mate`, then the predators' columns with the prefix `pred_` (`pred_pop` … `pred_invalid`, `pred_act_hunt`, `pred_act_rest`, `pred_act_mate`). `deaths_pred` counts prey killed by predators; counts are cumulative; `alleles` covers both species. |
+| `events.jsonl` | one line per event: `founder`, `immigrant` (id, genome), `birth` (child id, parents, generation, genome, mutations with the locus, parent and new allele, instruction number and new text), `death` (cause, age, generation, food eaten or a predator's meals (kills and carcass portions), offspring; `killer` when a predator killed it). Predator events carry `"species": "predator"`; prey events have no `species` field. |
+| `stats.csv` | every 100 ticks: `t, pop, mean_energy, mean_stamina, exhausted, mean_gen, max_gen, births, immigrants, deaths_starve, deaths_pred, deaths_age, decisions, backend_queries, invalid, alleles`, decisions per action `act_eat` … `act_mate`, then the predators' columns with the prefix `pred_` (`pred_pop` … `pred_invalid`, with `pred_portions` in place of `deaths_pred`, then `pred_act_hunt` … `pred_act_mate`). `deaths_pred` counts prey killed by predators, `pred_portions` carcass portions eaten, `exhausted` animal-ticks that began without stamina for one cell; counts are cumulative; `alleles` covers both species. Runs before the stamina change have no stamina or portion columns. |
 | `alleles.jsonl` | every allele seen in the run, both species: id, locus, text, origin, parent allele, operator (`llm#<n>`: the mutation instruction drawn), model, seed (the lineage of every gene) |
 | `final_population.json` | the living animals at the end: id, generation, genome (allele ids); predators carry `"species": "predator"` |
 | `run_info.json` | what ran: command, git commit, Ollama version and model digests, brain, seed, the main config sections |
-| `summary.json` | totals for the prey at the top level (births, newcomers, deaths by cause, mean lifespan, maximum generation, decisions, brain queries, memo hit rate, brain time, invalid rate, share of each action), the same for the predators under `predators` (plus `kills`), mutation counts, number of alleles, event hash; why the run stopped, minutes, model calls not answered by the cache, failures |
+| `summary.json` | totals for the prey at the top level (births, newcomers, deaths by cause, mean lifespan, maximum generation, decisions, brain queries, memo hit rate, brain time, invalid rate, share of animal-ticks out of breath `exhausted_share`, share of each action), the same for the predators under `predators` (plus `kills` and `portions`), mutation counts, number of alleles, event hash; why the run stopped, minutes, model calls not answered by the cache, failures |
 
 Long runs are safe to stop. `events.jsonl` and `stats.csv` are flushed every
 500 ticks and `alleles.jsonl` is saved every 5 000. Creating
@@ -396,28 +463,46 @@ columns. `gene_report` and `gene_timeline` still read them
 
 ## 13. Reference numbers for the Lab 1 world
 
-Measured on 2026-10-07 with the keyword brain and no mutation, 5 000 ticks,
-populations from tick 1 000 onward, seeds 1234, 7 and 42.
+Measured on 2026-10-07, after the stamina change, with the keyword brain and
+no mutation, 5 000 ticks, populations from tick 1 000 onward, seeds 1234, 7 and
+42.
 
 | | full (96 × 96, caps 135 / 34) | small (48 × 48, caps 40 / 6) |
 |---|---|---|
-| **Prey:** mean population | 74–93 (92.5 / 91.7 / 74.1) | 22–25 (24.6 / 22.2 / 24.4) |
-| Time at the floor / at the cap | 0 % / 0 % | 0–2 % / 0 % |
-| Deaths (5 000 ticks): predator / starvation | 896–1 174 / 669–1 012 | 308–331 / 161–188 |
-| Mean lifespan · generations reached | 214–222 ticks · 26 | 218–228 ticks · 25–26 |
-| Newcomers | 0 | 0 |
-| **Predators:** mean population | 15–21 (15.3 / 20.9 / 17.0) | 5.3–5.8 (5.6 / 5.3 / 5.8) |
-| Time at the floor (3) / at the cap | 0 % / 0–5 % | 0–4 % / 55–83 % |
-| Births · newcomers | 200–266 · 0 | 31–37 · 0 |
-| Deaths: starvation / old age | 189–252 / 2–9 | 23–28 / 6–9 |
-| Mean lifespan · generations reached | 362–369 ticks · 18–19 | 726–815 ticks · 9–13 |
-| Invalid actions (the animal searches instead, §6): prey / predators | 2 % / 2–5 % | 2 % / 0–1 % |
-| **Random brain** instead | prey 110–112; predators stay at their floor, 137–157 newcomers | prey 20–24; predators stay at their floor, 127–142 newcomers |
+| **Prey:** mean population | 81–94 (81.1 / 94.1 / 92.2) | 28–31 (30.8 / 28.1 / 29.2) |
+| Time at the floor / at the cap | 0–5 % / 0–3 % | 0 % / 0–1 % |
+| Deaths (5 000 ticks): predator / starvation | 995–1 206 / 396–644 | 214–252 / 282–325 |
+| Mean lifespan · generations reached | 228–245 ticks · 20–28 | 252–271 ticks · 25–27 |
+| Newcomers | 0–24 | 0 |
+| Mean stamina (of 60) · animal-ticks out of breath | 23–26 · 2–3 % | 23–25 · 2–4 % |
+| **Predators:** mean population | 28–34 (33.9 / 28.2 / 33.9) | 5.6–5.8 (5.8 / 5.7 / 5.6) |
+| Time at the floor (3) / at the cap | 0 % / 66–97 % | 1–10 % / 84–90 % |
+| Births · newcomers | 126–152 · 0 | 16–20 · 1–2 |
+| Kills · carcass portions eaten | 995–1 206 · 1 496–1 806 | 214–252 · 281–299 |
+| Deaths: starvation / old age | 19–90 / 42–89 | 0–1 / 16–18 |
+| Mean lifespan · generations reached | 824–1 380 ticks · 8–12 | 1 436–1 501 ticks · 7–9 |
+| Invalid actions (the animal searches instead, §6): prey / predators | 1–2 % / 0–6 % | 2 % / 0 % |
+| **Random brain** instead | prey 90–98; predators stay at their floor, 88–104 newcomers | prey 19–20 (at their floor 3–6 % of the time); predators stay at their floor, 75–98 newcomers |
 
-Decisions in the full world: prey eat 63 %, flee 18 %, rest 7 %, follow 7 %,
-mate 6 %; predators hunt 78 %, mate 10 %, rest 8 %, follow 5 %. Random prey
-are as many as keyword prey or more, because random predators hardly catch
-anything (48–67 kills in 5 000 ticks).
+Decisions in the full world: prey eat 48 %, rest 20 %, flee 20 %, follow 7 %,
+mate 5 %; predators mate 46 %, hunt 41 %, rest 9 %, follow 4 %.
+
+With carcasses each kill feeds up to three predators, so the keyword predators
+are limited by their cap rather than by food: they rarely starve, and most die
+of old age. Well fed, they spend much of their time digesting (50 ticks per
+kill, 25 per portion), and their stamina stays near full (28–29 of 30). The
+prey run low on stamina (23–26 of 60 on average) and rest in a fifth of their
+decisions, three times as often as before. In the full world random prey are as
+many as keyword prey, because random predators hardly catch anything (81–94
+kills in 5 000 ticks).
+
+**Before the stamina change** (the same day: one cell per tick for both species,
+no stamina, no carcasses), the same runs gave prey 74–93 and predators 15–21 in
+the full world (200–266 predator births, 18–19 generations, mean predator
+lifespan 362–369 ticks, most predators starved), and prey 22–25 and predators
+5.3–5.8 in the small world. Decisions in the full world: prey eat 63 %, flee
+18 %, rest 7 %, follow 7 %, mate 6 %; predators hunt 78 %, mate 10 %, rest 8 %,
+follow 5 %.
 
 **What changed on 2026-10-07**, in order:
 
@@ -438,10 +523,19 @@ anything (48–67 kills in 5 000 ticks).
   ([06 §5.13](06-experiments-and-results.md#513-llm-brain-in-the-64--64-world-partners-seen-across-the-vision)).
 - The small world's predator cap went from 10 to 6: with 10, predators bred so
   well that the prey sat at their floor up to 77 % of the time.
+- Stamina for both species, predators running 2 cells per tick when hunting,
+  and carcasses that feed up to two more predators (§3, §4, §6). The keyword
+  predators went from 15–21 to 28–34 in the full world (their cap is 34), and
+  the prey stayed at 81–94.
+- Stamina for both species, predators running 2 cells per tick when hunting,
+  and carcasses that feed up to two more predators (§3, §4, §6). The keyword
+  predators went from 15–21 to 28–34 in the full world (their cap is 34), and
+  the prey stayed at 81–94.
 
-Predators stay few. Prey production sets the limit: making predators cheaper
-or deadlier gave more predators only until the prey collapsed (§3). For more
-predators, give the prey more food or a bigger world. Before 2026-10-07, with
+Until the stamina change predators stayed few: prey production set the limit,
+and making predators cheaper or deadlier gave more predators only until the
+prey collapsed (§3). Carcasses changed that, since a kill now feeds up to three
+predators. Before 2026-10-07, with
 scripted predators and the 12-cell vision, the same runs gave 25–31 prey in
 the small world and 50–55 in the full world.
 
