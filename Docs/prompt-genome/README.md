@@ -58,7 +58,7 @@ pip install -e ".[dev]"
 pytest -q                                              # 69 tests, no model needed
 python -m experiments.smoke_run                        # Lab 1 world (96 × 96), rule-based brain, ≈ 22 s
 ollama pull gemma4:12b
-python -m experiments.smoke_run --backend llm --ticks 500   # the LLM brain for both species, ≈ 11 min on a 16 GB GPU
+python -m experiments.smoke_run --backend llm --ticks 500   # the LLM brain for both species, ≈ 50 min on a 16 GB GPU (--profile small: 10 min)
 ```
 
 ## Related material

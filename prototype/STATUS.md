@@ -5,12 +5,12 @@
 
 ## Position
 Session: S1.3 done locally, S4.3 gate run · Last updated: 2026-10-07 (predators = genetic animals with 4 genes;
-one partner's mate is enough; 96 x 96 default world; breeding line in both prompts; LLM check running)
+one partner's mate is enough; 96 x 96 default world; breeding line in both prompts; LLM check done)
 
 ## Next action
-All 4 owner options done 2026-10-07 (9aaac2d code, 88ed9ad docs). RUNNING: LLM check in the 96 x 96 world
-(Background jobs). When it ends: write ../Docs/prompt-genome/06 §5.14, 05 §6 cost, 09 (timeline, #10), STATUS key
-numbers, commit, report. Then WAIT for owner: G2 handling
+All 4 owner options done 2026-10-07 (9aaac2d code, 88ed9ad docs; LLM check in 06 §5.14). WAIT for owner
+(../Docs/prompt-genome/09 §4): #10 the full world's balance (LLM prey at their cap and starving, predators 6-14) and
+its cost (≈ 16 calls per tick, 5 000 ticks ≈ 9 h); G2 handling
 (all-zero answers → neutral answer? cleaner control sentences? prompt iteration 1/3?); founder pools H1
 (prey v2 + predator v2). Then longer LLM runs with both species + `gene_timeline --species prey|predator`. Rerun
 `python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b` (teacher_v4 + obs v2: new
@@ -111,7 +111,9 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
   predators 14/cap 34), breeding line in teacher_v4 / predator_v2; small predator cap 6. rule_based, no mutation, 5 000
   ticks, 3 seeds: full prey 74-93 (never at the floor), predators 15-21, 200-266 births, 18-19 gens; small prey 22-25,
   predators 5.3-5.8. Probe (8 founder predators, well fed): P(mate) with a ready partner adjacent 0.85 (0.60 with
-  the old prompt), 2-4 cells 0.66 (0.34), 11-20 cells 0.20 (0.13).
+  the old prompt), 2-4 cells 0.66 (0.34), 11-20 cells 0.20 (0.13). LLM 96 x 96 (seed 1234, results/runs/check_all4_llm):
+  time limit 3 h at tick 1 673, 26 604 calls, 0 failures; predators 29 births, no newcomers, gen 4, 6-14 alive, 35
+  starved, mate 28 %; prey 68 → 44 (t 100) → 135 = cap from t 1 000; 823 births, 584 starved, 172 killed; flee 4 %.
 - E1 rule_based reference (small, 48 obs, 10-gene genome): MI_G founders 0.23, MI_G random 0.00,
   MI_O 0.83, directed sign acc 1.00, ΔP 0.48, gibberish→neutral 0.00.
   Note for H2: even the "ideal" keyword interpreter scores MI_G 0.23 < G2 threshold 0.25
@@ -123,14 +125,14 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
 ## Background jobs
 | Job | Started | Log | Progress file | State |
 |---|---|---|---|---|
-| LLM check 96 x 96, 2 000 ticks, seed 1234 (`--out results/runs/check_all4_llm --minutes 180`) | 2026-10-07 14:23 | logs/check_all4_llm.log | logs/run_check_all4_llm.progress.json | running (≈ 2-3 h) |
+| LLM check 96 x 96, 2 000 ticks, seed 1234 (`--out results/runs/check_all4_llm --minutes 180`) | 2026-10-07 14:23 | logs/check_all4_llm.log | logs/run_check_all4_llm.progress.json | done 17:23 (time limit, tick 1 673) |
 
 ## Open issues
 - Own git server mirror: waiting for the URL + auth from the owner (see
   ../Docs/redesign/09-progress-log.md › Mirroring).
 - Founder pools (prey v2, predator v1) are drafts by Claude — need owner review (H1).
-- LLM predators bred 3 times (small) and 0 times (64 x 64) per 2 000 ticks before the 4 changes; LLM-read prey flee
-  only 7-9 % and decline while 4-5 predators hunt (09 §4 #8, #10). The 96 x 96 check answers whether this is fixed.
+- LLM predators breed since the 4 changes (29 births / 1 673 ticks, 96 x 96; 0-3 per 2 000 ticks before) but stay
+  few and starve; LLM prey flee only 4-9 % yet fill the 96 x 96 world to their cap (09 §4 #10).
 - LLM cost dominates E4: measured ≈ 4 decisions/s (gemma4:12b, RTX 5080) → 5 000 ticks ≈ 1 h
   (small). Decide run length / D / seeds before S6.
 - Logprobs: Ollama 0.32 returns them, but unusable with gemma4 (first token "f" = flee/follow,

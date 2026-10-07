@@ -349,6 +349,32 @@ whether the nearest other animal of their kind is ready to mate up to 20 cells
   brain. Predator genes can't evolve without births.
 - **Caveat:** one seed.
 
+### 5.14 LLM brain in the 96 × 96 world, with all four changes
+
+`results/runs/check_all4_llm` (not committed), 2026-10-07. The owner asked for
+all four options, for both species: one partner's `mate` is enough to breed,
+predators can `follow`, a 96 × 96 world, and a breeding line in both prompts
+(`teacher_v4.md`, `predator_v2.md`).
+
+- **Run:** 96 × 96 world, seed 1234, gemma4:12b deciding for both species and
+  mutating. It stopped at its 3-hour limit at tick 1 673: 50 072 decisions
+  (48 407 prey, 1 665 predator), 26 604 calls, 0 failures, 97 mutations.
+- **Predators breed now:** 29 births without any newcomer, up to generation 4;
+  35 starved. They stayed at 6–14 (8 at the end) and chose `mate` in 28 % of
+  decisions, `follow` in 5 %. Asked directly (8 founder genomes, well fed), the
+  brain now gives `mate` 0.85 with a ready partner next to the predator (0.60
+  with the old prompt), 0.66 at 2–4 cells (0.34) and 0.20 at 11–20 cells
+  (0.13).
+- **Prey:** after an early loss (68 → 44 in 100 ticks) they grew to their cap
+  of 135 by tick 1 000 and stayed near it: 823 births, 584 starved, 172 killed
+  by predators. They flee in 4 % of decisions and mate in 22 %.
+- **Reading:** the predators' breeding problem is solved, but the balance
+  flipped. The prey are limited by food and by their cap, not by the 6–10
+  predators, which catch about one prey per 100 ticks each and often starve.
+  The cost grew with the population: about 16 calls per tick, so 5 000 ticks
+  would take about 9 hours.
+- **Caveat:** one seed, 1 673 ticks.
+
 ### Summary
 
 | Gate | Status (2026-10-01) |
@@ -434,9 +460,13 @@ python -m experiments.smoke_run --profile small --backend llm --ticks 500 --snap
 python -m experiments.mutation_test                                             # 5.7 (≈ 4 min, cached afterwards)
 python -m experiments.smoke_run --profile full --ticks 50000 --seed 1234 --snapshots 5 --out results/runs/long_1234   # 5.8 (also seeds 7, 42)
 python -m experiments.gene_report results/runs/long_1234 results/runs/long_7 results/runs/long_42 --tag long_1234
-python -m experiments.smoke_run --profile small --backend llm --ticks 2000 --seed 1234 --out results/runs/check_predators_llm_2000   # 5.12
-python -m experiments.smoke_run --backend llm --ticks 2000 --seed 1234 --out results/runs/check_predators_llm_full                  # 5.13
+python -m experiments.smoke_run --profile small --backend llm --ticks 2000 --seed 1234 --out results/runs/check_predators_llm_2000   # 5.12 (code of 865c2c5)
+python -m experiments.smoke_run --backend llm --ticks 2000 --seed 1234 --out results/runs/check_predators_llm_full                  # 5.13 (code of 08e0c57)
+python -m experiments.smoke_run --backend llm --ticks 2000 --minutes 180 --seed 1234 --out results/runs/check_all4_llm              # 5.14
 ```
+
+§5.12 and §5.13 ran the code of the commits in brackets (smaller worlds, older
+rules): check them out to rerun those exactly.
 
 The gate writes `results/teacher_gate.md`. Rename it per model to keep both,
 as was done for the committed files.

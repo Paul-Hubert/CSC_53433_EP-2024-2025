@@ -40,7 +40,7 @@ python -m experiments.peek results/runs/smoke/events.jsonl -n 3
 python -m experiments.e0_probe_ollama --teacher gemma4:12b --mutator gemma4:12b  # speed, determinism, logprobs
 python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b  # do genes steer it? (G1/G2)
 python -m experiments.e1_sensitivity --backend llm --tag llm_points               # full E1 suite
-python -m experiments.smoke_run --backend llm --ticks 500                         # ≈ 11 min on a 16 GB GPU; read llm_calls
+python -m experiments.smoke_run --backend llm --ticks 500                         # ≈ 50 min on a 16 GB GPU (--profile small: 10 min); read llm_calls
 # cloud: export OLLAMA_API_KEY=...; set ollama.host: https://ollama.com (or use cloud tags via local server)
 ```
 

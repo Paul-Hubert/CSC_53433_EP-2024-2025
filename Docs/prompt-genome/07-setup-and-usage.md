@@ -137,9 +137,10 @@ llm_calls=761 failures=0 backend_queries=761 (memo hit rate 0.558)
 ```
 
 On the measured setup this took 425 s. Today, with both species in the
-64 × 64 world, 500 ticks take about 1 600 calls and 11 minutes, 2 000 ticks
-about 5 300 calls and 35 minutes. Extrapolate before launching anything
-longer: 5 000 ticks ≈ 1.5 hours. Answers are cached in `cache/`, so repeating a
+96 × 96 world, the first 500 ticks take about 50 minutes, and a 3-hour run
+reached tick 1 673 with 26 604 calls; in the 48 × 48 world (`--profile small`)
+500 ticks take about 10 minutes. Extrapolate before launching anything longer:
+5 000 ticks ≈ 9 hours in the full world. Answers are cached in `cache/`, so repeating a
 run with the same genomes costs almost nothing.
 
 **Cloud instead of a local GPU:**
