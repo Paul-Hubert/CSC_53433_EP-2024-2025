@@ -44,3 +44,24 @@ contrast 50 %, regular 40 %, random-text 10 %; 0 leaks; every val/test row has �
 - Measured with a fake near-random LLM (small, 2 000 ticks): 5 349 decisions →
   2 211 LLM queries with points (0.41/decision). Table+prefetch k=8: 1 185 requests
   but 9 342 generated answers (4×) → only for request-limited cloud, not for speed.
+
+## Moved from STATUS.md (2026-10-07): Revision 2026-09-30 — LLM brain, Laya parked
+Owner decision: no Laya fine-tuning for now. Decisions AND gene mutation by Ollama LLMs
+(local or cloud). See ../Docs/redesign/05-decision-backend.md §0 and the revision box
+at the top of plan 08. Implemented (offline-tested with fake Ollama, 38 tests):
+- `LLMPolicyBackend` (backends/ollama_policy.py; `TeacherBackend` = alias) with modes
+  points (default) / logprobs (1 token per decision; UNVERIFIED Ollama response format,
+  auto-fallback to points) / table (+prefetch) / ksample; per-situation cache
+  (cache/policy.sqlite) keyed by model+digest+prompt hash; parallel `workers`.
+- backends/factory.py: make_backend(name) and make_rewriter(cfg) used by all scripts;
+  smoke_run --backend llm also mutates genes with ollama.mutator_model.
+- Ollama Cloud: ollama.host https://ollama.com + key in env OLLAMA_API_KEY
+  (client_from_config); or cloud tags through the local server after `ollama signin`.
+Parked (kept, not deleted): laya_backend.py, e0_probe_laya.py, e0_budget.py,
+make_dataset.py, label_teacher.py, S5 distillation.
+
+## Moved from STATUS.md › Key numbers (2026-10-07, before genetic predators)
+- 5-gene genome (2026-10-07), rule_based, no mutation, 5 000 ticks, seeds 1234/7/42: small mean pop 25-31 (was 25-28),
+  full 50-55 (was 47-49), 24 generations, invalid 11-13 %, eat (incl. search) 54-63 % of decisions. LLM brain
+  500 ticks (small, seed 1234): pop 25 at the end (19-26), births 31, no newcomers (10-gene run: floor 10, 9
+  newcomers); decisions eat .28 rest .23 mate .23 follow .22 flee .04; 973 calls in 13 min, 0 failures.

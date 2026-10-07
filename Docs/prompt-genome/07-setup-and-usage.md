@@ -38,7 +38,7 @@ cd prototype
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
-pytest -q                      # 55 passed, no model needed
+pytest -q                      # 66 passed, no model needed
 ```
 
 Windows (PowerShell):
@@ -57,35 +57,39 @@ In Git Bash on Windows, activate with `source .venv/Scripts/activate`, or call
 ## 3. Run with the rule-based brain
 
 Genes mutate through the mutator model (`ollama.mutator_model`, gemma4:12b) with
-every brain, so Ollama must be running: a 5 000-tick run makes about 70
-mutation calls (5 genes × 3 % = 0.15 per birth), cached afterwards. If Ollama
+every brain, so Ollama must be running: a 5 000-tick run makes about 60
+mutation calls (0.15 per prey birth, 5 genes × 3 %; 0.09 per predator birth),
+cached afterwards. If Ollama
 doesn't answer, `smoke_run` stops at the start and says so. `--no-mutation`
 runs with no model at all (crossover only).
 
 ```bash
 python -m experiments.smoke_run                          # Lab 1 world, rule-based brain, 5 000 ticks
-python -m experiments.smoke_run --no-mutation            # the same without any model, ≈ 12 s
-python -m experiments.smoke_run --backend random         # null model: watch the population collapse
+python -m experiments.smoke_run --no-mutation            # the same without any model, ≈ 5 s
+python -m experiments.smoke_run --backend random         # null model: predators live on newcomers only
 python -m experiments.smoke_run --seed 7 --ticks 2000    # another seed, shorter
-python -m experiments.smoke_run --profile full           # 64 × 64 world, 30 animals, cap 60
+python -m experiments.smoke_run --profile full           # 64 × 64 world, 30 prey (cap 60), 6 predators (cap 15)
 python -m experiments.smoke_run --world terrain_preview  # preview of the terrain labs (water, mountains)
 python -m experiments.e1_sensitivity --backend rule_based   # gene-sensitivity suite (its single-gene edits come from the mutator)
 ```
 
-`smoke_run` prints a legend, a few ASCII snapshots, a one-line summary and the
-share of each action (here `--no-mutation`, seed 1234, 2026-10-07):
+`smoke_run` prints a legend, a few ASCII snapshots, then a summary line and
+the share of each action for the prey and for the predators (here
+`--no-mutation`, seed 1234, 2026-10-07):
 
 ```text
 animals by current action: E eat, F flee, L follow, R rest, M mate, ? not decided yet | P predator | . food | ~ water | ^ mountain
---- t=1666 pop=28
- ...   . EE
- .    .. R      .
-
-       E EL   E
-          ME
+--- t=3332 prey=20 predators=3
+ .    E   R  . R  E
+.           .
+ FF        . .
+  R   FF  E  .  E  F   .
+ E      M
 ...
-{"ticks": 5000, "pop_final": 29, "births": 470, "immigrants": 0, "deaths": {"predator": 266, "starvation": 199}, "mean_lifespan": 262.9, "max_gen": 24, ...}
-actions: {'eat': 0.62, 'rest': 0.107, 'flee': 0.098, 'follow': 0.092, 'mate': 0.084}
+prey: {"ticks": 5000, "pop_final": 29, "births": 343, "immigrants": 28, "deaths": {"predator": 247, "starvation": 119}, "mean_lifespan": 247.7, "max_gen": 19, ...}
+prey actions: {'eat': 0.553, 'flee': 0.212, 'follow': 0.083, 'mate': 0.076, 'rest': 0.075}
+predators: {"pop_final": 5, "births": 25, "immigrants": 4, "deaths": {"starvation": 24, "old_age": 4}, "kills": 247, "mean_lifespan": 675.1, "max_gen": 8, ...}
+predator actions: {'hunt': 0.767, 'mate': 0.133, 'rest': 0.1}
 ```
 
 The map is downsampled to fit the terminal, so one character can cover

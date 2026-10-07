@@ -21,6 +21,10 @@ world the animals live in.
 > **2026-10-07:** the genome now has 5 genes, one per behaviour (eat, flee,
 > follow, rest, mate). The temperament genes and the attack and wander actions
 > are gone ([04 §1](04-genome-and-evolution.md#1-genes-are-sentences-in-fixed-slots)).
+> The same day the **predators became genetic animals**: 3 genes (hunt, rest,
+> mate), the same LLM brain, energy, breeding and mutation. Both species see 20
+> cells, with distances in bands, and move at the same speed
+> ([03 §3](03-world-and-simulation.md#3-predators)).
 
 ## Documents
 
@@ -28,14 +32,14 @@ world the animals live in.
 |---|---|---|
 | 01 | [Overview](01-overview.md) | the idea, why the lab changes, how it works, design choices, glossary |
 | 02 | [Lab 1](02-lab1.md) | the flat world, learning goals, how to run it, suggested activities, compute budget, the bridge to the terrain and foliage labs |
-| 03 | [World and simulation](03-world-and-simulation.md) | grid, food, predators, energy, perception, actions, decisions, reproduction, tick order, outputs, reference numbers |
+| 03 | [World and simulation](03-world-and-simulation.md) | grid, food, the two species (prey and predators), energy, perception and distance bands, actions, decisions, reproduction, tick order, outputs, reference numbers |
 | 04 | [Genome and evolution](04-genome-and-evolution.md) | loci, alleles, founder pool, crossover, blind LLM mutation with real examples, selection, controls |
 | 05 | [The brain: decision backends](05-decision-backends.md) | random, rule-based and LLM brains; the prompt; points mode; caching; Ollama settings; model choice; measured costs |
 | 06 | [Experiments, metrics and results](06-experiments-and-results.md) | metrics, gates G1–G5, every result so far, known issues, next experiments |
 | 07 | [Setup, usage and troubleshooting](07-setup-and-usage.md) | install, run with and without a model, check a model, read outputs, long jobs, fixes |
 | 08 | [Code and configuration reference](08-code-and-config-reference.md) | modules, every configuration key, every script, tests, data, how to extend |
 | 09 | [Status, decisions and roadmap](09-status-and-roadmap.md) | where things stand, timeline, decisions taken and pending, roadmap |
-| 10 | [Natural selection in long runs](10-natural-selection-runs.md) | 230-generation runs with predators, how the gene report measures which genes did best, marked genes, drift |
+| 10 | [Natural selection in long runs](10-natural-selection-runs.md) | 230-generation runs with (scripted) predators, how the gene report measures which genes did best, marked genes, drift |
 | 11 | [How genes develop in one long run](11-gene-development.md) | 12 hours with the LLM brain: five phases from rescue to extinction, lineages of nonsense genes, gene dropping (selection or drift), the predation trap, whether genes stay meaningful |
 
 ## Where to start
@@ -50,7 +54,7 @@ world the animals live in.
 cd prototype
 python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
-pytest -q                                              # 55 tests, no model needed
+pytest -q                                              # 66 tests, no model needed
 python -m experiments.smoke_run                        # Lab 1 world, rule-based brain, ≈ 12 s
 ollama pull gemma4:12b
 python -m experiments.smoke_run --backend llm --ticks 500   # the LLM brain, ≈ 7 min on a 16 GB GPU

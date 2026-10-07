@@ -6,9 +6,15 @@ genes did best. Code: `prototype/experiments/smoke_run.py` (the runs) and
 `prototype/experiments/gene_report.py` (the analysis). Full results:
 `prototype/results/long_1234_genes.md` (2026-10-02).
 
-> **Genome change (2026-10-07).** These runs used the 10-gene genome of the
-> time: 7 action genes, including wander and attack, plus 3 temperament genes
-> (risk, social, place). The current genome has 5 genes, one per action ([04 §1](04-genome-and-evolution.md#1-genes-are-sentences-in-fixed-slots)).
+> **Genome and world changes (2026-10-07).** These runs used the 10-gene
+> genome of the time: 7 action genes, including wander and attack, plus 3
+> temperament genes (risk, social, place). The current genome has 5 genes, one
+> per action ([04 §1](04-genome-and-evolution.md#1-genes-are-sentences-in-fixed-slots)).
+> The predators were scripted (they chased the nearest animal within 6 cells
+> and never evolved) and animals saw 12 cells. Since 2026-10-07 predators are
+> genetic animals and both species see 20 cells
+> ([03 §3](03-world-and-simulation.md#3-predators)). The settings suggested
+> in §5 and §6 are today's.
 
 ## Contents
 
@@ -248,7 +254,7 @@ behaviour.
 |---|---|---|---|
 | More seeds | rerun with other `--seed`, pool them in `gene_report` | more carriers: about seven runs for 1 % leads | 14 min per three runs in parallel |
 | Larger population | `agents.cap`, `world.width/height` | drift weakens as the population grows | slower runs; more mutation calls |
-| Stronger predation | `predators.count`, `predators.kill_p` | bigger fitness gaps for flee and caution genes | changes the Lab 1 tuning; check the population stays below the cap |
+| Stronger predation | `predators.kill_p`, a shorter `predators.digest_ticks` | bigger fitness gaps for flee genes | changes the Lab 1 tuning; the prey can collapse to their floor ([03 §3](03-world-and-simulation.md#3-predators)) |
 | Gentler mutation | lower `p_mut`, or small-edit instructions only | genes stay readable longer; readings keep their meaning | less variation |
 | The LLM brain | `--backend llm` | meaning, not keywords, decides | about 1 hour per 5 000 ticks on a 16 GB GPU |
 
@@ -271,7 +277,7 @@ same seeds costs no new model calls.
 Questions for students (Lab 1 activity D, [02](02-lab1.md#d-watch-evolution)):
 
 - Run your own seeds: which readings get ▲ or ✗? Do they match the table above?
-- Double the predators (`predators.count: 6`): do flee or caution genes earn ★?
+- Make predators deadlier (`predators.kill_p: 0.2`): do flee genes earn ★?
 - Run with `--no-mutation`: which founder genes win when nothing new appears,
   and is selection easier to see?
 - Compare the genes at the end with the mutation test, which has no selection:

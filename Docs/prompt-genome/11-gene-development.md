@@ -7,10 +7,13 @@ one gene) and `gene_report.py`. Results: `prototype/results/llm_long_timeline.md
 (tables), `llm_long_timeline.html` (charts), `llm_long_genes.md`
 (2026-10-05/06). The prompt that ran it: `Docs/prompts/04-long-run-gene-development.md`.
 
-> **Genome change (2026-10-07).** This run used the 10-gene genome of the
-> time: 7 action genes, including wander and attack, plus 3 temperament genes
-> (risk, social, place). The current genome has 5 genes, one per action ([04 §1](04-genome-and-evolution.md#1-genes-are-sentences-in-fixed-slots));
-> `gene_swap` (§7, §10) now needs a 5-gene run.
+> **Genome and world changes (2026-10-07).** This run used the 10-gene genome
+> of the time: 7 action genes, including wander and attack, plus 3 temperament
+> genes (risk, social, place). The current genome has 5 genes, one per action ([04 §1](04-genome-and-evolution.md#1-genes-are-sentences-in-fixed-slots));
+> `gene_swap` (§7, §10) now needs a 5-gene run. The predators were scripted and
+> animals saw 12 cells; since 2026-10-07 predators are genetic animals and both
+> species see 20 cells ([03 §3](03-world-and-simulation.md#3-predators)).
+> `gene_timeline --species predator` follows the predators' genes.
 
 ## Contents
 

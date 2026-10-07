@@ -1,7 +1,8 @@
 # 04 — Genome and evolution
 
 What a gene is, where the first genes come from, and how genes change from one
-generation to the next. Code: `prototype/promptevo/genome.py`, `founder.py`,
+generation to the next, for both species: prey animals and, since 2026-10-07,
+predators. Code: `prototype/promptevo/species.py`, `genome.py`, `founder.py`,
 `evolution/mutation.py`, plus `sim.py` for births. Data:
 `prototype/data/*.json`.
 
@@ -20,28 +21,38 @@ generation to the next. Code: `prototype/promptevo/genome.py`, `founder.py`,
 
 ## 1. Genes are sentences, in fixed slots
 
-A **genome** has 5 **loci** (gene slots), always in the same order. Each locus
-holds one short English sentence, its **allele**.
+Both species are genetic animals. A **genome** has one **locus** (gene slot)
+per action of its species, always in the same order. Each locus holds one short
+English sentence, its **allele**.
 
-| Locus | Role | Max words |
-|---|---|---|
-| `eat` | when and how much to go for food | 12 |
-| `flee` | reaction to predators | 12 |
-| `follow` | staying with other animals | 12 |
-| `rest` | saving energy | 12 |
-| `mate` | reproduction | 12 |
+| Species | Locus | Role | Max words |
+|---|---|---|---|
+| prey | `eat` | when and how much to go for food | 12 |
+| prey | `flee` | reaction to predators | 12 |
+| prey | `follow` | staying with other animals | 12 |
+| prey | `rest` | saving energy | 12 |
+| prey | `mate` | reproduction | 12 |
+| predator | `hunt` | when and how to chase prey | 12 |
+| predator | `rest` | saving energy, waiting | 12 |
+| predator | `mate` | reproduction | 12 |
 
 There is one gene per behaviour: each gene belongs to the action of the same
-name, one of the five the brain can choose
-([03 §6](03-world-and-simulation.md#6-actions-the-five-behaviours)). The LLM
-brain sees the genes as a labelled list ([05](05-decision-backends.md#the-prompt)).
+name, one of the actions the brain can choose for that species
+([03 §6](03-world-and-simulation.md#6-actions-five-for-prey-three-for-predators)).
+The LLM brain sees the genes as a labelled list ([05](05-decision-backends.md#the-prompt)).
+
+In ids and files, predator loci carry the prefix `predator.`: `predator.hunt`,
+`predator.rest`, `predator.mate`. One registry then holds both species,
+although `rest` and `mate` exist in both. The prey loci keep their plain names,
+so older runs and caches stay valid. The brain sees the plain action names.
 
 Until 2026-10-07 the genome had 10 genes: 7 action genes (the five above plus
-`wander` and `attack`) and 3 temperament genes (`risk`, `social`, `place`).
-The owner asked to keep the genes to a minimum before predators become genetic
-animals too ([09](09-status-and-roadmap.md#3-decisions-taken)). The runs in
+`wander` and `attack`) and 3 temperament genes (`risk`, `social`, `place`), and
+predators were scripted. The owner asked to keep the genes to a minimum, then
+to make predators genetic animals the same way
+([09](09-status-and-roadmap.md#3-decisions-taken)). The runs in
 [10](10-natural-selection-runs.md) and [11](11-gene-development.md) used the
-old genome.
+old genome and scripted predators.
 
 The slots are fixed for two reasons:
 
@@ -57,33 +68,39 @@ An **allele** (`genome.Allele`) records:
 
 | Field | Meaning |
 |---|---|
-| `id` | `locus:n`, e.g. `eat:3`, numbered in order of appearance within a run |
+| `id` | `locus:n`, e.g. `eat:3` or `predator.hunt:0`, numbered in order of appearance within a run |
 | `text` | the sentence (whitespace normalised) |
 | `origin` | `founder`, `neutral`, `contrast`, `control`, `mutant` or `ood` |
 | `parent_id` | the allele it was mutated from (mutants only) |
 | `operator`, `model`, `seed` | how it was made (mutants only); `operator` is `llm#<n>`, the number of the mutation instruction drawn |
 
-The `AlleleRegistry` holds every allele seen in a run. The same text at the
-same locus is always the same allele, so if two mutations produce the same
-sentence they share one id. A **genome** is just the tuple of 5 allele ids. Its
-`genome_key` is a hash of the 5 texts, so the same genes have the same key in
-every run. The caches use this key.
+The `AlleleRegistry` holds every allele seen in a run, of both species. The
+same text at the same locus is always the same allele, so if two mutations
+produce the same sentence they share one id. A **genome** is the tuple of its
+allele ids (5 for a prey animal, 3 for a predator) and its species. Its
+`genome_key` is a hash of the texts, so the same genes have the same key in
+every run. A predator's key also includes the species. The caches use this key.
 
 `parent_id` links form a **lineage**: you can follow any gene back through its
 mutations to the founder sentence it came from.
 
 ## 3. The founder pool
 
-Every run starts from the same frozen pool, `data/founder_pool_v2.json`. Each
+Every run starts from the same frozen pools: `data/founder_pool_v2.json` for
+the prey and `data/predator_founder_pool_v1.json` for the predators. Each
 locus offers four instinct-like sentences plus a **neutral** allele that
 switches the drive off. A founder (and every later newcomer) draws one of the
-five options per locus uniformly at random, so there are 5^5 = 3 125 possible
-starting genomes. All runs share the same origin and can be compared.
+five options per locus uniformly at random. That gives 5^5 = 3 125 possible
+prey genomes and 5^3 = 125 predator genomes. All runs share the same origin
+and can be compared.
 
-> **Status:** the pool is a draft written by Claude. It is waiting for the
-> course owner's review (checkpoint H1 in the spike plan). v2 (2026-10-07)
-> keeps the v1 sentences of the five remaining slots. Rules used: imperative
-> voice, plain words, no numbers, at most 12 words.
+> **Status:** both pools are drafts written by Claude. They are waiting for the
+> course owner's review (checkpoint H1 in the spike plan). The prey pool v2
+> (2026-10-07) keeps the v1 sentences of the five remaining slots; the predator
+> pool v1 was written on 2026-10-07. Rules used: imperative voice, plain words,
+> no numbers, at most 12 words.
+
+**Prey:**
 
 | Locus | Founder alleles | Neutral |
 |---|---|---|
@@ -92,6 +109,18 @@ starting genomes. All runs share the same origin and can be compared.
 | follow | "Stay close to other animals." · "Follow others when you are lost or hungry." · "Keep your distance from other animals." · "Follow the strongest animal nearby." | "No preference." |
 | rest | "Rest when you are tired." · "Never stop moving." · "Rest only when you feel safe." · "Save energy by resting when food is far." | "No preference." |
 | mate | "Look for a partner when energy is high." · "Mate with any nearby adult." · "Mate only when food is plentiful." · "Seek a partner before growing old." | "No preference." |
+
+**Predators:**
+
+| Locus | Founder alleles | Neutral |
+|---|---|---|
+| hunt | "Chase any prey you see." · "Hunt only when you are hungry." · "Attack only when prey is close." · "Keep chasing until the prey is caught." | "No preference." |
+| rest | "Rest when your belly is full." · "Never stop moving." · "Lie still and let prey come to you." · "Rest when no prey is in sight." | "No preference." |
+| mate | "Look for a mate when well fed." · "Mate with any nearby adult." · "Hunt first, mate later." · "Seek a partner before growing old." | "No preference." |
+
+The predator sentences cover the same kinds of rule as the prey's: a drive
+that is always on, one tied to energy, one tied to distance, and an odd one
+("Hunt first, mate later." in the mate slot).
 
 Some founder sentences refer to things an animal doesn't sense. "Follow the
 strongest animal nearby." is an example: the observation says nothing about
@@ -102,18 +131,20 @@ Two more allele files exist for **measurement and controls**. They never appear
 in a normal run; the control sentences become founder genes only in control C4
 (§7) ([06](06-experiments-and-results.md#3-test-material)):
 
-- `contrast_alleles_v2.json`: a "pro" and an "anti" sentence per locus
-  ("Always eat, whatever happens." / "Never eat unless starving.") for directed
-  tests.
+- `contrast_alleles_v2.json` and `predator_contrast_alleles_v1.json`: a "pro"
+  and an "anti" sentence per locus ("Always eat, whatever happens." / "Never
+  eat unless starving.", "Always hunt, whatever happens." / "Never hunt unless
+  starving.") for directed tests.
 - `control_alleles_v1.json`: 20 shuffled-word sentences ("Needs bakery green
   bread records nine attic.") and 20 irrelevant sentences ("Trains leave from
   the north platform.") for random-text genomes.
 
 ## 4. Crossover
 
-`genome.crossover_uniform`: for each of the 5 loci the child takes the allele
-of one parent or the other with probability ½ each. Because loci are
-homologous, a child always has exactly one gene of each kind.
+`genome.crossover_uniform`: for each locus (5 for prey, 3 for predators) the
+child takes the allele of one parent or the other with probability ½ each.
+Because loci are homologous, a child always has exactly one gene of each kind.
+Parents are always of the same species.
 
 Other schemes are natural student exercises: one-point crossover, blocks of
 loci, or diploid genomes with dominant and recessive alleles.
@@ -126,9 +157,11 @@ review behind it is `prototype/notes/mutation-review.md`).
 
 ### Rate
 
-After crossover, each of the child's 5 genes mutates with probability
-`evolution.p_mut` = 0.03. On average that's 0.15 mutations per child, and
-about 14 % of children (1 − 0.97⁵) get at least one.
+After crossover, each of the child's genes mutates with probability
+`evolution.p_mut` = 0.03. A prey child gets 0.15 mutations on average, and
+about 14 % of prey children (1 − 0.97⁵) get at least one. For a predator
+child it's 0.09 and 9 % (1 − 0.97³). Predator genes mutate exactly like prey
+genes, with the same instructions, model and guards.
 
 ### One operator: the LLM makes a random change
 
@@ -239,15 +272,23 @@ the five):
 
 ## 6. Selection
 
-There is **no fitness function**. Nothing scores genomes. Animals that find
-food, avoid predators and mate leave more children, and their genes become more
-common. That is the whole of selection. Concretely, an animal reproduces only
+There is **no fitness function**. Nothing scores genomes. Prey animals that
+find food, avoid predators and mate leave more children; predators that catch
+prey and mate leave more children. Their genes become more common. That is the
+whole of selection. Concretely, an animal of either species reproduces only
 if it:
 
 1. survives to 150 ticks,
 2. keeps at least 50 energy,
-3. chooses `mate` at a moment when an adjacent partner also chooses `mate`,
-4. while the population is below the cap.
+3. chooses `mate` at a moment when an adjacent partner of its species also
+   chooses `mate`,
+4. while its species is below its cap.
+
+Since 2026-10-07 the two species evolve together. The prey's flee genes face
+predators whose hunt genes evolve, and the other way round. Predators are few,
+about 4–7 in the reference worlds
+([03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)),
+so chance (drift) weighs more on their genes than on the prey's.
 
 Each of these depends on the decisions its genes produce. Selection is
 *measured* afterwards for analysis (lifespan, offspring, food eaten, allele
@@ -258,7 +299,8 @@ frequencies), never used to choose parents. How it is measured, and what
 Two things weaken selection, and both are watched in the experiments:
 
 - **Newcomers.** Founders added at the floor bring fresh founder genes. If
-  they are frequent, they swamp what selection has achieved.
+  they are frequent, they swamp what selection has achieved. Each species has
+  its own floor; predators reach theirs more often.
 - **The cap.** At the cap, births depend on free slots rather than on finding
   food. That's why food regrowth was tuned to keep the Lab 1 population below
   the cap ([03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)).
@@ -266,12 +308,13 @@ Two things weaken selection, and both are watched in the experiments:
 ## 7. Experimental controls
 
 Switches in `configs/base.yaml › evolution` turn the simulation into control
-conditions (the experiment matrix in the spike plan, A10):
+conditions (the experiment matrix in the spike plan, A10). They apply to both
+species:
 
 | Control | Setting | Question it answers |
 |---|---|---|
 | C2 NO-MUT | `p_mut: 0` (or `smoke_run --no-mutation`) | How far does selection get with founder variation alone? |
-| C3 SHUFFLED | `shuffled: true` | Each decision uses a random *other* living animal's genome. Genes are inherited but don't affect their carrier, so any change is drift. |
+| C3 SHUFFLED | `shuffled: true` | Each decision uses the genome of a random *other* living animal of the same species. Genes are inherited but don't affect their carrier, so any change is drift. |
 | C4 RANDOM-FOUNDERS | `random_founders: true` | Founders get random-text genes. Can evolution climb out of nonsense? |
 | C5 RULE-BASED | `--backend rule_based` | The same experiment with the transparent keyword brain. |
 | C7 ASEXUAL | `sexual: false` | One parent, copy and mutation: the old lab's regime. |
@@ -302,6 +345,7 @@ gene dropping to tell selection from drift, and behaviour over time
 themselves is an open decision
 ([09 §4](09-status-and-roadmap.md#4-decisions-waiting-on-the-course-owner)).
 
-`gene_report` and `gene_timeline` take the slots from the run itself, so runs
-made before 2026-10-07, with 10 slots, stay readable. `gene_swap` needs a run
-made with the current 5 genes.
+Both tools read the prey by default; `--species predator` reads the
+predators' genes. They take the slots from the run itself, so runs made before
+2026-10-07, with 10 slots, stay readable. `gene_swap` reads prey slots only and
+needs a run made with the current 5 prey genes.

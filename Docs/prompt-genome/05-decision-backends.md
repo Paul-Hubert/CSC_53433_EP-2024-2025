@@ -1,9 +1,10 @@
 # 05 — The brain: decision backends
 
 The **brain** (decision backend) turns an animal's genes and its current
-situation into a probability for each of the five actions. The simulation then
-draws the action from those probabilities
-([03 §7](03-world-and-simulation.md#7-decisions)). Code:
+situation into a probability for each action of its species: five for prey
+animals, three for predators. The simulation then draws the action from those
+probabilities ([03 §7](03-world-and-simulation.md#7-decisions)). Both species
+use the same brain, each with its own prompt (since 2026-10-07). Code:
 `prototype/promptevo/backends/` and `prototype/promptevo/llm/`.
 
 ## Contents
@@ -23,27 +24,32 @@ draws the action from those probabilities
 ```python
 class Backend(Protocol):
     name: str
-    def decide(self, queries: list[Query]) -> np.ndarray: ...   # shape [len(queries), 5], rows sum to 1
+    def decide(self, queries: list[Query]) -> np.ndarray: ...   # shape [len(queries), actions of the species]
 ```
 
-A `Query` holds the `genome_key` (hash of the 5 gene texts), the `genes`
-(locus → text) and the `obs` (an `Observation`). The five columns follow
-`genome.ACTIONS`: eat, flee, follow, rest, mate.
+A `Query` holds the `genome_key` (hash of the gene texts), the `genes`
+(action → text), the `obs` (an `Observation` for a prey animal, a
+`PredatorObservation` for a predator) and the `species`. One batch holds one
+species. The columns follow that species' actions: eat, flee, follow, rest,
+mate for the prey; hunt, rest, mate for predators (`species.PREY.actions`,
+`species.PREDATOR.actions`). Rows sum to 1.
 
 Pick a brain by name with `--backend` or `backend.name` in the config:
 
 | Name | Needs | Speed | Use |
 |---|---|---|---|
 | `random` | nothing | instant | null model: does behaviour matter? |
-| `rule_based` | nothing | ≈ 2–3 ms per tick | fast reference, CPU-only work, debugging, control C5 |
+| `rule_based` | nothing | ≈ 1 ms per tick | fast reference, CPU-only work, debugging, control C5 |
 | `llm` | Ollama + a model | ≈ 0.5 s per new decision (gemma4:12b, desktop GPU) | the real experiment |
 | `laya` | parked | — | — |
 
 ## 2. `random`: the null model
 
-Every action gets probability 1/5, whatever the genes. In the Lab 1 world a
-random population can't sustain itself. It stays near the floor of 10 (11–16
-animals on average) and depends on 18–94 newcomers per 5 000 ticks
+Every action gets the same probability (1/5 for prey, 1/3 for predators),
+whatever the genes. In the Lab 1 world random predators can't sustain
+themselves: they stay at their floor of 3 and depend on 83–113 newcomers per
+5 000 ticks. Random prey hold 14–16 animals in the small world, against 21–25
+with the keyword brain
 ([03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)).
 So behaviour matters in this world.
 
@@ -53,19 +59,28 @@ So behaviour matters in this world.
 computes a score (logit) per action, adds the effect of the genes, and applies
 a softmax:
 
-1. **Situation defaults** (`default_logits`), for example: eat is high when
-   food is here or near and higher when energy is low; with no food in sight,
-   eat (which then means searching) gets a fixed 1.5; flee is high when a
-   predator is near; mate is high only when another animal within 3 cells is
-   ready, and this animal is adult with energy that isn't low.
+1. **Situation defaults** (`default_logits`), per species:
+   - **prey:** eat is higher the nearer the food (here 3.0, adjacent 2.5,
+     close 2.0, medium 1.5, far 1.0) and higher when energy is low; with no
+     food in sight, eat (which then means searching) gets a fixed 1.5. Flee is
+     high when a predator is adjacent or close (3.5, 3.0), weak at medium range
+     (1.0) and 0 when it is far. Mate is high only when another animal within
+     4 cells is ready, and this animal is adult with energy that isn't low.
+   - **predators:** hunt is higher the nearer the prey (adjacent 3.5 … far
+     1.0; with no prey in sight, searching gets 1.5) and when energy is low.
+     Rest gains 1.0 when energy is high. Mate is high when another predator
+     within 4 cells is ready; a well-fed adult also goes looking for a partner
+     it sees farther away (0.5). Predators are few, and without this they
+     rarely met ([03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)).
 2. **Genes** (`gene_weight`). Each gene adds a weight to its own action:
    - **intensity words:** *never / do not / avoid* −2.5, *rarely* −1.2,
      *always / whatever happens* +2.5, *whenever / often / quickly* +1.2,
      *sometimes* +0.3. With no intensity word, merely mentioning the action
      gives +0.8.
    - **conditions** such as *hungry*, *food is close*, *safe*, *alone* are
-     checked against the observation. An unmet condition keeps only 20 % of the
-     weight.
+     checked against the observation. Each species has its own list: a predator
+     reads *prey is close* or *no prey*, a prey animal *food is close* or
+     *predator*. An unmet condition keeps only 20 % of the weight.
    - **"unless …":** if the exception holds, the effect flips mildly.
 
 Gibberish and neutral genes contribute nothing. That's why its gene-sensitivity
@@ -81,7 +96,9 @@ served by [Ollama](https://ollama.com).
 
 ### The prompt
 
-Template `prompts/teacher_v2.md` (since 2026-10-07; `teacher_v1.md` before):
+Each species has its template (`policy.prompt` and `policy.predator_prompt`).
+For the prey, `prompts/teacher_v3.md` (since 2026-10-07; `teacher_v2.md` for
+the 5-gene genome with the 12-cell vision, `teacher_v1.md` before):
 
 ```text
 You decide what a wild animal does next in a simple grid world.
@@ -94,6 +111,7 @@ Actions:
 - mate: approach a ready partner to breed
 If the chosen action has nothing to act on in sight (no food, predator, animal or
 ready partner), the animal searches the surroundings instead.
+Animals and predators move at the same speed: at most one cell per step.
 
 This animal's instincts (its genes). They define its personality: follow them
 even when they seem unwise. Instincts that are meaningless have no effect.
@@ -104,21 +122,51 @@ Situation: {situation}
 {ask}
 ```
 
-`{genes}` becomes one line per gene (`- eat: "Eat whenever food is close."`).
-`{situation}` is the observation text (V1 or V2), and `{ask}` is the mode's
-instruction. In points mode that is: *"Distribute 100 points across the
-actions according to how likely this animal is to choose each."* The line
-after the actions tells the model what the simulation does with an action that
-has nothing to act on ([03 §6](03-world-and-simulation.md#6-actions-the-five-behaviours)).
-A full prompt is about 10 % shorter than with the 10 genes of
-`teacher_v1.md`: 971 characters against 1 096 for the same example genes.
-The old prompt was about 290 tokens.
+For predators, `prompts/predator_v1.md` has the same layout:
+
+```text
+You decide what a predator does next in a simple grid world.
+
+Actions:
+- hunt: chase the nearest visible prey animal; next to it, try to kill and eat it
+- rest: stay still to save energy
+- mate: approach a ready partner (another predator) to breed
+If the chosen action has nothing to act on in sight (no prey or ready partner),
+the predator searches the surroundings instead.
+Predators and their prey move at the same speed: at most one cell per step.
+
+This predator's instincts (its genes). They define its personality: follow them
+even when they seem unwise. Instincts that are meaningless have no effect.
+{genes}
+
+Situation: {situation}
+
+{ask}
+```
+
+`{genes}` becomes one line per gene (`- eat: "Eat whenever food is close."`,
+`- hunt: "Chase any prey you see."`). `{situation}` is the observation text (V1
+or V2) with distances in cells, for example `Energy: low. Prey: 2-4 cells
+away. Other predator: none within 20 cells. Age: adult.`
+([03 §5](03-world-and-simulation.md#5-perception-what-an-animal-knows)). `{ask}`
+is the mode's instruction. In points mode that is: *"Distribute 100 points
+across the actions according to how likely this animal is to choose each."*
+The line after the actions tells the model what the simulation does with an
+action that has nothing to act on
+([03 §6](03-world-and-simulation.md#6-actions-five-for-prey-three-for-predators)).
+The last line of the world description states the equal speed. It is a fact
+about the world, like the actions, and says nothing about what is wise.
+
+With founder genes and a typical situation, a full prey prompt has 1 076
+characters (967 with `teacher_v2.md` and the old situation text) and a
+predator prompt 917. The 10-gene prompt of `teacher_v1.md` was about 290
+tokens.
 
 ### Points mode (default)
 
-- **Structured output:** the request carries a JSON schema with the five
-  actions as required integer fields (0–100). Ollama constrains generation to
-  that shape.
+- **Structured output:** the request carries a JSON schema with the actions
+  of the species as required integer fields (0–100). Ollama constrains
+  generation to that shape.
 - **Reproducible:** temperature 0 and a fixed seed (`seed` = 0). Three
   identical requests gave identical answers. Answers can still shift a little
   with the seed or the server's batching: the probe's example below used seed
@@ -127,8 +175,9 @@ The old prompt was about 290 tokens.
 - **Answer → probabilities:** points are clipped at 0, a small 0.01 is added to
   each action, and the vector is divided by its sum.
 
-A real example (gemma4:12b, probe of 2026-10-01). It used the 10-gene genome
-and `teacher_v1.md` of the time, so the answer also has wander and attack.
+A real example (gemma4:12b, probe of 2026-10-01). It used the 10-gene genome,
+`teacher_v1.md` and the near/far situation text of the time, so the answer
+also has wander and attack.
 Genes: eat *"Eat whenever food is close."*, flee *"Always run away, whatever
 happens."*, follow *"Stay close to other animals."*, wander *"Keep moving to
 new places."*, rest *"Rest when you are tired."*, mate *"Look for a partner
@@ -182,13 +231,13 @@ Each layer avoids asking the same question twice:
 
 | Layer | Where | Key | Lifetime |
 |---|---|---|---|
-| Decision memo | `Simulation.memo` (memory) | (genome key, observation) | one run |
-| Policy cache | `cache/policy.sqlite` | model, model digest, prompt file hash, mode, text style, genome key, situation text | across runs |
+| Decision memo | `Simulation.memo` (memory) | (species, genome key, observation) | one run |
+| Policy cache | `cache/policy.sqlite` | model, model digest, prompt file name and hash (one per species), mode, text style, genome key, situation text | across runs |
 | Request cache | `cache/ollama.sqlite` | the exact request: model, digest, messages, schema, options | across runs |
 
 Because of the model digest and the prompt hash, a new model version or an
-edited prompt never reuses old answers: answers given to `teacher_v1.md` are
-not reused with `teacher_v2.md`. Before 2026-10-01 a bug (an empty cache
+edited prompt never reuses old answers: answers given to `teacher_v2.md` are
+not reused with `teacher_v3.md`, and prey and predator answers never mix. Before 2026-10-01 a bug (an empty cache
 file counted as "no cache") meant the request cache was never written; the
 policy cache was not affected. It's fixed, so reruns of the same genomes in the
 same situations now cost nothing.
@@ -293,6 +342,24 @@ genome.
 
 One seed and 500 ticks, so only a first sign: as gemma4:12b reads them, the
 5-gene founders kept a population without newcomers.
+
+**With genetic predators** (2026-10-07, same world and seed, `teacher_v3.md`
+and `predator_v1.md`, vision 20 with distance bands; the brain decides for both
+species):
+
+| | 500 ticks | 2 000 ticks |
+|---|---|---|
+| Questions to the brain: prey / predators | 1 264 / 74 | 4 345 / 255 |
+| LLM calls from an empty cache | ≈ 1 340 | ≈ 4 600 (0 failures) |
+| Time from an empty cache | ≈ 10 minutes | ≈ 32 minutes (0.41 s per call, 2 parallel requests) |
+| Memo hit rate: prey / predators | 0.39 / 0.67 | 0.40 / 0.71 |
+
+The distance bands make more situations distinct: the memo answered about 40 %
+of prey decisions, against 68 % in the 5-gene run above. Predators add few
+calls: there are only 3–5 of them, and a digesting predator doesn't decide. At
+about 2.2 calls per tick after the start, a 5 000-tick run needs roughly
+11 000 calls, about 1.3 hours on this machine. What happened in the world:
+[06 §5.12](06-experiments-and-results.md#512-first-llm-brain-run-with-genetic-predators).
 
 ## 7. Parked: Laya
 

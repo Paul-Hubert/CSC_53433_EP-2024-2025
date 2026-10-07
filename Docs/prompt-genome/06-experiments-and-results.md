@@ -6,10 +6,16 @@ explains how that is measured, which pass/fail **gates** were fixed in advance,
 and every result so far, dated. The full plan with sessions and budgets is
 `Docs/redesign/08-phase0-spike-plan.md`.
 
-> **Genome change (2026-10-07).** Every result on this page used the 10-gene
-> genome of before that date: 7 action genes, including wander and attack, plus
-> 3 temperament genes (risk, social, place). The current genome has 5 genes,
-> one per action ([04 §1](04-genome-and-evolution.md#1-genes-are-sentences-in-fixed-slots)).
+> **Genome and world changes (2026-10-07).** Every result on this page up to
+> §5.10 used the 10-gene genome of before that date (7 action genes, including
+> wander and attack, plus 3 temperament genes: risk, social, place), scripted
+> predators and a 12-cell vision with near/far distances. The current genome
+> has 5 genes, one per action
+> ([04 §1](04-genome-and-evolution.md#1-genes-are-sentences-in-fixed-slots)).
+> Since the same day predators are genetic animals, and both species see 20
+> cells with distances in bands ([03 §3](03-world-and-simulation.md#3-predators)).
+> §5.11 used the 5-gene genome with the old world; §5.12 is the first run of
+> today's world.
 
 ## Contents
 
@@ -69,7 +75,8 @@ predator, `follow` an animal, `mate` and `attack` an animal near; `wander` and
 
 | Material | Content |
 |---|---|
-| Observation set `data/observations_v1.jsonl` | 48 situations: 32 adult situations drawn from the 54 combinations of energy (low/medium/high) × food (none/far/near) × predator (none/near) × other animal (none / near, ready and weaker / near, not ready and stronger), plus the 16 most frequent other situations of a rule-based run (8 adult, 8 young) |
+| Observation set `data/observations_v1.jsonl` (results on this page) | 48 situations: 32 adult situations drawn from the 54 combinations of energy (low/medium/high) × food (none/far/near) × predator (none/near) × other animal (none / near, ready and weaker / near, not ready and stronger), plus the 16 most frequent other situations of a rule-based run (8 adult, 8 young) |
+| Observation set `data/observations_v2.jsonl` (since 2026-10-07) | the same recipe with distance bands: 32 adult situations from energy × food (none/far/close) × predator (none/close) × other animal (none / adjacent and ready / adjacent and not ready), plus the 16 most frequent other prey situations of a rule-based run with predators (6 adult, 10 young) |
 | Founder genomes | random draws from the founder pool |
 | Random-text genomes | every gene drawn from `control_alleles_v1.json`: 20 shuffled-word sentences ("Needs bakery green bread records nine attic.") and 20 irrelevant ones ("Trains leave from the north platform.") |
 | Neutral genome | "No preference." / "No particular temperament." everywhere |
@@ -184,8 +191,10 @@ Flat world, rule-based brain, 5 000 ticks, 3 seeds, 2026-10-01. Food
 regrowth 0.0007 keeps the population food-limited and below the cap. Details:
 [03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world).
 
-> 03 §13 now gives the numbers for the 5-gene genome (2026-10-07); the
-> 10-gene runs of this section gave 25–28 animals (small) and 47–49 (full).
+> 03 §13 now gives the numbers for today's world (5 genes, genetic predators,
+> distance bands; 2026-10-07). The 10-gene runs of this section gave 25–28
+> animals (small) and 47–49 (full); with 5 genes and scripted predators it was
+> 25–31 and 50–55.
 
 ### 5.6 First run with the LLM brain
 
@@ -277,6 +286,38 @@ Details: [11](11-gene-development.md).
 - **Behaviour:** eat 28 %, rest 23 %, mate 23 %, follow 22 %, flee 4 % of decisions; 5 % of decisions had nothing in sight and searched instead.
 - **Caveat:** one seed and 500 ticks.
 
+### 5.12 First LLM-brain run with genetic predators
+
+`results/runs/check_predators_llm` (500 ticks) and `check_predators_llm_2000`
+(the same run to 2 000 ticks), not committed, 2026-10-07.
+
+- **Run:** small Lab 1 world, seed 1234, gemma4:12b deciding for both species
+  and mutating, `prompts/teacher_v3.md` and `predator_v1.md`, vision 20 with
+  distance bands, the keyword-tuned predator settings
+  ([03 §3](03-world-and-simulation.md#3-predators)). 2 000 ticks: 8 131
+  decisions (7 252 prey, 879 predator), 4 600 questions to the brain, 0
+  failures, about 32 minutes from an empty cache.
+- **Prey:** 24 at the start, 16 at tick 500, then at their floor of 10 from
+  tick 600 to 1 500, with 35 newcomers. When the founder predators died of old
+  age (1 500 ticks), the prey grew to 28 by tick 2 000. 83 births; 90 killed by
+  predators, 24 starved.
+- **Predators:** 4 founders, 3 births (the first at about tick 650), 4
+  newcomers; 6 starved and 2 died of old age; 3 at tick 2 000. They chose
+  `mate` in 1 % of decisions in the first 500 ticks, while they were young, and
+  11 % over the whole run.
+- **Behaviour:** prey eat 38 %, mate 25 %, follow 16 %, rest 12 %, flee 9 %;
+  predators hunt 58 %, rest 32 %, mate 11 %. With the keyword brain the prey
+  flee about 21 % of the time and predators hunt 73 %
+  ([03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)).
+  The same first 500 ticks with the keyword brain: 11 prey and 5 predators at
+  tick 500, 29 prey killed, 1 predator birth.
+- **Reading:** the machinery works for both species, with no failures. As in
+  the 12-hour run with scripted predators
+  ([11 §9](11-gene-development.md#9-what-it-means)), the LLM-read prey of the
+  small world don't hold against this predation and depend on newcomers. Three
+  predator births in 2 000 ticks are too few for their genes to evolve yet.
+- **Caveat:** one seed.
+
 ### Summary
 
 | Gate | Status (2026-10-01) |
@@ -348,8 +389,10 @@ In the order of the plan (`prototype/STATUS.md` holds the live position):
 
 ## 8. Reproducing the results
 
-From `prototype/`. Since 2026-10-07 these commands run the 5-gene genome, so
-their numbers differ from the ones above.
+From `prototype/`. Since 2026-10-07 these commands run the 5-gene genome,
+genetic predators and the distance bands, so their numbers differ from the
+ones above. The E1 commands read `data/observations_v2.jsonl`; the results of
+§5.1–5.3 used `observations_v1.jsonl`, which today's brains can't read.
 
 ```bash
 python -m experiments.e1_sensitivity --backend rule_based                       # 5.1

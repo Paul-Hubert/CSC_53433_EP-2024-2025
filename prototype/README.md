@@ -26,7 +26,7 @@ python -m experiments.smoke_run --ticks 5000              # Lab 1 flat world + r
 python -m experiments.smoke_run --no-mutation             # the same with no model at all
 python -m experiments.smoke_run --backend random          # null model: the population collapses to the floor
 python -m experiments.smoke_run --world terrain_preview   # preview of the terrain labs (water, mountains)
-python -m experiments.make_obs                              # data/observations_v1.jsonl
+python -m experiments.make_obs                              # data/observations_v2.jsonl
 python -m experiments.e1_sensitivity --backend rule_based   # gene-sensitivity suite (reference numbers)
 python -m experiments.mutation_test                         # pure mutation: variety per temperature + lineages
 python -m experiments.status                                # background jobs
@@ -67,13 +67,14 @@ nohup python -m experiments.label_teacher --workers 4 > logs/label_teacher.log 2
 
 | Path | What |
 |---|---|
-| `promptevo/world.py` | grid world (flat in Lab 1; optional noise terrain with water/mountains), food regrowth, scripted predators |
-| `promptevo/genome.py`, `founder.py` | alleles, genomes of 5 genes (one per behaviour), crossover; founder/contrast/control pools |
-| `promptevo/perception.py`, `obs_text.py`, `actions.py` | discretised observations, text styles V1/V2, 5 behaviours (eat, flee, follow, rest, mate; with nothing to act on, the animal searches) |
-| `promptevo/sim.py` | lockstep loop, decision memo, reproduction, deaths, logging |
+| `promptevo/species.py` | the two species: prey (eat, flee, follow, rest, mate) and predators (hunt, rest, mate; loci `predator.<action>`) |
+| `promptevo/world.py` | grid world (flat in Lab 1; optional noise terrain with water/mountains), food regrowth |
+| `promptevo/genome.py`, `founder.py` | alleles, genomes of either species (one gene per action), crossover; founder/contrast/control pools per species |
+| `promptevo/perception.py`, `obs_text.py`, `actions.py` | discretised observations of both species (vision 20, distance bands), text styles V1/V2 with distances in cells, actions incl. hunt (with nothing to act on, the animal searches) |
+| `promptevo/sim.py` | lockstep loop for prey and predators, decision memo, reproduction, kills and digestion, deaths, logging |
 | `promptevo/backends/` | `random`, `rule_based`, `llm` (ollama_policy: points/logprobs/table/ksample), `laya` (parked); `factory.py` |
 | `promptevo/evolution/mutation.py` | blind mutation: the LLM gets a random-change instruction (`prompts/mutate_v2.txt`) + the gene, nothing else; guards |
 | `promptevo/llm/ollama_client.py` | stdlib Ollama client with sqlite cache |
 | `promptevo/metrics.py` | MI_G, MI_O, JSD, directed ΔP, locality, Spearman, bootstrap |
 | `experiments/` | probes, smoke run, observation set, E1 suite, status/peek helpers |
-| `data/` | founder pool v2 (5 slots since 2026-10-07; draft, needs owner review H1), contrast alleles v2, control alleles v1 |
+| `data/` | founder pool v2 (5 prey slots since 2026-10-07) and predator founder pool v1 (3 slots; drafts, need owner review H1), contrast alleles, control alleles v1, observation sets v1 (near/far, before 2026-10-07) and v2 (distance bands) |
