@@ -29,7 +29,7 @@ values come from `prototype/configs/base.yaml` and the two size profiles,
 
 The world is a 2D grid of square cells with hard borders (no wrap-around).
 
-| | `full` profile (the values in `base.yaml`) | `small` profile (the scripts' default) |
+| | `full` profile (the values in `base.yaml`; `smoke_run`'s default since 2026-10-07) | `small` profile (tests, quick checks) |
 |---|---|---|
 | Size | 64 × 64 cells | 48 × 48 cells |
 
@@ -188,7 +188,7 @@ Until then animals saw 12 cells, with two bands: near (≤ 3) and far.
 | `food` | here, adjacent, close, medium, far, none | nearest food item; `here` = on its cell |
 | `predator` | adjacent, close, medium, far, none | nearest predator |
 | `animal` | adjacent, close, medium, far, none | nearest other prey animal |
-| `animal_ready` | true / false | only when `animal` is adjacent or close: is it ready to mate (adult, energy ≥ 50)? |
+| `animal_ready` | true / false | is that animal ready to mate (adult, energy ≥ 50)? Seen up to `perception.partner_range` = 20 cells, the whole vision |
 | `age` | young, adult | young before 150 ticks |
 
 **A predator senses:**
@@ -198,13 +198,18 @@ Until then animals saw 12 cells, with two bands: near (≤ 3) and far.
 | `energy` | low, medium, high | same thresholds |
 | `prey` | adjacent, close, medium, far, none | nearest prey animal |
 | `animal` | adjacent, close, medium, far, none | nearest other predator |
-| `animal_ready` | true / false | only when that predator is adjacent or close |
+| `animal_ready` | true / false | is that predator ready to mate? Seen up to 20 cells |
 | `age` | young, adult | young before 150 ticks |
 
-That gives 3 × 6 × 5 × 7 × 2 = **1 260 possible prey observations**: energy ×
-food × predator × animal (none, far, medium, and adjacent or close, each ready
-to mate or not) × age. Predators have 3 × 5 × 7 × 2 = **210**. Before
-2026-10-07 the prey had 288.
+That gives 3 × 6 × 5 × 9 × 2 = **1 620 possible prey observations**: energy ×
+food × predator × animal (none, or one of the 4 bands, ready to mate or not) ×
+age. Predators have 3 × 5 × 9 × 2 = **270**. Before 2026-10-07 the prey had
+288.
+
+**Seeing a partner.** Until 2026-10-07 an animal saw whether another was ready
+to mate only within 4 cells (`partner_range` 4), so far partners were
+invisible and the few predators rarely met. Setting `partner_range: 4` gives
+back that rule.
 
 Animals don't sense directions, terrain, how many animals or how much food
 there is, or anything about another animal beyond whether it is ready to mate.
@@ -222,9 +227,8 @@ can see:
 | **V1** (default, terse) | `Energy: low. Food: 2-4 cells away. Predator: 5-10 cells away. Animal: none within 20 cells. Age: adult.` | `Energy: medium. Prey: 2-4 cells away. Other predator: none within 20 cells. Age: adult.` |
 | **V2** (first person) | `I am hungry and weak. The nearest food is 2-4 cells away. The nearest predator is 5-10 cells away. No other animal within 20 cells. I am an adult.` | `I have some energy. The nearest prey is 2-4 cells away. No other predator within 20 cells. I am an adult.` |
 
-On a food cell V1 says `Food: here.` When the other animal is adjacent or
-close, V1 says whether it is ready to mate, for example `Animal: 1 cell away,
-ready to mate.`
+On a food cell V1 says `Food: here.` V1 also says whether the other animal is
+ready to mate, for example `Animal: 11-20 cells away, ready to mate.`
 
 ## 6. Actions: five for prey, three for predators
 
@@ -248,7 +252,7 @@ probability 0.25 (`wander_turn_p`) and picks a new random heading when blocked.
 So "eat" with no food in sight means searching for food, and "hunt" with no
 prey in sight means searching for prey. These choices are counted as invalid
 (`invalid` and `pred_invalid` in `stats.csv`, `invalid_rate` in
-`summary.json`): 2–3 % of prey decisions and 1–5 % of predator decisions in
+`summary.json`): 2–3 % of prey decisions and 1–3 % of predator decisions in
 the reference runs (§13), against 11–13 % with the 12-cell vision. The LLM
 brain's prompts state the same rule ([05](05-decision-backends.md#the-prompt)).
 
@@ -285,7 +289,7 @@ steal energy from a neighbour
 - **Memo:** within one run, the distribution for each (species, genome,
   observation) is computed once and reused. Situations repeat, so many
   decisions don't need the brain at all. In the reference runs of §13 the memo
-  answered 49–73 % of prey decisions and 62–82 % of predator decisions. Before
+  answered 49–74 % of prey decisions and 60–84 % of predator decisions. Before
   the distance bands (5 genes, 12-cell vision, no mutation) it was 77–89 %.
 
 All decisions due on the same tick are sent to the brain in one batch per
@@ -395,33 +399,42 @@ columns. `gene_report` and `gene_timeline` still read them
 Measured on 2026-10-07 with the keyword brain and no mutation, 5 000 ticks,
 populations from tick 1 000 onward, seeds 1234, 7 and 42.
 
-| | small (48 × 48, caps 40 / 10) | full (64 × 64, caps 60 / 15) |
+| | full (64 × 64, caps 60 / 15) | small (48 × 48, caps 40 / 10) |
 |---|---|---|
-| **Prey:** mean population | 21–25 (21.0 / 25.4 / 21.1) | 45–50 (48.3 / 44.8 / 49.9) |
-| Time at the floor / at the cap | 0–11 % / 0 % | 0 % / 1–6 % |
-| Deaths (5 000 ticks): predator / starvation | 232–285 / 112–227 | 261–427 / 314–472 |
-| Mean lifespan · generations reached | 238–267 ticks · 19–24 | 262–290 ticks · 25–26 |
-| Newcomers | 0–44 | 0 |
-| **Predators:** mean population | 3.7–4.8 (4.0 / 3.7 / 4.8) | 3.8–7.2 (6.9 / 7.2 / 3.8) |
-| Time at the floor (3) | 34–50 % | 0–59 % |
-| Births · newcomers | 15–36 · 3–5 | 19–57 · 0–4 |
-| Deaths: starvation / old age | 12–33 / 4–6 | 18–49 / 8–9 |
-| Mean lifespan · generations reached | 609–814 ticks · 8–9 | 535–795 ticks · 6–15 |
-| Invalid actions (the animal searches instead, §6): prey / predators | 2–3 % / 2–5 % | 2 % / 1–2 % |
-| **Random brain** instead | prey 14–16 (at their floor 13–22 % of the time); predators stay at their floor, 83–99 newcomers | prey 26–34; predators stay at their floor, 103–113 newcomers |
+| **Prey:** mean population | 35–48 (40.4 / 48.3 / 35.2) | 23–30 (29.5 / 26.0 / 23.4) |
+| Time at the floor / at the cap | 0–8 % / 0–1 % | 0–11 % / 0 % |
+| Deaths (5 000 ticks): predator / starvation | 303–487 / 213–454 | 218–262 / 152–253 |
+| Mean lifespan · generations reached | 253–276 ticks · 23–26 | 246–284 ticks · 17–24 |
+| Newcomers | 0–27 | 0–48 |
+| **Predators:** mean population | 4.4–8.9 (8.0 / 4.4 / 8.9) | 3.5–4.2 (3.5 / 3.8 / 4.2) |
+| Time at the floor (3) | 0–35 % | 41–64 % |
+| Births · newcomers | 33–69 · 0–3 | 16–37 · 2–5 |
+| Deaths: starvation / old age | 35–67 / 3–11 | 15–38 / 2–4 |
+| Mean lifespan · generations reached | 508–687 ticks · 2–13 | 542–722 ticks · 3–11 |
+| Invalid actions (the animal searches instead, §6): prey / predators | 2 % / 1–2 % | 2–3 % / 1–3 % |
+| **Random brain** instead | prey 26–34; predators stay at their floor, 103–113 newcomers | prey 14–16 (at their floor 13–22 % of the time); predators stay at their floor, 83–99 newcomers |
 
-Decisions in the small world: prey eat 57 %, flee 20 %, follow 8 %, mate 8 %,
-rest 7 %; predators hunt 73 %, mate 15 %, rest 12 %. The keyword brain lets a
-well-fed adult predator look for a partner it sees farther away
-([05](05-decision-backends.md#3-rule_based-the-transparent-keyword-brain)). Without
-that, predators rarely met: in the small world they had 4–25 births and 0–7
-generations in 5 000 ticks.
+Decisions in the full world: prey eat 61 %, flee 17 %, mate 9 %, follow 8 %,
+rest 5 %; predators hunt 71 %, mate 20 %, rest 9 %. Animals see whether a
+partner is ready across their whole vision (§5), and the keyword brain goes to
+a ready partner at any distance
+([05](05-decision-backends.md#3-rule_based-the-transparent-keyword-brain)).
+When readiness was seen only within 4 cells, predators rarely met: in the small
+world they had 4–25 births and 0–7 generations in 5 000 ticks.
+
+**Bigger worlds** (keyword brain, the same settings, populations and caps
+scaled by area): 80 × 80 holds 66–82 prey and 5.9–10.4 predators, 96 × 96
+holds 96–118 prey and 7.7–18.4 predators (43–141 predator births in 5 000
+ticks). The LLM brain's cost grows with the number of animals, so `smoke_run`
+uses the full world by default since 2026-10-07: in the small world the
+LLM-read prey didn't hold against the predators
+([06 §5.12](06-experiments-and-results.md#512-first-llm-brain-run-with-genetic-predators)).
 
 Predators stay few. Prey production sets the limit: making predators cheaper
 or deadlier gave more predators only until the prey collapsed (§3). For more
-predators, give the prey more food or use the full world. Before 2026-10-07,
-with scripted predators and the 12-cell vision, the same runs gave 25–31 prey
-in the small world and 50–55 in the full world.
+predators, give the prey more food or a bigger world. Before 2026-10-07, with
+scripted predators and the 12-cell vision, the same runs gave 25–31 prey in
+the small world and 50–55 in the full world.
 
 Food regrowth was tuned to 0.0007 (2026-10-01, with the 10-gene genome and
 scripted predators) so that the population stays limited by food, below the
@@ -429,4 +442,4 @@ cap. At the earlier 0.001 the flat world sat at the cap 25–68 % of the time,
 and births then depend on free slots rather than on finding food. With
 predators that hunt, the prey stay below the cap almost all the time in both
 worlds. One simulated tick with the keyword brain takes about 1 ms on a desktop
-CPU (5 000 ticks ≈ 4–5 s).
+CPU (5 000 ticks ≈ 5 s small, 9 s full).

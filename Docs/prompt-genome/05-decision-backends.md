@@ -48,7 +48,7 @@ Pick a brain by name with `--backend` or `backend.name` in the config:
 Every action gets the same probability (1/5 for prey, 1/3 for predators),
 whatever the genes. In the Lab 1 world random predators can't sustain
 themselves: they stay at their floor of 3 and depend on 83–113 newcomers per
-5 000 ticks. Random prey hold 14–16 animals in the small world, against 21–25
+5 000 ticks. Random prey hold 14–16 animals in the small world, against 23–30
 with the keyword brain
 ([03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)).
 So behaviour matters in this world.
@@ -64,14 +64,16 @@ a softmax:
      close 2.0, medium 1.5, far 1.0) and higher when energy is low; with no
      food in sight, eat (which then means searching) gets a fixed 1.5. Flee is
      high when a predator is adjacent or close (3.5, 3.0), weak at medium range
-     (1.0) and 0 when it is far. Mate is high only when another animal within
-     4 cells is ready, and this animal is adult with energy that isn't low.
+     (1.0) and 0 when it is far.
    - **predators:** hunt is higher the nearer the prey (adjacent 3.5 … far
      1.0; with no prey in sight, searching gets 1.5) and when energy is low.
-     Rest gains 1.0 when energy is high. Mate is high when another predator
-     within 4 cells is ready; a well-fed adult also goes looking for a partner
-     it sees farther away (0.5). Predators are few, and without this they
-     rarely met ([03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)).
+     Rest gains 1.0 when energy is high.
+   - **both:** mate is high when the nearest animal of its kind is ready and
+     this animal is an adult that isn't hungry: 2.5 up to 4 cells away, 1.5 at
+     5–10 cells, 1.0 at 11–20. Otherwise it is −3.0. Readiness is seen across
+     the whole vision since 2026-10-07; before, only within 4 cells, and the
+     few predators rarely met
+     ([03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)).
 2. **Genes** (`gene_weight`). Each gene adds a weight to its own action:
    - **intensity words:** *never / do not / avoid* −2.5, *rarely* −1.2,
      *always / whatever happens* +2.5, *whenever / often / quickly* +1.2,

@@ -94,13 +94,13 @@ cfg = load_config("small", overrides={"world": {"food_regrow_p": 0.0005},
 ## 3. Configuration
 
 `configs/base.yaml` holds every default. A **profile** (`--profile small` or
-`full`, default `small` in the scripts that read the config) is merged over it, then optional
+`full`; `smoke_run` defaults to `full` since 2026-10-07, the other scripts to `small`) is merged over it, then optional
 **world overlays** from `configs/worlds/`, then overrides.
 
 | File | Content |
 |---|---|
 | `base.yaml` | all defaults (the full-size Lab 1 world) |
-| `small.yaml` | 48 × 48 world; 24 prey at start, cap 40; 4 predators at start, cap 10 (CPU-friendly; the default profile) |
+| `small.yaml` | 48 × 48 world; 24 prey at start, cap 40; 4 predators at start, cap 10 (tests and quick checks) |
 | `full.yaml` | empty: the defaults are the full size |
 | `worlds/terrain_preview.yaml` | noise terrain: 15 % water, 10 % mountains, food regrowth 0.001 |
 
@@ -129,6 +129,7 @@ cfg = load_config("small", overrides={"world": {"food_regrow_p": 0.0005},
 | Key | Default | Meaning |
 |---|---|---|
 | `bands` | [1, 4, 10] | distance bands in cells for both species: adjacent ≤ 1, close ≤ 4, medium ≤ 10, far ≤ vision ([03 §5](03-world-and-simulation.md#5-perception-what-an-animal-knows)); three increasing values below the vision |
+| `partner_range` | 20 | cells within which an animal sees whether the nearest other animal of its kind is ready to mate (4 until 2026-10-07) |
 
 ### `agents` (the prey)
 
@@ -240,14 +241,14 @@ backend. See `Docs/redesign/05-decision-backend.md`.
 
 Run them from `prototype/` with `python -m experiments.<name>`. The scripts that
 read the configuration (`smoke_run`, `teacher_gate`, `e1_sensitivity`,
-`make_obs`) accept `--profile` (default `small`); `e0_probe_ollama`, `status`
+`make_obs`) accept `--profile` (default `full` for `smoke_run`, `small` for the others); `e0_probe_ollama`, `status`
 and `peek` don't read it.
 
 ### Running the world
 
 | Script | Purpose | Options |
 |---|---|---|
-| `smoke_run` | Run a simulation, print ASCII snapshots and a summary, write the run files | `--ticks` (5000), `--backend` (config default `rule_based`; `random`, `llm`), `--seed`, `--out` (`results/runs/smoke`), `--snapshots` (3; 0 = none), `--world` (overlay from `configs/worlds/`), `--no-mutation` (crossover only, no model needed), `--minutes` (stop after N minutes of wall-clock time). Stop cleanly with `logs/run_<name>.stop`; run the same command again to resume ([03 §12](03-world-and-simulation.md#12-what-a-run-writes-to-disk)) |
+| `smoke_run` | Run a simulation, print ASCII snapshots and a summary, write the run files | `--profile` (`full`, 64 × 64; `small` 48 × 48), `--ticks` (5000), `--backend` (config default `rule_based`; `random`, `llm`), `--seed`, `--out` (`results/runs/smoke`), `--snapshots` (3; 0 = none), `--world` (overlay from `configs/worlds/`), `--no-mutation` (crossover only, no model needed), `--minutes` (stop after N minutes of wall-clock time). Stop cleanly with `logs/run_<name>.stop`; run the same command again to resume ([03 §12](03-world-and-simulation.md#12-what-a-run-writes-to-disk)) |
 
 The summary has a line for the prey and one for the predators (population,
 births, newcomers, deaths, kills, lifespan, generations, action shares). With
@@ -309,7 +310,7 @@ history.
 
 ## 6. Tests
 
-`cd prototype && pytest -q` runs 66 offline tests in about 30 s, with no model
+`cd prototype && pytest -q` runs 67 offline tests in about 30 s, with no model
 needed. LLM calls are replaced by small fake servers. Two marked tests talk to
 real models: `pytest -m ollama` (needs Ollama and `policy.model`) and
 `pytest -m laya` (parked).
@@ -318,7 +319,7 @@ real models: `pytest -m ollama` (needs Ollama and `policy.model`) and
 |---|---|
 | `test_core.py` | config merge, random streams, cache round-trip, progress files |
 | `test_world.py` | flat Lab 1 world, terrain fractions and connectivity, nobody enters blocked cells, unambiguous map symbols |
-| `test_behaviour.py` | flee increases distance, eating gains energy, eat with no food in sight → a random walk, counted invalid; distance bands and the same vision for both species; text styles of both species; rule-based directed tests and gibberish, the keyword brain reads predator genes |
+| `test_behaviour.py` | flee increases distance, eating gains energy, eat with no food in sight → a random walk, counted invalid; distance bands and the same vision for both species; a partner's readiness seen 15 cells away (and not with `partner_range` 4); text styles of both species; rule-based directed tests and gibberish, the keyword brain reads predator genes |
 | `test_predators.py` | hunt steps, strikes and feeds; hunt with no prey in sight searches; a kill removes the prey (cause, killer id) and the predator digests without moving or deciding; predators breed with their own genes; newcomers below each floor; everyone moves at most one cell per tick; one registry holds both species |
 | `test_genome.py` | allele pools, registry dedup and genome keys, crossover |
 | `test_evolution.py` | guards and instruction list, the mutator sends only the instruction and the gene (fake LLM), rejected answers, no LLM → no mutation, determinism, population bounds, shuffled control (each species uses its own genomes), no mutation → no new alleles, decisions per action in `stats.csv` (both species) |

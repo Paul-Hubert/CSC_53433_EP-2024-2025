@@ -23,8 +23,9 @@ world the animals live in.
 > are gone ([04 §1](04-genome-and-evolution.md#1-genes-are-sentences-in-fixed-slots)).
 > The same day the **predators became genetic animals**: 3 genes (hunt, rest,
 > mate), the same LLM brain, energy, breeding and mutation. Both species see 20
-> cells, with distances in bands, and move at the same speed
-> ([03 §3](03-world-and-simulation.md#3-predators)).
+> cells, with distances in bands, see a partner's readiness as far, and move at
+> the same speed ([03 §3](03-world-and-simulation.md#3-predators)). Runs use the
+> 64 × 64 world by default.
 
 ## Documents
 
@@ -54,7 +55,7 @@ world the animals live in.
 cd prototype
 python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
-pytest -q                                              # 66 tests, no model needed
+pytest -q                                              # 67 tests, no model needed
 python -m experiments.smoke_run                        # Lab 1 world, rule-based brain, ≈ 12 s
 ollama pull gemma4:12b
 python -m experiments.smoke_run --backend llm --ticks 500   # the LLM brain, ≈ 7 min on a 16 GB GPU

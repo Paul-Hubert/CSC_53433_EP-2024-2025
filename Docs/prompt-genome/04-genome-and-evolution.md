@@ -286,7 +286,7 @@ if it:
 
 Since 2026-10-07 the two species evolve together. The prey's flee genes face
 predators whose hunt genes evolve, and the other way round. Predators are few,
-about 4–7 in the reference worlds
+about 4–9 in the reference worlds
 ([03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)),
 so chance (drift) weighs more on their genes than on the prey's.
 
