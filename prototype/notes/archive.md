@@ -65,3 +65,15 @@ make_dataset.py, label_teacher.py, S5 distillation.
   full 50-55 (was 47-49), 24 generations, invalid 11-13 %, eat (incl. search) 54-63 % of decisions. LLM brain
   500 ticks (small, seed 1234): pop 25 at the end (19-26), births 31, no newcomers (10-gene run: floor 10, 9
   newcomers); decisions eat .28 rest .23 mate .23 follow .22 flee .04; 973 calls in 13 min, 0 failures.
+
+## Moved from STATUS.md › Key numbers (2026-10-07, predator checks before the 4 options)
+- Genetic predators (2026-10-07), rule_based, no mutation, 5 000 ticks, seeds 1234/7/42: small prey 21-25 (at the
+  floor 0-11 %), predators 3.7-4.8 (15-36 births, 8-9 generations); full prey 45-50, predators 3.8-7.2 (6-15
+  generations); invalid 2-5 %; memo prey 0.49-0.73 (bands: was 0.77-0.89). LLM (small, seed 1234, 2 000 ticks,
+  results/runs/check_predators_llm_2000): ≈ 4 600 calls ≈ 32 min fresh, 0 failures; prey at the floor t 600-1 500
+  (35 newcomers), 28 at the end after the founder predators died of old age; predators 3 births, mate 11 %;
+  prey flee 9 % (rule_based 21 %). Docs: ../Docs/prompt-genome/03 §3, §13; 05 §6; 06 §5.12.
+- Partners seen across the vision (partner_range 20) + 64 x 64 default (08e0c57). rule_based 5 000 ticks: 64 x 64 prey
+  35-48, predators 4.4-8.9 (33-69 births, ≤ 13 gens); 96 x 96: 96-118 / 7.7-18.4. LLM 64 x 64, 2 000 ticks (seed 1234,
+  results/runs/check_predators_llm_full): ≈ 5 300 calls, 35 min, 0 failures; prey 30 → 12 (t 1 000), floor t 1 100-1 400
+  (8 newcomers), 57 at the end; predators 0 births (P(mate) 0.60 with a ready partner adjacent, 0.13 at 11-20 cells).
