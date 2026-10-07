@@ -50,13 +50,13 @@ def run(sim: Simulation, ticks: int, minutes: float | None = None, stop_file: Pa
             if sim.t % PROGRESS_EVERY == 0:
                 sim.log.flush()
                 if prog:
-                    prog.update(sim.t, pop=len(sim.agents), births=sim.c.births,
-                                mutations=sim.mutator.stats["ok"])
+                    prog.update(sim.t, pop=len(sim.agents), predators=len(sim.predators),
+                                births=sim.c.births, mutations=sim.mutator.stats["ok"])
             if sim.t % CHECKPOINT_EVERY == 0:
                 sim.checkpoint()
             if snapshot_every and sim.t % snapshot_every == 0:
-                print(f"--- t={sim.t} pop={len(sim.agents)}", flush=True)
-                print(ascii_map(sim.world, sim.agents, max_w=40, max_h=14), flush=True)
+                print(f"--- t={sim.t} prey={len(sim.agents)} predators={len(sim.predators)}", flush=True)
+                print(ascii_map(sim.world, sim.agents, sim.predators, max_w=40, max_h=14), flush=True)
             if stop_file and sim.t % STOP_CHECK_EVERY == 0 and stop_file.exists():
                 stop_file.unlink(missing_ok=True)          # used up: running the command again resumes
                 return "stop file"
@@ -84,7 +84,7 @@ def write_info(out: Path, a, cfg, brain: str, seed: int, mutator_model: str | No
             "profile": a.profile, "world": a.world or "flat (Lab 1)", "ticks": a.ticks, "minutes": a.minutes,
             "git": {"commit": git("rev-parse", "--short", "HEAD"),
                     "uncommitted_files": len((git("status", "--porcelain", "--untracked-files=no") or "").splitlines())},
-            "config": {k: cfg[k] for k in ("evolution", "policy", "agents", "predators", "world", "sim")}}
+            "config": {k: cfg[k] for k in ("evolution", "policy", "agents", "predators", "perception", "world", "sim")}}
     if client is not None:
         models = sorted({m for m in (cfg.policy.model if brain == "llm" else None, mutator_model) if m})
         try:
@@ -160,11 +160,16 @@ def main() -> None:
     keep = {k: s[k] for k in ("ticks", "pop_final", "births", "immigrants", "deaths",
                               "mean_lifespan", "max_gen", "memo_hit_rate", "invalid_rate",
                               "backend_s", "alleles", "mutations")}
-    print(json.dumps(keep))
-    print("actions:", s["action_share"])
+    print("prey:", json.dumps(keep))
+    print("prey actions:", s["action_share"])
+    pr = s["predators"]
+    print("predators:", json.dumps({k: pr[k] for k in ("pop_final", "births", "immigrants", "deaths", "kills",
+                                                       "mean_lifespan", "max_gen", "memo_hit_rate", "invalid_rate")}))
+    print("predator actions:", pr["action_share"])
     if hasattr(backend, "calls"):
         print(f"llm_calls={backend.calls} failures={getattr(backend, 'failures', 0)} "
-              f"backend_queries={s['backend_queries']} (memo hit rate {s['memo_hit_rate']})")
+              f"backend_queries={s['backend_queries'] + pr['backend_queries']} "
+              f"(memo hit rate prey {s['memo_hit_rate']}, predators {pr['memo_hit_rate']})")
     if rewriter:
         print(f"mutation_calls={s['mutation_calls']} (not answered by the cache)")
     print("details:", out)

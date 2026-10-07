@@ -11,19 +11,21 @@ from promptevo.cache import KVCache
 from promptevo.config import load_config, resolve
 from promptevo.genome import ACTIONS
 from promptevo.llm.ollama_client import OllamaClient, client_from_config
+from promptevo.founder import AllelePools
 from promptevo.obs_text import render
-from promptevo.perception import Observation
+from promptevo.perception import Observation, PredatorObservation
 from promptevo.sim import Simulation
+from promptevo.species import PREDATOR
 
-OBS = [Observation("low", f, p, "none") for f in ("none", "near") for p in ("none", "near")]
+OBS = [Observation("low", f, p, "none") for f in ("none", "close") for p in ("none", "close")]
 
 
-def points_for(genes: dict, situation: str) -> dict:
-    pts = {a: 10 for a in ACTIONS}
-    for a in ACTIONS:
+def points_for(genes: dict, situation: str, actions=ACTIONS) -> dict:
+    pts = {}
+    for a in actions:
         g = genes.get(a, "").lower()
         pts[a] = 80 if "always" in g else 1 if "never" in g else 10
-    if "Predator: near" in situation:
+    if "flee" in pts and "Predator: 2-4 cells away" in situation:
         pts["flee"] += 40
     return pts
 
@@ -38,12 +40,13 @@ def fake(log, break_rows=()):
         props = payload["format"]["properties"]
         if "s1" in props:                                   # table mode
             sits = dict(re.findall(r"^(s\d+): (.*)$", prompt, flags=re.M))
-            out = {k: ({} if k in break_rows else points_for(genes, sits[k])) for k in props}
+            acts = list(props["s1"]["properties"])
+            out = {k: ({} if k in break_rows else points_for(genes, sits[k], acts)) for k in props}
         elif "action" in props:
-            p = points_for(genes, prompt)
+            p = points_for(genes, prompt, props["action"]["enum"])
             out = {"action": max(p, key=p.get)}
         else:
-            out = points_for(genes, prompt)
+            out = points_for(genes, prompt, list(props))
         return {"message": {"content": json.dumps(out)}}
     return t
 
@@ -57,16 +60,16 @@ def test_table_mode_batches_and_matches_points(reg_pools):
     pro, anti = pools.contrast_pair("flee")
     qs = _queries(reg, pools, [pro, anti])
     log_t, log_p = [], []
-    table = LLMPolicyBackend(OllamaClient(transport=fake(log_t)), "brain", resolve("prompts/teacher_v2.md"),
+    table = LLMPolicyBackend(OllamaClient(transport=fake(log_t)), "brain", resolve("prompts/teacher_v3.md"),
                              mode="table", table_k=8, prefetch=False)
-    points = LLMPolicyBackend(OllamaClient(transport=fake(log_p)), "brain", resolve("prompts/teacher_v2.md"),
+    points = LLMPolicyBackend(OllamaClient(transport=fake(log_p)), "brain", resolve("prompts/teacher_v3.md"),
                               mode="points")
     Pt, Pp = table.decide(qs), points.decide(qs)
     assert len(log_t) == 2 and len(log_p) == len(qs)          # one call per genome vs per query
     assert np.allclose(Pt, Pp)
     f = ACTIONS.index("flee")
     assert Pt[0, f] > Pt[len(OBS), f]                          # "always flee" > "never flee"
-    near = [i for i, o in enumerate(OBS) if o.predator == "near"]
+    near = [i for i, o in enumerate(OBS) if o.predator == "close"]
     far = [i for i, o in enumerate(OBS) if o.predator == "none"]
     assert Pt[len(OBS) + near[0], f] > Pt[len(OBS) + far[0], f]   # the situation matters too
 
@@ -75,7 +78,7 @@ def test_table_malformed_row_falls_back_to_single_call(reg_pools):
     reg, pools = reg_pools
     log = []
     b = LLMPolicyBackend(OllamaClient(transport=fake(log, break_rows=("s2",))), "brain",
-                         resolve("prompts/teacher_v2.md"), mode="table", prefetch=False)
+                         resolve("prompts/teacher_v3.md"), mode="table", prefetch=False)
     P = b.decide(_queries(reg, pools, [pools.neutral_genome()]))
     assert len(log) == 2 and np.allclose(P.sum(1), 1)          # 1 table call + 1 repair call
 
@@ -85,7 +88,7 @@ def test_per_query_cache_survives_new_backend(reg_pools, tmp_path):
     qs = _queries(reg, pools, [pools.neutral_genome()])
     log = []
     mk = lambda: LLMPolicyBackend(OllamaClient(transport=fake(log)), "brain",
-                                  resolve("prompts/teacher_v2.md"), mode="table",
+                                  resolve("prompts/teacher_v3.md"), mode="table",
                                   cache=KVCache(tmp_path / "p.sqlite"))
     P1 = mk().decide(qs)
     n = len(log)
@@ -104,7 +107,7 @@ def test_failed_call_is_never_cached_and_strict_raises(reg_pools, tmp_path, monk
         raise ConnectionRefusedError("no server")
     cache = KVCache(tmp_path / "p.sqlite")
     mk = lambda **kw: LLMPolicyBackend(OllamaClient(transport=down, retries=1), "brain",
-                                       resolve("prompts/teacher_v2.md"), cache=cache, **kw)
+                                       resolve("prompts/teacher_v3.md"), cache=cache, **kw)
     b = mk()
     P = b.decide(qs)                                            # not strict: uniform for this decision only
     assert np.allclose(P, 1 / len(ACTIONS)) and b.failures == len(qs)
@@ -153,9 +156,10 @@ def test_factory_and_llm_simulation(reg_pools):
     assert rw is not None and model == "brain"
     sim = Simulation(cfg, backend, seed=3, rewriter=rewriter, rewriter_model="fake")
     s = sim.run(300)
-    assert s["decisions"] > 0 and backend.calls > 0
+    assert s["decisions"] > 0 and s["predators"]["decisions"] > 0 and backend.calls > 0
     # prefetch: most later decisions of a genome are answered by its earlier table call
-    assert backend.calls < 0.7 * s["backend_queries"], (backend.calls, s["backend_queries"])
+    queries = s["backend_queries"] + s["predators"]["backend_queries"]
+    assert backend.calls < 0.7 * queries, (backend.calls, queries)
     assert backend.prefetched > 0
     sim._birth(sim.agents[:2])                                  # force one birth: genes via LLM
     child = sim.agents[-1]
@@ -183,13 +187,13 @@ def test_logprobs_mode_and_fallback(reg_pools):
     log = []
     toks = [(" flee", np.log(0.6)), ("eat", np.log(0.3)), ("The", np.log(0.05))]
     b = LLMPolicyBackend(OllamaClient(transport=lp_transport(log, toks)), "brain",
-                         resolve("prompts/teacher_v2.md"), mode="logprobs")
+                         resolve("prompts/teacher_v3.md"), mode="logprobs")
     p = b.decide(q)[0]
     assert p.argmax() == ACTIONS.index("flee") and abs(p[ACTIONS.index("eat")] - 1 / 3) < 0.01
     assert log[0]["options"]["num_predict"] == 1 and b.logprob_fallbacks == 0
     log2 = []                                         # server without logprobs → points fallback
     b2 = LLMPolicyBackend(OllamaClient(transport=fake(log2)), "brain",
-                          resolve("prompts/teacher_v2.md"), mode="logprobs")
+                          resolve("prompts/teacher_v3.md"), mode="logprobs")
     p2 = b2.decide(q)[0]
     assert b2.logprob_fallbacks == 1 and abs(p2.sum() - 1) < 1e-9
 
@@ -214,3 +218,27 @@ def test_make_rewriter_off_and_unreachable(monkeypatch):
         raise ConnectionRefusedError("no server")
     with pytest.raises(MutatorUnavailable):
         make_rewriter(load_config("small"), OllamaClient(transport=down, retries=1), check=True)
+
+
+def test_predator_queries_use_their_own_prompt_and_actions(reg_pools, cfg):
+    reg, prey_pools = reg_pools
+    pools = AllelePools(reg, cfg.paths.data_dir, species=PREDATOR)
+    log = []
+    mk = lambda **kw: LLMPolicyBackend(OllamaClient(transport=fake(log)), "brain",
+                                       resolve("prompts/teacher_v3.md"), **kw)
+    b = mk(predator_prompt_path=resolve("prompts/predator_v1.md"))
+    pro, anti = pools.contrast_pair("hunt")
+    o = PredatorObservation("low", "close", "none")
+    qs = [Query(reg.genome_key(g), reg.genes(g), o, "predator") for g in (pro, anti)]
+    P = b.decide(qs)
+    assert P.shape == (2, 3) and P[0, 0] > P[1, 0]                 # "always hunt" > "never hunt"
+    prompt = log[0]["messages"][0]["content"]
+    assert prompt.startswith("You decide what a predator does next") and '- hunt: "Always hunt' in prompt
+    assert "Situation: Energy: low. Prey: 2-4 cells away. Other predator: none within 20 cells." in prompt
+    assert list(log[0]["format"]["properties"]) == list(PREDATOR.actions)
+    prey_q = _queries(reg, prey_pools, [prey_pools.neutral_genome()])[0]
+    assert b._key(prey_q) != b._key(qs[0])
+    with pytest.raises(ValueError):                                 # one species per batch
+        b.decide([prey_q, qs[0]])
+    with pytest.raises(ValueError):                                 # no predator prompt configured
+        mk().decide(qs)

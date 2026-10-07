@@ -23,12 +23,12 @@ from pathlib import Path
 import numpy as np
 
 from experiments.make_dataset import load_rows
+from experiments.make_obs import obs_from_dict
 from promptevo import metrics as M
 from promptevo.backends.base import Query
 from promptevo.cache import make_key
 from promptevo.config import load_config, resolve
 from promptevo.genome import ACTIONS, LOCI
-from promptevo.perception import Observation
 from promptevo.progress import Progress
 
 
@@ -39,7 +39,7 @@ def labels_path(cfg, model: str, mode: str, version: str = "v1") -> Path:
 
 def row_query(row: dict) -> Query:
     genes = row["genes"]
-    return Query(make_key("genes", [genes[l] for l in LOCI])[:24], genes, Observation(**row["obs"]))
+    return Query(make_key("genes", [genes[l] for l in LOCI])[:24], genes, obs_from_dict(row["obs"]))
 
 
 def done_keys(path: Path) -> set[str]:
@@ -124,7 +124,7 @@ def main() -> None:
     ap.add_argument("--splits", default="val,test,train")
     ap.add_argument("--model", default=None)
     ap.add_argument("--mode", default=None, help="points | ksample (default: cfg.ollama.teacher_mode)")
-    ap.add_argument("--prompt", default="prompts/teacher_v2.md")
+    ap.add_argument("--prompt", default="prompts/teacher_v3.md")
     ap.add_argument("--workers", type=int, default=1)
     ap.add_argument("--limit", type=int, default=None, help="label at most N new rows (e.g. 50 for a first look)")
     ap.add_argument("--check", action="store_true", help="only print sanity stats of existing labels")

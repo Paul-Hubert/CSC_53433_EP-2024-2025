@@ -1,4 +1,7 @@
-"""Alleles (gene texts), genomes (one allele per locus) and crossover. Plan §A5."""
+"""Alleles (gene texts), genomes (one allele per locus) and crossover. Plan §A5.
+
+Both species use this module (rev. 2026-10-07): a genome knows its species, and one
+registry holds the alleles of both (see species.py for the locus ids)."""
 from __future__ import annotations
 
 import hashlib
@@ -8,8 +11,10 @@ from pathlib import Path
 
 import numpy as np
 
-ACTIONS = ("eat", "flee", "follow", "rest", "mate")   # action order used for every probability vector
-LOCI = ACTIONS   # one gene per action (rev. 2026-10-07: risk, social, place, attack, wander removed)
+from .species import ALL_LOCI, PREY, SPECIES, Species
+
+ACTIONS = PREY.actions   # the prey's actions, in the order of their probability vectors
+LOCI = PREY.loci         # one gene per action (rev. 2026-10-07: risk, social, place, attack, wander removed)
 
 
 @dataclass(frozen=True)
@@ -26,24 +31,30 @@ class Allele:
 
 @dataclass(frozen=True)
 class Genome:
-    """One allele id per locus, in LOCI order."""
+    """One allele id per locus of its species, in the species' locus order."""
     alleles: tuple[str, ...]
+    species: str = "prey"
 
     def __post_init__(self):
-        if len(self.alleles) != len(LOCI):
-            raise ValueError(f"genome needs {len(LOCI)} alleles, got {len(self.alleles)}")
+        n = len(self.sp.loci)
+        if len(self.alleles) != n:
+            raise ValueError(f"a {self.species} genome needs {n} alleles, got {len(self.alleles)}")
+
+    @property
+    def sp(self) -> Species:
+        return SPECIES[self.species]
 
     def at(self, locus: str) -> str:
-        return self.alleles[LOCI.index(locus)]
+        return self.alleles[self.sp.loci.index(locus)]
 
     def replace(self, locus: str, allele_id: str) -> "Genome":
         a = list(self.alleles)
-        a[LOCI.index(locus)] = allele_id
-        return Genome(tuple(a))
+        a[self.sp.loci.index(locus)] = allele_id
+        return Genome(tuple(a), self.species)
 
 
 class AlleleRegistry:
-    """All alleles seen in a run. Same (locus, text) → same allele (first origin kept)."""
+    """All alleles seen in a run, both species. Same (locus, text) → same allele (first origin kept)."""
 
     def __init__(self):
         self._by_id: dict[str, Allele] = {}
@@ -52,7 +63,7 @@ class AlleleRegistry:
         self._gkey: dict[Genome, str] = {}
 
     def add(self, locus: str, text: str, origin: str, **meta) -> Allele:
-        if locus not in LOCI:
+        if locus not in ALL_LOCI:
             raise ValueError(f"unknown locus {locus}")
         text = " ".join(text.split())
         existing = self._by_text.get((locus, text))
@@ -79,19 +90,24 @@ class AlleleRegistry:
         return len(self._by_id)
 
     def genes(self, g: Genome) -> dict[str, str]:
-        return {locus: self.text(aid) for locus, aid in zip(LOCI, g.alleles)}
+        """{action: gene text}: what the brain reads (for the prey, action = locus)."""
+        return {a: self.text(aid) for a, aid in zip(g.sp.actions, g.alleles)}
 
     def genome_key(self, g: Genome) -> str:
-        """Run-independent hash of the gene texts (used for caches)."""
+        """Run-independent hash of the gene texts (used for caches). Predator genomes also hash
+        their species; prey keys are unchanged since 2026-09, so cached answers stay valid."""
         k = self._gkey.get(g)
         if k is None:
-            blob = json.dumps([self.text(a) for a in g.alleles], ensure_ascii=False)
+            texts = [self.text(a) for a in g.alleles]
+            blob = json.dumps(texts if g.species == "prey" else [g.species, *texts], ensure_ascii=False)
             k = hashlib.sha256(blob.encode()).hexdigest()[:24]
             self._gkey[g] = k
         return k
 
-    def make_genome(self, genes: dict[str, str], origin: str = "custom") -> Genome:
-        return Genome(tuple(self.add(l, genes[l], origin).id for l in LOCI))
+    def make_genome(self, genes: dict[str, str], origin: str = "custom", species: str = "prey") -> Genome:
+        """Genome from {action: text}."""
+        sp = SPECIES[species]
+        return Genome(tuple(self.add(l, genes[a], origin).id for a, l in zip(sp.actions, sp.loci)), species)
 
     def dump_jsonl(self, path: str | Path) -> None:
         with Path(path).open("w") as f:
@@ -100,5 +116,7 @@ class AlleleRegistry:
 
 
 def crossover_uniform(a: Genome, b: Genome, rng: np.random.Generator) -> Genome:
-    pick = rng.random(len(LOCI)) < 0.5
-    return Genome(tuple(x if p else y for x, y, p in zip(a.alleles, b.alleles, pick)))
+    if a.species != b.species:
+        raise ValueError(f"cannot cross a {a.species} with a {b.species}")
+    pick = rng.random(len(a.alleles)) < 0.5
+    return Genome(tuple(x if p else y for x, y, p in zip(a.alleles, b.alleles, pick)), a.species)

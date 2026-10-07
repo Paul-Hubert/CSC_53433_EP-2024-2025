@@ -14,7 +14,7 @@ from promptevo.config import load_config
 from promptevo.founder import AllelePools
 from promptevo.genome import ACTIONS, LOCI, AlleleRegistry
 
-SITUATION = "Energy: medium. Food: near. Predator: far. Animal: near, ready to mate, weaker. Age: adult."
+SITUATION = "Energy: medium. Food: 2-4 cells away. Predator: 11-20 cells away. Animal: 1 cell away, ready to mate. Age: adult."
 
 
 def segment_texts(genes, placement):

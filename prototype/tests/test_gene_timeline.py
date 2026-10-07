@@ -7,6 +7,7 @@ from promptevo.backends.rule_based import RuleBasedBackend
 from promptevo.config import load_config
 from promptevo.genome import LOCI
 from promptevo.sim import Simulation
+from promptevo.species import PREDATOR
 
 
 def write_run(d, events, alleles, ticks, final=True):
@@ -75,7 +76,11 @@ def test_timeline_invariants_on_a_short_run(tmp_path):
     b = build(tmp_path, every=250, window=500, drops=50)
     run, g = b["run"], b["genes"]
     assert not run.finished and b["scan"]["snaps"][-1]["t"] == 1500 and made
-    assert b["scan"]["snaps"][0]["families"] == cfg.agents.init_pop
+    tick0 = [e for e in run.events if e["t"] == 0]    # prey events only: predators have genes of their own
+    born0 = {e["id"] for e in tick0 if e["kind"] in ("founder", "immigrant")}
+    alive0 = born0 - {e["id"] for e in tick0 if e["kind"] == "death"}
+    assert b["scan"]["snaps"][0]["families"] == len(alive0) > cfg.agents.init_pop // 2
+    assert all(len(e.get("genome", LOCI)) == len(LOCI) for e in run.events)
     for s in b["scan"]["snaps"]:
         for locus in LOCI:
             total = sum(by_t.get(s["t"], 0) for a, by_t in b["shares"].items() if run.alleles[a]["locus"] == locus)
@@ -134,3 +139,21 @@ def test_a_run_is_read_with_its_own_slots(tmp_path):
     assert {r["slot"] for r in b["rows"]} == set(old)
     risk = {r["t"]: r for r in b["rows"] if r["slot"] == "risk"}
     assert risk[500]["leader"] == "risk:1" and risk[500]["leader_share"] == 1
+
+
+def test_timeline_follows_the_predators(tmp_path):
+    cfg = load_config("small", {"evolution": {"p_mut": 0.3}})
+    sim = Simulation(cfg, RuleBasedBackend(), seed=9, out_dir=tmp_path,
+                     rewriter=lambda prompt, seed: f"Mutant hunter {seed % 97}.", rewriter_model="fake")
+    sim.run(1500)
+    b = build(tmp_path, every=250, window=500, drops=20, species="predator")
+    run = b["run"]
+    assert run.loci == PREDATOR.loci and run.final and run.summary["ticks"] == 1500
+    for s in b["scan"]["snaps"]:
+        for locus in PREDATOR.loci:
+            total = sum(by_t.get(s["t"], 0) for a, by_t in b["shares"].items() if run.alleles[a]["locus"] == locus)
+            assert total == pytest.approx(1)
+    beh = b["behaviour"]
+    assert set(beh[0]["actions"]) == set(PREDATOR.actions) and beh[0]["kills_per_1000"] > 0
+    prey = build(tmp_path, every=250, window=500, drops=20)["run"]
+    assert prey.loci == LOCI and not set(prey.genome) & set(run.genome)     # no animal in both

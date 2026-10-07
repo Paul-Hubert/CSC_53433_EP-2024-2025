@@ -6,8 +6,8 @@
 
 Takes the distinct genomes alive at --tick (only those carrying --carrying in --slot, if given,
 at most --genomes of them), puts each text in --slot (the carried text first), and asks the LLM
-brain (points mode, cached) about the E1 situations relevant to the slot (data/observations_v1.jsonl;
-for mate and attack: another animal near). Prints the mean probability of each action per text, and
+brain (points mode, cached) about the E1 situations relevant to the slot (data/observations_v2.jsonl;
+for mate: another animal adjacent or close). Prey slots only. Prints the mean probability of each action per text, and
 the change against the first text with a 95 % interval over genomes. Stops at --max-calls new calls.
 """
 from __future__ import annotations

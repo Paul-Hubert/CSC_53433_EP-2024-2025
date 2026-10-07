@@ -126,6 +126,8 @@ class LayaBackend:
                         render(q.obs, self.style))
 
     def decide(self, queries: list[Query]) -> np.ndarray:
+        if any(q.species != "prey" for q in queries):     # parked before predators got genes
+            raise NotImplementedError("the Laya backend only reads prey genomes")
         out = np.zeros((len(queries), len(ACTIONS)))
         for i, q in enumerate(queries):
             k = self.key(q)

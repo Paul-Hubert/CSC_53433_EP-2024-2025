@@ -1,0 +1,15 @@
+{
+ "note": "Directed tests only (plan §A9). Never used as founders.",
+ "hunt": {
+  "pro": "Always hunt, whatever happens.",
+  "anti": "Never hunt unless starving."
+ },
+ "rest": {
+  "pro": "Always rest and stay still.",
+  "anti": "Never rest, keep moving."
+ },
+ "mate": {
+  "pro": "Always try to mate.",
+  "anti": "Never mate."
+ }
+}

@@ -1,8 +1,9 @@
-"""Headless grid world: terrain (water/mountain), food, scripted predators. Plan §A4."""
+"""Headless grid world: terrain (water/mountain) and food. Plan §A4.
+
+Predators were scripted here until 2026-10-07; they are now genetic animals (sim.py, actions.py)."""
 from __future__ import annotations
 
 from collections import deque
-from dataclasses import dataclass
 
 import numpy as np
 
@@ -54,20 +55,11 @@ def largest_component(walk: np.ndarray) -> np.ndarray:
     return label == best
 
 
-@dataclass
-class Predator:
-    y: int
-    x: int
-    heading: int
-    rest: int = 0
-
-
 class World:
-    def __init__(self, cfg, rng_world: np.random.Generator, rng_pred: np.random.Generator):
+    def __init__(self, cfg, rng_world: np.random.Generator):
         self.cfg = cfg
         wc = cfg.world
         self.h, self.w = int(wc.height), int(wc.width)
-        self.rng_pred = rng_pred
         for _ in range(50):
             terrain = self._make_terrain(rng_world)
             walk = terrain == GRASS
@@ -91,8 +83,6 @@ class World:
         self.regrow_p = np.where(self.near_water, wc.food_regrow_p * wc.food_water_bonus,
                                  wc.food_regrow_p) * self.walkable
         self.food = (rng_world.random((self.h, self.w)) < wc.food_initial_fraction) & self.walkable
-        self.predators = [Predator(*self.random_cell(rng_pred), heading=int(rng_pred.integers(8)))
-                          for _ in range(int(cfg.predators.count))]
 
     def _make_terrain(self, rng: np.random.Generator) -> np.ndarray:
         wc = self.cfg.world
@@ -163,20 +153,3 @@ class World:
     # --- dynamics ----------------------------------------------------------
     def regrow_food(self, rng: np.random.Generator) -> None:
         self.food |= rng.random((self.h, self.w)) < self.regrow_p
-
-    def move_predators(self, agents) -> None:
-        """Each predator chases the nearest agent within chase_radius, else wanders."""
-        pc = self.cfg.predators
-        for p in self.predators:
-            if p.rest > 0:
-                p.rest -= 1
-                continue
-            target, best = None, int(pc.chase_radius) + 1
-            for a in agents:
-                d = cheb(p.y, p.x, a.y, a.x)
-                if d < best:
-                    target, best = a, d
-            if target is not None:
-                p.y, p.x = self.step_toward(p.y, p.x, target.y, target.x, self.rng_pred)
-            else:
-                p.y, p.x, p.heading = self.step_heading(p.y, p.x, p.heading, pc.turn_p, self.rng_pred)

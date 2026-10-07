@@ -8,6 +8,7 @@ from promptevo.config import load_config
 from promptevo.evolution.mutation import TEMPLATE, Mutator, clean, load_instructions, valid
 from promptevo.genome import ACTIONS, LOCI
 from promptevo.sim import Simulation
+from promptevo.species import PREDATOR
 
 
 def test_guards_and_instructions():
@@ -81,12 +82,16 @@ def test_shuffled_control_uses_other_genomes(cfg):
 
     class Spy(RuleBasedBackend):
         def decide(self, queries):
-            seen.extend(q.genome_key for q in queries)
+            seen.extend((q.species, q.genome_key) for q in queries)
             return super().decide(queries)
     sim = Simulation(cfg2, Spy(), seed=2)
     own = {sim.registry.genome_key(a.genome) for a in sim.agents}
+    own_pred = {sim.registry.genome_key(a.genome) for a in sim.predators}
     sim.decide()
-    assert seen and set(seen) <= own          # only real genomes, but chosen at random
+    prey_seen = {k for sp, k in seen if sp == "prey"}
+    pred_seen = {k for sp, k in seen if sp == "predator"}
+    assert prey_seen and prey_seen <= own         # only real genomes, but chosen at random
+    assert pred_seen and pred_seen <= own_pred    # each species behaves like one of its own
 
 
 def test_no_mutation_means_no_new_alleles(cfg):
@@ -104,3 +109,4 @@ def test_stats_count_decisions_per_action(cfg, tmp_path):
     last = rows[-1]
     assert int(last["t"]) == 400
     assert sum(int(last[f"act_{a}"]) for a in ACTIONS) == int(last["decisions"]) == sim.c.decisions
+    assert sum(int(last[f"pred_act_{a}"]) for a in PREDATOR.actions) == int(last["pred_decisions"]) > 0

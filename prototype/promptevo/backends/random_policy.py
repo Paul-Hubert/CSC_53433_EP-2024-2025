@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import numpy as np
 
-from .base import N_ACTIONS, Query
+from .base import Query, batch_actions
 
 
 class RandomBackend:
     name = "random"
 
     def decide(self, queries: list[Query]) -> np.ndarray:
-        return np.full((len(queries), N_ACTIONS), 1.0 / N_ACTIONS)
+        k = len(batch_actions(queries))
+        return np.full((len(queries), k), 1.0 / k)

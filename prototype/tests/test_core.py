@@ -10,9 +10,9 @@ from promptevo.rng import Streams
 
 def test_config_profile_merge():
     c = load_config("small")
-    assert c.world.width == 48 and c.agents.vision == 12 and c.profile == "small"
-    c2 = load_config("small", {"agents": {"vision": 5}})
-    assert c2.agents.vision == 5 and c2.agents.near == 3
+    assert c.world.width == 48 and c.agents.vision == 20 and c.profile == "small"
+    c2 = load_config("small", {"agents": {"vision": 15}})
+    assert c2.agents.vision == 15 and c2.predators.vision == 20 and c2.perception.bands == [1, 4, 10]
 
 
 def test_streams_reproducible_and_independent():

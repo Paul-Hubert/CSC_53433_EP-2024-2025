@@ -15,7 +15,7 @@ import traceback
 from promptevo.backends.laya_backend import build_request, extract_probs
 from promptevo.config import resolve
 
-SITUATION = "Energy: low. Food: near. Predator: far. Animal: none. Age: adult."
+SITUATION = "Energy: low. Food: 2-4 cells away. Predator: 11-20 cells away. Animal: none within 20 cells. Age: adult."
 GENES = {"eat": "Eat whenever food is close.", "flee": "Run from any predator you see.",
          "follow": "Stay close to other animals.", "rest": "Rest when you are tired.",
          "mate": "Look for a partner when energy is high."}
@@ -80,8 +80,8 @@ def main() -> None:
     def criteria_effect():
         base = extract_probs(agent.predict(state, questions)["answers"]["action"])[0]
         g2 = dict(GENES, flee="Always run away, whatever happens.")
-        s2, q2 = build_request(g2, SITUATION.replace("Predator: far", "Predator: near"), "P4")
-        s1, q1 = build_request(GENES, SITUATION.replace("Predator: far", "Predator: near"), "P4")
+        s2, q2 = build_request(g2, SITUATION.replace("Predator: 11-20 cells away", "Predator: 1 cell away"), "P4")
+        s1, q1 = build_request(GENES, SITUATION.replace("Predator: 11-20 cells away", "Predator: 1 cell away"), "P4")
         p1 = extract_probs(agent.predict(s1, q1)["answers"]["action"])[0]
         p2 = extract_probs(agent.predict(s2, q2)["answers"]["action"])[0]
         return {"P(flee) founder gene": round(float(p1[1]), 4), "P(flee) 'always run' gene": round(float(p2[1]), 4),

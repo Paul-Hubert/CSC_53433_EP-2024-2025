@@ -8,7 +8,7 @@ from promptevo.backends.base import Query
 from promptevo.genome import ACTIONS
 from promptevo.perception import Observation
 
-O = Observation("low", "near", "near", "none")
+O = Observation("low", "close", "close", "none")
 
 
 @pytest.mark.laya

@@ -1,7 +1,7 @@
 """Which genes did best? Ranks genes by how the animals that carried them did.
 
     python -m experiments.gene_report results/runs/long_1234 [results/runs/long_7 ...]
-                                      [--min-carriers 100] [--tag long]
+                                      [--min-carriers 100] [--tag long] [--species predator]
 
 Fitness = mean number of offspring of the animals that carried the gene and died during the
 run (complete lives), each divided by the mean of the animals that died in the same 5 000
@@ -11,7 +11,8 @@ also grouped by what the keyword brain reads in them (strength, action, conditio
 Marks use every run given (seeds): ★ clearly above average, ▲ steady leader (above average
 in every run), ✗ clearly below average. Also: share killed by predators, frequency over
 time, predator kills per 1 000 animal-ticks, and the lineage of the most common genes.
-Writes results/<tag>_genes.md + .json and prints the marked genes.
+Writes results/<tag>_genes.md + .json and prints the marked genes. Since 2026-10-07 predators have
+genes too: --species predator reads theirs (predator events carry "species"; prey events don't).
 """
 from __future__ import annotations
 
@@ -24,17 +25,19 @@ from pathlib import Path
 
 import numpy as np
 
-from promptevo.backends.rule_based import ACTION_WORDS, CONDITIONS, INTENSITY
+from promptevo.backends.rule_based import ACTION_WORDS, CONDITIONS_BY_SPECIES, INTENSITY
 from promptevo.config import load_config, resolve
 from promptevo.evolution.mutation import load_instructions
 from promptevo.genome import LOCI
+from promptevo.species import SPECIES, species_of_locus
 
 STOP = set("a an the is are be to of and or in on at for with by from any you your it its it's this that when "
            "whenever if only then before after unless until while do not no never always often rarely sometimes "
            "very too more less than what where there here other others one some all every each so as but".split())
 SITUATION_WORDS = {"energy", "food", "predator", "predators", "animal", "animals", "mate", "young", "adult", "near",
                    "far", "hungry", "eat", "flee", "follow", "wander", "rest", "attack", "fight", "run", "hide",
-                   "danger", "safe", "safety", "partner", "hunger", "prey", "sleep", "tired", "strong", "weak", "alone"}
+                   "danger", "safe", "safety", "partner", "hunger", "prey", "sleep", "tired", "strong", "weak", "alone",
+                   "hunt", "chase", "kill", "catch", "close", "adjacent", "medium", "cell", "cells", "distance"}
 
 
 def jsonl(path: Path) -> list[dict]:
@@ -71,17 +74,20 @@ def first_alt(pattern: str) -> str:
 def reading(locus: str, text: str) -> str:
     """What the keyword brain reads in a gene (same rules as rule_based.gene_weight)."""
     t = text.lower()
-    if locus not in ACTION_WORDS:              # a slot the genome no longer has (runs before 2026-10-07)
+    try:
+        sp = species_of_locus(locus)
+    except ValueError:                         # a slot the genome no longer has (runs before 2026-10-07)
         return "not read (slot removed)"
     w = next((v for p, v in INTENSITY if re.search(p, t)), None)
     if w is None:
-        w = 0.8 if re.search(ACTION_WORDS[locus], t) else 0.0
+        w = 0.8 if re.search(ACTION_WORDS[sp.action_of(locus)], t) else 0.0
     if w == 0.0:
         return "no effect"
+    conditions = CONDITIONS_BY_SPECIES[sp.name]
     unless = re.search(r"\bunless (.+)$", t)
     main = t[:unless.start()] if unless else t
-    conds = [first_alt(p) for p in CONDITIONS if re.search(p, main)]
-    exc = [first_alt(p) for p in CONDITIONS if unless and re.search(p, unless.group(1))]
+    conds = [first_alt(p) for p in conditions if re.search(p, main)]
+    exc = [first_alt(p) for p in conditions if unless and re.search(p, unless.group(1))]
     label = f"{locus} {w:+.1f} ({STRENGTH.get(w, w)})"
     if conds:
         label += ", when " + " & ".join(conds)
@@ -91,11 +97,13 @@ def reading(locus: str, text: str) -> str:
 
 
 class Run:
-    def __init__(self, path: Path):
-        self.path, self.name = path, path.name
-        self.events = jsonl(path / "events.jsonl")
+    def __init__(self, path: Path, species: str = "prey"):
+        self.path, self.name, self.species = path, path.name, species
+        self.col = "" if species == "prey" else "pred_"          # stats.csv column prefix
+        self.events = [e for e in jsonl(path / "events.jsonl") if e.get("species", "prey") == species]
         first = next((e["genome"] for e in self.events if e["kind"] in ("founder", "immigrant", "birth")), None)
-        self.loci = tuple(a.split(":")[0] for a in first) if first else LOCI     # the run's own slots
+        self.loci = (tuple(a.split(":")[0] for a in first) if first     # the run's own slots
+                     else SPECIES[species].loci)
         self.alleles = {a["id"]: a for a in jsonl(path / "alleles.jsonl")} if (path / "alleles.jsonl").exists() else {}
         info = path / "run_info.json"
         self.info = json.loads(info.read_text(encoding="utf-8")) if info.exists() else {}
@@ -115,14 +123,18 @@ class Run:
         self.finished = (path / "summary.json").exists() and (path / "final_population.json").exists()
         if self.finished:
             self.summary = json.loads((path / "summary.json").read_text())
-            self.final = json.loads((path / "final_population.json").read_text())
+            if species != "prey":                 # the run's figures, with this species' own counts
+                self.summary = {**{k: self.summary[k] for k in ("ticks", "seed", "backend", "mutations")},
+                                **self.summary.get(species + "s", {})}
+            self.final = [x for x in json.loads((path / "final_population.json").read_text())
+                          if x.get("species", "prey") == species]
         else:
             self.final = list(alive.values())
             self.summary = self._rebuilt_summary()
         self._reading: dict[str, str] = {}
         self.world = set(SITUATION_WORDS)
         for a in self.alleles.values():
-            if a["origin"] in ("founder", "neutral"):
+            if a["origin"] in ("founder", "neutral") and a["locus"] in self.loci:
                 self.world |= words(a["text"])
 
     def _rebuilt_summary(self) -> dict:
@@ -213,8 +225,9 @@ class Run:
         pops = defaultdict(list)
         with (self.path / "stats.csv").open() as f:
             for row in csv.DictReader(f):
-                if (row.get("pop") or "").isdigit():      # skips a last row cut short by a hard stop
-                    pops[(int(row["t"]) - 1) // every].append(int(row["pop"]))
+                pop = row.get(self.col + "pop") or ""
+                if pop.isdigit():                         # skips a last row cut short by a hard stop
+                    pops[(int(row["t"]) - 1) // every].append(int(pop))
         wins = defaultdict(Counter)
         for d in self.death.values():
             wins[d["t"] // every][d["cause"]] += 1
@@ -276,12 +289,13 @@ def main() -> None:
     ap.add_argument("--min-carriers", type=int, default=100)
     ap.add_argument("--every", type=int, default=10000)
     ap.add_argument("--tag", default=None)
+    ap.add_argument("--species", default="prey", choices=sorted(SPECIES))
     a = ap.parse_args()
     cfg = load_config("small")
     instructions = load_instructions(cfg.evolution.mutation_prompts)
-    runs = [Run(resolve(p)) for p in a.runs]
+    runs = [Run(resolve(p), a.species) for p in a.runs]
     main_run = runs[0]
-    tag = a.tag or main_run.name
+    tag = a.tag or (main_run.name if a.species == "prey" else f"{main_run.name}_{a.species}")
     fit = {r.name: r.fitness(a.min_carriers) for r in runs}
     F = fit[main_run.name]
     R = {r.name: r.by_reading(a.min_carriers) for r in runs}

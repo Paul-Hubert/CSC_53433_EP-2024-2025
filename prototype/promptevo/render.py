@@ -8,7 +8,7 @@ LEGEND = ("animals by current action: E eat, F flee, L follow, R rest, M mate, ?
           "P predator | . food | ~ water | ^ mountain")
 
 
-def ascii_map(world, agents=(), max_w: int = 48, max_h: int = 24) -> str:
+def ascii_map(world, agents=(), predators=(), max_w: int = 48, max_h: int = 24) -> str:
     sy = max(1, -(-world.h // max_h))
     sx = max(1, -(-world.w // max_w))
     grid = []
@@ -28,6 +28,6 @@ def ascii_map(world, agents=(), max_w: int = 48, max_h: int = 24) -> str:
         grid.append(row)
     for a in agents:
         grid[a.y // sy][a.x // sx] = ACTION_CHAR.get(a.action, "?")
-    for p in world.predators:
+    for p in predators:
         grid[p.y // sy][p.x // sx] = "P"
     return "\n".join("".join(r) for r in grid)

@@ -17,7 +17,7 @@ from typing import Callable
 import numpy as np
 
 from ..config import resolve
-from ..genome import LOCI, AlleleRegistry, Genome
+from ..genome import AlleleRegistry, Genome
 
 TEMPLATE = '{instruction}\n\n"{text}"\n\nReply with the new sentence only.'
 
@@ -72,7 +72,7 @@ class Mutator:
 
     def mutate(self, g: Genome, rng: np.random.Generator) -> tuple[Genome, list[dict]]:
         events = []
-        for locus, aid in zip(LOCI, g.alleles):
+        for locus, aid in zip(g.sp.loci, g.alleles):     # either species
             if rng.random() >= self.p_mut:
                 continue
             self.stats["tried"] += 1

@@ -1,7 +1,7 @@
 """How the genes develop during one run.
 
     python -m experiments.gene_timeline results/runs/llm_long [--every 500] [--window 2000]
-                                        [--tag llm_long] [--drops 500] [--judge]
+                                        [--tag llm_long] [--drops 500] [--judge] [--species predator]
 
 Reads the run files (also a run still going, or stopped hard) and answers six questions:
 1. The gene pool, per checkpoint and slot: distinct genes, effective number (1 / sum of share²),
@@ -19,6 +19,7 @@ Reads the run files (also a run still going, or stopped hard) and answers six qu
    gene that had at least 3 carriers at once still gives a usable rule for its slot (cached,
    temperature 0, at most --judge-max new calls).
 Writes results/<tag>_timeline.md, .json, .csv (one row per checkpoint and slot) and .html.
+--species predator follows the predators' genes instead (predators have genes since 2026-10-07).
 """
 from __future__ import annotations
 
@@ -37,6 +38,7 @@ from experiments.gene_report import words as content_words
 from experiments.mutation_test import compare
 from promptevo.config import load_config, resolve
 from promptevo.evolution.mutation import load_instructions
+from promptevo.species import SPECIES, species_of_locus
 
 SWEEP = 0.25        # a gene "swept" when it reached this share of its slot at a checkpoint
 SPREAD = 5          # a mutant "spread" when it had this many living carriers at once
@@ -44,7 +46,9 @@ RARE = 0.05         # charts: genes that never reached this share of their slot 
 JUDGE_MIN = 3       # --judge asks only about texts that had this many living carriers at once
 JUDGE_PROMPT = "prompts/judge_sense_v1.txt"
 TOPIC = {"eat": "when and how to eat", "flee": "when to run away", "follow": "when to follow other animals",
-         "rest": "when to rest", "mate": "when to look for a partner"}
+         "rest": "when to rest", "mate": "when to look for a partner",
+         "predator.hunt": "when and how to hunt prey", "predator.rest": "when to rest",
+         "predator.mate": "when to look for a partner"}
 
 
 def mean(xs) -> float | None:
@@ -369,14 +373,17 @@ def behaviour(run: Run, window: int) -> list[dict]:
     """Question 5: per window of ticks, from stats.csv (cumulative counters) and the deaths."""
     if not (run.path / "stats.csv").exists():
         return []
+    c = run.col                                                  # "pred_" for the predators' columns
     with (run.path / "stats.csv").open() as f:
-        rows = [r for r in csv.DictReader(f) if (r.get("pop") or "").isdigit() and r.get("act_attack", "0") is not None]
+        rows = [r for r in csv.DictReader(f)          # a last row cut short by a hard stop has None values
+                if (r.get(c + "pop") or "").isdigit() and None not in r.values()]
     if not rows:
         return []
-    acts = [k[4:] for k in rows[0] if k.startswith("act_")]     # the run's own actions (none before 2026-10-05)
+    acts = [k[len(c) + 4:] for k in rows[0] if k.startswith(c + "act_")]   # the run's own actions (since 2026-10-05)
     deaths = [e for e in run.events if e["kind"] == "death"]
-    cum = ["births", "immigrants", "deaths_starve", "deaths_pred", "deaths_age", "decisions"] + \
-          [f"act_{a}" for a in acts]
+    # prey: deaths_pred = prey killed; predators: the same column counts their kills
+    cum = [c + "births", c + "immigrants", c + "deaths_starve", "deaths_pred", c + "deaths_age", c + "decisions"] + \
+          [f"{c}act_{a}" for a in acts]
     out, prev, prev_t = [], {k: 0 for k in cum}, 0
     last_t = int(rows[-1]["t"])
     ends = list(range(window, last_t + 1, window)) + ([last_t] if last_t % window else [])
@@ -385,11 +392,11 @@ def behaviour(run: Run, window: int) -> list[dict]:
         win = [x for x in rows if prev_t < int(x["t"]) <= end]
         if not win:
             continue
-        d = {k: int(r[k]) - int(prev[k]) for k in cum}
-        pop = mean(int(x["pop"]) for x in win)
+        d = {k[len(c):] if k.startswith(c) else k: int(r[k]) - int(prev[k]) for k in cum}
+        pop = mean(int(x[c + "pop"]) for x in win)
         at = pop * (end - prev_t) if pop else 0
         ages = [x["age"] for x in deaths if prev_t < x["t"] <= end]
-        out.append({"from": prev_t, "to": end, "pop": pop, "energy": mean(float(x["mean_energy"]) for x in win),
+        out.append({"from": prev_t, "to": end, "pop": pop, "energy": mean(float(x[c + "mean_energy"]) for x in win),
                     "births_per_1000": 1000 * d["births"] / at if at else None,
                     "kills_per_1000": 1000 * d["deaths_pred"] / at if at else None,
                     "starved_per_1000": 1000 * d["deaths_starve"] / at if at else None,
@@ -397,6 +404,14 @@ def behaviour(run: Run, window: int) -> list[dict]:
                     "actions": ({a: d[f"act_{a}"] / d["decisions"] for a in acts} if acts and d["decisions"] else None)})
         prev, prev_t = r, end
     return out
+
+
+def slot_name(locus: str) -> str:
+    """The slot as the brain sees it: the action ("predator.hunt" -> "hunt")."""
+    try:
+        return species_of_locus(locus).action_of(locus)
+    except ValueError:                           # slots removed on 2026-10-07
+        return locus
 
 
 def judge(run: Run, aids: list[str], cfg, max_calls: int) -> tuple[dict, int]:
@@ -411,7 +426,7 @@ def judge(run: Run, aids: list[str], cfg, max_calls: int) -> tuple[dict, int]:
         if client.cache.misses >= max_calls:
             break
         a = run.alleles[aid]
-        prompt = template.format(slot=a["locus"], topic=TOPIC.get(a["locus"], a["locus"]), text=a["text"])
+        prompt = template.format(slot=slot_name(a["locus"]), topic=TOPIC.get(a["locus"], a["locus"]), text=a["text"])
         r = client.chat_json(cfg.policy.model, [{"role": "user", "content": prompt}], schema,
                              options={"seed": 0, "temperature": 0})
         out[aid] = r.get("answer") == "yes"
@@ -774,12 +789,12 @@ def page(run: Run, g: Genes, sc, rows, sh, sw, beh, md_lines, tag: str) -> str:
 
 # --- main ------------------------------------------------------------------------------------
 def build(run_dir: Path, every: int, window: int, drops: int, judge_on: bool = False, judge_max: int = 3000,
-          cfg=None, test: str | None = None, test_from: int = 0) -> dict:
+          cfg=None, test: str | None = None, test_from: int = 0, species: str = "prey") -> dict:
     cfg = cfg or load_config("small")
     instructions = load_instructions(cfg.evolution.mutation_prompts)
     mt_path = resolve(cfg.paths.results_dir) / "mutation_test.json"
     mt = json.loads(mt_path.read_text(encoding="utf-8")) if mt_path.exists() else None
-    run = Run(run_dir)
+    run = Run(run_dir, species)
     g = Genes(run, instructions, mt["summary"]["per_prompt"] if mt else None)
     sc = scan(run, every)
     sense, calls = {}, 0
@@ -813,10 +828,12 @@ def main() -> None:
     ap.add_argument("--judge-max", type=int, default=3000, help="most new model calls for --judge")
     ap.add_argument("--test", default=None, help="a gene text singled out earlier, to test on what came after")
     ap.add_argument("--test-from", type=int, default=0, help="tick at which --test was singled out")
+    ap.add_argument("--species", default="prey", choices=sorted(SPECIES))
     a = ap.parse_args()
     cfg = load_config("small")
-    b = build(resolve(a.run), a.every, a.window, a.drops, a.judge, a.judge_max, cfg, a.test, a.test_from)
-    run, tag = b["run"], a.tag or b["run"].name
+    b = build(resolve(a.run), a.every, a.window, a.drops, a.judge, a.judge_max, cfg, a.test, a.test_from, a.species)
+    run = b["run"]
+    tag = a.tag or (run.name if a.species == "prey" else f"{run.name}_{a.species}")
     out = resolve(cfg.paths.results_dir)
     md = report(run, b["genes"], b["scan"], b["rows"], b["sweeps"], b["leaders"], b["sets"], b["drop"],
                 b["fitness"], b["behaviour"], b["sense"], b["judge_calls"], a, tag, null=b["null"], test=b["test"])
