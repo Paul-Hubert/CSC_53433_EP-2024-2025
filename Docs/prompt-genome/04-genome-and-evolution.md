@@ -33,16 +33,17 @@ English sentence, its **allele**.
 | prey | `rest` | saving energy | 12 |
 | prey | `mate` | reproduction | 12 |
 | predator | `hunt` | when and how to chase prey | 12 |
+| predator | `follow` | staying with other predators (since 2026-10-07, pool v2) | 12 |
 | predator | `rest` | saving energy, waiting | 12 |
 | predator | `mate` | reproduction | 12 |
 
 There is one gene per behaviour: each gene belongs to the action of the same
 name, one of the actions the brain can choose for that species
-([03 §6](03-world-and-simulation.md#6-actions-five-for-prey-three-for-predators)).
+([03 §6](03-world-and-simulation.md#6-actions-five-for-prey-four-for-predators)).
 The LLM brain sees the genes as a labelled list ([05](05-decision-backends.md#the-prompt)).
 
 In ids and files, predator loci carry the prefix `predator.`: `predator.hunt`,
-`predator.rest`, `predator.mate`. One registry then holds both species,
+`predator.follow`, `predator.rest`, `predator.mate`. One registry then holds both species,
 although `rest` and `mate` exist in both. The prey loci keep their plain names,
 so older runs and caches stay valid. The brain sees the plain action names.
 
@@ -77,7 +78,7 @@ An **allele** (`genome.Allele`) records:
 The `AlleleRegistry` holds every allele seen in a run, of both species. The
 same text at the same locus is always the same allele, so if two mutations
 produce the same sentence they share one id. A **genome** is the tuple of its
-allele ids (5 for a prey animal, 3 for a predator) and its species. Its
+allele ids (5 for a prey animal, 4 for a predator) and its species. Its
 `genome_key` is a hash of the texts, so the same genes have the same key in
 every run. A predator's key also includes the species. The caches use this key.
 
@@ -87,17 +88,17 @@ mutations to the founder sentence it came from.
 ## 3. The founder pool
 
 Every run starts from the same frozen pools: `data/founder_pool_v2.json` for
-the prey and `data/predator_founder_pool_v1.json` for the predators. Each
+the prey and `data/predator_founder_pool_v2.json` for the predators. Each
 locus offers four instinct-like sentences plus a **neutral** allele that
 switches the drive off. A founder (and every later newcomer) draws one of the
 five options per locus uniformly at random. That gives 5^5 = 3 125 possible
-prey genomes and 5^3 = 125 predator genomes. All runs share the same origin
+prey genomes and 5^4 = 625 predator genomes. All runs share the same origin
 and can be compared.
 
 > **Status:** both pools are drafts written by Claude. They are waiting for the
 > course owner's review (checkpoint H1 in the spike plan). The prey pool v2
 > (2026-10-07) keeps the v1 sentences of the five remaining slots; the predator
-> pool v1 was written on 2026-10-07. Rules used: imperative voice, plain words,
+> pool was written on 2026-10-07 (v1: hunt, rest, mate; v2 adds follow). Rules used: imperative voice, plain words,
 > no numbers, at most 12 words.
 
 **Prey:**
@@ -115,6 +116,7 @@ and can be compared.
 | Locus | Founder alleles | Neutral |
 |---|---|---|
 | hunt | "Chase any prey you see." · "Hunt only when you are hungry." · "Attack only when prey is close." · "Keep chasing until the prey is caught." | "No preference." |
+| follow | "Stay close to other predators." · "Hunt as a pack." · "Keep away from other predators." · "Follow others when no prey is in sight." | "No preference." |
 | rest | "Rest when your belly is full." · "Never stop moving." · "Lie still and let prey come to you." · "Rest when no prey is in sight." | "No preference." |
 | mate | "Look for a mate when well fed." · "Mate with any nearby adult." · "Hunt first, mate later." · "Seek a partner before growing old." | "No preference." |
 
@@ -131,7 +133,7 @@ Two more allele files exist for **measurement and controls**. They never appear
 in a normal run; the control sentences become founder genes only in control C4
 (§7) ([06](06-experiments-and-results.md#3-test-material)):
 
-- `contrast_alleles_v2.json` and `predator_contrast_alleles_v1.json`: a "pro"
+- `contrast_alleles_v2.json` and `predator_contrast_alleles_v2.json`: a "pro"
   and an "anti" sentence per locus ("Always eat, whatever happens." / "Never
   eat unless starving.", "Always hunt, whatever happens." / "Never hunt unless
   starving.") for directed tests.
@@ -141,7 +143,7 @@ in a normal run; the control sentences become founder genes only in control C4
 
 ## 4. Crossover
 
-`genome.crossover_uniform`: for each locus (5 for prey, 3 for predators) the
+`genome.crossover_uniform`: for each locus (5 for prey, 4 for predators) the
 child takes the allele of one parent or the other with probability ½ each.
 Because loci are homologous, a child always has exactly one gene of each kind.
 Parents are always of the same species.
@@ -160,7 +162,7 @@ review behind it is `prototype/notes/mutation-review.md`).
 After crossover, each of the child's genes mutates with probability
 `evolution.p_mut` = 0.03. A prey child gets 0.15 mutations on average, and
 about 14 % of prey children (1 − 0.97⁵) get at least one. For a predator
-child it's 0.09 and 9 % (1 − 0.97³). Predator genes mutate exactly like prey
+child it's 0.12 and 11 % (1 − 0.97⁴). Predator genes mutate exactly like prey
 genes, with the same instructions, model and guards.
 
 ### One operator: the LLM makes a random change
@@ -280,13 +282,14 @@ if it:
 
 1. survives to 150 ticks,
 2. keeps at least 50 energy,
-3. chooses `mate` at a moment when an adjacent partner of its species also
-   chooses `mate`,
+3. chooses `mate` next to a ready partner of its species, or is that ready
+   partner (since 2026-10-07 one partner's choice is enough; before, both had
+   to choose `mate`),
 4. while its species is below its cap.
 
 Since 2026-10-07 the two species evolve together. The prey's flee genes face
-predators whose hunt genes evolve, and the other way round. Predators are few,
-about 4–9 in the reference worlds
+predators whose hunt genes evolve, and the other way round. Predators are
+fewer than the prey: 15–21 in the full world and about 5 in the small one
 ([03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)),
 so chance (drift) weighs more on their genes than on the prey's.
 

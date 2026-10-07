@@ -22,7 +22,7 @@ Genes mutate through the mutator LLM (`ollama.mutator_model`, gemma4:12b) with e
 so these runs need Ollama; add `--no-mutation` to run fully offline (crossover only).
 
 ```bash
-python -m experiments.smoke_run --ticks 5000              # Lab 1 flat world (64 x 64) + rule-based prey and predators, ASCII snapshots
+python -m experiments.smoke_run --ticks 5000              # Lab 1 flat world (96 x 96) + rule-based prey and predators, ASCII snapshots
 python -m experiments.smoke_run --no-mutation             # the same with no model at all
 python -m experiments.smoke_run --backend random          # null model: predators live on newcomers only
 python -m experiments.smoke_run --world terrain_preview   # preview of the terrain labs (water, mountains)
@@ -67,7 +67,7 @@ nohup python -m experiments.label_teacher --workers 4 > logs/label_teacher.log 2
 
 | Path | What |
 |---|---|
-| `promptevo/species.py` | the two species: prey (eat, flee, follow, rest, mate) and predators (hunt, rest, mate; loci `predator.<action>`) |
+| `promptevo/species.py` | the two species: prey (eat, flee, follow, rest, mate) and predators (hunt, follow, rest, mate; loci `predator.<action>`) |
 | `promptevo/world.py` | grid world (flat in Lab 1; optional noise terrain with water/mountains), food regrowth |
 | `promptevo/genome.py`, `founder.py` | alleles, genomes of either species (one gene per action), crossover; founder/contrast/control pools per species |
 | `promptevo/perception.py`, `obs_text.py`, `actions.py` | discretised observations of both species (vision 20, distance bands), text styles V1/V2 with distances in cells, actions incl. hunt (with nothing to act on, the animal searches) |
@@ -77,4 +77,4 @@ nohup python -m experiments.label_teacher --workers 4 > logs/label_teacher.log 2
 | `promptevo/llm/ollama_client.py` | stdlib Ollama client with sqlite cache |
 | `promptevo/metrics.py` | MI_G, MI_O, JSD, directed ΔP, locality, Spearman, bootstrap |
 | `experiments/` | probes, smoke run, observation set, E1 suite, status/peek helpers |
-| `data/` | founder pool v2 (5 prey slots since 2026-10-07) and predator founder pool v1 (3 slots; drafts, need owner review H1), contrast alleles, control alleles v1, observation sets v1 (near/far, before 2026-10-07) and v2 (distance bands) |
+| `data/` | founder pool v2 (5 prey slots since 2026-10-07) and predator founder pool v2 (4 slots; drafts, need owner review H1), contrast alleles, control alleles v1, observation sets v1 (near/far, before 2026-10-07) and v2 (distance bands) |

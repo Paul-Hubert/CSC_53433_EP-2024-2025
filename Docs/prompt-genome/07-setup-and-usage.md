@@ -38,7 +38,7 @@ cd prototype
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
-pytest -q                      # 67 passed, no model needed
+pytest -q                      # 69 passed, no model needed
 ```
 
 Windows (PowerShell):
@@ -64,11 +64,11 @@ doesn't answer, `smoke_run` stops at the start and says so. `--no-mutation`
 runs with no model at all (crossover only).
 
 ```bash
-python -m experiments.smoke_run                          # Lab 1 world (64 × 64), rule-based brain, 5 000 ticks
-python -m experiments.smoke_run --no-mutation            # the same without any model, ≈ 9 s
+python -m experiments.smoke_run                          # Lab 1 world (96 × 96), rule-based brain, 5 000 ticks
+python -m experiments.smoke_run --no-mutation            # the same without any model, ≈ 22 s
 python -m experiments.smoke_run --backend random         # null model: predators live on newcomers only
 python -m experiments.smoke_run --seed 7 --ticks 2000    # another seed, shorter
-python -m experiments.smoke_run --profile small          # 48 × 48 world for quick checks: 24 prey (cap 40), 4 predators (cap 10)
+python -m experiments.smoke_run --profile small          # 48 × 48 world for quick checks: 24 prey (cap 40), 4 predators (cap 6)
 python -m experiments.smoke_run --world terrain_preview  # preview of the terrain labs (water, mountains)
 python -m experiments.e1_sensitivity --backend rule_based   # gene-sensitivity suite (its single-gene edits come from the mutator)
 ```
@@ -79,16 +79,16 @@ the share of each action for the prey and for the predators (here
 
 ```text
 animals by current action: E eat, F flee, L follow, R rest, M mate, ? not decided yet | P predator | . food | ~ water | ^ mountain
---- t=3332 prey=38 predators=12
- EE .    .             . E . PPF
-        .  .     E          P
-  E            .       .
-  ... .P . .         M.    .   .
+--- t=3332 prey=41 predators=20
+    FF P.E F. F F   . P.. ......
+    FEE ..P .      P..FP......L.
+  .   FF.P   .. ..P...... ... ..
+ E  .     .  . .................
 ...
-prey: {"ticks": 5000, "pop_final": 59, "births": 736, "immigrants": 0, "deaths": {"predator": 435, "starvation": 271, "old_age": 1}, "mean_lifespan": 262.5, "max_gen": 23, ...}
-prey actions: {'eat': 0.576, 'flee': 0.183, 'mate': 0.094, 'follow': 0.086, 'rest': 0.06}
-predators: {"pop_final": 3, "births": 69, "immigrants": 0, "deaths": {"starvation": 67, "old_age": 5}, "kills": 435, "mean_lifespan": 508.1, "max_gen": 13, ...}
-predator actions: {'hunt': 0.692, 'mate': 0.211, 'rest': 0.097}
+prey: {"ticks": 5000, "pop_final": 87, "births": 1927, "immigrants": 0, "deaths": {"predator": 896, "starvation": 1012}, "mean_lifespan": 220.8, "max_gen": 26, ...}
+prey actions: {'eat': 0.638, 'flee': 0.152, 'rest': 0.085, 'follow': 0.067, 'mate': 0.058}
+predators: {"pop_final": 21, "births": 200, "immigrants": 0, "deaths": {"starvation": 189, "old_age": 4}, "kills": 896, "mean_lifespan": 362.5, "max_gen": 18, ...}
+predator actions: {'hunt': 0.791, 'mate': 0.09, 'rest': 0.069, 'follow': 0.05}
 ```
 
 The map is downsampled to fit the terminal, so one character can cover

@@ -48,7 +48,7 @@ lives only in `prototype/`. A Unity version is on the roadmap
 |---|---|---|
 | `config.py` | Load YAML configuration | `load_config(profile, overrides, extra_files)` deep-merges `base.yaml`, the profile, optional extra files (world overlays) and overrides; `Cfg` (dict with attribute access); `resolve(path)` (paths relative to `prototype/`); `CONFIG_DIR` |
 | `rng.py` | Reproducible randomness | `Streams(seed).get(name)`: one independent generator per name; `fresh(name)` |
-| `species.py` | The two species | `Species(name, actions, prefix, config)` with `loci`; `PREY` (eat, flee, follow, rest, mate; config section `agents`), `PREDATOR` (hunt, rest, mate; loci `predator.<action>`; section `predators`); `SPECIES`, `ALL_LOCI`, `species_of_locus`, `species_cfg(cfg, species)` |
+| `species.py` | The two species | `Species(name, actions, prefix, config)` with `loci`; `PREY` (eat, flee, follow, rest, mate; config section `agents`), `PREDATOR` (hunt, follow, rest, mate; loci `predator.<action>`; section `predators`); `SPECIES`, `ALL_LOCI`, `species_of_locus`, `species_cfg(cfg, species)` |
 | `world.py` | Grid and food | `World(cfg, rng_world)` (terrain, walkability, food, regrowth, `step_toward`, `step_heading`, `nearest_food`); `value_noise`; `largest_component`; `cheb` (Chebyshev distance); cell codes `GRASS, WATER, MOUNTAIN` |
 | `perception.py` | What an animal senses | `Observation` (prey) and `PredatorObservation` (frozen dataclasses with a `scale` of band edges, `tags()` for directed tests); `sense(agent, world, prey, predators, cfg)`; distance bands `DIST`, `NEAR`, `band(d, scale)`, `make_scale(cfg, species)`, `DEFAULT_SCALE`; `mate_ready`; `RELEVANT_TAG` |
 | `obs_text.py` | Observation → text | `render(obs, style)` for both species, styles `V1`, `V2`; `distance(band, scale)` ("2-4 cells away") |
@@ -100,7 +100,7 @@ cfg = load_config("small", overrides={"world": {"food_regrow_p": 0.0005},
 | File | Content |
 |---|---|
 | `base.yaml` | all defaults (the full-size Lab 1 world) |
-| `small.yaml` | 48 × 48 world; 24 prey at start, cap 40; 4 predators at start, cap 10 (tests and quick checks) |
+| `small.yaml` | 48 × 48 world; 24 prey at start, cap 40; 4 predators at start, cap 6 (tests and quick checks) |
 | `full.yaml` | empty: the defaults are the full size |
 | `worlds/terrain_preview.yaml` | noise terrain: 15 % water, 10 % mountains, food regrowth 0.001 |
 
@@ -114,7 +114,7 @@ cfg = load_config("small", overrides={"world": {"food_regrow_p": 0.0005},
 
 | Key | Default | Meaning |
 |---|---|---|
-| `width`, `height` | 64, 64 (small: 48, 48) | grid size in cells |
+| `width`, `height` | 96, 96 (small: 48, 48) | grid size in cells (64 × 64 until 2026-10-07) |
 | `water_fraction` | 0.0 | share of cells that are water (Lab 1: none) |
 | `mountain_fraction` | 0.0 | share of cells that are mountains (Lab 1: none) |
 | `noise_octaves` | [16, 8, 4] | cell sizes of the heightmap noise (used only with water or mountains) |
@@ -135,9 +135,9 @@ cfg = load_config("small", overrides={"world": {"food_regrow_p": 0.0005},
 
 | Key | Default | Meaning |
 |---|---|---|
-| `init_pop` | 30 (small: 24) | prey animals at tick 0 |
+| `init_pop` | 68 (small: 24) | prey animals at tick 0 |
 | `floor` | 10 | minimum population; newcomers fill the gap |
-| `cap` | 60 (small: 40) | maximum population; no births above it |
+| `cap` | 135 (small: 40) | maximum population; no births above it |
 | `vision` | 20 | perception radius in cells (12 until 2026-10-07; `near` 3 was removed) |
 | `energy_max` | 100 | energy cap |
 | `energy_start` | 60 | energy of founders and newcomers |
@@ -160,9 +160,9 @@ listed here:
 
 | Key | Default | Meaning |
 |---|---|---|
-| `init_pop` | 6 (small: 4) | predators at tick 0 |
+| `init_pop` | 14 (small: 4) | predators at tick 0 |
 | `floor` | 3 | minimum number of predators; newcomers from the predator founder pool fill the gap |
-| `cap` | 15 (small: 10) | maximum number of predators |
+| `cap` | 34 (small: 6) | maximum number of predators |
 | `vision` | 20 | perception radius in cells |
 | `kill_p` | 0.1 | chance that a strike kills; a hunting predator strikes when it is next to its prey after its step |
 | `kill_gain` | 60 | energy from one kill |
@@ -206,8 +206,8 @@ The scripted predators' keys (`count`, `chase_radius`, `turn_p`,
 | `mode` | points | `points`, `table`, `ksample` or `logprobs` ([05](05-decision-backends.md#other-modes)) |
 | `table_k` | 8 | situations per call in table mode |
 | `workers` | 2 | parallel requests to Ollama |
-| `prompt` | prompts/teacher_v3.md | prompt template of the prey |
-| `predator_prompt` | prompts/predator_v1.md | prompt template of the predators |
+| `prompt` | prompts/teacher_v4.md | prompt template of the prey |
+| `predator_prompt` | prompts/predator_v2.md | prompt template of the predators |
 
 ### `ollama`
 
@@ -293,13 +293,13 @@ let the LLM decide directly. Their usage is in their docstrings and in
 | File | Content |
 |---|---|
 | `data/founder_pool_v2.json` | prey: 5 loci × (4 founder alleles + neutral) ([04 §3](04-genome-and-evolution.md#3-the-founder-pool)) |
-| `data/predator_founder_pool_v1.json` | predators: 3 loci × (4 founder alleles + neutral) |
-| `data/contrast_alleles_v2.json`, `data/predator_contrast_alleles_v1.json` | pro / anti sentence per locus, for directed tests only |
+| `data/predator_founder_pool_v2.json` | predators: 4 loci × (4 founder alleles + neutral) |
+| `data/contrast_alleles_v2.json`, `data/predator_contrast_alleles_v2.json` | pro / anti sentence per locus, for directed tests only |
 | `data/control_alleles_v1.json` | 20 shuffled-word + 20 irrelevant sentences for random-text genomes (both species) |
 | `data/observations_v2.jsonl` | 48 prey observations with distance bands (32 synthetic + 16 frequent in a rule-based run), with directed-test tags |
 | `data/observations_v1.jsonl` | the near / far observation set of the code before 2026-10-07 (E1 results in [06](06-experiments-and-results.md)); today's brains can't read it |
-| `prompts/teacher_v3.md` | decision prompt of the prey ([05](05-decision-backends.md#the-prompt)) |
-| `prompts/predator_v1.md` | decision prompt of the predators |
+| `prompts/teacher_v4.md` | decision prompt of the prey ([05](05-decision-backends.md#the-prompt)) |
+| `prompts/predator_v2.md` | decision prompt of the predators |
 | `prompts/mutate_v2.txt` | the 16 mutation instructions, one per line ([04 §5](04-genome-and-evolution.md#5-mutation)) |
 | `prompts/novel_v1.md` | prompt for brand-new alleles (parked dataset pipeline) |
 
@@ -310,7 +310,7 @@ history.
 
 ## 6. Tests
 
-`cd prototype && pytest -q` runs 67 offline tests in about 30 s, with no model
+`cd prototype && pytest -q` runs 69 offline tests in about 30 s, with no model
 needed. LLM calls are replaced by small fake servers. Two marked tests talk to
 real models: `pytest -m ollama` (needs Ollama and `policy.model`) and
 `pytest -m laya` (parked).

@@ -14,8 +14,8 @@ each sentence from one parent or the other, and now and then a sentence is
 Nobody scores the genomes; survival does. Because genes are sentences, what
 evolves can be **read**.
 
-The predators work the same way (since 2026-10-07). Each carries three
-sentences, for hunting, resting and mating, read by the same kind of LLM, and
+The predators work the same way (since 2026-10-07). Each carries four
+sentences, for hunting, following, resting and mating, read by the same kind of LLM, and
 predators that catch prey and mate pass them on. Prey and predators evolve
 together.
 
@@ -27,8 +27,8 @@ neural networks:
 
 | | Previous lab | This project |
 |---|---|---|
-| Genome | weights of a 5-neuron network | readable sentences in fixed slots, one per behaviour (5 for prey, 3 for predators) |
-| Behaviour | one output: a turn angle | 5 behaviours (predators: 3) with probabilities |
+| Genome | weights of a 5-neuron network | readable sentences in fixed slots, one per behaviour (5 for prey, 4 for predators) |
+| Behaviour | one output: a turn angle | 5 behaviours (predators: 4) with probabilities |
 | Reproduction | eating spawns a mutated copy (asexual) | two parents mate; gene-by-gene crossover |
 | Mutation | random noise on weights | blind random changes made by an LLM, logged with their lineage |
 | Selection | hard-wired into the agent's update | implicit: survival, food, mating |
@@ -66,18 +66,18 @@ neural networks:
                              (an LLM makes one random change)
 ```
 
-The diagram shows a prey animal. A predator goes through the same loop with 3
-sentences and the actions hunt, rest and mate; its prey are part of its world.
+The diagram shows a prey animal. A predator goes through the same loop with 4
+sentences and the actions hunt, follow, rest and mate; its prey are part of its world.
 
 ## Design choices and why
 
 | Choice | Reason | More |
 |---|---|---|
-| **Fixed gene slots**, one per behaviour (prey: eat, flee, follow, rest, mate; predators: hunt, rest, mate) | crossover swaps like with like; position in the prompt is the same for everyone | [04 §1](04-genome-and-evolution.md#1-genes-are-sentences-in-fixed-slots) |
+| **Fixed gene slots**, one per behaviour (prey: eat, flee, follow, rest, mate; predators: hunt, follow, rest, mate) | crossover swaps like with like; position in the prompt is the same for everyone | [04 §1](04-genome-and-evolution.md#1-genes-are-sentences-in-fixed-slots) |
 | **Predators are genetic animals too**, with the same brain, energy, breeding and mutation | selection on the prey comes from predators that evolve as well; one mechanism for both species | [03 §3](03-world-and-simulation.md#3-predators) |
 | **A frozen founder pool** of instinct-like sentences | random text gives random behaviour that mutation can't climb out of; a shared origin makes runs comparable | [04 §3](04-genome-and-evolution.md#3-the-founder-pool) |
 | **The LLM gives probabilities** (points per action), not a single choice | graded behaviour; selection can act on small differences | [05 §4](05-decision-backends.md#4-llm-the-llm-brain) |
-| **High-level decisions every 4 ticks**, executed by plain code | the LLM never does motor control; far fewer calls | [03 §6–7](03-world-and-simulation.md#6-actions-five-for-prey-three-for-predators) |
+| **High-level decisions every 4 ticks**, executed by plain code | the LLM never does motor control; far fewer calls | [03 §6–7](03-world-and-simulation.md#6-actions-five-for-prey-four-for-predators) |
 | **Discrete observations** with distances in bands (adjacent, 2-4 cells, 5-10, 11-20, none), the same 20-cell vision and the same speed for both species | short stable prompts with real distances; identical situations are cached | [03 §5](03-world-and-simulation.md#5-perception-what-an-animal-knows) |
 | **Lockstep simulation** that waits for the brain | a slower machine gives a slower run, never a different one | [03 §7](03-world-and-simulation.md#7-decisions) |
 | **Blind mutation**: the LLM gets one random-change instruction, drawn from a list of 16, and the gene sentence, nothing else | mutation must not know what helps; the instruction list, the seed and the temperature make it random, and a length guard stops genes growing | [04 §5](04-genome-and-evolution.md#5-mutation) |
@@ -132,7 +132,7 @@ ecology where selection is implicit rather than a scored fitness.
 
 | Term | Meaning here |
 |---|---|
-| **Locus** (plural loci) | one of the fixed gene slots, one per behaviour: 5 for prey (eat, flee, follow, rest, mate), 3 for predators (hunt, rest, mate) |
+| **Locus** (plural loci) | one of the fixed gene slots, one per behaviour: 5 for prey (eat, flee, follow, rest, mate), 4 for predators (hunt, follow, rest, mate) |
 | **Allele** | one sentence that can occupy a locus |
 | **Genome** | the alleles of one animal, one per locus of its species |
 | **Founder pool** | the frozen sentences every run starts from: 4 per locus + neutral |

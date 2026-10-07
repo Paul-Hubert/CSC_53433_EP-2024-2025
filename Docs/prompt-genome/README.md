@@ -21,11 +21,11 @@ world the animals live in.
 > **2026-10-07:** the genome now has 5 genes, one per behaviour (eat, flee,
 > follow, rest, mate). The temperament genes and the attack and wander actions
 > are gone ([04 §1](04-genome-and-evolution.md#1-genes-are-sentences-in-fixed-slots)).
-> The same day the **predators became genetic animals**: 3 genes (hunt, rest,
-> mate), the same LLM brain, energy, breeding and mutation. Both species see 20
+> The same day the **predators became genetic animals**: 4 genes (hunt, follow,
+> rest, mate), the same LLM brain, energy, breeding and mutation. Both species see 20
 > cells, with distances in bands, see a partner's readiness as far, and move at
 > the same speed ([03 §3](03-world-and-simulation.md#3-predators)). Runs use the
-> 64 × 64 world by default.
+> 96 × 96 world by default, and one partner's choice is enough to breed.
 
 ## Documents
 
@@ -55,8 +55,8 @@ world the animals live in.
 cd prototype
 python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
-pytest -q                                              # 67 tests, no model needed
-python -m experiments.smoke_run                        # Lab 1 world (64 × 64), rule-based brain, ≈ 9 s
+pytest -q                                              # 69 tests, no model needed
+python -m experiments.smoke_run                        # Lab 1 world (96 × 96), rule-based brain, ≈ 22 s
 ollama pull gemma4:12b
 python -m experiments.smoke_run --backend llm --ticks 500   # the LLM brain for both species, ≈ 11 min on a 16 GB GPU
 ```

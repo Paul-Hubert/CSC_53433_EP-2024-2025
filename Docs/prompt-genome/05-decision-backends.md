@@ -2,7 +2,7 @@
 
 The **brain** (decision backend) turns an animal's genes and its current
 situation into a probability for each action of its species: five for prey
-animals, three for predators. The simulation then draws the action from those
+animals, four for predators. The simulation then draws the action from those
 probabilities ([03 §7](03-world-and-simulation.md#7-decisions)). Both species
 use the same brain, each with its own prompt (since 2026-10-07). Code:
 `prototype/promptevo/backends/` and `prototype/promptevo/llm/`.
@@ -31,7 +31,7 @@ A `Query` holds the `genome_key` (hash of the gene texts), the `genes`
 (action → text), the `obs` (an `Observation` for a prey animal, a
 `PredatorObservation` for a predator) and the `species`. One batch holds one
 species. The columns follow that species' actions: eat, flee, follow, rest,
-mate for the prey; hunt, rest, mate for predators (`species.PREY.actions`,
+mate for the prey; hunt, follow, rest, mate for predators (`species.PREY.actions`,
 `species.PREDATOR.actions`). Rows sum to 1.
 
 Pick a brain by name with `--backend` or `backend.name` in the config:
@@ -48,8 +48,8 @@ Pick a brain by name with `--backend` or `backend.name` in the config:
 Every action gets the same probability (1/5 for prey, 1/3 for predators),
 whatever the genes. In the Lab 1 world random predators can't sustain
 themselves: they stay at their floor of 3 and depend on 83–113 newcomers per
-5 000 ticks. Random prey hold 14–16 animals in the small world, against 23–30
-with the keyword brain
+5 000 ticks. Random prey are as many as keyword prey (20–24 against 22–25 in
+the small world), because random predators hardly catch anything
 ([03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)).
 So behaviour matters in this world.
 
@@ -67,7 +67,8 @@ a softmax:
      (1.0) and 0 when it is far.
    - **predators:** hunt is higher the nearer the prey (adjacent 3.5 … far
      1.0; with no prey in sight, searching gets 1.5) and when energy is low.
-     Rest gains 1.0 when energy is high.
+     Follow uses the prey's values (−0.5 next to another predator, 0.3 at
+     5–20 cells, −2.5 with none in sight). Rest gains 1.0 when energy is high.
    - **both:** mate is high when the nearest animal of its kind is ready and
      this animal is an adult that isn't hungry: 2.5 up to 4 cells away, 1.5 at
      5–10 cells, 1.0 at 11–20. Otherwise it is −3.0. Readiness is seen across
@@ -99,8 +100,9 @@ served by [Ollama](https://ollama.com).
 ### The prompt
 
 Each species has its template (`policy.prompt` and `policy.predator_prompt`).
-For the prey, `prompts/teacher_v3.md` (since 2026-10-07; `teacher_v2.md` for
-the 5-gene genome with the 12-cell vision, `teacher_v1.md` before):
+For the prey, `prompts/teacher_v4.md` (since 2026-10-07; before it, `teacher_v3.md`
+without the breeding lines, `teacher_v2.md` for the 12-cell vision, `teacher_v1.md`
+for the 10-gene genome):
 
 ```text
 You decide what a wild animal does next in a simple grid world.
@@ -110,10 +112,12 @@ Actions:
 - flee: run away from the nearest predator
 - follow: move toward the nearest other animal
 - rest: stay still to save energy
-- mate: approach a ready partner to breed
+- mate: walk to the nearest ready partner in sight and breed with it
 If the chosen action has nothing to act on in sight (no food, predator, animal or
 ready partner), the animal searches the surroundings instead.
 Animals and predators move at the same speed: at most one cell per step.
+Breeding needs only one of the two to choose mate: an adult that chooses mate
+breeds as soon as it reaches a ready partner, whatever the partner is doing.
 
 This animal's instincts (its genes). They define its personality: follow them
 even when they seem unwise. Instincts that are meaningless have no effect.
@@ -124,18 +128,22 @@ Situation: {situation}
 {ask}
 ```
 
-For predators, `prompts/predator_v1.md` has the same layout:
+For predators, `prompts/predator_v2.md` has the same layout (`predator_v1.md`
+had no follow and no breeding lines):
 
 ```text
 You decide what a predator does next in a simple grid world.
 
 Actions:
 - hunt: chase the nearest visible prey animal; next to it, try to kill and eat it
+- follow: move toward the nearest other predator
 - rest: stay still to save energy
-- mate: approach a ready partner (another predator) to breed
-If the chosen action has nothing to act on in sight (no prey or ready partner),
-the predator searches the surroundings instead.
+- mate: walk to the nearest ready partner (another predator) in sight and breed with it
+If the chosen action has nothing to act on in sight (no prey, other predator or
+ready partner), the predator searches the surroundings instead.
 Predators and their prey move at the same speed: at most one cell per step.
+Breeding needs only one of the two to choose mate: an adult that chooses mate
+breeds as soon as it reaches a ready partner, whatever the partner is doing.
 
 This predator's instincts (its genes). They define its personality: follow them
 even when they seem unwise. Instincts that are meaningless have no effect.
@@ -155,13 +163,16 @@ is the mode's instruction. In points mode that is: *"Distribute 100 points
 across the actions according to how likely this animal is to choose each."*
 The line after the actions tells the model what the simulation does with an
 action that has nothing to act on
-([03 §6](03-world-and-simulation.md#6-actions-five-for-prey-three-for-predators)).
-The last line of the world description states the equal speed. It is a fact
-about the world, like the actions, and says nothing about what is wise.
+([03 §6](03-world-and-simulation.md#6-actions-five-for-prey-four-for-predators)).
+The last lines of the world description state the equal speed and the
+breeding rule (since 2026-10-07). They are facts about the world, like the
+actions, and say nothing about what is wise. The breeding lines were added
+because LLM predators chose `mate` mostly when a ready partner was already next
+to them ([06 §5.13](06-experiments-and-results.md#513-llm-brain-in-the-64--64-world-partners-seen-across-the-vision)).
 
-With founder genes and a typical situation, a full prey prompt has 1 076
-characters (967 with `teacher_v2.md` and the old situation text) and a
-predator prompt 917. The 10-gene prompt of `teacher_v1.md` was about 290
+With founder genes and a typical situation, a full prey prompt has 1 258
+characters (1 076 with `teacher_v3.md`, 967 with `teacher_v2.md` and the old
+situation text) and a predator prompt 1 207. The 10-gene prompt of `teacher_v1.md` was about 290
 tokens.
 
 ### Points mode (default)
@@ -239,7 +250,7 @@ Each layer avoids asking the same question twice:
 
 Because of the model digest and the prompt hash, a new model version or an
 edited prompt never reuses old answers: answers given to `teacher_v2.md` are
-not reused with `teacher_v3.md`, and prey and predator answers never mix. Before 2026-10-01 a bug (an empty cache
+not reused with `teacher_v4.md`, and prey and predator answers never mix. Before 2026-10-01 a bug (an empty cache
 file counted as "no cache") meant the request cache was never written; the
 policy cache was not affected. It's fixed, so reruns of the same genomes in the
 same situations now cost nothing.
