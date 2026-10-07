@@ -163,9 +163,7 @@ After crossover, each of the child's genes mutates with probability
 `evolution.p_mut` = 0.03. A prey child gets 0.15 mutations on average, and
 about 14 % of prey children (1 − 0.97⁵) get at least one. For a predator
 child it's 0.12 and 11 % (1 − 0.97⁴). Predator genes mutate exactly like prey
-genes, with the same instructions, model and guards. Since 2026-10-08 about 12 %
-of mutations fail every check below, so the real rate is about 0.026 per gene. Since 2026-10-08 about 12 %
-of mutations fail every check below, so the real rate is about 0.026 per gene.
+genes, with the same instructions, model and guards.
 
 ### One operator: the LLM makes a small random change
 
@@ -197,7 +195,7 @@ asked for random word edits, some of them big ("Randomly change the meaning of
 this sentence a lot.", "Make an unexpected change to this sentence."). Genes
 then left the animal's world within 10–15 mutations (below). The owner asked
 for mutation that stays random but small and keeps to meaning most of the
-time ([below](#small-edits-and-guards-since-2026-10-08)).
+time ([below](#small-edits-since-2026-10-08)).
 
 There is no other way for a gene to change. Without a mutator model
 (`ollama.mutator_model: null`, or `smoke_run --no-mutation`), children only
@@ -207,20 +205,17 @@ recombine their parents' genes. To add an instruction, add a line to the file.
 
 The answer goes through `clean` (keep the quoted sentence if there is one,
 strip meta-text such as "Here is the new sentence:", keep the first sentence,
-capitalise, end with a full stop) and three checks:
+capitalise, end with a full stop) and `valid` (1–12 words, set by
+`evolution.max_words`; different from the old text; plain characters only). A
+rejected answer is drawn again, with a new instruction and seed, up to 5
+attempts (`evolution.mutation_tries`; one attempt before 2026-10-08). The guards
+check form, never meaning: about 99 % of answers pass, so nearly every mutation
+happens. Setting `mutation_prompts` to `prompts/mutate_v2.txt` and
+`mutation_tries` to 1 gives back the mutation of 2026-10-02.
 
-| Check | Rejects | Since |
-|---|---|---|
-| `valid` | not 1–12 words (`evolution.max_words`), unchanged, or characters other than plain letters and punctuation | 2026-10-02 |
-| size | more than 3 words replaced, added or removed (`evolution.max_changed_words`) | 2026-10-08 |
-| vocabulary | a word outside `data/world_vocabulary_v1.txt` (`evolution.vocabulary`): the words of the founder genes, the decision prompts and the situation texts, plus everyday words for rules, about 490 in all; simple endings (-s, -ed, -ing, -ly, …) are accepted, while objects, foods, colours, people and other species are left out | 2026-10-08 |
-
-A rejected answer is drawn again, with a new instruction and seed, up to 5
-attempts (`evolution.mutation_tries`). If all fail, the gene doesn't mutate
-this time. The checks look only at the sentence, never at how the animal does.
-Setting `mutation_prompts` to `prompts/mutate_v2.txt`, `max_changed_words` and
-`vocabulary` to null and `mutation_tries` to 1 gives back the mutation of
-2026-10-02, whose only guard was `valid` (99 % of answers passed).
+Two more checks were tried on 2026-10-08 and removed the same day on the
+owner's request: at most 3 words changed, and only words of a 493-word list of
+the animal's world ([below](#small-edits-since-2026-10-08)).
 
 Every accepted mutation is logged in the child's `birth` event (locus, parent
 allele, new allele, instruction number, text) and registered as an allele with
@@ -230,7 +225,7 @@ its parent, `operator` = `llm#<instruction number>`, model and seed.
 
 This and the next section describe the instructions of 2026-10-02
 (`mutate_v2.txt`); today's rules are compared with them
-[at the end](#small-edits-and-guards-since-2026-10-08).
+[at the end](#small-edits-since-2026-10-08).
 
 `python -m experiments.mutation_test` mutates every founder sentence with 8
 seeds at four temperatures, with no selection (`results/mutation_test.md`,
@@ -298,103 +293,55 @@ the five):
   selection keeps genes meaningful. The keyword brain reads only its keywords,
   so most nonsense is neutral for it and can spread by drift.
 
-### Small edits and guards (since 2026-10-08)
+### Small edits (since 2026-10-08)
 
 The owner asked for mutation that stays random but small and keeps to meaning
 most of the time. The instructions became small edits of the rule
-(`mutate_v3.txt`), and two checks and the redraws were added (above). Measured
-with `experiments.mutation_test` against the rules before, on the 36 founder
-sentences of both species (8 seeds each, and 30 mutations in a row from each),
-temperature 1.2, no selection. gemma4:12b judged whether each gene still gives a
-usable rule for its slot (the question of `gene_timeline --judge`):
+(`mutate_v3.txt`). For a few hours two checks were added as well (at most 3
+words changed, only words of a world word list, with redraws), then removed on
+the owner's request. Measured with `experiments.mutation_test` on the 36
+founder sentences of both species (8 seeds each, and 30 mutations in a row from
+each), temperature 1.2, no selection. gemma4:12b judged whether each gene still
+gives a usable rule for its slot (the question of `gene_timeline --judge`):
 
-| | Rules before (v2) | Since 2026-10-08 (v3 + checks) |
-|---|---|---|
-| mutations that succeed | 99 % | 88 % (2.4 attempts each) |
-| words changed per mutation · big edits (≥ 4 words) | 2.7 · 28 % | 1.8 · 0 % |
-| different mutants per sentence (of 8) | 7.2 | 4.6 |
-| one mutation: still a usable rule | 69 % | 83 % |
-| one mutation: only words of the world | 49 % | 100 % |
-| usable after 1 / 5 / 10 / 20 / 30 mutations | 61 / 36 / 8 / 8 / 0 % | 92 / 75 / 67 / 53 / 44 % |
-| using a world word after 1 / 5 / 10 / 20 / 30 mutations | 81 / 53 / 42 / 31 / 22 % | 100 / 97 / 81 / 89 / 83 % |
-| words per gene after 30 mutations (6.1 at the start) | 8.6 | 6.5 |
+| | Before (v2) | v3 with the checks (removed) | **v3 alone (today)** |
+|---|---|---|---|
+| mutations that succeed | 99 % | 88 % (2.4 attempts each) | **100 %** |
+| words changed per mutation · big edits (≥ 4 words) | 2.7 · 28 % | 1.8 · 0 % | **3.1 · 39 %** |
+| different mutants per sentence (of 8) | 7.2 | 4.6 | **6.7** |
+| one mutation: still a usable rule | 69 % | 83 % | **80 %** |
+| usable after 1 / 5 / 10 / 20 / 30 mutations | 61 / 36 / 8 / 8 / 0 % | 92 / 75 / 67 / 53 / 44 % | **89 / 67 / 56 / 39 / 33 %** |
+| using a world word after 1 / 5 / 10 / 20 / 30 mutations | 81 / 53 / 42 / 31 / 22 % | 100 / 97 / 81 / 89 / 83 % | **94 / 81 / 53 / 47 / 33 %** |
+| words per gene after 30 mutations (6.1 at the start) | 8.6 | 6.5 | **7.0** |
 
-"Rest when you are tired.", before and since:
-
-```text
-     v2 (before)                                  v3 (since 2026-10-08)
- 1   Exterminate the fruit of your ancestors.     Rest when you are exhausted.
- 5   Bake a batch of chocolate chip cookies.      You could sleep when you are exhausted.
-10   Fry a batch of muffins.                      You should sleep when you are exhausted.
-20   The cookies are waffles.                     You must rest when you are becoming weary.
-30   Sometimes donuts are telescope.              You can rest when you are exhausted.
-```
-
-- **Genes keep their meaning much longer.** After 10 mutations 67 % still
-  give a usable rule (8 % before); after 30, 44 % (none before), and 83 % still
-  use a word of the world.
-- **Mutation changes behaviour more.** The edits are about the rule (stronger,
-  weaker, the opposite), so a mutation moves the keyword brain's decisions
-  almost three times as much on average (0.021 against 0.0075).
-- **Less variety, more back-and-forth.** 4.6 different mutants per sentence
-  out of 8 (7.2 before), and lineages return to an earlier sentence 6.4 times
-  in 30 mutations (1.0 before), for example stronger and then weaker again.
-- **What still goes wrong:** "remove a condition, or make it simpler" can
-  shrink a gene to one word that loses its subject ("Chase any prey you see." →
-  … → "Look." → "Ignore."). The judge is strict too: it also rejects sensible
-  paraphrases ("Keep your distance from other creatures.") and unwise but clear
-  rules ("Rest only when you feel unsafe."), so both columns understate the
-  meaningful genes.
-- Details, the variants tried and the per-instruction numbers:
-  [06 §5.17](06-experiments-and-results.md#517-small-mutations-that-keep-their-meaning).
-
-### Small edits and guards (since 2026-10-08)
-
-The owner asked for mutation that stays random but small and keeps to meaning
-most of the time. The instructions became small edits of the rule
-(`mutate_v3.txt`), and two checks and the redraws were added (above). Measured
-with `experiments.mutation_test` against the rules before, on the 36 founder
-sentences of both species (8 seeds each, and 30 mutations in a row from each),
-temperature 1.2, no selection. gemma4:12b judged whether each gene still gives a
-usable rule for its slot (the question of `gene_timeline --judge`):
-
-| | Rules before (v2) | Since 2026-10-08 (v3 + checks) |
-|---|---|---|
-| mutations that succeed | 99 % | 88 % (2.4 attempts each) |
-| words changed per mutation · big edits (≥ 4 words) | 2.7 · 28 % | 1.8 · 0 % |
-| different mutants per sentence (of 8) | 7.2 | 4.6 |
-| one mutation: still a usable rule | 69 % | 83 % |
-| one mutation: only words of the world | 49 % | 100 % |
-| usable after 1 / 5 / 10 / 20 / 30 mutations | 61 / 36 / 8 / 8 / 0 % | 92 / 75 / 67 / 53 / 44 % |
-| using a world word after 1 / 5 / 10 / 20 / 30 mutations | 81 / 53 / 42 / 31 / 22 % | 100 / 97 / 81 / 89 / 83 % |
-| words per gene after 30 mutations (6.1 at the start) | 8.6 | 6.5 |
-
-"Rest when you are tired.", before and since:
+"Rest when you are tired.", 30 mutations in a row:
 
 ```text
-     v2 (before)                                  v3 (since 2026-10-08)
- 1   Exterminate the fruit of your ancestors.     Rest when you are exhausted.
- 5   Bake a batch of chocolate chip cookies.      You could sleep when you are exhausted.
-10   Fry a batch of muffins.                      You should sleep when you are exhausted.
-20   The cookies are waffles.                     You must rest when you are becoming weary.
-30   Sometimes donuts are telescope.              You can rest when you are exhausted.
+     v2 (before)                                v3 alone (today)
+ 1   Exterminate the fruit of your ancestors.   Take a break when you feel exhausted.
+ 5   Bake a batch of chocolate chip cookies.    You should not take a break if you are feeling slightly tired.
+10   Fry a batch of muffins.                    You are required to take a break.
+20   The cookies are waffles.                   Breaks may be taken.
+30   Sometimes donuts are telescope.            Breaks are mandatory except during the scheduled lunch period.
 ```
 
-- **Genes keep their meaning much longer.** After 10 mutations 67 % still
-  give a usable rule (8 % before); after 30, 44 % (none before), and 83 % still
-  use a word of the world.
-- **Mutation changes behaviour more.** The edits are about the rule (stronger,
-  weaker, the opposite), so a mutation moves the keyword brain's decisions
-  almost three times as much on average (0.021 against 0.0075).
-- **Less variety, more back-and-forth.** 4.6 different mutants per sentence
-  out of 8 (7.2 before), and lineages return to an earlier sentence 6.4 times
-  in 30 mutations (1.0 before), for example stronger and then weaker again.
-- **What still goes wrong:** "remove a condition, or make it simpler" can
-  shrink a gene to one word that loses its subject ("Chase any prey you see." →
-  … → "Look." → "Ignore."). The judge is strict too: it also rejects sensible
-  paraphrases ("Keep your distance from other creatures.") and unwise but clear
-  rules ("Rest only when you feel unsafe."), so both columns understate the
-  meaningful genes.
+- **One mutation usually keeps the meaning.** 80 % of single mutations are
+  still a usable rule (69 % before), and they bring in plain rule words ("try",
+  "avoid", "approach", "exhausted") rather than random objects ("toaster",
+  "purple", "dance" before). Random words still appear now and then ("moon",
+  "weather", "kingdom").
+- **Many mutations drift into another register.** After 20–30 mutations
+  without selection, genes read like office, school or game rules ("Achievements
+  must be unlocked before the final boss.", "Collaborate extensively with your
+  entire department on all organizational initiatives."). A third are still
+  usable rules after 30 mutations, against none before.
+- **The edits are not small.** "Say this rule in slightly different words"
+  rewrites 5.4 words and jumps in 48 % of cases; "a little stronger" changes 4.2
+  words. The checks had held edits to 1.8 words, and kept genes in the world
+  much longer (83 % using a world word after 30 mutations).
+- **Judge:** strict; it also rejects sensible paraphrases ("Keep your distance
+  from other creatures.") and unwise but clear rules ("Rest only when you feel
+  unsafe."), so every column understates the meaningful genes.
 - Details, the variants tried and the per-instruction numbers:
   [06 §5.17](06-experiments-and-results.md#517-small-mutations-that-keep-their-meaning).
 

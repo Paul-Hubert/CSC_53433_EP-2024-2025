@@ -135,14 +135,6 @@ sat at their floor up to 10 % of the time in the full world. `kill_p` 0.07, a
 digestion of 80 ticks or a slower recovery (1.5 per tick) left the predators at
 their cap and the prey at 96–120.
 
-Speed, stamina and carcasses came later the same day, on the owner's request.
-Their values were checked with the keyword brain (5 000 ticks, 3 seeds, both
-worlds; §13). Smaller portions (20 energy), alone or with `kill_p` 0.07, kept
-the predators below their cap but let them starve in waves, and the prey then
-sat at their floor up to 10 % of the time in the full world. `kill_p` 0.07, a
-digestion of 80 ticks or a slower recovery (1.5 per tick) left the predators at
-their cap and the prey at 96–120.
-
 ## 4. Animals
 
 "Animal" means either species here. Prey and predators have the same state and
@@ -523,10 +515,6 @@ follow 5 %.
   ([06 §5.13](06-experiments-and-results.md#513-llm-brain-in-the-64--64-world-partners-seen-across-the-vision)).
 - The small world's predator cap went from 10 to 6: with 10, predators bred so
   well that the prey sat at their floor up to 77 % of the time.
-- Stamina for both species, predators running 2 cells per tick when hunting,
-  and carcasses that feed up to two more predators (§3, §4, §6). The keyword
-  predators went from 15–21 to 28–34 in the full world (their cap is 34), and
-  the prey stayed at 81–94.
 - Stamina for both species, predators running 2 cells per tick when hunting,
   and carcasses that feed up to two more predators (§3, §4, §6). The keyword
   predators went from 15–21 to 28–34 in the full world (their cap is 34), and

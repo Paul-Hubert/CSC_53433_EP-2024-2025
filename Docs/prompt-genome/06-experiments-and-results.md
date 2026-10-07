@@ -459,40 +459,50 @@ mutating), with the rules of §5.15.
 ### 5.17 Small mutations that keep their meaning
 
 2026-10-08, owner request: mutation should stay random but make small changes
-that keep to meaning most of the time. Two changes, both blind to fitness
-([04 §5](04-genome-and-evolution.md#small-edits-and-guards-since-2026-10-08)): new instructions that ask for small edits of the rule
+that keep to meaning most of the time. First two changes, both blind to fitness
+([04 §5](04-genome-and-evolution.md#small-edits-since-2026-10-08)): new instructions that ask for small edits of the rule
 (`prompts/mutate_v3.txt`), and checks on each answer (at most 3 words changed,
-only words of `data/world_vocabulary_v1.txt`), with a rejected answer drawn
-again. `results/mutation_test_*.md`: 36 founder sentences of both species × 8
-seeds, and 36 lineages of 30 mutations, temperature 1.2, no selection;
-gemma4:12b judged each gene (usable rule for its slot or not).
+only words of a 493-word world list), with a rejected answer drawn again. Later
+that day the owner had the word list and the word-change limit removed; the
+instructions and the redraws stay. `results/mutation_test_*.md`: 36 founder
+sentences of both species × 8 seeds, and 36 lineages of 30 mutations,
+temperature 1.2, no selection; gemma4:12b judged each gene (usable rule for its
+slot or not).
 
-| | Rules before | Draft: 10 instructions, ≤ 3 words, 3 attempts | Draft, ≤ 5 words | Draft, 5 attempts | **Kept: 9 instructions, ≤ 3 words, 5 attempts** |
-|---|---|---|---|---|---|
-| mutations that succeed | 99 % | 74 % | 87 % | 86 % | **88 %** |
-| words changed per mutation | 2.7 | 1.7 | 2.5 | 1.7 | **1.8** |
-| different mutants per sentence (of 8) | 7.2 | 4.0 | 5.1 | 4.4 | **4.6** |
-| one mutation: usable rule | 69 % | 83 % | 79 % | 82 % | **83 %** |
-| lineages usable after 1 / 10 / 30 | 61 / 8 / 0 % | 86 / 69 / 47 % | 75 / 58 / 42 % | 86 / 58 / 53 % | **92 / 67 / 44 %** |
-| lineages using a world word after 30 | 22 % | 72 % | 69 % | 69 % | **83 %** |
+| | Rules before | Draft: 10 instructions, ≤ 3 words, 3 attempts | Draft, ≤ 5 words | Draft, 5 attempts | 9 instructions, ≤ 3 words, 5 attempts (removed) | **9 instructions alone (kept)** |
+|---|---|---|---|---|---|---|
+| mutations that succeed | 99 % | 74 % | 87 % | 86 % | 88 % | **100 %** |
+| words changed per mutation | 2.7 | 1.7 | 2.5 | 1.7 | 1.8 | **3.1** |
+| different mutants per sentence (of 8) | 7.2 | 4.0 | 5.1 | 4.4 | 4.6 | **6.7** |
+| one mutation: usable rule | 69 % | 83 % | 79 % | 82 % | 83 % | **80 %** |
+| lineages usable after 1 / 10 / 30 | 61 / 8 / 0 % | 86 / 69 / 47 % | 75 / 58 / 42 % | 86 / 58 / 53 % | 92 / 67 / 44 % | **89 / 56 / 33 %** |
+| lineages using a world word after 30 | 22 % | 72 % | 69 % | 69 % | 83 % | **33 %** |
+
+Files: `mutation_test_old_rules`, `mutation_test_v3_draft`, `_v3_draft_max5`,
+`_v3_draft_tries5`, `_v3_checks` and `mutation_test_v3` (today's rules).
 
 - **The checks rejected** 288 answers for being too big, 127 for a word outside
-  the world and 14 as invalid (final rules); 12 % of mutations failed all 5
-  attempts. With 3 attempts 26 % failed, so the redraws went up to 5 to keep the
-  mutation rate close to `p_mut`.
+  the world and 14 as invalid; 12 % of mutations failed all 5 attempts (26 % with
+  3 attempts). Without them nearly every answer passes (4 invalid of 292).
+- **The 9 instructions alone** keep single mutations meaningful (80 % usable)
+  and bring in plain rule words rather than random objects, but over 20–30
+  mutations genes drift into office, school or game language ("Breaks are
+  mandatory except during the scheduled lunch period."), and edits average 3.1
+  words: "say this rule in slightly different words" rewrites 5.4.
 - **A 5-word limit** gave more variety and more successes, with slightly less
   meaning, so the 3-word limit stayed.
 - **One draft instruction was dropped:** "Make this rule about something else
   close to its subject." moved genes into another slot's topic ("Rest when you
   are tired." → "Eat when you are hungry.") and had the fewest usable answers
   (57 %).
-- **Per instruction** (final rules): "say the opposite" and "how near, far or
-  much" gave the most usable rules (87 %); "remove a condition, or make it
-  simpler" the fewest (75 %), because it can shrink a gene to one word.
-- **Targets set beforehand:** at least 90 % usable after one mutation (92 % on
-  the lineages' first step, 83 % on the larger sample of single mutations: not
-  met) and at least 80 % of genes using a world word after 30 mutations (83 %:
-  met). The judge is strict ([04 §5](04-genome-and-evolution.md#small-edits-and-guards-since-2026-10-08)).
+- **Per instruction** (9 instructions alone): "say this rule in slightly
+  different words" gave the most usable rules (93 %) but the biggest edits;
+  "remove a condition, or make it simpler" the fewest (61 %), because it can
+  shrink a gene to one word ("Look.").
+- **Targets set beforehand:** at least 90 % usable after one mutation and at
+  least 80 % of genes using a world word after 30 mutations. With the checks:
+  83 % (92 % on the lineages' first step) and 83 %; with the instructions alone:
+  80 % (89 %) and 33 %. The judge is strict ([04 §5](04-genome-and-evolution.md#small-edits-since-2026-10-08)).
 - **Caveat:** no selection and one model; in a run, a gene meets only about
   0.03 mutations per generation.
 
@@ -588,7 +598,7 @@ python -m experiments.smoke_run --ticks 5000 --no-mutation --snapshots 0 --seed 
 python -m experiments.smoke_run --backend llm --ticks 2000 --minutes 180 --seed 1234 --out results/runs/check_stamina_llm           # 5.16
 python -m experiments.mutation_test --temps 1.2 --tag mutation_test_v3                     # 5.17, today's rules (≈ 6 min)
 python -m experiments.mutation_test --temps 1.2 --rules old --tag mutation_test_old_rules  # 5.17, the rules before (≈ 4 min)
-python -m experiments.mutation_test --temps 1.2 --max-changed 5 --tag mine                 # a variant (also --tries N)
+python -m experiments.mutation_test --temps 1.2 --tries 1 --tag mine                     # a variant
 ```
 
 §5.12–5.14 ran the code of the commits in brackets (smaller worlds, older

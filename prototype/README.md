@@ -73,7 +73,7 @@ nohup python -m experiments.label_teacher --workers 4 > logs/label_teacher.log 2
 | `promptevo/perception.py`, `obs_text.py`, `actions.py` | discretised observations of both species (vision 20, distance bands), text styles V1/V2 with distances in cells, actions incl. hunt (with nothing to act on, the animal searches) |
 | `promptevo/sim.py` | lockstep loop for prey and predators, decision memo, stamina, reproduction, kills and digestion, deaths, logging |
 | `promptevo/backends/` | `random`, `rule_based`, `llm` (ollama_policy: points/logprobs/table/ksample), `laya` (parked); `factory.py` |
-| `promptevo/evolution/mutation.py` | blind mutation: the LLM gets a small-edit instruction (`prompts/mutate_v3.txt`) + the gene, nothing else; guards (size, world vocabulary) with redraws |
+| `promptevo/evolution/mutation.py` | blind mutation: the LLM gets a small-edit instruction (`prompts/mutate_v3.txt`) + the gene, nothing else; guards with redraws |
 | `promptevo/llm/ollama_client.py` | stdlib Ollama client with sqlite cache |
 | `promptevo/metrics.py` | MI_G, MI_O, JSD, directed ΔP, locality, Spearman, bootstrap |
 | `experiments/` | probes, smoke run, observation set, E1 suite, status/peek helpers |

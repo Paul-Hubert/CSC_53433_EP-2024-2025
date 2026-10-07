@@ -8,16 +8,15 @@ temperature. Since 2026-10-08 the instructions (mutate_v3.txt) ask for small edi
 the rule says ("a little stronger", "add a short condition", "say the opposite"); v2 asked
 for random word edits, big ones included.
 
-Guards: the answer must be a clean sentence (clean, valid), and since 2026-10-08 it may
-differ from its parent in at most evolution.max_changed_words words and use only words of
-evolution.vocabulary (the animal's world plus everyday words). A rejected answer is drawn
-again (new instruction, new seed), up to evolution.mutation_tries attempts; if all fail the
-gene doesn't mutate this time. The guards look only at the sentence, never at fitness.
+Guards: the answer must be a clean sentence (clean, valid) that differs from its parent. A
+rejected answer is drawn again (new instruction, new seed), up to evolution.mutation_tries
+attempts; if all fail the gene doesn't mutate this time. The guards look only at the
+sentence, never at fitness. (A word-change limit and a world vocabulary were tried on
+2026-10-08 and removed the same day: results/mutation_test_v3_checks.md.)
 `llm` is any callable llm(prompt, seed) -> str: Ollama in runs, a fake in tests.
 """
 from __future__ import annotations
 
-import difflib
 import re
 from collections import Counter
 from pathlib import Path
@@ -60,37 +59,6 @@ def words(t: str) -> list[str]:
     return t.lower().rstrip(".!?").replace(",", " ").replace(":", " ").replace(";", " ").split()
 
 
-def changed_words(old: str, new: str) -> int:
-    """How many words an edit replaced, added or removed."""
-    ops = difflib.SequenceMatcher(None, words(old), words(new)).get_opcodes()
-    return sum(max(i2 - i1, j2 - j1) for op, i1, i2, j1, j2 in ops if op != "equal")
-
-
-ENDINGS = ("'s", "s", "es", "ed", "d", "ing", "ly", "er", "est")
-
-
-def load_vocabulary(path: str | Path) -> set[str]:
-    """Words separated by blanks; lines starting with # are skipped."""
-    lines = resolve(path).read_text(encoding="utf-8").splitlines()
-    return {w.lower() for l in lines if not l.lstrip().startswith("#") for w in l.split()}
-
-
-def known(word: str, vocab: set[str]) -> bool:
-    """In the vocabulary, maybe with a simple ending ("chasing", "quickly", "tired")."""
-    if word in vocab:
-        return True
-    for end in ENDINGS:
-        stem = word[:-len(end)]
-        if word.endswith(end) and len(stem) >= 2:
-            if stem in vocab or stem + "e" in vocab or (len(stem) > 2 and stem[-1] == stem[-2] and stem[:-1] in vocab):
-                return True
-    return False
-
-
-def unknown_words(text: str, vocab: set[str]) -> list[str]:
-    return [w for w in re.findall(r"[a-z']+", text.lower().replace("’", "'")) if not known(w.strip("'"), vocab)]
-
-
 def valid(new: str, old: str, max_words: int) -> bool:
     n = len(new.split())
     return (0 < n <= max_words and new.lower() != old.lower()
@@ -103,9 +71,6 @@ class Mutator:
         ec = cfg.evolution
         self.p_mut = float(ec.p_mut) if llm else 0.0          # no mutator LLM: no mutation
         self.max_words = int(ec.max_words)
-        self.max_changed = ec.get("max_changed_words")        # None: any edit size
-        vocab = ec.get("vocabulary")
-        self.vocab = load_vocabulary(vocab) if vocab else None
         self.tries = max(1, int(ec.get("mutation_tries") or 1))
         self.instructions = instructions or load_instructions(ec.mutation_prompts)
         self.registry, self.llm, self.model = registry, llm, model
@@ -115,13 +80,8 @@ class Mutator:
         """Why an answer can't be the mutant (None: it can)."""
         if not valid(new, old, self.max_words):
             return "invalid"
-        n = changed_words(old, new)
-        if n == 0:
+        if words(new) == words(old):                           # only punctuation changed
             return "unchanged"
-        if self.max_changed is not None and n > int(self.max_changed):
-            return "too big"
-        if self.vocab is not None and unknown_words(new, self.vocab):
-            return "unknown word"
         return None
 
     def attempt(self, locus: str, text: str, rng: np.random.Generator) -> tuple[str | None, int, int, str | None]:

@@ -2,12 +2,11 @@
 mutated again and again? Pure mutation, no selection (a mutation-accumulation experiment).
 
     python -m experiments.mutation_test [--rules current|old] [--temps 0.9,1.2,1.5,2.0] [--seeds 8]
-                                        [--steps 30] [--lineages all|first] [--no-judge] [--max-changed N] [--tries N]
+                                        [--steps 30] [--lineages all|first] [--no-judge] [--tries N]
                                         [--workers 4] [--model gemma4:12b] [--tag mutation_test]
 
 --rules: current = the config (since 2026-10-08: small edits of the rule, prompts/mutate_v3.txt,
-with the size and vocabulary guards and redraws); old = the mutation of 2026-10-02 to 10-07
-(prompts/mutate_v2.txt, no size or vocabulary guard, one attempt).
+redraws); old = the mutation of 2026-10-02 to 10-07 (prompts/mutate_v2.txt, one attempt).
 Part 1, variety: every founder sentence of both species x seeds x temperatures, one mutation
 each (with its redraws). For a given (sentence, seed index) the random draws are the same at
 every temperature.
@@ -16,9 +15,10 @@ mutation keeps the sentence): every founder sentence of both species (--lineages
 or the first one of each prey slot (first, as on 2026-10-02).
 Meaning: gemma4 judges whether a mutant still gives a usable rule for its slot (the question of
 gene_timeline --judge, prompts/judge_sense_v1.txt; single mutations and lineage steps 1, 5, 10,
-20, 30), whether it uses a word of the animal's world (gene_report's world words) and whether
-all its words are in data/world_vocabulary_v1.txt. Prey mutants are also read by the keyword
-brain (other genes neutral): behaviour distance d.
+20, 30), whether it still uses a word of the animal's world, and whether it brings in a new
+word from outside it (a word in neither the parent nor the world words: the founder genes'
+words and gene_report.SITUATION_WORDS; a measure only, nothing is rejected for it). Prey
+mutants are also read by the keyword brain (other genes neutral): behaviour distance d.
 Writes results/<tag>.json + .md; progress in logs/<tag>.progress.json.
 """
 from __future__ import annotations
@@ -40,7 +40,7 @@ from promptevo import metrics as M
 from promptevo.backends.base import Query
 from promptevo.backends.rule_based import RuleBasedBackend
 from promptevo.config import load_config, resolve
-from promptevo.evolution.mutation import Mutator, load_vocabulary, unknown_words, words
+from promptevo.evolution.mutation import Mutator, words
 from promptevo.founder import AllelePools
 from promptevo.genome import AlleleRegistry
 from promptevo.llm.ollama_client import client_from_config, make_rewriter
@@ -48,9 +48,7 @@ from promptevo.progress import Progress
 from promptevo.species import PREDATOR, PREY
 
 LINEAGE_LOCI = ("eat", "flee", "follow", "rest", "mate")       # --lineages first
-OLD_RULES = {"mutation_prompts": "prompts/mutate_v2.txt", "max_changed_words": None, "vocabulary": None,
-             "mutation_tries": 1}                              # mutation from 2026-10-02 to 2026-10-07
-VOCABULARY = "data/world_vocabulary_v1.txt"                    # "only world words" is measured with it for both rules
+OLD_RULES = {"mutation_prompts": "prompts/mutate_v2.txt", "mutation_tries": 1}   # mutation from 2026-10-02 to 2026-10-07
 JUDGE_STEPS = (1, 5, 10, 20, 30)
 
 
@@ -125,15 +123,12 @@ def main() -> None:
     ap.add_argument("--steps", type=int, default=30)
     ap.add_argument("--lineages", default="all", choices=["all", "first"])
     ap.add_argument("--no-judge", action="store_true", help="skip the usable-rule question (no extra calls)")
-    ap.add_argument("--max-changed", type=int, default=None, help="override evolution.max_changed_words")
     ap.add_argument("--tries", type=int, default=None, help="override evolution.mutation_tries")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--model", default=None)
     ap.add_argument("--tag", default="mutation_test")
     a = ap.parse_args()
     over = dict(OLD_RULES) if a.rules == "old" else {}
-    if a.max_changed is not None:
-        over["max_changed_words"] = a.max_changed
     if a.tries is not None:
         over["mutation_tries"] = a.tries
     cfg = load_config(a.profile, {"evolution": over})
@@ -144,7 +139,6 @@ def main() -> None:
     pools = {sp.name: AllelePools(reg, cfg.paths.data_dir, species=sp) for sp in (PREY, PREDATOR)}
     kw = KeywordJudge(reg, pools["prey"])
     sense = None if a.no_judge else SenseJudge(cfg, client)
-    vocab = load_vocabulary(VOCABULARY)
     founders = [(l, reg.text(x)) for p in pools.values() for l in p.founders for x in p.founders[l]
                 if reg.get(x).origin == "founder"]
     world = set(SITUATION_WORDS) | {w for _, t in founders for w in content_words(t)}
@@ -162,8 +156,9 @@ def main() -> None:
             if done[0] % 20 == 0:
                 prog.update(done[0])
 
-    def meaning(locus: str, text: str, judge: bool) -> dict:
-        out = {"world": bool(content_words(text) & world), "in_vocab": not unknown_words(text, vocab)}
+    def meaning(locus: str, text: str, judge: bool, parent: str) -> dict:
+        new = content_words(text) - content_words(parent) - world
+        out = {"world": bool(content_words(text) & world), "outside": bool(new)}
         if judge and sense:
             out["usable"] = sense.usable(locus, text)
         return out
@@ -176,7 +171,7 @@ def main() -> None:
         if new is None:
             row["reason"] = tries[-1]
         else:
-            row.update(compare(text, new), d=kw.d(locus, text, new), **meaning(locus, new, True))
+            row.update(compare(text, new), d=kw.d(locus, text, new), **meaning(locus, new, True, text))
         tick()
         return row
 
@@ -186,11 +181,12 @@ def main() -> None:
         cur, steps = start, []
         for step in range(1, a.steps + 1):
             new, k, seed, tries = mutate(muts[t], locus, cur, rng)
+            parent = cur
             if new is not None:
                 cur = new
             steps.append({"step": step, "prompt": k, "accepted": new is not None, "tries": len(tries), "text": cur,
                           "words": len(cur.split()), "sim_to_start": compare(start, cur)["sim"],
-                          "d_to_start": kw.d(locus, start, cur), **meaning(locus, cur, step in JUDGE_STEPS)})
+                          "d_to_start": kw.d(locus, start, cur), **meaning(locus, cur, step in JUDGE_STEPS, parent)})
             tick()
         return {"temp": t, "locus": locus, "start": start, "steps": steps}
 
@@ -204,8 +200,7 @@ def main() -> None:
         raise
     ec = cfg.evolution
     res = {"model": model, "digest": client.digest(model), "rules": a.rules, "prompts": ec.mutation_prompts,
-           "guards": {"max_changed_words": ec.get("max_changed_words"), "vocabulary": ec.get("vocabulary"),
-                      "tries": muts[temps[0]].tries},
+           "guards": {"tries": muts[temps[0]].tries},
            "temps": temps, "seeds": a.seeds, "steps": a.steps, "instructions": instructions,
            "variety": variety, "lineages": lineages, "judge_model": None if a.no_judge else cfg.policy.model,
            "elapsed_s": round(time.time() - t0, 1), "date": time.strftime("%Y-%m-%d")}
@@ -252,7 +247,7 @@ def summarise(res: dict) -> dict:
             "valid": len(ok) / len(rows), "reasons": dict(Counter(r["reason"] for r in rows if not r["new"])),
             "attempts": float(np.mean([len(r["tries"]) for r in rows])),
             "rejected": dict(Counter(x for r in rows for x in r["tries"] if x != "ok")),
-            "usable": share(ok, "usable"), "world": share(ok, "world"), "in_vocab": share(ok, "in_vocab"),
+            "usable": share(ok, "usable"), "world": share(ok, "world"), "outside": share(ok, "outside"),
             "distinct_per_sentence": sum(len(v) for v in distinct.values()) / n_parents,
             "edit_words": float(np.mean([r["size"] for r in ok])), "one_word": float(np.mean([r["size"] == 1 for r in ok])),
             "big": float(np.mean([r["size"] >= 4 for r in ok])),
@@ -267,7 +262,7 @@ def summarise(res: dict) -> dict:
             "lineage_sim_end": float(np.mean([x["steps"][-1]["sim_to_start"] for x in lin])),
             "lineage_revisits": float(np.mean([revisits(x) for x in lin])),
             "lineage_meaning": {n: {k: share([x["steps"][n - 1] for x in lin if len(x["steps"]) >= n], k)
-                                    for k in ("usable", "world", "in_vocab")}
+                                    for k in ("usable", "world", "outside")}
                                 for n in JUDGE_STEPS if n <= res["steps"]},
             "finals_alike": sims(fin), "starts_alike": sims([x["start"] for x in lin])}
     per_prompt = {}
@@ -293,28 +288,29 @@ def report(res: dict) -> list[str]:
     n_par = len({(r["locus"], r["parent"]) for r in res["variety"]})
     n_lin = len(res["lineages"]) // len(T)
     g = res.get("guards", {})
-    rules = (f"`{res.get('prompts', 'prompts/mutate_v2.txt')}`, at most {g.get('max_changed_words') or 'any'} words "
-             f"changed, vocabulary {g.get('vocabulary') or 'any word'}, up to {g.get('tries', 1)} attempts")
+    rules = f"`{res.get('prompts', 'prompts/mutate_v2.txt')}`, up to {g.get('tries', 1)} attempts"
+    if g.get("max_changed_words") or g.get("vocabulary"):              # results of the checks tried on 2026-10-08
+        rules += f", at most {g.get('max_changed_words') or 'any'} words changed, vocabulary {g.get('vocabulary') or 'any'}"
     L = [f"# Mutation test — {res['model']} (digest {res['digest']}), {res['date']}", "",
          f"Pure mutation, no selection. Rules: {res.get('rules', 'old')} ({rules}). Variety: {n_par} founder "
          f"sentences × {res['seeds']} seeds × {len(T)} temperature(s). Lineages: {n_lin} sentences × {res['steps']} "
          f"steps per temperature. {len(res['instructions'])} instructions. {res['elapsed_s']:.0f} s.", ""]
-    if res.get("judge_model") or any("in_vocab" in r for r in res["variety"]):
+    if res.get("judge_model") or any("outside" in r for r in res["variety"]):
         L += [f"**Meaning** (usable: {res.get('judge_model') or '—'} says the gene still gives a usable rule for its slot; "
-              "world word: uses a word of the animal's world; only world words: every word in "
-              f"`{VOCABULARY}`).", "",
+              "world word: still uses a word of the animal's world; new outside word: brings in a word that is in "
+              "neither its parent nor the world words).", "",
               "| temperature | " + " | ".join(str(t) for t in T) + " |", "|---|" + "---|" * len(T)]
         B = S["by_temp"]
         L.append("| single mutations: usable | " + " | ".join(pct(B[t]["usable"]) for t in T) + " |")
         L.append("| … use a world word | " + " | ".join(pct(B[t]["world"]) for t in T) + " |")
-        L.append("| … only world words | " + " | ".join(pct(B[t]["in_vocab"]) for t in T) + " |")
+        L.append("| … bring in a new outside word | " + " | ".join(pct(B[t]["outside"]) for t in T) + " |")
         L.append("| attempts per mutation | " + " | ".join(f"{B[t]['attempts']:.2f}" for t in T) + " |")
         L.append("| rejected attempts | " + " | ".join(", ".join(f"{k} {v}" for k, v in B[t]["rejected"].items()) or "none"
                                                        for t in T) + " |")
         for n in B[T[0]]["lineage_meaning"]:
             m = {t: B[t]["lineage_meaning"][n] for t in T}
-            L.append(f"| lineages after {n} steps: usable / world word / only world words | "
-                     + " | ".join(f"{pct(m[t]['usable'])} / {pct(m[t]['world'])} / {pct(m[t]['in_vocab'])}" for t in T) + " |")
+            L.append(f"| lineages after {n} steps: usable / world word | "
+                     + " | ".join(f"{pct(m[t]['usable'])} / {pct(m[t]['world'])}" for t in T) + " |")
         L.append("")
     L += ["| temperature | " + " | ".join(str(t) for t in T) + " |", "|---|" + "---|" * len(T)]
     rows = [("valid answers (after redraws)", "valid", "{:.0%}"), (f"distinct mutants per sentence (of {res['seeds']})", "distinct_per_sentence", "{:.1f}"),

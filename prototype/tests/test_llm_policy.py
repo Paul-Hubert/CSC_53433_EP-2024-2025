@@ -151,7 +151,7 @@ def test_factory_and_llm_simulation(reg_pools):
 
     def rewriter(prompt, seed):
         calls.append(prompt)
-        return re.search(r'"(.*)"', prompt).group(1).rstrip(".") + " quickly."   # a small edit in the world
+        return re.search(r'"(.*)"', prompt).group(1).rstrip(".") + " quickly."   # a small edit
     rw, model = make_rewriter(cfg, client)
     assert rw is not None and model == "brain"
     sim = Simulation(cfg, backend, seed=3, rewriter=rewriter, rewriter_model="fake")

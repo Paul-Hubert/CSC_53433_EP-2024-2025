@@ -5,16 +5,12 @@ import numpy as np
 
 from promptevo.backends.rule_based import RuleBasedBackend
 from promptevo.config import load_config
-from promptevo.evolution.mutation import (TEMPLATE, Mutator, changed_words, clean, load_instructions,
-                                         load_vocabulary, unknown_words, valid)
-from promptevo.founder import AllelePools
-from promptevo.genome import AlleleRegistry
+from promptevo.evolution.mutation import TEMPLATE, Mutator, clean, load_instructions, valid
 from promptevo.genome import ACTIONS, LOCI
 from promptevo.sim import Simulation
-from promptevo.species import PREDATOR, PREY
+from promptevo.species import PREDATOR
 
-OLD_RULES = {"p_mut": 1.0, "mutation_prompts": "prompts/mutate_v2.txt", "max_changed_words": None,
-             "vocabulary": None, "mutation_tries": 1}       # mutation before 2026-10-08: no size or word guard
+OLD_RULES = {"p_mut": 1.0, "mutation_prompts": "prompts/mutate_v2.txt", "mutation_tries": 1}   # before 2026-10-08
 
 
 def test_guards_and_instructions():
@@ -23,21 +19,6 @@ def test_guards_and_instructions():
     for f in ("prompts/mutate_v2.txt", "prompts/mutate_v3.txt"):
         ins = load_instructions(f)
         assert len(ins) >= 9 and len(set(ins)) == len(ins) and not any(i.startswith("#") for i in ins)
-
-
-def test_size_and_vocabulary_guards(cfg):
-    assert changed_words("Eat quickly, then move on.", "Eat slowly, then move on.") == 1
-    assert changed_words("Never stop moving.", "Moving stop never.") > 3              # scrambled
-    vocab = load_vocabulary(cfg.evolution.vocabulary)
-    assert unknown_words("Keep chasing the nearest prey quickly.", vocab) == []       # endings: -ing, -est, -ly
-    assert unknown_words("Save energy by roasting when food is far.", vocab) == ["roasting"]
-    assert unknown_words("Mate with any nearby adult bird.", vocab) == ["bird"]
-    reg = AlleleRegistry()
-    for sp in (PREY, PREDATOR):                                     # every founder gene passes the word guard
-        pools = AllelePools(reg, cfg.paths.data_dir, species=sp)
-        for locus, ids in pools.founders.items():
-            for aid in ids:
-                assert unknown_words(reg.text(aid), vocab) == [], reg.text(aid)
 
 
 def test_mutator_sends_only_the_gene(reg_pools):
@@ -84,13 +65,13 @@ def test_mutator_rejects_bad_answers_and_needs_an_llm(reg_pools):
 def test_rejected_mutants_are_drawn_again(reg_pools):
     reg, pools = reg_pools
     cfg2 = load_config("small", {"evolution": {"p_mut": 1.0}})
-    answers = iter(["Eat whenever pancakes are close.",                 # a word outside the world
-                    "Always eat everything you see whenever you are hungry.",   # more than 3 words changed
-                    "Eat whenever food is very close."])                # small, in the world: accepted
+    answers = iter(["word " * 30,                                       # too long
+                    "Eat whenever food is close!",                      # only the punctuation changed
+                    "Eat whenever food is very close."])                # accepted
     m = Mutator(cfg2, reg, lambda prompt, seed: next(answers), "fake")
     new, k, seed = m.mutate_text("eat", "Eat whenever food is close.", np.random.default_rng(0))
     assert new == "Eat whenever food is very close." and m.stats["calls"] == 3
-    assert dict(m.stats["rejected"]) == {"unknown word": 1, "too big": 1}
+    assert dict(m.stats["rejected"]) == {"invalid": 1, "unchanged": 1}
 
 
 def _run(cfg, seed, ticks=600):
