@@ -26,7 +26,7 @@ class Species:
 
 
 PREY = Species("prey", ("eat", "flee", "follow", "rest", "mate"), "", "agents")
-PREDATOR = Species("predator", ("hunt", "rest", "mate"), "predator.", "predators")
+PREDATOR = Species("predator", ("hunt", "follow", "rest", "mate"), "predator.", "predators")   # follow since v2
 SPECIES = {s.name: s for s in (PREY, PREDATOR)}
 ALL_LOCI = PREY.loci + PREDATOR.loci
 

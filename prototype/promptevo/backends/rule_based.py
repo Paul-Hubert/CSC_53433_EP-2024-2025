@@ -26,7 +26,7 @@ INTENSITY = [  # first match wins (longest phrases first)
 ACTION_WORDS = {
     "eat": r"\b(eat|eating|food|feed|graze|forage)\b",
     "flee": r"\b(flee|run|escape|hide|danger|predator)\b",
-    "follow": r"\b(follow|stay close|close to other|group|companion|herd)\b",
+    "follow": r"\b(follow|stay close|close to other|group|companion|herd|pack)\b",
     "rest": r"\b(rest|sleep|stay still|lie still|wait|save energy|stop)\b",
     "mate": r"\b(mate|partner|breed|offspring)\b",
     "hunt": r"\b(hunt|hunting|chase|chasing|attack|kill|prey|strike|pounce|stalk)\b",
@@ -57,6 +57,7 @@ PREDATOR_CONDITIONS = {
 CONDITIONS_BY_SPECIES = {"prey": CONDITIONS, "predator": PREDATOR_CONDITIONS}
 ENERGY_PUSH = {"low": 1.5, "medium": 0.5, "high": -1.0}     # hungry animals look for food
 MATE_PULL = {"adjacent": 2.5, "close": 2.5, "medium": 1.5, "far": 1.0}   # a ready partner this far away
+FOLLOW_PULL = {"adjacent": -0.5, "close": -0.5, "medium": 0.3, "far": 0.3, "none": -2.5}   # both species
 
 
 def mate_logit(o: Observation | PredatorObservation) -> float:
@@ -74,7 +75,7 @@ def prey_logits(o: Observation) -> dict:
         l["eat"] = {"here": 3.0, "adjacent": 2.5, "close": 2.0, "medium": 1.5, "far": 1.0}[o.food]
         l["eat"] += ENERGY_PUSH[o.energy]
     l["flee"] = {"adjacent": 3.5, "close": 3.0, "medium": 1.0, "far": 0.0, "none": -3.0}[o.predator]
-    l["follow"] = {"adjacent": -0.5, "close": -0.5, "medium": 0.3, "far": 0.3, "none": -2.5}[o.animal]
+    l["follow"] = FOLLOW_PULL[o.animal]
     l["rest"] = -0.5 + (0.5 if o.energy == "high" and o.predator in ("none", "far") else 0.0)
     l["mate"] = mate_logit(o)
     return l
@@ -84,6 +85,7 @@ def predator_logits(o: PredatorObservation) -> dict:
     l = dict.fromkeys(SPECIES["predator"].actions, 0.0)
     l["hunt"] = {"adjacent": 3.5, "close": 3.0, "medium": 2.0, "far": 1.0,
                  "none": 1.5}[o.prey] + ENERGY_PUSH[o.energy]    # no prey in sight: hunting means searching
+    l["follow"] = FOLLOW_PULL[o.animal]
     l["rest"] = -0.5 + (1.0 if o.energy == "high" else 0.0)
     l["mate"] = mate_logit(o)
     return l

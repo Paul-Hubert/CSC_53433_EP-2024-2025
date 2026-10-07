@@ -4,8 +4,8 @@ world:
   # Lab 1 (2026-10-01): a flat world. No water and no mountains, so every cell is
   # walkable and food appears uniformly at random. The terrain and foliage labs change
   # this; configs/worlds/terrain_preview.yaml shows the built-in noise terrain.
-  width: 64
-  height: 64
+  width: 96                    # 64 x 64 until 2026-10-07 (owner: a bigger world, more predators)
+  height: 96
   water_fraction: 0.0          # share of cells that are water (impassable)
   mountain_fraction: 0.0       # share of cells that are mountain (impassable)
   noise_octaves: [16, 8, 4]    # heightmap noise, used only when a fraction above is > 0
@@ -18,9 +18,9 @@ perception:                   # both species (rev. 2026-10-07)
   bands: [1, 4, 10]           # distance bands in cells: adjacent <= 1, close <= 4, medium <= 10, far <= vision
   partner_range: 20           # cells within which an animal sees whether the nearest other one of its kind is ready to mate (4 until 2026-10-07)
 agents:                       # the prey animals
-  init_pop: 30
+  init_pop: 68                # 30 and 60 in the 64 x 64 world; scaled by area
   floor: 10
-  cap: 60
+  cap: 135
   vision: 20                  # cells (Chebyshev); was 12 with only near/far until 2026-10-07
   energy_max: 100.0
   energy_start: 60.0
@@ -37,9 +37,9 @@ agents:                       # the prey animals
   wander_turn_p: 0.25         # random walk of an animal whose chosen action has nothing in sight
 predators:                    # genetic animals like the prey since 2026-10-07: genes, LLM brain, energy, breeding.
                               # kill_p and digest_ticks tuned 2026-10-07 (keyword brain, 4 seeds): both species coexist
-  init_pop: 6
+  init_pop: 14                # 6 and 15 in the 64 x 64 world; scaled by area
   floor: 3                    # newcomers from the predator founder pool below this
-  cap: 15
+  cap: 34
   vision: 20                  # same as the prey; everyone moves at most one cell per tick
   energy_max: 100.0
   energy_start: 60.0
@@ -80,8 +80,8 @@ policy:                       # LLM decision backend (default brain, rev. 2026-0
                               # generated answers via prefetch; only for request-limited cloud) | ksample
   table_k: 8
   workers: 2                  # parallel requests (match OLLAMA_NUM_PARALLEL / cloud limits)
-  prompt: prompts/teacher_v3.md            # prey
-  predator_prompt: prompts/predator_v1.md
+  prompt: prompts/teacher_v4.md            # prey
+  predator_prompt: prompts/predator_v2.md
 laya:
   checkpoint: convaiinnovations/laya   # or subfolder multilingual (decided in S1.5)
   subfolder: null

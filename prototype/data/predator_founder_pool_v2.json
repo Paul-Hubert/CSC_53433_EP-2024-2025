@@ -1,6 +1,6 @@
 {
- "version": "v1",
- "note": "Draft for owner review (H1), 2026-10-07: predators became genetic animals. One gene per predator action (hunt, rest, mate), same rules as the prey pool: at most 12 words, imperative, plain words, no numbers.",
+ "version": "v2",
+ "note": "Draft for owner review (H1), 2026-10-07. One gene per predator action. v2 adds follow (the owner asked for follow in both species); hunt, rest and mate keep the v1 texts. Same rules as the prey pool: at most 12 words, imperative, plain words, no numbers.",
  "loci": {
   "hunt": {
    "neutral": "No preference.",
@@ -9,6 +9,15 @@
     "Hunt only when you are hungry.",
     "Attack only when prey is close.",
     "Keep chasing until the prey is caught."
+   ]
+  },
+  "follow": {
+   "neutral": "No preference.",
+   "alleles": [
+    "Stay close to other predators.",
+    "Hunt as a pack.",
+    "Keep away from other predators.",
+    "Follow others when no prey is in sight."
    ]
   },
   "rest": {

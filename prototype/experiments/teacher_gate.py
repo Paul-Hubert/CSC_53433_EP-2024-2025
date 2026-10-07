@@ -85,7 +85,7 @@ def main() -> None:
     ap.add_argument("--n-obs", type=int, default=24)
     ap.add_argument("--workers", type=int, default=1)
     ap.add_argument("--model", default=None)
-    ap.add_argument("--prompt", default="prompts/teacher_v3.md")
+    ap.add_argument("--prompt", default="prompts/teacher_v4.md")
     a = ap.parse_args()
     cfg = load_config(a.profile)
     model = a.model or cfg.policy.model or cfg.ollama.teacher_model

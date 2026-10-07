@@ -80,10 +80,49 @@ def test_predators_breed_with_their_own_genes(tmp_path):
     sim._breed(PREDATOR)
     child = sim.predators[-1]
     assert len(sim.predators) == n + 1 and child.species == "predator" and child.parents == (p.id, q.id)
-    assert len(child.genome.alleles) == 3 and all(a.startswith("predator.") for a in child.genome.alleles)
+    assert len(child.genome.alleles) == len(PREDATOR.loci) and all(a.startswith("predator.") for a in child.genome.alleles)
     sim.finish()
     births = [json.loads(l) for l in (tmp_path / "events.jsonl").read_text().splitlines() if '"birth"' in l]
     assert births[-1]["species"] == "predator" and births[-1]["id"] == child.id
+
+
+def test_one_partner_choosing_mate_is_enough():
+    """Since 2026-10-07 an animal that chose mate breeds with a ready partner next to it,
+    whatever the partner chose; an unready partner (young or hungry) doesn't breed."""
+    cfg = load_config("small", {"predators": {"kill_p": 0.0}})
+    for sp in (PREY, PREDATOR):
+        sim = Simulation(cfg, RuleBasedBackend(), seed=7)
+        sim.step()
+        members = sim.members(sp)
+        a, b = members[0], members[1]
+        others = [x for x in members if x is not a and x is not b]
+        for i, x in enumerate(others):                      # out of the way
+            x.y, x.x = 40, 2 + i
+        (a.y, a.x), (b.y, b.x) = (10, 10), (11, 11)
+        a.age, a.energy, a.action = 200, 90.0, "mate"
+        b.age, b.energy, b.action = 200, 90.0, "rest" if sp is PREY else "hunt"
+        a.bred = b.bred = False
+        n = len(members)
+        sim._breed(sp)
+        assert len(sim.members(sp)) == n + 1 and sim.members(sp)[-1].parents == (a.id, b.id), sp.name
+        a.bred = b.bred = False
+        b.energy = 20.0                                     # partner not ready: no birth
+        sim._breed(sp)
+        assert len(sim.members(sp)) == n + 1, sp.name
+
+
+def test_predators_follow_each_other():
+    from promptevo.actions import do_follow
+    cfg = load_config("small")
+    sim = Simulation(cfg, RuleBasedBackend(), seed=8)
+    p, q = sim.predators[0], sim.predators[1]
+    sim.predators = [p, q]
+    (p.y, p.x), (q.y, q.x) = (20, 10), (20, 18)
+    moved = do_follow(p, sim.world, sim.agents, sim.predators, cfg, np.random.default_rng(0))
+    assert moved and cheb(p.y, p.x, q.y, q.x) == 7 and not p.invalid
+    q.y, q.x = 45, 45                                       # beyond vision: follow means searching
+    do_follow(p, sim.world, sim.agents, sim.predators, cfg, np.random.default_rng(0))
+    assert p.invalid
 
 
 def test_both_species_have_newcomers_below_their_floor():
@@ -117,10 +156,10 @@ def test_one_registry_holds_both_species(cfg):
     loci = {reg.get(aid).locus for a in sim.agents + sim.predators for aid in a.genome.alleles}
     assert "predator.rest" in loci and "rest" in loci and loci <= set(PREY.loci) | set(PREDATOR.loci)
     r = AlleleRegistry()
-    texts = {"hunt": "No preference.", "rest": "No preference.", "mate": "No preference."}
+    texts = dict.fromkeys(PREDATOR.actions, "No preference.")
     g = r.make_genome(texts, species="predator")
     assert g.species == "predator" and r.genes(g) == texts
-    assert g.alleles == ("predator.hunt:0", "predator.rest:0", "predator.mate:0")
+    assert g.alleles == ("predator.hunt:0", "predator.follow:0", "predator.rest:0", "predator.mate:0")
     prey = r.make_genome(dict.fromkeys(PREY.actions, "No preference."))
     assert prey.alleles[3] == "rest:0"                          # same text, other species: other allele
     as_prey = hashlib.sha256(json.dumps(list(texts.values())).encode()).hexdigest()[:24]

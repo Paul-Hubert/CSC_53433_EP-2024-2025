@@ -79,7 +79,7 @@ def test_ollama_client_and_teacher(reg_pools):
     g = pools.neutral_genome()
     q = Query(reg.genome_key(g), reg.genes(g), O)
     for mode in ("points", "ksample"):
-        t = TeacherBackend(c, "teach", resolve("prompts/teacher_v3.md"), mode=mode, k=3)
+        t = TeacherBackend(c, "teach", resolve("prompts/teacher_v4.md"), mode=mode, k=3)
         p = t.decide([q])
         assert p[0].argmax() == ACTIONS.index("flee") and abs(p.sum() - 1) < 1e-9
     ask = make_rewriter(c, "teach", temperature=1.2)

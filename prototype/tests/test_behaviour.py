@@ -124,9 +124,10 @@ def test_rule_based_reads_predator_genes(cfg, reg_pools):
     for k, a in enumerate(PREDATOR.actions):
         pro, anti = pools.contrast_pair(a)
         p = b.decide([Query(reg.genome_key(g), reg.genes(g), o, "predator") for g in (pro, anti)])
-        assert p.shape == (2, 3) and p[0, k] > p[1, k], a
+        assert p.shape == (2, len(PREDATOR.actions)) and p[0, k] > p[1, k], a
     hungry_far = PredatorObservation("low", "far", "none")
     full_far = PredatorObservation("high", "far", "none")
     g = pools.neutral_genome()
     p = b.decide([Query(reg.genome_key(g), reg.genes(g), x, "predator") for x in (hungry_far, full_far)])
-    assert p[0, 0] > p[1, 0] and p[1, 1] > p[0, 1]      # hungry hunts, full rests
+    hunt, rest = PREDATOR.actions.index("hunt"), PREDATOR.actions.index("rest")
+    assert p[0, hunt] > p[1, hunt] and p[1, rest] > p[0, rest]      # hungry hunts, full rests

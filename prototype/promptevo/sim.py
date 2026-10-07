@@ -291,12 +291,14 @@ class Simulation:
                 if a.action == "mate" and not a.bred and mate_ready(a, sc):
                     self._birth([a])
             return
-        ready = [a for a in members if a.action == "mate" and not a.bred and mate_ready(a, sc)]
-        for a in ready:
+        # One partner's choice is enough (rev. 2026-10-07): an animal that chose mate breeds with a
+        # ready partner next to it, whatever that partner is doing. Before, both had to choose mate.
+        seekers = [a for a in members if a.action == "mate" and not a.bred and mate_ready(a, sc)]
+        for a in seekers:
             if len(self.members(sp)) >= cap or a.bred:
                 continue
-            for b in ready:
-                if b is not a and not b.bred and cheb(a.y, a.x, b.y, b.x) <= 1:
+            for b in list(members):
+                if b is not a and not b.bred and mate_ready(b, sc) and cheb(a.y, a.x, b.y, b.x) <= 1:
                     self._birth([a, b])
                     break
 

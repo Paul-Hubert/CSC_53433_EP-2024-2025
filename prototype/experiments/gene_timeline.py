@@ -47,8 +47,8 @@ JUDGE_MIN = 3       # --judge asks only about texts that had this many living ca
 JUDGE_PROMPT = "prompts/judge_sense_v1.txt"
 TOPIC = {"eat": "when and how to eat", "flee": "when to run away", "follow": "when to follow other animals",
          "rest": "when to rest", "mate": "when to look for a partner",
-         "predator.hunt": "when and how to hunt prey", "predator.rest": "when to rest",
-         "predator.mate": "when to look for a partner"}
+         "predator.hunt": "when and how to hunt prey", "predator.follow": "when to follow other predators",
+         "predator.rest": "when to rest", "predator.mate": "when to look for a partner"}
 
 
 def mean(xs) -> float | None:

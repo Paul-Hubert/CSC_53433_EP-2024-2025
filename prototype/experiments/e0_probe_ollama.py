@@ -47,7 +47,7 @@ def main() -> None:
             facts[title] = f"FAILED {e!r}"
 
     section("1. Version & models", lambda: {"version": c.version(), "models": c.models()})
-    prompt = teacher_prompt(open(resolve("prompts/teacher_v3.md")).read(), GENES, SITUATION, "points")
+    prompt = teacher_prompt(open(resolve("prompts/teacher_v4.md")).read(), GENES, SITUATION, "points")
     msgs = [{"role": "user", "content": prompt}]
 
     def structured():
@@ -66,7 +66,7 @@ def main() -> None:
     section("3. seed+temperature 0 determinism", determinism)
 
     def logprobs():
-        p = teacher_prompt(open(resolve("prompts/teacher_v3.md")).read(), GENES, SITUATION, "logprobs")
+        p = teacher_prompt(open(resolve("prompts/teacher_v4.md")).read(), GENES, SITUATION, "logprobs")
         res = c.chat_raw(a.teacher, [{"role": "user", "content": p}],
                          options={"seed": 1, "temperature": 0, "num_predict": 1},
                          extra={"logprobs": True, "top_logprobs": 10})
@@ -81,7 +81,7 @@ def main() -> None:
     def timing():
         out = {}
         for mode in ("points", "logprobs"):
-            p = teacher_prompt(open(resolve("prompts/teacher_v3.md")).read(), GENES, SITUATION, mode)
+            p = teacher_prompt(open(resolve("prompts/teacher_v4.md")).read(), GENES, SITUATION, mode)
             m = [{"role": "user", "content": p}]
             ts = []
             for i in range(3):

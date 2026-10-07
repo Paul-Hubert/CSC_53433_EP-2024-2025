@@ -1,6 +1,6 @@
 """Load founder / contrast / control allele files and build genome sets. Plan §A5.
 
-One pool per species: data/founder_pool_v2.json (prey) and data/predator_founder_pool_v1.json,
+One pool per species: data/founder_pool_v2.json (prey) and data/predator_founder_pool_v2.json,
 with the matching contrast_alleles files. The JSON files name the slots by action.
 """
 from __future__ import annotations
@@ -15,7 +15,7 @@ from .genome import AlleleRegistry, Genome
 from .species import PREY, Species
 
 FILE_PREFIX = {"prey": "", "predator": "predator_"}
-DEFAULT_VERSION = {"prey": "v2", "predator": "v1"}
+DEFAULT_VERSION = {"prey": "v2", "predator": "v2"}
 
 
 class AllelePools:

@@ -4,6 +4,10 @@
   "pro": "Always hunt, whatever happens.",
   "anti": "Never hunt unless starving."
  },
+ "follow": {
+  "pro": "Always follow other predators.",
+  "anti": "Never go near other predators."
+ },
  "rest": {
   "pro": "Always rest and stay still.",
   "anti": "Never rest, keep moving."
