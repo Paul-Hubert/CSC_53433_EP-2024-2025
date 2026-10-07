@@ -66,6 +66,26 @@ def test_distance_bands_and_vision(cfg):
         assert sense(p, sim.world, sim.agents, sim.predators, cfg).prey == want   # both see equally far
 
 
+def test_partner_readiness_is_seen_far_away(cfg):
+    from promptevo.config import load_config
+    sim = Simulation(cfg, RuleBasedBackend(), seed=1)
+    a, b = sim.agents[0], sim.agents[1]
+    sim.agents = [a, b]
+    (a.y, a.x), (b.y, b.x) = (24, 5), (24, 20)                 # 15 cells: far
+    b.age, b.energy = 300, 90.0
+    o = sense(a, sim.world, sim.agents, sim.predators, cfg)
+    assert o.animal == "far" and o.animal_ready is True       # partner_range 20: the whole vision
+    old = load_config("small", {"perception": {"partner_range": 4}})
+    assert sense(a, sim.world, sim.agents, sim.predators, old).animal_ready is None   # the rule before 2026-10-07
+    b.y, b.x = 24, 7
+    assert sense(a, sim.world, sim.agents, sim.predators, old).animal_ready is True
+    p, q = sim.predators[0], sim.predators[1]
+    sim.predators = [p, q]
+    (p.y, p.x), (q.y, q.x) = (40, 5), (40, 23)                 # predators too
+    q.age, q.energy = 300, 90.0
+    assert sense(p, sim.world, sim.agents, sim.predators, cfg).animal_ready is True
+
+
 def test_obs_text_styles():
     o = Observation("low", "close", "none", "adjacent", True, "adult")
     v1 = render(o, "V1")

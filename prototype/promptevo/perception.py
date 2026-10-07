@@ -5,7 +5,9 @@ Both species see `vision` cells far (Chebyshev distance, each species' config se
 get every distance as a band: adjacent (1 cell), close, medium or far, with the edges from
 `perception.bands`; "none" means nothing of that kind within vision. The bands keep the
 number of distinct observations small (cache-friendly); the text tells the brain how many
-cells each band covers (obs_text.py).
+cells each band covers (obs_text.py). Whether the nearest other animal of its species is
+ready to mate is seen up to `perception.partner_range` cells (the whole vision since
+2026-10-07; 4 before, so far partners were invisible).
 """
 from __future__ import annotations
 
@@ -15,7 +17,7 @@ from .species import species_cfg
 from .world import cheb
 
 DIST = ("adjacent", "close", "medium", "far")    # distance bands, nearest first
-NEAR = ("adjacent", "close")                     # near enough to tell whether a partner is ready
+NEAR = ("adjacent", "close")                     # the two nearest bands (up to 4 cells)
 DEFAULT_SCALE = (1, 4, 10, 20)                   # band edges in cells, the last one = vision (base.yaml)
 
 
@@ -26,7 +28,7 @@ class Observation:
     food: str                   # here | adjacent | close | medium | far | none
     predator: str               # nearest predator: adjacent | close | medium | far | none
     animal: str                 # nearest other prey animal: adjacent | close | medium | far | none
-    animal_ready: bool | None = None     # only when animal is adjacent or close
+    animal_ready: bool | None = None     # only within perception.partner_range of the animal
     age: str = "adult"          # young | adult
     scale: tuple = DEFAULT_SCALE         # band edges and vision in cells, for the text
 
@@ -52,7 +54,7 @@ class PredatorObservation:
     energy: str                 # low | medium | high
     prey: str                   # nearest prey animal: adjacent | close | medium | far | none
     animal: str                 # nearest other predator: adjacent | close | medium | far | none
-    animal_ready: bool | None = None     # only when animal is adjacent or close
+    animal_ready: bool | None = None     # only within perception.partner_range of the animal
     age: str = "adult"          # young | adult
     scale: tuple = DEFAULT_SCALE
 
@@ -117,7 +119,8 @@ def sense(agent, world, prey, predators, cfg) -> Observation | PredatorObservati
     energy = "low" if agent.energy < sc.energy_low else "high" if agent.energy > sc.energy_high else "medium"
     other, do = _nearest(agent, prey if agent.species == "prey" else predators)
     animal = band(do, scale)
-    ready = mate_ready(other, sc) if animal in NEAR else None
+    seen = animal != "none" and do <= int(cfg.perception.partner_range)
+    ready = mate_ready(other, sc) if seen else None
     age = "young" if agent.age < sc.maturity else "adult"
     if agent.species == "prey":
         nf = world.nearest_food(agent.y, agent.x, scale[-1])

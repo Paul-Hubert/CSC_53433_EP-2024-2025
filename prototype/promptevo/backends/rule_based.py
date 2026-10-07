@@ -56,6 +56,14 @@ PREDATOR_CONDITIONS = {
 }
 CONDITIONS_BY_SPECIES = {"prey": CONDITIONS, "predator": PREDATOR_CONDITIONS}
 ENERGY_PUSH = {"low": 1.5, "medium": 0.5, "high": -1.0}     # hungry animals look for food
+MATE_PULL = {"adjacent": 2.5, "close": 2.5, "medium": 1.5, "far": 1.0}   # a ready partner this far away
+
+
+def mate_logit(o: Observation | PredatorObservation) -> float:
+    """Both species: an adult that isn't hungry goes to a ready partner, more eagerly the
+    closer it is (readiness is seen up to perception.partner_range)."""
+    ready = o.animal_ready and o.age == "adult" and o.energy != "low"
+    return MATE_PULL[o.animal] if ready else -3.0
 
 
 def prey_logits(o: Observation) -> dict:
@@ -68,8 +76,7 @@ def prey_logits(o: Observation) -> dict:
     l["flee"] = {"adjacent": 3.5, "close": 3.0, "medium": 1.0, "far": 0.0, "none": -3.0}[o.predator]
     l["follow"] = {"adjacent": -0.5, "close": -0.5, "medium": 0.3, "far": 0.3, "none": -2.5}[o.animal]
     l["rest"] = -0.5 + (0.5 if o.energy == "high" and o.predator in ("none", "far") else 0.0)
-    ready = o.animal in NEAR and o.animal_ready and o.age == "adult" and o.energy != "low"
-    l["mate"] = 2.5 if ready else -3.0
+    l["mate"] = mate_logit(o)
     return l
 
 
@@ -78,10 +85,7 @@ def predator_logits(o: PredatorObservation) -> dict:
     l["hunt"] = {"adjacent": 3.5, "close": 3.0, "medium": 2.0, "far": 1.0,
                  "none": 1.5}[o.prey] + ENERGY_PUSH[o.energy]    # no prey in sight: hunting means searching
     l["rest"] = -0.5 + (1.0 if o.energy == "high" else 0.0)
-    ready = o.animal in NEAR and o.animal_ready and o.age == "adult" and o.energy != "low"
-    # predators are few: a well-fed adult also goes looking for a partner it sees farther away
-    seek = o.animal in ("medium", "far") and o.age == "adult" and o.energy == "high"
-    l["mate"] = 2.5 if ready else 0.5 if seek else -3.0
+    l["mate"] = mate_logit(o)
     return l
 
 

@@ -16,6 +16,7 @@ world:
   water_bonus_radius: 3
 perception:                   # both species (rev. 2026-10-07)
   bands: [1, 4, 10]           # distance bands in cells: adjacent <= 1, close <= 4, medium <= 10, far <= vision
+  partner_range: 20           # cells within which an animal sees whether the nearest other one of its kind is ready to mate (4 until 2026-10-07)
 agents:                       # the prey animals
   init_pop: 30
   floor: 10

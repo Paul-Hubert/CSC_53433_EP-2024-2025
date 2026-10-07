@@ -1,5 +1,8 @@
-"""Smoke run: python -m experiments.smoke_run --profile small --ticks 5000 [--backend rule_based|llm]
+"""Smoke run: python -m experiments.smoke_run [--profile full] --ticks 5000 [--backend rule_based|llm]
                                             [--world terrain_preview] [--minutes 720]
+
+The default world is the full one, 64 x 64 (since 2026-10-07: in the 48 x 48 small world
+the LLM-read prey didn't hold against the predators); --profile small for quick checks.
 
 Genes mutate through the mutator LLM (ollama.mutator_model, see evolution/mutation.py) with
 every brain, so Ollama must be running; --no-mutation runs without it (crossover only).
@@ -97,7 +100,7 @@ def write_info(out: Path, a, cfg, brain: str, seed: int, mutator_model: str | No
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--profile", default="small")
+    ap.add_argument("--profile", default="full", help="world size: full 64 x 64 (default), small 48 x 48")
     ap.add_argument("--ticks", type=int, default=5000)
     ap.add_argument("--backend", default=None)
     ap.add_argument("--seed", type=int, default=None)

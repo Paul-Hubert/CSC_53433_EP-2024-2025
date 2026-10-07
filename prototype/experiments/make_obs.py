@@ -65,7 +65,7 @@ def main() -> None:
     sampled = [o for o, _ in seen.most_common() if o not in set(syn)][: n_total - len(syn)]
     rows = [(o, "synthetic") for o in syn] + [(o, "sampled") for o in sampled]
     path = resolve(a.out)
-    with path.open("w") as f:
+    with path.open("w", newline="\n") as f:          # LF on every OS (the committed file)
         for o, src in rows:
             f.write(json.dumps({**asdict(o), "source": src, "tags": sorted(o.tags())}) + "\n")
     tags = Counter(t for o, _ in rows for t in o.tags())
