@@ -84,3 +84,8 @@ make_dataset.py, label_teacher.py, S5 distillation.
   grew to 25-29; 4 immigrants (t 2 982-3 228) = 84 % of final ancestry; "Never fight." 23/25 at the end
   (≈ 30 % expected from ancestry). Predators 71 % of deaths; flee 4.5 %, attack 9.5 % of decisions.
   results/llm_60min_genes.md, Docs/prompt-genome/10 §7.
+- Long runs (2026-10-02, full, rule_based, LLM mutation v2, 50 000 ticks ≈ 230 generations, seeds 1234/7/42 in
+  parallel ≈ 14 min, ≈ 2 400 mutation calls each): predators 42-43 % of deaths. No gene reading clearly above
+  average even pooled; steady leaders +1-2 % (cautious, solitary, familiar, flee when predator very close, never
+  attack, rest when food far); clearly worse: attack always 0.77, restless 0.79 (60 % killed by predators), risk
+  no effect 0.89 (53 %). Living genes 92-100 % mutants, 62-79 % use a world word. results/long_1234_genes.md.

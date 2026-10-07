@@ -5,12 +5,12 @@
 
 ## Position
 Session: S1.3 done locally, S4.3 gate run · Last updated: 2026-10-07 (predators = genetic animals with 4 genes;
-96 x 96 default world; stamina + speed + carcasses (bb61a30); LLM check of it running)
+96 x 96 default world; stamina + speed + carcasses (bb61a30); LLM check done)
 
 ## Next action
-Stamina, speed, carcasses done 2026-10-07 (bb61a30 code; docs 06 §5.15). RUNNING: LLM check 96 x 96 (Background
-jobs). When it ends: results into 06 §5.16, 05 §6 cost, 09 #10 + timeline, 02 compute budget, STATUS key numbers;
-commit; report. Then WAIT for owner (../Docs/prompt-genome/09 §4): #10 balance and cost; G2 handling
+Stamina, speed, carcasses done 2026-10-07 (bb61a30 code, ab6a1ad docs; LLM check in 06 §5.16). WAIT for owner
+(../Docs/prompt-genome/09 §4): #10 keep the values (predators at their cap with both brains) or let food limit
+them; cost ≈ 12 calls per tick (5 000 ticks ≈ 6.5 h); G2 handling
 (all-zero answers → neutral answer? cleaner control sentences? prompt iteration 1/3?); founder pools H1
 (prey v2 + predator v2). Then longer LLM runs with both species + `gene_timeline --species prey|predator`. Rerun
 `python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b` (teacher_v4 + obs v2: new
@@ -90,11 +90,6 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
   Lineages (24 × 30 steps): genes using a world word 83 % after 1, 58 % after 10, 21 % after 15,
   12 % after 30; 4.7 → 6.5-7.8 words; "toaster" in 18/24 lineages. ≈ 270 mutation calls per
   10 000 ticks (rule_based, small).
-- Long runs (2026-10-02, full, rule_based, LLM mutation v2, 50 000 ticks ≈ 230 generations, seeds 1234/7/42 in
-  parallel ≈ 14 min, ≈ 2 400 mutation calls each): predators 42-43 % of deaths. No gene reading clearly above
-  average even pooled; steady leaders +1-2 % (cautious, solitary, familiar, flee when predator very close, never
-  attack, rest when food far); clearly worse: attack always 0.77, restless 0.79 (60 % killed by predators), risk
-  no effect 0.89 (53 %). Living genes 92-100 % mutants, 62-79 % use a world word. results/long_1234_genes.md.
 - LLM brain, 12 h (2026-10-05/06, seed 1234 continues llm_60min): 57 061 ticks, 79 667 calls, 0 failures, 812
   mutations, peak generation 114. Rescued line thrived (29 animals, t 6-20k), then died out (t 27 337); 874
   newcomers in 30k ticks, no second rescue. Predation trap: kills ≈ constant → 1.9 vs 3.8 per 1 000
@@ -114,7 +109,13 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
   cap 66-97 %), 126-152 births, 995-1 206 kills, 1 496-1 806 portions, few starve; small prey 28-31, predators 5.6-5.8.
   Memo prey 52-67 % (61-81 before). Random brain: predators at the floor. LLM probe (8 founders): predator hunt 0.82
   rested vs 0.25 out of breath (rest 0.69); carcass 2-4 cells, no prey: hunt 0.44 vs 0.09; prey out of breath, no
-  predator: rest 0.79 vs 0.10. Prompts 1 527 / 1 633 chars (1 259 / 1 207 before).
+  predator: rest 0.79 vs 0.10. Prompts 1 527 / 1 633 chars (1 259 / 1 207 before). LLM 96 x 96 (seed 1234,
+  results/runs/check_stamina_llm): 2 000 ticks in 2 h 37 min, 23 608 calls, 0 failures; predators 14 → 34 = cap by
+  t 800, 131 births, no newcomers, gen 7, 110 starved; prey 38-83, no newcomers, 374 killed, 201 starved, flee 10 %;
+  memo prey 35 %, predators 47 %. LLM 96 x 96 (seed 1234,
+  results/runs/check_stamina_llm): 2 000 ticks in 2 h 37 min, 23 608 calls, 0 failures; predators 14 → 34 = cap by
+  t 800, 131 births, no newcomers, gen 7, 110 starved; prey 38-83, no newcomers, 374 killed, 201 starved, flee 10 %;
+  memo prey 35 %, predators 47 %.
 - E1 rule_based reference (small, 48 obs, 10-gene genome): MI_G founders 0.23, MI_G random 0.00,
   MI_O 0.83, directed sign acc 1.00, ΔP 0.48, gibberish→neutral 0.00.
   Note for H2: even the "ideal" keyword interpreter scores MI_G 0.23 < G2 threshold 0.25
@@ -127,14 +128,14 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
 | Job | Started | Log | Progress file | State |
 |---|---|---|---|---|
 | LLM check 96 x 96, 2 000 ticks, seed 1234 (`--out results/runs/check_all4_llm --minutes 180`) | 2026-10-07 14:23 | logs/check_all4_llm.log | logs/run_check_all4_llm.progress.json | done 17:23 (time limit, tick 1 673) |
-| LLM check stamina 96 x 96, 2 000 ticks, seed 1234 (`--out results/runs/check_stamina_llm --minutes 180`) | 2026-10-07 18:53 | logs/check_stamina_llm.log | logs/run_check_stamina_llm.progress.json | running (ends 21:53 at the latest) |
+| LLM check stamina 96 x 96, 2 000 ticks, seed 1234 (`--out results/runs/check_stamina_llm --minutes 180`) | 2026-10-07 18:53 | logs/check_stamina_llm.log | logs/run_check_stamina_llm.progress.json | done 21:31 (2 000 ticks) |
 
 ## Open issues
 - Own git server mirror: waiting for the URL + auth from the owner (see
   ../Docs/redesign/09-progress-log.md › Mirroring).
 - Founder pools (prey v2, predator v2) are drafts by Claude — need owner review (H1).
-- LLM predators breed since the 4 changes (29 births / 1 673 ticks, 96 x 96; 0-3 per 2 000 ticks before) but stay
-  few and starve; LLM prey flee only 4-9 % yet fill the 96 x 96 world to their cap (09 §4 #10).
+- Since the stamina change LLM predators fill their cap (34) in the 96 x 96 world and the prey stay at 38-83 without
+  newcomers; before it predators stayed at 6-14 while the prey filled their cap (09 §4 #10).
 - LLM cost dominates E4: measured ≈ 4 decisions/s (gemma4:12b, RTX 5080) → 5 000 ticks ≈ 1 h
   (small). Decide run length / D / seeds before S6.
 - Logprobs: Ollama 0.32 returns them, but unusable with gemma4 (first token "f" = flee/follow,

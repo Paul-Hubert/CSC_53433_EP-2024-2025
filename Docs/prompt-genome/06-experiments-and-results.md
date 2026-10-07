@@ -426,6 +426,36 @@ ticks. Prompts `teacher_v5.md` and `predator_v3.md`.
   the keyword runs' memo answered 52–67 % of prey decisions against 61–81 %
   before), so an LLM run needs more calls per tick.
 
+### 5.16 LLM brain with stamina and carcasses
+
+`results/runs/check_stamina_llm` (not committed), 2026-10-07: the same check as
+§5.14 (96 × 96 world, seed 1234, gemma4:12b deciding for both species and
+mutating), with the rules of §5.15.
+
+- **Run:** all 2 000 ticks in 2 h 37 min: 37 585 decisions (30 068 prey, 7 517
+  predator), 23 608 calls, 0 failures, 76 mutations.
+- **Predators:** from 14 to their cap of 34 by tick 800, then at or near it (32
+  at the end): 131 births without any newcomer, up to generation 7; 110 starved
+  and 3 died of old age. 374 kills and 544 carcass portions eaten (1.5 per
+  kill). They chose `mate` in 34 % of decisions, `hunt` 33 %, `rest` 21 %,
+  `follow` 12 %.
+- **Prey:** after the early loss (68 → 43 in 100 ticks) they stayed between 38
+  and 83, never at their floor and without newcomers: 552 births, 374 killed,
+  201 starved, mean lifespan 190 ticks, up to generation 11. They chose `eat` in
+  33 % of decisions, `mate` 24 %, `rest` 20 %, `follow` 13 % and `flee` 10 % (4 %
+  in §5.14). Animals were out of breath in 0.3 % of their ticks.
+- **Reading:** the balance turned around again. In §5.14 the prey filled their
+  cap and starved while 6–14 predators starved too. Now the predators fill
+  theirs, and predation rather than food limits the prey (374 killed against
+  201 starved). Both species bred without newcomers. As with the keyword brain
+  ([03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)),
+  the predators' cap sets their number.
+- **Cost:** 11.8 calls per tick, against 16 in §5.14 when 135 prey lived. Fewer
+  animals, but situations repeat less: the memo answered 35 % of prey decisions
+  and 47 % of predator decisions (47 % and 51 % in §5.14). 5 000 ticks would
+  take about 6.5 hours.
+- **Caveat:** one seed, 2 000 ticks.
+
 ### Summary
 
 | Gate | Status (2026-10-01) |
@@ -515,6 +545,7 @@ python -m experiments.smoke_run --profile small --backend llm --ticks 2000 --see
 python -m experiments.smoke_run --backend llm --ticks 2000 --seed 1234 --out results/runs/check_predators_llm_full                  # 5.13 (code of 08e0c57)
 python -m experiments.smoke_run --backend llm --ticks 2000 --minutes 180 --seed 1234 --out results/runs/check_all4_llm              # 5.14 (code of 9aaac2d)
 python -m experiments.smoke_run --ticks 5000 --no-mutation --snapshots 0 --seed 1234 --out results/runs/stamina_1234                # 5.15, keyword brain (also seeds 7, 42; --profile small)
+python -m experiments.smoke_run --backend llm --ticks 2000 --minutes 180 --seed 1234 --out results/runs/check_stamina_llm           # 5.16
 ```
 
 §5.12–5.14 ran the code of the commits in brackets (smaller worlds, older
