@@ -79,7 +79,9 @@ def predator_logits(o: PredatorObservation) -> dict:
                  "none": 1.5}[o.prey] + ENERGY_PUSH[o.energy]    # no prey in sight: hunting means searching
     l["rest"] = -0.5 + (1.0 if o.energy == "high" else 0.0)
     ready = o.animal in NEAR and o.animal_ready and o.age == "adult" and o.energy != "low"
-    l["mate"] = 2.5 if ready else -3.0
+    # predators are few: a well-fed adult also goes looking for a partner it sees farther away
+    seek = o.animal in ("medium", "far") and o.age == "adult" and o.energy == "high"
+    l["mate"] = 2.5 if ready else 0.5 if seek else -3.0
     return l
 
 

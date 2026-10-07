@@ -1,4 +1,4 @@
 # CPU-friendly profile
 world: {width: 48, height: 48}
-predators: {init_pop: 4, floor: 2, cap: 10}
+predators: {init_pop: 4, cap: 10}             # floor 3 as in base.yaml
 agents: {init_pop: 24, cap: 40}
