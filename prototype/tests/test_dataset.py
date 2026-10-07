@@ -75,7 +75,7 @@ def test_label_resume_and_check(cfg, reg_pools, tmp_path):
     rows, _ = _dataset(cfg, reg_pools, n=120)
     calls = []
     client = OllamaClient(transport=fake_transport(calls))
-    teacher = TeacherBackend(client, "teach", resolve("prompts/teacher_v4.md"), strict=True)
+    teacher = TeacherBackend(client, "teach", resolve("prompts/teacher_v5.md"), strict=True)
     out = tmp_path / "labels.jsonl"
     r1 = label(rows[:50], teacher, out, {"model": "teach"}, workers=2)
     assert r1["written"] == 50 and r1["failed"] == 0
@@ -98,7 +98,7 @@ def test_label_skips_failures(cfg, reg_pools, tmp_path):
             return {"models": []}
         raise RuntimeError("model not loaded")
     teacher = TeacherBackend(OllamaClient(transport=broken, retries=1), "x",
-                             resolve("prompts/teacher_v4.md"), strict=True)
+                             resolve("prompts/teacher_v5.md"), strict=True)
     r = label(rows[:5], teacher, tmp_path / "l.jsonl", {}, workers=1)
     assert r["written"] == 0 and r["failed"] == 5
 
@@ -107,6 +107,6 @@ def test_teacher_gate_with_fake(cfg):
     calls = []
     client = OllamaClient(transport=fake_transport(calls))
     results, agreement = run_gate(cfg, client, ["points", "ksample"], 12, 1,
-                                  resolve("prompts/teacher_v4.md"), "teach", logs=False)
+                                  resolve("prompts/teacher_v5.md"), "teach", logs=False)
     assert results["points"]["sign_acc"] > 0.9 and results["points"]["gate"]["directed"]
     assert agreement is not None and agreement >= 0

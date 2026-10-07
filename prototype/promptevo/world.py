@@ -1,9 +1,11 @@
-"""Headless grid world: terrain (water/mountain) and food. Plan §A4.
+"""Headless grid world: terrain (water/mountain), food and carcasses. Plan §A4.
 
-Predators were scripted here until 2026-10-07; they are now genetic animals (sim.py, actions.py)."""
+Predators were scripted here until 2026-10-07; they are now genetic animals (sim.py, actions.py).
+A predator's kill leaves a carcass (since 2026-10-07) that other predators can eat from."""
 from __future__ import annotations
 
 from collections import deque
+from dataclasses import dataclass, field
 
 import numpy as np
 
@@ -13,6 +15,20 @@ DIRS = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]  #
 
 def cheb(ay: int, ax: int, by: int, bx: int) -> int:
     return max(abs(ay - by), abs(ax - bx))
+
+
+@dataclass(eq=False)
+class Carcass:
+    """The remains of a killed prey animal: one portion each for other predators."""
+    y: int
+    x: int
+    portions: int
+    killer: int                 # the predator that made the kill doesn't eat from it again
+    rot: int                    # ticks left before it rots away
+    eaters: set = field(default_factory=set)   # predators that ate a portion
+
+    def edible_by(self, predator) -> bool:
+        return self.portions > 0 and predator.id != self.killer and predator.id not in self.eaters
 
 
 def value_noise(h: int, w: int, octaves: list[int], rng: np.random.Generator) -> np.ndarray:
@@ -83,6 +99,8 @@ class World:
         self.regrow_p = np.where(self.near_water, wc.food_regrow_p * wc.food_water_bonus,
                                  wc.food_regrow_p) * self.walkable
         self.food = (rng_world.random((self.h, self.w)) < wc.food_initial_fraction) & self.walkable
+        self.carcasses: list[Carcass] = []
+        self.portions_eaten = 0             # carcass portions eaten so far (stats)
 
     def _make_terrain(self, rng: np.random.Generator) -> np.ndarray:
         wc = self.cfg.world
@@ -153,3 +171,9 @@ class World:
     # --- dynamics ----------------------------------------------------------
     def regrow_food(self, rng: np.random.Generator) -> None:
         self.food |= rng.random((self.h, self.w)) < self.regrow_p
+
+    def age_carcasses(self) -> None:
+        """Carcasses rot; eaten-up and rotten ones are removed."""
+        for c in self.carcasses:
+            c.rot -= 1
+        self.carcasses = [c for c in self.carcasses if c.portions > 0 and c.rot > 0]

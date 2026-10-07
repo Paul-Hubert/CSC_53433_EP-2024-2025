@@ -25,8 +25,14 @@ agents:                       # the prey animals
   energy_max: 100.0
   energy_start: 60.0
   cost_base: 0.7
-  cost_move: 0.5
+  cost_move: 0.5              # per cell moved
   cost_rest: 0.2
+  speed: 1                    # cells per tick when running (flee); every other move walks 1 cell
+  stamina_max: 60.0           # stamina (since 2026-10-07) = cells an animal can move before it must stop; 1 per cell
+  stamina_regen: 2.0          # stamina back per tick without moving
+  cost_regen: 0.3             # extra energy per tick without moving, until stamina is full
+  stamina_low: 20.0           # observation: low < 20 <= medium <= 40 < high
+  stamina_high: 40.0
   eat_gain: 25.0
   maturity: 150
   max_age: 1500
@@ -40,15 +46,24 @@ predators:                    # genetic animals like the prey since 2026-10-07: 
   init_pop: 14                # 6 and 15 in the 64 x 64 world; scaled by area
   floor: 3                    # newcomers from the predator founder pool below this
   cap: 34
-  vision: 20                  # same as the prey; everyone moves at most one cell per tick
+  vision: 20                  # same as the prey
   energy_max: 100.0
   energy_start: 60.0
   cost_base: 0.7
-  cost_move: 0.5
+  cost_move: 0.5              # per cell moved
   cost_rest: 0.2
+  speed: 2                    # cells per tick when hunting (faster than the prey); every other move walks 1 cell
+  stamina_max: 30.0           # half the prey's: 15 ticks of running
+  stamina_regen: 2.0
+  cost_regen: 0.3
+  stamina_low: 10.0
+  stamina_high: 20.0
   kill_p: 0.1                 # chance that a strike kills; a hunting predator strikes when next to its prey
   kill_gain: 60.0             # energy from one kill
-  digest_ticks: 50            # after a kill the predator stays still and doesn't decide (was rest_after_kill 20)
+  digest_ticks: 50            # after a kill the predator stays still and doesn't decide; after a carcass portion, in proportion (30 → 25 ticks)
+  carcass_portions: 2         # a kill leaves a carcass: one portion each for up to 2 other predators (0 = no carcass)
+  carcass_gain: 30.0          # energy per portion
+  carcass_ticks: 100          # a carcass rots away after this many ticks
   maturity: 150
   max_age: 1500
   mate_energy: 50.0
@@ -80,8 +95,8 @@ policy:                       # LLM decision backend (default brain, rev. 2026-0
                               # generated answers via prefetch; only for request-limited cloud) | ksample
   table_k: 8
   workers: 2                  # parallel requests (match OLLAMA_NUM_PARALLEL / cloud limits)
-  prompt: prompts/teacher_v4.md            # prey
-  predator_prompt: prompts/predator_v2.md
+  prompt: prompts/teacher_v5.md            # prey
+  predator_prompt: prompts/predator_v3.md
 laya:
   checkpoint: convaiinnovations/laya   # or subfolder multilingual (decided in S1.5)
   subfolder: null

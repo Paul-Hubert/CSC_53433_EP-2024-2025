@@ -8,6 +8,10 @@ number of distinct observations small (cache-friendly); the text tells the brain
 cells each band covers (obs_text.py). Whether the nearest other animal of its species is
 ready to mate is seen up to `perception.partner_range` cells (the whole vision since
 2026-10-07; 4 before, so far partners were invisible).
+
+Stamina and carcasses (added later on 2026-10-07): both species sense their stamina (low,
+medium, high), predators the nearest carcass they may eat from. Both fields come last and
+default to None ("not sensed"): observations made before keep their text.
 """
 from __future__ import annotations
 
@@ -31,6 +35,7 @@ class Observation:
     animal_ready: bool | None = None     # only within perception.partner_range of the animal
     age: str = "adult"          # young | adult
     scale: tuple = DEFAULT_SCALE         # band edges and vision in cells, for the text
+    stamina: str | None = None  # low | medium | high (None: not sensed)
 
     species = "prey"            # class attribute, not a field
 
@@ -57,6 +62,8 @@ class PredatorObservation:
     animal_ready: bool | None = None     # only within perception.partner_range of the animal
     age: str = "adult"          # young | adult
     scale: tuple = DEFAULT_SCALE
+    stamina: str | None = None  # low | medium | high (None: not sensed)
+    carcass: str | None = None  # nearest carcass it may eat from: adjacent | close | medium | far | none
 
     species = "predator"
 
@@ -101,6 +108,22 @@ def mate_ready(a, sc) -> bool:
     return a.age >= sc.maturity and a.energy >= sc.mate_energy
 
 
+def stamina_level(a, sc) -> str:
+    return "low" if a.stamina < sc.stamina_low else "high" if a.stamina > sc.stamina_high else "medium"
+
+
+def edible_carcass(predator, world):
+    """(carcass, distance) of the nearest carcass this predator may eat from, or (None, None):
+    portions left, not its own kill, not eaten from yet."""
+    best, bd = None, None
+    for c in world.carcasses:
+        if c.edible_by(predator):
+            d = cheb(predator.y, predator.x, c.y, c.x)
+            if bd is None or d < bd:
+                best, bd = c, d
+    return best, bd
+
+
 def _nearest(agent, others):
     best, bd = None, None
     for b in others:
@@ -122,10 +145,12 @@ def sense(agent, world, prey, predators, cfg) -> Observation | PredatorObservati
     seen = animal != "none" and do <= int(cfg.perception.partner_range)
     ready = mate_ready(other, sc) if seen else None
     age = "young" if agent.age < sc.maturity else "adult"
+    stamina = stamina_level(agent, sc)
     if agent.species == "prey":
         nf = world.nearest_food(agent.y, agent.x, scale[-1])
         food = "none" if nf is None else "here" if nf[2] == 0 else band(nf[2], scale)
         dp = min((cheb(agent.y, agent.x, p.y, p.x) for p in predators), default=None)
-        return Observation(energy, food, band(dp, scale), animal, ready, age, scale)
+        return Observation(energy, food, band(dp, scale), animal, ready, age, scale, stamina)
     dq = min((cheb(agent.y, agent.x, b.y, b.x) for b in prey if not b.killed), default=None)
-    return PredatorObservation(energy, band(dq, scale), animal, ready, age, scale)
+    _, dc = edible_carcass(agent, world)
+    return PredatorObservation(energy, band(dq, scale), animal, ready, age, scale, stamina, band(dc, scale))

@@ -25,7 +25,7 @@ def test_flee_increases_distance(cfg, reg_pools):
     y, x = _open_cell(w)
     p = sim.predators[0]
     p.y, p.x = y, x + 2
-    a = Agent(999, y, x, 50.0, sim.agents[0].genome)
+    a = Agent(999, y, x, 50.0, sim.agents[0].genome, stamina=cfg.agents.stamina_max)
     before = cheb(a.y, a.x, p.y, p.x)
     do_flee(a, w, [a], [p], cfg, np.random.default_rng(0))
     assert cheb(a.y, a.x, p.y, p.x) > before
@@ -37,7 +37,7 @@ def test_eat_on_food_gains_energy(cfg):
     y, x = _open_cell(w)
     w.food[:] = False
     w.food[y, x] = True
-    a = Agent(999, y, x, 50.0, sim.agents[0].genome)
+    a = Agent(999, y, x, 50.0, sim.agents[0].genome, stamina=cfg.agents.stamina_max)
     do_eat(a, w, [a], [], cfg, np.random.default_rng(0))
     assert a.energy == 50.0 + cfg.agents.eat_gain and not w.food[y, x]
 

@@ -1,4 +1,4 @@
-"""Predators as genetic animals (rev. 2026-10-07): hunt, digest, breed, newcomers, equal speed."""
+"""Predators as genetic animals (rev. 2026-10-07): hunt, digest, breed, newcomers, speed."""
 import hashlib
 import json
 
@@ -23,16 +23,18 @@ def _alone(sim, prey_pos, pred_pos):
     return a, p
 
 
-def test_hunt_steps_strikes_and_feeds():
+def test_hunt_runs_strikes_and_feeds():
     cfg = load_config("small", SURE_KILL)
     sim = Simulation(cfg, RuleBasedBackend(), seed=1)
-    a, p = _alone(sim, (24, 20), (24, 23))
+    a, p = _alone(sim, (24, 20), (24, 25))
     p.energy = 30.0
     moved = do_hunt(p, sim.world, sim.agents, sim.predators, cfg, np.random.default_rng(0))
-    assert moved and cheb(a.y, a.x, p.y, p.x) == 2 and not a.killed      # one step, not next to it yet
-    do_hunt(p, sim.world, sim.agents, sim.predators, cfg, np.random.default_rng(0))
-    assert a.killed and a.killer == p.id and p.food_eaten == 1
+    assert moved == 2 and cheb(a.y, a.x, p.y, p.x) == 3 and not a.killed   # runs 2 cells, not next to it yet
+    moved = do_hunt(p, sim.world, sim.agents, sim.predators, cfg, np.random.default_rng(0))
+    assert moved == 2 and a.killed and a.killer == p.id and p.food_eaten == 1
     assert p.energy == 30.0 + cfg.predators.kill_gain and p.digest == cfg.predators.digest_ticks
+    [c] = sim.world.carcasses                                  # the kill leaves a carcass for others
+    assert (c.y, c.x) == (a.y, a.x) and c.portions == cfg.predators.carcass_portions == 2 and c.killer == p.id
 
 
 def test_hunt_without_prey_in_sight_searches():
@@ -134,20 +136,24 @@ def test_both_species_have_newcomers_below_their_floor():
     assert sim.cs["predator"].immigrants == cfg.predators.floor
 
 
-def test_everyone_moves_at_most_one_cell_per_tick():
-    """Same speed for both species: at most one cell (8 directions) per tick."""
+def test_moves_follow_speed_and_stamina():
+    """Prey move at most 1 cell per tick, predators 2 (running after prey); nobody moves more
+    cells than its stamina allows, and stamina stays within 0 and its maximum."""
     cfg = load_config("small")
     sim = Simulation(cfg, RuleBasedBackend(), seed=5)
-    moved = {"prey": 0, "predator": 0}
+    longest = {"prey": 0, "predator": 0}
     for _ in range(400):
-        before = {a.id: (a.y, a.x) for a in sim.agents + sim.predators}
+        before = {a.id: (a.y, a.x, a.stamina) for a in sim.agents + sim.predators}
         sim.step()
         for a in sim.agents + sim.predators:
             if a.id in before:
-                d = cheb(*before[a.id], a.y, a.x)
-                assert d <= 1, (a.species, d)
-                moved[a.species] += d
-    assert moved["prey"] and moved["predator"]
+                y, x, stamina = before[a.id]
+                d = cheb(y, x, a.y, a.x)
+                sc = cfg.agents if a.species == "prey" else cfg.predators
+                assert d <= sc.speed and d <= stamina, (a.species, d, stamina)
+                assert 0 <= a.stamina <= sc.stamina_max
+                longest[a.species] = max(longest[a.species], d)
+    assert longest == {"prey": 1, "predator": 2}
 
 
 def test_one_registry_holds_both_species(cfg):

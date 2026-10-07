@@ -3,7 +3,9 @@
 Deliberately simple and readable — students can see exactly how text becomes
 behaviour, and it is the fast reference for pipeline tests and control C5.
 Gibberish or neutral genes contribute nothing. Both species (rev. 2026-10-07): each has
-default logits and situation words of its own; the intensity words are shared.
+default logits and situation words of its own; the intensity words are shared. With stamina
+(later that day) an animal out of breath leans to rest, "tired" in a gene means out of breath
+(it meant low energy before), and a predator treats a carcass in sight like prey.
 """
 from __future__ import annotations
 
@@ -11,7 +13,7 @@ import re
 
 import numpy as np
 
-from ..perception import NEAR, Observation, PredatorObservation
+from ..perception import DIST, NEAR, Observation, PredatorObservation
 from ..species import SPECIES
 from .base import Query, batch_actions, normalise
 
@@ -27,14 +29,15 @@ ACTION_WORDS = {
     "eat": r"\b(eat|eating|food|feed|graze|forage)\b",
     "flee": r"\b(flee|run|escape|hide|danger|predator)\b",
     "follow": r"\b(follow|stay close|close to other|group|companion|herd|pack)\b",
-    "rest": r"\b(rest|sleep|stay still|lie still|wait|save energy|stop)\b",
+    "rest": r"\b(rest|sleep|stay still|lie still|wait|save energy|stop|catch (your|its) breath|recover)\b",
     "mate": r"\b(mate|partner|breed|offspring)\b",
-    "hunt": r"\b(hunt|hunting|chase|chasing|attack|kill|prey|strike|pounce|stalk)\b",
+    "hunt": r"\b(hunt|hunting|chase|chasing|attack|kill|prey|strike|pounce|stalk|carcass|carrion|scavenge|leftovers)\b",
 }
+TIRED = r"tired|out of breath|exhausted|winded"      # stamina low (low energy until stamina came in)
 CONDITIONS = {  # prey: phrase -> predicate on the observation
     r"hungry|starving|energy is low|low energy|weak": lambda o: o.energy == "low",
     r"energy is high|well fed|full|strong|fed": lambda o: o.energy == "high",
-    r"tired": lambda o: o.energy == "low",
+    TIRED: lambda o: o.stamina == "low",
     r"predator|danger|threat|attack(s|ed)? you": lambda o: o.predator != "none",
     r"very close|right next to you|too close": lambda o: o.predator in NEAR or o.animal in NEAR,
     r"food is (close|near)|food nearby": lambda o: o.food in ("here", *NEAR),
@@ -47,7 +50,8 @@ CONDITIONS = {  # prey: phrase -> predicate on the observation
 PREDATOR_CONDITIONS = {
     r"hungry|starving|energy is low|low energy|weak": lambda o: o.energy == "low",
     r"energy is high|well fed|full|strong|fed": lambda o: o.energy == "high",
-    r"tired": lambda o: o.energy == "low",
+    TIRED: lambda o: o.stamina == "low",
+    r"carcass|carrion|leftovers|remains": lambda o: o.carcass not in (None, "none"),
     r"prey is (close|near)|prey nearby|next to (the )?prey": lambda o: o.prey in NEAR,
     r"very close|right next to you|too close": lambda o: o.prey in NEAR or o.animal in NEAR,
     r"no prey|prey is (far|scarce)|nothing to hunt": lambda o: o.prey in ("none", "medium", "far"),
@@ -58,6 +62,13 @@ CONDITIONS_BY_SPECIES = {"prey": CONDITIONS, "predator": PREDATOR_CONDITIONS}
 ENERGY_PUSH = {"low": 1.5, "medium": 0.5, "high": -1.0}     # hungry animals look for food
 MATE_PULL = {"adjacent": 2.5, "close": 2.5, "medium": 1.5, "far": 1.0}   # a ready partner this far away
 FOLLOW_PULL = {"adjacent": -0.5, "close": -0.5, "medium": 0.3, "far": 0.3, "none": -2.5}   # both species
+CATCH_BREATH = {"low": 2.0, "medium": 0.3, "high": 0.0, None: 0.0}     # rest push by stamina (both species)
+
+
+def nearer(a: str, b: str | None) -> str:
+    """The nearer of two distance bands (None and "none" = nothing in sight)."""
+    order = DIST + ("none",)
+    return min(a, b or "none", key=order.index)
 
 
 def mate_logit(o: Observation | PredatorObservation) -> float:
@@ -77,16 +88,18 @@ def prey_logits(o: Observation) -> dict:
     l["flee"] = {"adjacent": 3.5, "close": 3.0, "medium": 1.0, "far": 0.0, "none": -3.0}[o.predator]
     l["follow"] = FOLLOW_PULL[o.animal]
     l["rest"] = -0.5 + (0.5 if o.energy == "high" and o.predator in ("none", "far") else 0.0)
+    l["rest"] += CATCH_BREATH[o.stamina]
     l["mate"] = mate_logit(o)
     return l
 
 
 def predator_logits(o: PredatorObservation) -> dict:
     l = dict.fromkeys(SPECIES["predator"].actions, 0.0)
+    food = nearer(o.prey, o.carcass)             # a carcass in sight counts like prey
     l["hunt"] = {"adjacent": 3.5, "close": 3.0, "medium": 2.0, "far": 1.0,
-                 "none": 1.5}[o.prey] + ENERGY_PUSH[o.energy]    # no prey in sight: hunting means searching
+                 "none": 1.5}[food] + ENERGY_PUSH[o.energy]      # nothing in sight: hunting means searching
     l["follow"] = FOLLOW_PULL[o.animal]
-    l["rest"] = -0.5 + (1.0 if o.energy == "high" else 0.0)
+    l["rest"] = -0.5 + (1.0 if o.energy == "high" else 0.0) + CATCH_BREATH[o.stamina]
     l["mate"] = mate_logit(o)
     return l
 

@@ -4,11 +4,14 @@ Actions:
 - eat: go to the nearest visible food and eat it
 - flee: run away from the nearest predator
 - follow: move toward the nearest other animal
-- rest: stay still to save energy
+- rest: stay still to catch your breath and save energy
 - mate: walk to the nearest ready partner in sight and breed with it
 If the chosen action has nothing to act on in sight (no food, predator, animal or
 ready partner), the animal searches the surroundings instead.
-Animals and predators move at the same speed: at most one cell per step.
+Animals move one cell per step. Predators run two cells per step when they
+hunt, but they have half an animal's stamina, so a long chase tires them first.
+Every cell moved costs stamina. Standing still brings it back, which costs some
+energy until stamina is full. Without stamina an animal cannot move.
 Breeding needs only one of the two to choose mate: an adult that chooses mate
 breeds as soon as it reaches a ready partner, whatever the partner is doing.
 

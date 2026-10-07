@@ -2,8 +2,13 @@
 predators are both genetic animals (genes, brain, energy, breeding, mutation).
 
 Each tick: decide every D ticks (newcomers at once; one backend batch per species), prey act
-and breed, predators act (a hunt can kill a prey animal) and breed, deaths (killed,
-starvation, old age), food regrowth, newcomers for each species below its floor.
+and breed, predators act (a hunt can kill a prey animal or eat from a carcass) and breed,
+deaths (killed, starvation, old age), food regrowth, carcasses rot, newcomers for each
+species below its floor.
+
+Stamina (since 2026-10-07): each cell moved costs one point of stamina and energy
+(cost_move); a tick without moving brings stamina back (stamina_regen), which costs extra
+energy (cost_regen) until stamina is full.
 
 The backend is only called for (species, genome, observation) triples not yet seen in this
 run; identical situations reuse the stored distribution (big speed-up with an LLM brain).
@@ -31,6 +36,13 @@ from .species import PREDATOR, PREY, SPECIES, Species, species_cfg
 from .world import World, cheb
 
 
+def _recover(a, sc) -> None:
+    """A tick without moving brings stamina back; until it is full that costs extra energy."""
+    if a.stamina < sc.stamina_max:
+        a.stamina = min(float(sc.stamina_max), a.stamina + sc.stamina_regen)
+        a.energy -= sc.cost_regen
+
+
 @dataclass(eq=False)
 class Agent:
     id: int
@@ -51,7 +63,8 @@ class Agent:
     immigrant: bool = False
     killed: bool = False
     killer: int | None = None    # the predator that killed this prey animal
-    digest: int = 0              # predators: ticks left digesting a kill (no decision, no move)
+    digest: int = 0              # predators: ticks left digesting a meal (no decision, no move)
+    stamina: float = 0.0         # cells it can move before it must stop; the simulation starts it full
 
     @property
     def species(self) -> str:
@@ -64,6 +77,8 @@ class Counters:
     backend_queries: int = 0
     memo_hits: int = 0
     invalid: int = 0
+    animal_ticks: int = 0        # one per living animal per tick
+    exhausted: int = 0           # animal-ticks that began without stamina to move a cell
     births: int = 0
     immigrants: int = 0
     deaths: Counter = field(default_factory=Counter)
@@ -133,7 +148,8 @@ class Simulation:
 
     def _new_agent(self, y, x, energy, genome, generation=0, parents=()) -> Agent:
         a = Agent(self.next_id, y, x, float(energy), genome, generation, parents, born=self.t,
-                  heading=int(self._rng(genome.sp).integers(8)))
+                  heading=int(self._rng(genome.sp).integers(8)),
+                  stamina=float(species_cfg(self.cfg, genome.sp).stamina_max))
         self.next_id += 1
         self.members(genome.sp).append(a)
         return a
@@ -178,7 +194,7 @@ class Simulation:
     # --- decisions -----------------------------------------------------------
     def decide(self, agents: list[Agent] | None = None) -> None:
         """Choose actions for `agents` (default: every living animal), one backend batch per
-        species. A predator digesting a kill doesn't decide."""
+        species. A predator digesting a meal doesn't decide."""
         for sp in (PREY, PREDATOR):
             group = self.members(sp) if agents is None else [a for a in agents if a.species == sp.name]
             group = [a for a in group if a.digest == 0]
@@ -254,6 +270,7 @@ class Simulation:
                 gone = {id(a) for a, _ in dead}
                 self._set_members(sp, [a for a in self.members(sp) if id(a) not in gone])
         self.world.regrow_food(self.rng_food)
+        self.world.age_carcasses()
         for sp in (PREY, PREDATOR):
             while len(self.members(sp)) < int(species_cfg(cfg, sp).floor):
                 self._spawn_founder(sp, immigrant=True)
@@ -265,20 +282,26 @@ class Simulation:
         sc, c, members = species_cfg(self.cfg, sp), self.cs[sp.name], self.members(sp)
         for i in self.rng_act.permutation(len(members)):
             a = members[i]
-            if a.digest > 0:                     # digesting a kill: stays still, decides again when done
+            c.animal_ticks += 1
+            if a.stamina < 1:
+                c.exhausted += 1                 # out of breath: can't move this tick
+            if a.digest > 0:                     # digesting a meal: stays still, decides again when done
                 a.digest -= 1
                 if a.digest == 0:
                     a.action = None
                 a.energy -= sc.cost_rest
+                _recover(a, sc)
                 continue
             was_invalid = a.invalid
             moved = EXECUTORS[a.action](a, self.world, self.agents, self.predators, self.cfg, self.rng_act)
             if a.invalid and not was_invalid:
                 c.invalid += 1
-            if a.action == "rest" and not moved:
-                a.energy -= sc.cost_rest
+            if moved:                            # each cell costs energy and a point of stamina
+                a.energy -= sc.cost_base + sc.cost_move * moved
+                a.stamina -= moved
             else:
-                a.energy -= sc.cost_base + (sc.cost_move if moved else 0.0)
+                a.energy -= sc.cost_rest if a.action == "rest" else sc.cost_base
+                _recover(a, sc)
 
     def _breed(self, sp: Species) -> None:
         sc = species_cfg(self.cfg, sp)
@@ -311,12 +334,16 @@ class Simulation:
             n = len(ms)
             row.update({f"{pre}pop": n,
                         f"{pre}mean_energy": round(float(np.mean([a.energy for a in ms])) if n else 0.0, 2),
+                        f"{pre}mean_stamina": round(float(np.mean([a.stamina for a in ms])) if n else 0.0, 2),
+                        f"{pre}exhausted": c.exhausted,
                         f"{pre}mean_gen": round(float(np.mean([a.generation for a in ms])) if n else 0.0, 2),
                         f"{pre}max_gen": max((a.generation for a in ms), default=0),
                         f"{pre}births": c.births, f"{pre}immigrants": c.immigrants,
                         f"{pre}deaths_starve": c.deaths["starvation"]})
             if sp.name == "prey":
                 row["deaths_pred"] = c.deaths["predator"]          # prey killed by predators
+            else:
+                row["pred_portions"] = self.world.portions_eaten   # carcass portions eaten
             row.update({f"{pre}deaths_age": c.deaths["old_age"], f"{pre}decisions": c.decisions,
                         f"{pre}backend_queries": c.backend_queries, f"{pre}invalid": c.invalid})
             if sp.name == "prey":
@@ -362,12 +389,14 @@ class Simulation:
                 "memo_hit_rate": round(c.memo_hits / max(1, c.decisions), 3),
                 "backend_s": round(c.backend_time, 2),
                 "invalid_rate": round(c.invalid / max(1, c.decisions), 3),
+                "exhausted_share": round(c.exhausted / max(1, c.animal_ticks), 3),
                 "action_share": {k: round(v / max(1, c.decisions), 3) for k, v in c.actions.most_common()}}
 
     def summary(self) -> dict:
         """Prey figures at the top level (as before 2026-10-07), predators under "predators"."""
         pred = self._species_summary(PREDATOR)
         pred["kills"] = self.c.deaths["predator"]
+        pred["portions"] = self.world.portions_eaten                # carcass portions eaten
         return {"ticks": self.t, "seed": self.seed, "backend": getattr(self.backend, "name", "?"),
                 **self._species_summary(PREY),
                 "predators": pred,

@@ -162,13 +162,14 @@ def main() -> None:
         print(f"stopped at t={sim.t} ({why}). To resume, run the same command again: "
               "the part already done replays from the cache.")
     keep = {k: s[k] for k in ("ticks", "pop_final", "births", "immigrants", "deaths",
-                              "mean_lifespan", "max_gen", "memo_hit_rate", "invalid_rate",
+                              "mean_lifespan", "max_gen", "memo_hit_rate", "invalid_rate", "exhausted_share",
                               "backend_s", "alleles", "mutations")}
     print("prey:", json.dumps(keep))
     print("prey actions:", s["action_share"])
     pr = s["predators"]
     print("predators:", json.dumps({k: pr[k] for k in ("pop_final", "births", "immigrants", "deaths", "kills",
-                                                       "mean_lifespan", "max_gen", "memo_hit_rate", "invalid_rate")}))
+                                                       "portions", "mean_lifespan", "max_gen", "memo_hit_rate",
+                                                       "invalid_rate", "exhausted_share")}))
     print("predator actions:", pr["action_share"])
     if hasattr(backend, "calls"):
         print(f"llm_calls={backend.calls} failures={getattr(backend, 'failures', 0)} "

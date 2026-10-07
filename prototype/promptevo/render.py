@@ -5,7 +5,7 @@ from .world import MOUNTAIN, WATER
 
 ACTION_CHAR = {"eat": "E", "flee": "F", "follow": "L", "rest": "R", "mate": "M"}
 LEGEND = ("animals by current action: E eat, F flee, L follow, R rest, M mate, ? not decided yet | "
-          "P predator | . food | ~ water | ^ mountain")
+          "P predator | x carcass | . food | ~ water | ^ mountain")
 
 
 def ascii_map(world, agents=(), predators=(), max_w: int = 48, max_h: int = 24) -> str:
@@ -26,6 +26,8 @@ def ascii_map(world, agents=(), predators=(), max_w: int = 48, max_h: int = 24) 
                 ch = " "
             row.append(ch)
         grid.append(row)
+    for c in world.carcasses:
+        grid[c.y // sy][c.x // sx] = "x"
     for a in agents:
         grid[a.y // sy][a.x // sx] = ACTION_CHAR.get(a.action, "?")
     for p in predators:
