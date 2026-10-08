@@ -127,3 +127,13 @@ def test_mutator_goes_through_openai_client_at_its_own_host():
 def test_mutator_ollama_api_uses_mutator_host():
     cfg = load_config("small", {"mutator": {"api": "ollama", "host": "http://other:11434"}})
     assert mutator_client(cfg).host == "http://other:11434"
+
+
+def test_gate_runs_on_the_jev_backend(cfg):
+    from experiments.teacher_gate import run_gate
+    log = []
+    b = backend(jev_model(log))
+    results, agreement = run_gate(cfg, None, ["jev"], 12, 1, None, b.model.id, logs=False, make=lambda m: b)
+    r = results["jev"]
+    assert r["calls"] > 0 and len(log) == b.calls and r["failures"] == r["calls"]   # fake prompts count as too long
+    assert r["sign_acc"] > 0.9 and agreement is None

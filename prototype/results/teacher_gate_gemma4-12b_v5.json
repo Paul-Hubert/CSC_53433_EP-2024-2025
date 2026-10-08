@@ -1,0 +1,64 @@
+{
+ "model": "gemma4:12b",
+ "prompt": "prompts/teacher_v5.md",
+ "results": {
+  "points": {
+   "n_genomes": 31,
+   "n_obs": 12,
+   "calls": 372,
+   "mi_g_founders": 0.2388957903713137,
+   "mi_g_random": 0.26529705042101837,
+   "mi_o_founders": 0.7870019944101541,
+   "directed": {
+    "eat": {
+     "mean_dp": 0.2070870505341388,
+     "sign_acc": 0.875,
+     "n": 8
+    },
+    "flee": {
+     "mean_dp": 0.5247351339945268,
+     "sign_acc": 1.0,
+     "n": 10
+    },
+    "follow": {
+     "mean_dp": 0.4703282904507202,
+     "sign_acc": 0.9,
+     "n": 10
+    },
+    "rest": {
+     "mean_dp": 0.5481442209875808,
+     "sign_acc": 0.9166666666666666,
+     "n": 12
+    },
+    "mate": {
+     "mean_dp": 0.46474764241489874,
+     "sign_acc": 0.7,
+     "n": 10
+    }
+   },
+   "sign_acc": 0.88,
+   "mean_dp": 0.44300846767637303,
+   "locality": {
+    "median_edit": NaN,
+    "median_unrelated": NaN,
+    "ratio": NaN
+   },
+   "rho_text_behaviour": NaN,
+   "gibberish_to_neutral": 0.11506958763897242,
+   "founder_to_neutral": 0.0967946311212973,
+   "approx_probs": 0,
+   "gates": {
+    "G1": true,
+    "G2": false,
+    "G3": false
+   },
+   "failures": 0,
+   "gate": {
+    "directed": true,
+    "mi_margin": false,
+    "pass": false
+   }
+  }
+ },
+ "agreement": null
+}

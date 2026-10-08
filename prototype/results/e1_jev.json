@@ -1,0 +1,55 @@
+{
+ "n_genomes": 109,
+ "n_obs": 48,
+ "calls": 5232,
+ "mi_g_founders": 0.1352095933359868,
+ "mi_g_random": 0.010530800688371091,
+ "mi_o_founders": 0.9776948674539266,
+ "directed": {
+  "eat": {
+   "mean_dp": 0.2925553247703315,
+   "sign_acc": 1.0,
+   "n": 39
+  },
+  "flee": {
+   "mean_dp": 0.19261921664838771,
+   "sign_acc": 1.0,
+   "n": 34
+  },
+  "follow": {
+   "mean_dp": 0.5720439774300152,
+   "sign_acc": 1.0,
+   "n": 39
+  },
+  "rest": {
+   "mean_dp": 0.3420284044614052,
+   "sign_acc": 1.0,
+   "n": 48
+  },
+  "mate": {
+   "mean_dp": 0.36830482806124043,
+   "sign_acc": 1.0,
+   "n": 38
+  }
+ },
+ "sign_acc": 1.0,
+ "mean_dp": 0.353510350274276,
+ "locality": {
+  "median_edit": 0.005490247805511484,
+  "median_unrelated": 0.052315770728054156,
+  "ratio": 0.1049444121553839
+ },
+ "rho_text_behaviour": 0.3872773525818509,
+ "gibberish_to_neutral": 0.012626155167028103,
+ "founder_to_neutral": 0.05598825109237334,
+ "approx_probs": 0,
+ "gates": {
+  "G1": true,
+  "G2": false,
+  "G3": true
+ },
+ "tag": "jev",
+ "backend": "jev",
+ "placement": null,
+ "style": null
+}

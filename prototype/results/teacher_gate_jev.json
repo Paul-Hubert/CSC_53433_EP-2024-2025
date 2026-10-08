@@ -1,0 +1,64 @@
+{
+ "model": "autotrust/JEV-9B@b63f651ce8ed:/root/.cache/huggingface/hub/models--autotrust--JEV-9B/snapshots/b63f651ce8ed64481d3f5e73ecdb05f740042f01/adapter_vllm",
+ "prompt": "prompts/teacher_v5.md",
+ "results": {
+  "jev": {
+   "n_genomes": 31,
+   "n_obs": 12,
+   "calls": 372,
+   "mi_g_founders": 0.14336008354942426,
+   "mi_g_random": 0.013761035845771928,
+   "mi_o_founders": 0.9426065139197959,
+   "directed": {
+    "eat": {
+     "mean_dp": 0.3368632070164962,
+     "sign_acc": 1.0,
+     "n": 8
+    },
+    "flee": {
+     "mean_dp": 0.17733692903445517,
+     "sign_acc": 1.0,
+     "n": 10
+    },
+    "follow": {
+     "mean_dp": 0.6017047069015341,
+     "sign_acc": 1.0,
+     "n": 10
+    },
+    "rest": {
+     "mean_dp": 0.34141746514568566,
+     "sign_acc": 1.0,
+     "n": 12
+    },
+    "mate": {
+     "mean_dp": 0.4234764754531678,
+     "sign_acc": 1.0,
+     "n": 10
+    }
+   },
+   "sign_acc": 1.0,
+   "mean_dp": 0.3761597567102678,
+   "locality": {
+    "median_edit": NaN,
+    "median_unrelated": NaN,
+    "ratio": NaN
+   },
+   "rho_text_behaviour": NaN,
+   "gibberish_to_neutral": 0.010227022474382199,
+   "founder_to_neutral": 0.055844972857363825,
+   "approx_probs": 0,
+   "gates": {
+    "G1": true,
+    "G2": false,
+    "G3": false
+   },
+   "failures": 0,
+   "gate": {
+    "directed": true,
+    "mi_margin": true,
+    "pass": true
+   }
+  }
+ },
+ "agreement": null
+}

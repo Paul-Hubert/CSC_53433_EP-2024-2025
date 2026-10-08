@@ -1,6 +1,7 @@
 """Decision-model gate (was S4.3 "teacher gate"): does the LLM brain read the genes?
 
     python -m experiments.teacher_gate [--modes points,table] [--n-obs 24] [--workers 4] [--model TAG]
+    python -m experiments.teacher_gate --backend jev [--n-obs 12]     (JEV-9B on jev.host, rev. 2026-10-08)
 
 Since rev. 2026-09-30 the LLM is the decision backend itself, so this gate is the
 main G1/G2 check (plan §A2), per mode. "table" is the cheap simulation mode; the
@@ -55,7 +56,8 @@ def gate(res: dict) -> dict:
     return {"directed": ok_dir, "mi_margin": ok_mi, "pass": ok_dir and ok_mi}
 
 
-def run_gate(cfg, client, modes, n_obs, workers, prompt, model, logs=True, obs=None):
+def run_gate(cfg, client, modes, n_obs, workers, prompt, model, logs=True, obs=None, make=None):
+    """make(mode) -> backend replaces the Ollama teacher (e.g. the JEV backend; mode is then a label)."""
     rng = np.random.default_rng(cfg.seed)
     reg = AlleleRegistry()
     pools = AllelePools(reg, cfg.paths.data_dir)
@@ -63,11 +65,12 @@ def run_gate(cfg, client, modes, n_obs, workers, prompt, model, logs=True, obs=N
     sets = build_sets(cfg, reg, pools, rng, dict(founders=10, random=10, edit_parents=0, edits=0))
     results, Ps = {}, {}
     for mode in modes:
-        b = TeacherBackend(client, model, prompt, mode=mode, style=cfg.backend.obs_style,
-                           k=int(cfg.ollama.ksample_k), workers=workers, table_k=int(cfg.policy.table_k))
+        b = make(mode) if make else TeacherBackend(client, model, prompt, mode=mode, style=cfg.backend.obs_style,
+                                                   k=int(cfg.ollama.ksample_k), workers=workers,
+                                                   table_k=int(cfg.policy.table_k))
         prog = Progress(resolve(cfg.paths.logs_dir), f"teacher_gate_{mode}") if logs else None
         res, P, _ = evaluate(b, reg, sets, obs, prog, chunk=16)
-        res["failures"] = b.failures
+        res["failures"] = getattr(b, "failures", 0) + getattr(b, "too_long", 0)
         res["gate"] = gate(res)
         results[mode], Ps[mode] = res, P
         if prog:
@@ -86,15 +89,23 @@ def main() -> None:
     ap.add_argument("--workers", type=int, default=1)
     ap.add_argument("--model", default=None)
     ap.add_argument("--prompt", default="prompts/teacher_v5.md")
+    ap.add_argument("--backend", default="llm", help="llm (Ollama, --model) | jev (jev.host, policy.prompt)")
+    ap.add_argument("--tag", default=None, help="results/teacher_gate_<tag>.md (default: teacher_gate.md)")
     a = ap.parse_args()
     cfg = load_config(a.profile)
-    model = a.model or cfg.policy.model or cfg.ollama.teacher_model
-    if not model:
-        raise SystemExit("set policy.model in configs/base.yaml or pass --model")
-    client = client_from_config(cfg)
-    modes = a.modes.split(",")
-    results, agreement = run_gate(cfg, client, modes, a.n_obs, a.workers, resolve(a.prompt), model)
-    lines = [f"# Teacher gate — {model} ({a.prompt}, digest {client.digest(model)})", ""]
+    if a.backend == "jev":
+        from promptevo.backends.factory import make_backend
+        jev = make_backend("jev", cfg)
+        model, client, modes, make = jev.model.id, None, ["jev"], (lambda mode: jev)
+        title = f"# Decision gate — JEV {model} ({cfg.policy.prompt}, template bare-v1)"
+    else:
+        model = a.model or cfg.policy.model or cfg.ollama.teacher_model
+        if not model:
+            raise SystemExit("set policy.model in configs/base.yaml or pass --model")
+        client, modes, make = client_from_config(cfg), a.modes.split(","), None
+        title = f"# Teacher gate — {model} ({a.prompt}, digest {client.digest(model)})"
+    results, agreement = run_gate(cfg, client, modes, a.n_obs, a.workers, resolve(a.prompt), model, make=make)
+    lines = [title, ""]
     lines.append("| mode | sign acc | ΔP | MI_G founders | MI_G random | MI_O | failures | pass |")
     lines.append("|---|---|---|---|---|---|---|---|")
     for m, r in results.items():
@@ -105,8 +116,9 @@ def main() -> None:
     for m, r in results.items():
         lines += [""] + report_lines(r, f"Detail — {m}")[4:]
     out = resolve(cfg.paths.results_dir)
-    (out / "teacher_gate.md").write_text("\n".join(lines) + "\n")
-    (out / "teacher_gate.json").write_text(json.dumps({"model": model, "prompt": a.prompt,
+    name = f"teacher_gate_{a.tag}" if a.tag else "teacher_gate"
+    (out / f"{name}.md").write_text("\n".join(lines) + "\n")
+    (out / f"{name}.json").write_text(json.dumps({"model": model, "prompt": a.prompt,
                                                         "results": results, "agreement": agreement},
                                                        indent=1, default=float))
     print("\n".join(lines[:4 + len(results) + (2 if agreement is not None else 0)]))

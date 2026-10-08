@@ -112,3 +112,8 @@ uniform 1/7 distribution → likely inflates MI_G random (G2). Candidate fix (ne
 all-zero as "no effect" → use the neutral genome's answer for that situation. Speed with a free
 GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were never cached
 (empty-KVCache bug, fixed ed485c5).
+
+## From STATUS 2026-10-08: gate 2026-10-01 (points, --n-obs 12, 420 calls)
+| gemma4:26b | sign acc 0.99 | ΔP 0.62 | MI_G founders 0.244 | MI_G random 0.314 | gib/founder→neutral 0.20 / 0.13 | G1 ✔ | G2 ✘ |
+Both gemma4 sizes read directed genes well, but irrelevant/shuffled text moved behaviour as much as founder
+genes (gate wants founders ≥ 2× random). Control texts contain world words (mountains, river, bread...).

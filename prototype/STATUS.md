@@ -9,16 +9,15 @@ small edits of the rule; word list and word-change limit removed on request, mea
 
 ## Next action
 JEV brain ready (2026-10-08, owner): `docker compose -f docker/compose.yaml up -d jev`, then `--backend jev`;
-mutator qwen3.5:0.8b on the CPU (Ollama). To do: batching (owner: later), JEV gate/E1 vs gemma4, long JEV run.
+mutator qwen3.5:0.8b on the CPU (Ollama). To do: batching (owner: later), long JEV run (gate, E1, 1 000-tick test done: Gate results).
 Mutation v4 2026-10-08: context line + 7 instructions (mutate_v4.txt), redraws; word list + change limit removed
 (owner). Long LLM run with v4 stopped by the owner at t 7 000 (Key numbers); not yet written up in 06/09. To
 continue it: the same command (Background jobs) replays from the cache. WAIT for owner
 (../Docs/prompt-genome/09 §4): #10 keep the values (predators at their cap with both brains) or let food limit
 them; cost ≈ 12 calls per tick (5 000 ticks ≈ 6.5 h); G2 handling
 (all-zero answers → neutral answer? cleaner control sentences? prompt iteration 1/3?); founder pools H1
-(prey v2 + predator v2). Then longer LLM runs with both species + `gene_timeline --species prey|predator`. Rerun
-`python -m experiments.teacher_gate --modes points --n-obs 12 --model gemma4:12b` (teacher_v5 + obs v2: new
-answers, ≈ 420 calls), then E1 on the LLM brain in the background:
+(prey v2 + predator v2). Then longer LLM runs with both species + `gene_timeline --species prey|predator`. Gate rerun
+on gemma4:12b with teacher_v5 + obs v2 done 2026-10-08 (`--tag gemma4-12b_v5`, Gate results); then E1 on the LLM brain in the background:
 `nohup python -m experiments.e1_sensitivity --backend llm --tag llm_points > logs/e1_llm.log 2>&1 &`
 (≈ 5 500 decisions, ≈ 50 min). Then several-seed LLM runs on the Lab 1 world (S6 prep).
 
@@ -63,15 +62,15 @@ showed as DEAD? → fixed (OpenProcess + GetExitCodeProcess).
 ## FT facts
 (S5.1)
 
-## Gate results 2026-10-01 (points, --n-obs 12, 420 calls each; results/teacher_gate_gemma4-*.md)
-| model | sign acc | ΔP | MI_G founders | MI_G random | gib→neutral / founder→neutral | G1 | G2 |
+## Gate results (points, --n-obs 12, same 35 genomes x 12 situations; results/teacher_gate_<tag>.md)
+| brain | sign acc | ΔP | MI_G founders | MI_G random | gib→neutral / founder→neutral | G1 | G2 |
 |---|---|---|---|---|---|---|---|
-| gemma4:12b | 0.96 | 0.75 | 0.250 | 0.297 | 0.16 / 0.23 | ✔ | ✘ |
-| gemma4:26b | 0.99 | 0.62 | 0.244 | 0.314 | 0.20 / 0.13 | ✔ | ✘ |
-Both read directed genes well, but irrelevant/shuffled text moves behaviour as much as founder
-genes (gate wants founders ≥ 2× random). Control texts contain world words (mountains, river,
-bread...). Owner decision needed before prompt iteration (≤ 3 tries) or gate change.
-Point totals, all-zero answers (likely inflate MI_G random; fix needs owner OK), speed: notes/archive.md.
+| gemma4:12b 10-01 (older prompt/obs) | 0.96 | 0.75 | 0.250 | 0.297 | 0.16 / 0.23 | ✔ | ✘ |
+| gemma4:12b 10-08 teacher_v5 + obs v2 (`gemma4-12b_v5`) | 0.88 | 0.44 | 0.239 | 0.265 | 0.115 / 0.097 | ✔ | ✘ |
+| JEV-9B FP8 10-08 (`--backend jev --tag jev`, 26 s) | 1.00 | 0.38 | 0.143 | 0.014 | 0.010 / 0.056 | ✔ | ✘ MI_G < 0.25 |
+E1 JEV (results/e1_jev.md, 5 232 decisions, 6 min): sign acc 1.00, ΔP 0.35, MI_G 0.135 / random 0.011, MI_O 0.98, gib / founder→neutral 0.013 / 0.056, locality 0.10, ρ 0.39 → G1 ✔ G3 ✔ G2 ✘ only on MI_G ≥ 0.25. JEV ignores irrelevant text (gemma's G2 failure; the 2× margin passes) but genes move it less than situations do.
+gemma4 mate sign acc 0.70, eat 0.88. 10-01 gemma4:26b row, point totals, all-zero answers: notes/archive.md.
+JEV run test (results/runs/jev_test, 96 x 96, seed 1234, 1 000 ticks): 7.6 min = 0.46 s/tick (gemma ≈ 4 s/tick), 6 396 calls, 0 failures, 21 mutations; t 1 000 prey 20 / predators 10 (gemma run: 40 / 32). Ran on top of another session's uncommitted sim/world/perception/actions edits.
 
 ## Decisions
 | Date | Decision | Why |
