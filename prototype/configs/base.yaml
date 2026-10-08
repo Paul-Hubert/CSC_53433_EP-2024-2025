@@ -80,7 +80,7 @@ evolution:
   p_mut: 0.03                 # chance per gene per child that the mutator LLM changes it
   shuffled: false             # C3 control
   random_founders: false      # C4 control
-  # Mutation (rev. 2026-10-02): one operator. The mutator LLM (ollama.mutator_model) gets one
+  # Mutation (rev. 2026-10-02): one operator. The mutator LLM (mutator.model) gets one
   # instruction drawn at random from this file plus the gene sentence, nothing else.
   # Rev. 2026-10-08: small edits of the rule (v4; v2 = random word edits) after a fixed context line.
   mutation_prompts: prompts/mutate_v4.txt
@@ -89,7 +89,7 @@ evolution:
   max_words: 12               # guard: longer answers are rejected
   mutation_tries: 5           # a rejected answer is drawn again (new instruction and seed), up to 5 attempts
 backend:
-  name: rule_based            # random | rule_based | llm | laya (parked)
+  name: rule_based            # random | rule_based | llm | jev | laya (parked)
   obs_style: V1
 policy:                       # LLM decision backend (default brain, rev. 2026-09-30)
   model: gemma4:12b           # chosen 2026-10-01 (gate 12b vs 26b, local RTX 5080); or a cloud model tag
@@ -100,6 +100,25 @@ policy:                       # LLM decision backend (default brain, rev. 2026-0
   workers: 2                  # parallel requests (match OLLAMA_NUM_PARALLEL / cloud limits)
   prompt: prompts/teacher_v5.md            # prey
   predator_prompt: prompts/predator_v3.md
+jev:                          # --backend jev (rev. 2026-10-08): JEV-9B System 1 (LoRA + 24-slot head) served by
+                              # vLLM (docker/compose.yaml); one prefill pass per decision; reads policy.prompt /
+                              # policy.predator_prompt
+  host: http://localhost:8000 # OpenAI-compatible server (any machine: change only this)
+  served_model: jev-decision  # the LoRA module name given to vLLM (--lora-modules)
+  repo: autotrust/JEV-9B      # NOT prithivMLmods/JEV-9B-GGUF: those files are the bare Qwen3.5-9B backbone
+  revision: b63f651ce8ed64481d3f5e73ecdb05f740042f01   # pinned 2026-10-08 (decision_head.json, calibration.json)
+  max_tokens: 1024            # training length; longer inputs are counted (too_long), not cut
+  timeout_s: 60
+  api_key_env: null           # name of an env var holding a key, if the server needs one
+mutator:                      # gene mutation (rev. 2026-10-08): a small model; mutations are meant to be random
+  api: ollama                 # ollama | openai (an OpenAI-compatible server, e.g. vLLM)
+  host: http://localhost:11434   # its own address, independent of jev.host
+  model: qwen3.5:0.8b         # null = no mutation (before 2026-10-08: gemma4:12b on the GPU)
+  timeout_s: 60
+  api_key_env: null
+  options: {num_gpu: 0, num_ctx: 1024}   # ollama: on the CPU, the GPU is JEV's (FP8 needs nearly all of it)
+  think: false                # ollama: Qwen3.5 thinks by default
+  extra: {chat_template_kwargs: {enable_thinking: false}}   # openai: sent with every request
 laya:
   checkpoint: convaiinnovations/laya   # or subfolder multilingual (decided in S1.5)
   subfolder: null
@@ -111,7 +130,6 @@ ollama:
   host: http://localhost:11434   # or https://ollama.com (direct cloud API, needs a key)
   api_key_env: OLLAMA_API_KEY    # name of the env var holding the key; sent only if set
   teacher_model: null         # chosen in S1.3
-  mutator_model: gemma4:12b   # gene mutation (same model as the brain: no swaps); null = no mutation
   embed_model: null
   teacher_mode: points        # points | ksample
   ksample_k: 8

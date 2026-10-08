@@ -5,7 +5,7 @@
     python -m experiments.e1_sensitivity --backend llm --tag llm_table     (LLM brain; needs policy.model)
 
 Writes results/e1_<tag>.json + .md and prints a ≤ 20-line summary with G1–G3.
-The single-gene edits for G3 come from the mutator LLM (ollama.mutator_model); without a
+The single-gene edits for G3 come from the mutator LLM (mutator.model); without a
 reachable mutator the edits are skipped and G3 is not measured.
 Long runs: launch with nohup; progress in logs/e1_<tag>.progress.json.
 """

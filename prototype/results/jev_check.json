@@ -1,0 +1,55 @@
+{
+ "info": {
+  "model": "autotrust/JEV-9B@b63f651ce8ed:/root/.cache/huggingface/hub/models--autotrust--JEV-9B/snapshots/b63f651ce8ed64481d3f5e73ecdb05f740042f01/adapter_vllm",
+  "host": "http://localhost:8000",
+  "prompts": {
+   "prey": "teacher_v5.md:ad9d045e",
+   "predator": "predator_v3.md:abacaf75"
+  },
+  "template": "bare-v1",
+  "temperature_choice": 0.9840233476014968
+ },
+ "n": 60,
+ "seconds": 4.997516393661499,
+ "too_long": 0,
+ "argmax_share": [
+  0.38333333333333336,
+  0.18333333333333332,
+  0.08333333333333333,
+  0.06666666666666667,
+  0.2833333333333333
+ ],
+ "contrast": {
+  "eat": [
+   0.19424059003026997,
+   0.0895106061624556
+  ],
+  "flee": [
+   0.4008611571236522,
+   0.16127093059002898
+  ],
+  "follow": [
+   0.334338223349242,
+   0.04402486431419996
+  ],
+  "rest": [
+   0.41801223722318825,
+   0.100235885004705
+  ],
+  "mate": [
+   0.5552360417287374,
+   0.1863687425890145
+  ]
+ },
+ "mutator": {
+  "model": "qwen3.5:0.8b",
+  "s_per_call": 0.8151016235351562,
+  "samples": [
+   "Avoid running when a predator is close.",
+   "Change to **Run if a predator is present**.",
+   "Run away when you are **close** to a predator.",
+   "\"Never run, if a predator is close.\"",
+   "\"Approach predators safely.\""
+  ]
+ }
+}

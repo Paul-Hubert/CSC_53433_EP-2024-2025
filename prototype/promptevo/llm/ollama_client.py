@@ -129,20 +129,21 @@ class OllamaClient:
         return emb
 
 
-def client_from_config(cfg, transport: Transport | None = None) -> OllamaClient:
-    """The one place scripts build a client: host, API key (env), sqlite cache, timeout."""
+def client_from_config(cfg, transport: Transport | None = None, host: str | None = None) -> OllamaClient:
+    """The one place scripts build a client: host (default ollama.host), API key (env), sqlite cache, timeout."""
     from ..cache import KVCache
     from ..config import resolve
     oc = cfg.ollama
     env = oc.get("api_key_env")
     key = os.environ.get(env) if env else None
-    return OllamaClient(oc.host, KVCache(resolve(cfg.paths.cache_dir) / "ollama.sqlite"),
+    return OllamaClient(host or oc.host, KVCache(resolve(cfg.paths.cache_dir) / "ollama.sqlite"),
                         oc.timeout_s, transport=transport, api_key=key or None,
                         options=dict(oc.get("options") or {}), think=oc.get("think"))
 
 
-def make_rewriter(client: OllamaClient, model: str, temperature: float = 1.0):
-    """Return llm(prompt, seed) -> str for evolution.mutation.Mutator: one cached chat call."""
+def make_rewriter(client, model: str, temperature: float = 1.0):
+    """Return llm(prompt, seed) -> str for evolution.mutation.Mutator: one cached chat call
+    (OllamaClient or OpenAIClient: same chat signature)."""
     def ask(prompt: str, seed: int) -> str:
         return client.chat(model, [{"role": "user", "content": prompt}],
                            options={"seed": int(seed), "temperature": float(temperature)})

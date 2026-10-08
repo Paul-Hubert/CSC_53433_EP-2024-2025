@@ -5,9 +5,11 @@
 
 ## Position
 Session: S1.3 done locally, S4.3 gate run · Last updated: 2026-10-08 (stamina + speed + carcasses; mutation v3:
-small edits of the rule; word list and word-change limit removed on request, measured)
+small edits of the rule; word list and word-change limit removed on request, measured; JEV brain + CPU mutator)
 
 ## Next action
+JEV brain ready (2026-10-08, owner): `docker compose -f docker/compose.yaml up -d jev`, then `--backend jev`;
+mutator qwen3.5:0.8b on the CPU (Ollama). To do: batching (owner: later), JEV gate/E1 vs gemma4, long JEV run.
 Mutation v4 2026-10-08: context line + 7 instructions (mutate_v4.txt), redraws; word list + change limit removed
 (owner). Long LLM run with v4 stopped by the owner at t 7 000 (Key numbers); not yet written up in 06/09. To
 continue it: the same command (Background jobs) replays from the cache. WAIT for owner
@@ -36,9 +38,14 @@ backslashes in Bash heredocs (they lose one level): use the Write tool for scrip
 Windows: experiments.status used os.kill(pid, 0); signal 0 is CTRL_C_EVENT on Windows, so live jobs
 showed as DEAD? → fixed (OpenProcess + GetExitCodeProcess).
 
-## API facts — Laya
-(S1.2: return schema, per-option probabilities?, criteria effect, head_max_len,
-overflow behaviour, batch API, determinism, latency)
+## API facts — JEV / vLLM (2026-10-08; docker/README.md)
+- prithivMLmods/JEV-9B-GGUF = bare Qwen3.5-9B backbone (no System 1 LoRA, no head): not usable as JEV.
+- autotrust/JEV-9B @b63f651c served by vLLM nightly-81198e97 (v0.31.1rc1) in Docker, LoRA `jev-decision`
+  (adapter_vllm), FP8 online: weights 10.5 GiB; 14.4 GB of 16 GB used. vLLM's profile came out < 0 at any
+  --gpu-memory-utilization (counts Windows' 1.3 GiB + 2 GiB activation peak) → --kv-cache-memory-bytes 768M,
+  max-model-len 1024. Start-up ≈ 5-8 min (17 GB over the 9P Windows share, ≈ 2.5 min CUDA graphs).
+- No room for a 2nd vLLM → mutator = Ollama qwen3.5:0.8b, num_gpu 0 (0 VRAM, 0.3-0.8 s/call; more random than gemma4:12b: 1.19 attempts, world word after 10 steps 47 % vs 83 %, results/mutation_test_qwen35_0.8b_cpu.md). jev_check: 12 decisions/s sequential, 5/5 contrast pairs in the right direction
+  (results/jev_check.json); prefix cache hit 0 % (vLLM caches this model in 528-token blocks).
 
 ## API facts — Ollama
 (2026-10-01, results/e0_ollama.md) gemma4:26b digest 001e5dafc3c7 (25.2B MoE, Q4_K_M, 18 GB, thinking model).
@@ -64,19 +71,12 @@ overflow behaviour, batch API, determinism, latency)
 Both read directed genes well, but irrelevant/shuffled text moves behaviour as much as founder
 genes (gate wants founders ≥ 2× random). Control texts contain world words (mountains, river,
 bread...). Owner decision needed before prompt iteration (≤ 3 tries) or gate change.
-Point totals (60 gate decisions, 12b, 2026-10-01): 44 (73 %) exactly 100, 13 at 56-98, 3 at 0; none above.
-Harmless (points_to_probs divides by the total), EXCEPT all-zero answers: 3/17 random-text answers
-were all zeros (none for founder/contrast/neutral genomes) and normalise(eps) turns them into a
-uniform 1/7 distribution → likely inflates MI_G random (G2). Candidate fix (needs owner OK): treat
-all-zero as "no effect" → use the neutral genome's answer for that situation. Speed with a free
-GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were never cached
-(empty-KVCache bug, fixed ed485c5).
+Point totals, all-zero answers (likely inflate MI_G random; fix needs owner OK), speed: notes/archive.md.
 
 ## Decisions
 | Date | Decision | Why |
 |---|---|---|
-| 2026-09-28 | Provisional world tuning: food_regrow_p 0.001, cost_base 0.7, kill_p 0.3, predators 3 (base) / 2 (small) | rule_based 5k ticks small: pop ≈ 28 (< cap 40, food-limited), deaths split starvation 294 / predator 254, lifespan ≈ 300, 24 generations; random policy collapses (needs immigrants) → behaviour matters |
-| 2026-09-28 | Invalid action → wander (logged) | plan §A6 |
+| 2026-10-08 | Brain option `--backend jev` (JEV-9B System 1, vLLM FP8, jev.host); mutator → mutator.* section, qwen3.5:0.8b on CPU | owner: decisions smart + fast, mutator small (random anyway); FP8 JEV fills the GPU |
 | 2026-10-01 | Brain (policy.model) = gemma4:12b; mutator stays gemma4:26b | gate: reads genes as well as 26b (sign acc 0.96 vs 0.99, ΔP 0.75 vs 0.62), ~3× less compute per decision (0.9 vs 2.8 s), fits 100 % in 16 GB VRAM |
 | 2026-10-02 | **Mutation = one blind LLM operator**: instruction drawn from prompts/mutate_v2.txt (16 "random change" variants) + the gene, nothing else; temperature 1.2; word operators, styles, founder_reintroduce removed; mutator_model gemma4:12b; every run with mutation needs Ollama (`--no-mutation` otherwise) | owner: "evolution and mutation does not care about state and success, pure random"; review notes/mutation-review.md; test results/mutation_test.md |
 | 2026-10-07 | **Genome = 5 genes, one per action** (eat, flee, follow, rest, mate): risk, social, place (temperament) and the attack and wander genes AND actions removed; no fights between animals; an action with nothing in sight still wanders (eat = search); founder_pool_v2 (same texts); prompts/teacher_v2.md; evolution.max_words | owner: "simplify the genes to a minimum"; predators become genetic animals next |

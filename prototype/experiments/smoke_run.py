@@ -5,7 +5,7 @@ The default world is the full one, 96 x 96 (since 2026-10-07: in the 48 x 48 sma
 the LLM-read prey didn't hold against the predators, and in 64 x 64 the few predators
 didn't breed); --profile small (48 x 48) for quick checks.
 
-Genes mutate through the mutator LLM (ollama.mutator_model, see evolution/mutation.py) with
+Genes mutate through the mutator LLM (mutator.model at mutator.host, see evolution/mutation.py) with
 every brain, so Ollama must be running; --no-mutation runs without it (crossover only).
 With --backend llm the LLM also decides (policy.model). Start short (--ticks 500) and read
 "llm_calls" to extrapolate.
@@ -31,7 +31,7 @@ import time
 import traceback
 from pathlib import Path
 
-from promptevo.backends.factory import MutatorUnavailable, make_backend, make_rewriter
+from promptevo.backends.factory import MutatorUnavailable, make_backend, make_rewriter, mutator_client
 from promptevo.config import CONFIG_DIR, ROOT, load_config, resolve
 from promptevo.llm.ollama_client import client_from_config
 from promptevo.progress import Progress, keep_awake
@@ -81,7 +81,8 @@ def git(*args: str) -> str | None:
         return None
 
 
-def write_info(out: Path, a, cfg, brain: str, seed: int, mutator_model: str | None, client=None) -> None:
+def write_info(out: Path, a, cfg, brain: str, seed: int, mutator_model: str | None, client=None,
+               brain_info: dict | None = None) -> None:
     """run_info.json: what ran (command, code version, models, settings), kept with the results."""
     info = {"command": "python -m experiments.smoke_run " + " ".join(sys.argv[1:]),
             "started": time.strftime("%Y-%m-%d %H:%M:%S"), "brain": brain, "seed": seed,
@@ -90,12 +91,21 @@ def write_info(out: Path, a, cfg, brain: str, seed: int, mutator_model: str | No
                     "uncommitted_files": len((git("status", "--porcelain", "--untracked-files=no") or "").splitlines())},
             "config": {k: cfg[k] for k in ("evolution", "policy", "agents", "predators", "perception", "world", "sim")}}
     if client is not None:
-        models = sorted({m for m in (cfg.policy.model if brain == "llm" else None, mutator_model) if m})
+        models = [cfg.policy.model]
         try:
             info["ollama"] = {"host": cfg.ollama.host, "version": client.version(),
                               "models": {m: client.digest(m) for m in models}}
         except RuntimeError as e:
             info["ollama"] = {"host": cfg.ollama.host, "error": str(e)[:200]}
+    if mutator_model:
+        mc = mutator_client(cfg)
+        try:
+            info["mutator"] = {"api": cfg.mutator.api, "host": cfg.mutator.host, "model": mutator_model,
+                               "version": mc.version(), "digest": mc.digest(mutator_model)}
+        except RuntimeError as e:
+            info["mutator"] = {"api": cfg.mutator.api, "host": cfg.mutator.host, "error": str(e)[:200]}
+    if brain_info:
+        info[brain] = brain_info                              # e.g. the JEV checkpoint, quantization, prompts
     (out / "run_info.json").write_text(json.dumps(info, indent=1, default=str), encoding="utf-8")
 
 
@@ -117,12 +127,12 @@ def main() -> None:
                       overrides={"evolution": {"p_mut": 0.0}} if a.no_mutation else None)
     name = a.backend or cfg.backend.name
     backend = make_backend(name, cfg, strict=True)        # a failed model call stops the run, uncached
-    client = client_from_config(cfg)
+    client = client_from_config(cfg) if name == "llm" else None    # the Ollama brain
+    mclient = mutator_client(cfg)                                   # the mutator (mutator.host)
     try:
-        rewriter, rw_model = make_rewriter(cfg, client=client, check=True)
+        rewriter, rw_model = make_rewriter(cfg, client=mclient, check=True)
     except MutatorUnavailable as e:
-        raise SystemExit(f"{e}.\nStart Ollama (and `ollama pull {cfg.ollama.mutator_model}`), "
-                         "or run with --no-mutation.")
+        raise SystemExit(f"{e}.\nStart the mutator server (docker/README.md), or run with --no-mutation.")
     print(f"mutation: {rw_model} (T={cfg.evolution.temperature}, p_mut={cfg.evolution.p_mut})"
           if rewriter else "mutation: off")
     out = resolve(a.out)
@@ -135,7 +145,8 @@ def main() -> None:
     for f in ("summary.json", "final_population.json"):    # from an earlier attempt; written again at the end
         (out / f).unlink(missing_ok=True)
     sim = Simulation(cfg, backend, seed=a.seed, out_dir=out, rewriter=rewriter, rewriter_model=rw_model)
-    write_info(out, a, cfg, name, sim.seed, rw_model, client if (name == "llm" or rewriter) else None)
+    write_info(out, a, cfg, name, sim.seed, rw_model, client,
+               brain_info=backend.info() if hasattr(backend, "info") else None)
     sim.checkpoint()                                          # alleles.jsonl with the founders, right away
     started = time.time()
     prog = Progress(logs, job, total=a.ticks, deadline=started + 60 * a.minutes if a.minutes else None)
@@ -148,7 +159,7 @@ def main() -> None:
     s = sim.finish()
     s.update(stopped=why, minutes=round((time.time() - started) / 60, 1),
              llm_calls=getattr(backend, "calls", 0), failures=getattr(backend, "failures", 0),
-             mutation_calls=client.cache.misses if rewriter else 0)   # model calls not answered by the cache
+             mutation_calls=mclient.cache.misses if rewriter else 0)   # model calls not answered by the cache
     (out / "summary.json").write_text(json.dumps(s, indent=1))
     if why in ("ticks", "time limit"):
         prog.finish(sim.t)

@@ -13,7 +13,7 @@ from promptevo.llm.ollama_client import OllamaClient
 from promptevo.progress import Progress, keep_awake
 from promptevo.sim import Simulation
 
-MUTATING = {"evolution": {"p_mut": 0.3}, "ollama": {"mutator_model": "m"}}
+MUTATING = {"evolution": {"p_mut": 0.3}, "mutator": {"model": "m"}}
 
 
 def fake_mutator(calls):

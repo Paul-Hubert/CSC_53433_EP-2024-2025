@@ -32,7 +32,8 @@ Headless Python test of "genes = text prompts, an LLM decides, an LLM mutates".
 - All randomness via `promptevo.rng` named substreams; no global `random`/`np.random`.
 - Every model call goes through the sqlite cache in `cache/`; never delete caches unasked.
 - Record model digests / checkpoint ids with every result.
-- Decision backend = Ollama LLM (`--backend llm`, rev. 2026-09-30); Laya is parked.
+- Decision backend = Ollama LLM (`--backend llm`, rev. 2026-09-30) or JEV-9B System 1 on vLLM
+  (`--backend jev`, jev.host, docker/README.md, rev. 2026-10-08); Laya is parked. Mutator: mutator.* (own host).
   Ollama runs locally (http://localhost:11434) or in the cloud (https://ollama.com with the
   key in the env var `OLLAMA_API_KEY`). Never write keys to files, configs or logs.
 - LLM calls are the expensive resource: start runs short (`--ticks 500`), read llm_calls,

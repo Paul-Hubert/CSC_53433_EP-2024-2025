@@ -97,3 +97,18 @@ make_dataset.py, label_teacher.py, S5 distillation.
   Lineages (24 × 30 steps): genes using a world word 83 % after 1, 58 % after 10, 21 % after 15,
   12 % after 30; 4.7 → 6.5-7.8 words; "toaster" in 18/24 lineages. ≈ 270 mutation calls per
   10 000 ticks (rule_based, small).
+
+## Decisions moved from STATUS.md (2026-10-08)
+| Date | Decision | Why |
+|---|---|---|
+| 2026-09-28 | Provisional world tuning: food_regrow_p 0.001, cost_base 0.7, kill_p 0.3, predators 3 (base) / 2 (small) | rule_based 5k ticks small: pop ≈ 28 (< cap 40, food-limited), deaths split starvation 294 / predator 254, lifespan ≈ 300, 24 generations; random policy collapses (needs immigrants) → behaviour matters |
+| 2026-09-28 | Invalid action → wander (logged) | plan §A6 |
+
+## Gate results 2026-10-01, details moved from STATUS.md (2026-10-08)
+Point totals (60 gate decisions, 12b, 2026-10-01): 44 (73 %) exactly 100, 13 at 56-98, 3 at 0; none above.
+Harmless (points_to_probs divides by the total), EXCEPT all-zero answers: 3/17 random-text answers
+were all zeros (none for founder/contrast/neutral genomes) and normalise(eps) turns them into a
+uniform 1/7 distribution → likely inflates MI_G random (G2). Candidate fix (needs owner OK): treat
+all-zero as "no effect" → use the neutral genome's answer for that situation. Speed with a free
+GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were never cached
+(empty-KVCache bug, fixed ed485c5).

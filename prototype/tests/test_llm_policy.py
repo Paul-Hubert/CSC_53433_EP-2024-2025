@@ -140,7 +140,7 @@ def test_api_key_header_and_client_from_config(monkeypatch):
 
 
 def test_factory_and_llm_simulation(reg_pools):
-    cfg = load_config("small", {"policy": {"model": "brain", "mode": "table"}, "ollama": {"mutator_model": "brain"},
+    cfg = load_config("small", {"policy": {"model": "brain", "mode": "table"}, "mutator": {"model": "brain"},
                                 "evolution": {"p_mut": 1.0}})
     assert make_backend("rule_based", cfg).name == "rule_based"
     log = []
@@ -211,7 +211,7 @@ def test_empty_persistent_cache_is_used(tmp_path):
 
 def test_make_rewriter_off_and_unreachable(monkeypatch):
     from promptevo.backends.factory import MutatorUnavailable
-    assert make_rewriter(load_config("small", {"ollama": {"mutator_model": None}})) == (None, None)
+    assert make_rewriter(load_config("small", {"mutator": {"model": None}})) == (None, None)
     assert make_rewriter(load_config("small", {"evolution": {"p_mut": 0.0}})) == (None, None)
     monkeypatch.setattr("promptevo.llm.ollama_client.time.sleep", lambda s: None)
 

@@ -43,6 +43,7 @@ from promptevo.config import load_config, resolve
 from promptevo.evolution.mutation import Mutator, words
 from promptevo.founder import AllelePools
 from promptevo.genome import AlleleRegistry
+from promptevo.backends.factory import mutator_client
 from promptevo.llm.ollama_client import client_from_config, make_rewriter
 from promptevo.progress import Progress
 from promptevo.species import PREDATOR, PREY
@@ -134,8 +135,9 @@ def main() -> None:
         over["mutation_tries"] = a.tries
     cfg = load_config(a.profile, {"evolution": over})
     temps = [float(t) for t in a.temps.split(",")]
-    model = a.model or cfg.ollama.mutator_model
-    client = client_from_config(cfg)
+    model = a.model or cfg.mutator.model
+    client = client_from_config(cfg)                     # the judge (Ollama)
+    mclient = mutator_client(cfg)                        # the mutator (mutator.host)
     reg = AlleleRegistry()
     pools = {sp.name: AllelePools(reg, cfg.paths.data_dir, species=sp) for sp in (PREY, PREDATOR)}
     kw = KeywordJudge(reg, pools["prey"])
@@ -143,7 +145,7 @@ def main() -> None:
     founders = [(l, reg.text(x)) for p in pools.values() for l in p.founders for x in p.founders[l]
                 if reg.get(x).origin == "founder"]
     world = set(SITUATION_WORDS) | {w for _, t in founders for w in content_words(t)}
-    muts = {t: Mutator(cfg, reg, make_rewriter(client, model, temperature=t), model) for t in temps}
+    muts = {t: Mutator(cfg, reg, make_rewriter(mclient, model, temperature=t), model) for t in temps}
     instructions = muts[temps[0]].instructions
     starts = (founders if a.lineages == "all"
               else [(l, reg.text(pools["prey"].founders[l][0])) for l in LINEAGE_LOCI])

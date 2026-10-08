@@ -77,7 +77,7 @@ def main() -> None:
     ap.add_argument("--profile", default="small")
     ap.add_argument("--per-allele", type=int, default=6)
     ap.add_argument("--ood-per-locus", type=int, default=5)
-    ap.add_argument("--mutator", default=None, help="Ollama model (default ollama.mutator_model)")
+    ap.add_argument("--mutator", default=None, help="mutator model (default mutator.model)")
     ap.add_argument("--out", default="data/mutants_v1.jsonl")
     a = ap.parse_args()
     cfg = load_config(a.profile)
@@ -85,10 +85,11 @@ def main() -> None:
     reg = AlleleRegistry()
     pools = AllelePools(reg, cfg.paths.data_dir)
     llm = client = None
-    model = a.mutator or cfg.ollama.mutator_model
+    model = a.mutator or cfg.mutator.model
     if model:
-        from promptevo.llm.ollama_client import client_from_config, make_rewriter
-        client = client_from_config(cfg)
+        from promptevo.backends.factory import mutator_client
+        from promptevo.llm.ollama_client import make_rewriter
+        client = mutator_client(cfg)
         llm = make_rewriter(client, model, temperature=float(cfg.evolution.temperature))
     rows = make_mutants(cfg, reg, pools, rng, a.per_allele, llm, model)
     if client:

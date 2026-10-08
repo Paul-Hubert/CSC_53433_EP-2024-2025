@@ -8,7 +8,8 @@ dependencies = ["numpy>=1.24", "pyyaml>=6"]
 [project.optional-dependencies]
 dev = ["pytest>=7"]
 laya = ["laya"]            # installed on the local machine (S1.2)
-analysis = ["matplotlib", "pandas", "scipy"]
+jev = ["torch", "transformers>=5.16", "peft", "bitsandbytes", "accelerate", "safetensors", "huggingface_hub"]
+analysis =["matplotlib", "pandas", "scipy"]
 
 [build-system]
 requires = ["setuptools>=61"]

@@ -1,0 +1,70 @@
+# Model servers for promptevo (rev. 2026-10-08): one vLLM image, two OpenAI-compatible servers.
+#   jev      :8000  JEV-9B System 1 (decisions, --backend jev)       -> configs/base.yaml jev.host
+#   mutator  :8001  a small chat model (gene mutation), optional     -> mutator.api openai, mutator.host
+# Start:  docker compose -f docker/compose.yaml up -d      (README.md next to this file)
+# Both read the Windows Hugging Face cache, so the JEV weights downloaded there are reused.
+# Knobs (environment or docker/.env): JEV_QUANT, JEV_GPU, JEV_KV, MUTATOR_GPU, JEV_PORT, MUTATOR_PORT.
+
+x-vllm: &vllm
+  image: vllm/vllm-openai:nightly-81198e97ba7eee2a22540caaa756b7fdddcb4d93   # pinned 2026-10-08 (Qwen3.5, LoRA on lm_head)
+  ipc: host
+  restart: unless-stopped
+  volumes:
+    - ${USERPROFILE}/.cache/huggingface:/root/.cache/huggingface
+  deploy:
+    resources:
+      reservations:
+        devices: [{driver: nvidia, count: all, capabilities: [gpu]}]
+
+services:
+  jev:
+    <<: *vllm
+    container_name: promptevo-jev
+    ports: ["${JEV_PORT:-8000}:8000"]
+    environment:
+      HF_HUB_OFFLINE: "1"
+      VLLM_MEMORY_PROFILER_ESTIMATE_CUDAGRAPHS: "0"   # graphs take 0.14 GiB; the estimate reserved more
+    command:
+      - autotrust/JEV-9B
+      - --revision=b63f651ce8ed64481d3f5e73ecdb05f740042f01
+      - --served-model-name=autotrust/JEV-9B
+      - --quantization=${JEV_QUANT:-fp8}             # fp8 (native on the RTX 5080) | bitsandbytes (4-bit, less VRAM)
+      - --enable-lora
+      - --max-lora-rank=32
+      - --lora-modules
+      - jev-decision=/root/.cache/huggingface/hub/models--autotrust--JEV-9B/snapshots/b63f651ce8ed64481d3f5e73ecdb05f740042f01/adapter_vllm
+      - --logprobs-mode=processed_logprobs           # required: log-probs that respect allowed_token_ids
+      - --max-model-len=1024                         # JEV's training length; our prompts are ~450 tokens
+      - --max-num-seqs=8
+      - --max-num-batched-tokens=1024                # caps the activation peak (2 GiB at 2048, more by default)
+      - --gpu-memory-utilization=${JEV_GPU:-0.90}    # FP8 weights 10.5 GiB; vLLM counts Windows' ~1.3 GiB too
+      - --kv-cache-memory-bytes=${JEV_KV:-768M}      # set directly: vLLM's estimate came out < 0 although ~1.9 GiB stayed free
+      - --enable-prefix-caching
+      - --mamba-cache-mode=align
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:8000/health"]
+      interval: 15s
+      start_period: 600s                            # 3-8 min start-up (CUDA graphs with LoRA, model card)
+
+  mutator:                                         # optional (`--profile gpu-mutator`): does not fit next to
+    <<: *vllm                                      # FP8 JEV on a 16 GB card; the default mutator is Ollama on the CPU
+    profiles: [gpu-mutator]
+    container_name: promptevo-mutator
+    ports: ["${MUTATOR_PORT:-8001}:8000"]
+    environment: {HF_HUB_OFFLINE: "1"}             # weights pre-downloaded into the same cache (README)
+    depends_on:
+      jev: {condition: service_healthy}            # start after JEV has taken its share of the GPU
+    command:
+      - Qwen/Qwen3.5-0.8B
+      - --revision=2fc06364715b967f1860aea9cf38778875588b17
+      - --served-model-name=Qwen/Qwen3.5-0.8B
+      - --max-model-len=1024
+      - --max-num-seqs=4
+      - --max-num-batched-tokens=1024
+      - --quantization=fp8
+      - --gpu-memory-utilization=${MUTATOR_GPU:-0.09}
+      - --limit-mm-per-prompt={"image":0,"video":0}  # text only (the checkpoint also has a vision encoder)
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:8000/health"]
+      interval: 15s
+      start_period: 300s
