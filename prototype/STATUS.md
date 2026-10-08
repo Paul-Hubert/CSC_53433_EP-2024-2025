@@ -9,7 +9,9 @@ small edits of the rule; word list and word-change limit removed on request, mea
 
 ## Next action
 Mutation v4 2026-10-08: context line + 7 instructions (mutate_v4.txt), redraws; word list + change limit removed
-(owner). Not yet run: an LLM run with mutation v4. WAIT for owner
+(owner). RUNNING (owner: "run a very long simulation"): results/runs/long_v4_llm, see Background jobs; when done:
+`gene_timeline --species prey|predator`, gene_report, write up in 06/11. Stop: create logs/run_long_v4_llm.stop;
+resume: same command (cache replays). WAIT for owner
 (../Docs/prompt-genome/09 §4): #10 keep the values (predators at their cap with both brains) or let food limit
 them; cost ≈ 12 calls per tick (5 000 ticks ≈ 6.5 h); G2 handling
 (all-zero answers → neutral answer? cleaner control sentences? prompt iteration 1/3?); founder pools H1
@@ -124,8 +126,8 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
 ## Background jobs
 | Job | Started | Log | Progress file | State |
 |---|---|---|---|---|
-| LLM check 96 x 96, 2 000 ticks, seed 1234 (`--out results/runs/check_all4_llm --minutes 180`) | 2026-10-07 14:23 | logs/check_all4_llm.log | logs/run_check_all4_llm.progress.json | done 17:23 (time limit, tick 1 673) |
 | LLM check stamina 96 x 96, 2 000 ticks, seed 1234 (`--out results/runs/check_stamina_llm --minutes 180`) | 2026-10-07 18:53 | logs/check_stamina_llm.log | logs/run_check_stamina_llm.progress.json | done 21:31 (2 000 ticks) |
+| **Long LLM run, mutation v4** 96 x 96, seed 1234, 20 000 ticks or 24 h (`--backend llm --ticks 20000 --minutes 1440 --snapshots 20 --out results/runs/long_v4_llm`; commit 5d60b77) | 2026-10-08 04:32 | logs/long_v4_llm.log | logs/run_long_v4_llm.progress.json | running |
 
 ## Open issues
 - Own git server mirror: waiting for the URL + auth from the owner (see
