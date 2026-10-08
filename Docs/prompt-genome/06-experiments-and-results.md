@@ -469,17 +469,18 @@ sentences of both species × 8 seeds, and 36 lineages of 30 mutations,
 temperature 1.2, no selection; gemma4:12b judged each gene (usable rule for its
 slot or not).
 
-| | Rules before | Draft: 10 instructions, ≤ 3 words, 3 attempts | Draft, ≤ 5 words | Draft, 5 attempts | 9 instructions, ≤ 3 words, 5 attempts (removed) | **9 instructions alone (kept)** |
-|---|---|---|---|---|---|---|
-| mutations that succeed | 99 % | 74 % | 87 % | 86 % | 88 % | **100 %** |
-| words changed per mutation | 2.7 | 1.7 | 2.5 | 1.7 | 1.8 | **3.1** |
-| different mutants per sentence (of 8) | 7.2 | 4.0 | 5.1 | 4.4 | 4.6 | **6.7** |
-| one mutation: usable rule | 69 % | 83 % | 79 % | 82 % | 83 % | **80 %** |
-| lineages usable after 1 / 10 / 30 | 61 / 8 / 0 % | 86 / 69 / 47 % | 75 / 58 / 42 % | 86 / 58 / 53 % | 92 / 67 / 44 % | **89 / 56 / 33 %** |
-| lineages using a world word after 30 | 22 % | 72 % | 69 % | 69 % | 83 % | **33 %** |
+| | Rules before | Draft: 10 instructions, ≤ 3 words, 3 attempts | Draft, ≤ 5 words | Draft, 5 attempts | 9 instructions, ≤ 3 words, 5 attempts (removed) | 9 instructions alone (v3) | **Context line, 7 instructions (v4, kept)** |
+|---|---|---|---|---|---|---|---|
+| mutations that succeed | 99 % | 74 % | 87 % | 86 % | 88 % | 100 % | **100 %** |
+| words changed per mutation | 2.7 | 1.7 | 2.5 | 1.7 | 1.8 | 3.1 | **2.8** |
+| different mutants per sentence (of 8) | 7.2 | 4.0 | 5.1 | 4.4 | 4.6 | 6.7 | **6.1** |
+| one mutation: usable rule | 69 % | 83 % | 79 % | 82 % | 83 % | 80 % | **81 %** |
+| lineages usable after 1 / 10 / 30 | 61 / 8 / 0 % | 86 / 69 / 47 % | 75 / 58 / 42 % | 86 / 58 / 53 % | 92 / 67 / 44 % | 89 / 56 / 33 % | **89 / 50 / 36 %** |
+| lineages using a world word after 30 | 22 % | 72 % | 69 % | 69 % | 83 % | 33 % | **72 %** |
 
 Files: `mutation_test_old_rules`, `mutation_test_v3_draft`, `_v3_draft_max5`,
-`_v3_draft_tries5`, `_v3_checks` and `mutation_test_v3` (today's rules).
+`_v3_draft_tries5`, `_v3_checks`, `mutation_test_v3` and `mutation_test_v4`
+(today's rules).
 
 - **The checks rejected** 288 answers for being too big, 127 for a word outside
   the world and 14 as invalid; 12 % of mutations failed all 5 attempts (26 % with
@@ -489,20 +490,25 @@ Files: `mutation_test_old_rules`, `mutation_test_v3_draft`, `_v3_draft_max5`,
   mutations genes drift into office, school or game language ("Breaks are
   mandatory except during the scheduled lunch period."), and edits average 3.1
   words: "say this rule in slightly different words" rewrites 5.4.
+- **v4 (owner's choice: one context line, the two biggest-rewrite instructions
+  dropped):** genes stay about animals (72 % still use a world word after 30
+  mutations, 33 % with v3) but bring in wildlife the simulation doesn't have
+  (villages, forests, miles) and can move into another slot's topic. Edits
+  shrink to 2.8 words. Rules weaken a little, as expected without "a little
+  stronger": genes with firm words fall from 25 % to 8–14 %.
 - **A 5-word limit** gave more variety and more successes, with slightly less
   meaning, so the 3-word limit stayed.
 - **One draft instruction was dropped:** "Make this rule about something else
   close to its subject." moved genes into another slot's topic ("Rest when you
   are tired." → "Eat when you are hungry.") and had the fewest usable answers
   (57 %).
-- **Per instruction** (9 instructions alone): "say this rule in slightly
-  different words" gave the most usable rules (93 %) but the biggest edits;
-  "remove a condition, or make it simpler" the fewest (61 %), because it can
-  shrink a gene to one word ("Look.").
+- **Per instruction** (v4): "change how near, how far or how much" gave the
+  most usable rules (98 %); "remove a condition, or make it simpler" the fewest
+  (41 %), because it can shrink a gene to one word ("Look.").
 - **Targets set beforehand:** at least 90 % usable after one mutation and at
   least 80 % of genes using a world word after 30 mutations. With the checks:
   83 % (92 % on the lineages' first step) and 83 %; with the instructions alone:
-  80 % (89 %) and 33 %. The judge is strict ([04 §5](04-genome-and-evolution.md#small-edits-since-2026-10-08)).
+  80 % (89 %) and 33 %; v4: 81 % (89 %) and 72 %. The judge is strict ([04 §5](04-genome-and-evolution.md#small-edits-since-2026-10-08)).
 - **Caveat:** no selection and one model; in a run, a gene meets only about
   0.03 mutations per generation.
 
@@ -596,7 +602,7 @@ python -m experiments.smoke_run --backend llm --ticks 2000 --seed 1234 --out res
 python -m experiments.smoke_run --backend llm --ticks 2000 --minutes 180 --seed 1234 --out results/runs/check_all4_llm              # 5.14 (code of 9aaac2d)
 python -m experiments.smoke_run --ticks 5000 --no-mutation --snapshots 0 --seed 1234 --out results/runs/stamina_1234                # 5.15, keyword brain (also seeds 7, 42; --profile small)
 python -m experiments.smoke_run --backend llm --ticks 2000 --minutes 180 --seed 1234 --out results/runs/check_stamina_llm           # 5.16
-python -m experiments.mutation_test --temps 1.2 --tag mutation_test_v3                     # 5.17, today's rules (≈ 6 min)
+python -m experiments.mutation_test --temps 1.2 --tag mutation_test_v4                     # 5.17, today's rules (≈ 6 min)
 python -m experiments.mutation_test --temps 1.2 --rules old --tag mutation_test_old_rules  # 5.17, the rules before (≈ 4 min)
 python -m experiments.mutation_test --temps 1.2 --tries 1 --tag mine                     # a variant
 ```

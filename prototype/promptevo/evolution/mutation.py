@@ -1,12 +1,13 @@
 """Gene mutation: an LLM makes one random change (plan §A8, rev. 2026-10-02 and 2026-10-08).
 
 Each gene of a child mutates with probability evolution.p_mut. The mutator LLM gets one
-instruction drawn at random from evolution.mutation_prompts and the gene sentence, and
-nothing else: no world, no other genes, no fitness. Mutation is blind; selection decides
-what survives. The randomness comes from the drawn instruction, the seed and the sampling
-temperature. Since 2026-10-08 the instructions (mutate_v3.txt) ask for small edits of what
-the rule says ("a little stronger", "add a short condition", "say the opposite"); v2 asked
-for random word edits, big ones included.
+instruction drawn at random from evolution.mutation_prompts and the gene sentence, after one
+fixed context line (evolution.mutation_context, since 2026-10-08: the sentence is a rule a
+wild animal follows), and nothing else: no world details, no other genes, no fitness. Mutation
+is blind; selection decides what survives. The randomness comes from the drawn instruction,
+the seed and the sampling temperature. Since 2026-10-08 the instructions ask for small edits
+of what the rule says ("a little weaker", "add a short condition", "say the opposite";
+mutate_v4.txt); v2 asked for random word edits, big ones included.
 
 Guards: the answer must be a clean sentence (clean, valid) that differs from its parent. A
 rejected answer is drawn again (new instruction, new seed), up to evolution.mutation_tries
@@ -72,9 +73,15 @@ class Mutator:
         self.p_mut = float(ec.p_mut) if llm else 0.0          # no mutator LLM: no mutation
         self.max_words = int(ec.max_words)
         self.tries = max(1, int(ec.get("mutation_tries") or 1))
+        self.context = ec.get("mutation_context") or None      # None: the instruction comes first
         self.instructions = instructions or load_instructions(ec.mutation_prompts)
         self.registry, self.llm, self.model = registry, llm, model
         self.stats = {"tried": 0, "ok": 0, "calls": 0, "rejected": Counter()}
+
+    def prompt(self, k: int, text: str) -> str:
+        """What the mutator model gets: the context line (if any), instruction k and the gene."""
+        p = TEMPLATE.format(instruction=self.instructions[k], text=text)
+        return f"{self.context}\n{p}" if self.context else p
 
     def reject(self, new: str, old: str) -> str | None:
         """Why an answer can't be the mutant (None: it can)."""
@@ -88,7 +95,7 @@ class Mutator:
         """One call: (new sentence or None, instruction index, seed, why it was rejected or None)."""
         k = int(rng.integers(len(self.instructions)))
         seed = int(rng.integers(2**31))
-        answer = self.llm(TEMPLATE.format(instruction=self.instructions[k], text=text), seed)
+        answer = self.llm(self.prompt(k, text), seed)
         self.stats["calls"] += 1
         new = clean(answer)
         why = self.reject(new, text)

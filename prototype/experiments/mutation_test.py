@@ -48,7 +48,8 @@ from promptevo.progress import Progress
 from promptevo.species import PREDATOR, PREY
 
 LINEAGE_LOCI = ("eat", "flee", "follow", "rest", "mate")       # --lineages first
-OLD_RULES = {"mutation_prompts": "prompts/mutate_v2.txt", "mutation_tries": 1}   # mutation from 2026-10-02 to 2026-10-07
+OLD_RULES = {"mutation_prompts": "prompts/mutate_v2.txt", "mutation_tries": 1,
+             "mutation_context": None}                         # mutation from 2026-10-02 to 2026-10-07
 JUDGE_STEPS = (1, 5, 10, 20, 30)
 
 
@@ -200,7 +201,7 @@ def main() -> None:
         raise
     ec = cfg.evolution
     res = {"model": model, "digest": client.digest(model), "rules": a.rules, "prompts": ec.mutation_prompts,
-           "guards": {"tries": muts[temps[0]].tries},
+           "guards": {"tries": muts[temps[0]].tries}, "context": muts[temps[0]].context,
            "temps": temps, "seeds": a.seeds, "steps": a.steps, "instructions": instructions,
            "variety": variety, "lineages": lineages, "judge_model": None if a.no_judge else cfg.policy.model,
            "elapsed_s": round(time.time() - t0, 1), "date": time.strftime("%Y-%m-%d")}
@@ -289,6 +290,8 @@ def report(res: dict) -> list[str]:
     n_lin = len(res["lineages"]) // len(T)
     g = res.get("guards", {})
     rules = f"`{res.get('prompts', 'prompts/mutate_v2.txt')}`, up to {g.get('tries', 1)} attempts"
+    if res.get("context"):
+        rules += f", context line \"{res['context']}\""
     if g.get("max_changed_words") or g.get("vocabulary"):              # results of the checks tried on 2026-10-08
         rules += f", at most {g.get('max_changed_words') or 'any'} words changed, vocabulary {g.get('vocabulary') or 'any'}"
     L = [f"# Mutation test — {res['model']} (digest {res['digest']}), {res['date']}", "",

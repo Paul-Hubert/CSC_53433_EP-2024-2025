@@ -168,10 +168,12 @@ genes, with the same instructions, model and guards.
 ### One operator: the LLM makes a small random change
 
 For each mutating gene, the code draws one instruction at random from
-`prompts/mutate_v3.txt` (since 2026-10-08) and sends it, with the gene sentence
-and nothing else, to the mutator model (`ollama.mutator_model`, gemma4:12b):
+`prompts/mutate_v4.txt` (since 2026-10-08) and sends it, with the gene sentence
+and one fixed context line (`evolution.mutation_context`), to the mutator model
+(`ollama.mutator_model`, gemma4:12b):
 
 ```text
+The sentence below is a rule that a wild animal follows.
 Make the rule in this sentence a little weaker.
 
 "Rest when you are tired."
@@ -179,13 +181,13 @@ Make the rule in this sentence a little weaker.
 Reply with the new sentence only.
 ```
 
-The 9 instructions ask for small edits of what the rule says: make it a
-little stronger or a little weaker, change when it applies, add a short
-condition, remove a condition (or make it simpler), change how near, how far or
-how much it is about, make it say the opposite, change one word into a related
-word, or say it in slightly different words. Which one is drawn is random, so
-mutation stays blind: the mutator never sees the world, the other genes or how
-well the animal does. Randomness comes from three places: the instruction
+The 7 instructions ask for small edits of what the rule says: make it a
+little weaker, change when it applies, add a short condition, remove a
+condition (or make it simpler), change how near, how far or how much it is
+about, make it say the opposite, or change one word into a related word. The
+context line is the same for every gene of both species. Which instruction is
+drawn is random, so mutation stays blind: the mutator never sees the world's
+details, the other genes, the gene's slot or how well the animal does. Randomness comes from three places: the instruction
 drawn, the seed (drawn from the simulation's `mutation` stream, so a run can be
 replayed) and the sampling temperature (`evolution.temperature`, 1.2). Answers
 are cached in `cache/ollama.sqlite`.
@@ -195,7 +197,9 @@ asked for random word edits, some of them big ("Randomly change the meaning of
 this sentence a lot.", "Make an unexpected change to this sentence."). Genes
 then left the animal's world within 10–15 mutations (below). The owner asked
 for mutation that stays random but small and keeps to meaning most of the
-time ([below](#small-edits-since-2026-10-08)).
+time ([below](#small-edits-since-2026-10-08)). The first version of the small
+edits (`mutate_v3.txt`, 9 instructions, no context line) is kept for the
+record.
 
 There is no other way for a gene to change. Without a mutator model
 (`ollama.mutator_model: null`, or `smoke_run --no-mutation`), children only
@@ -297,48 +301,59 @@ the five):
 
 The owner asked for mutation that stays random but small and keeps to meaning
 most of the time. The instructions became small edits of the rule
-(`mutate_v3.txt`). For a few hours two checks were added as well (at most 3
-words changed, only words of a world word list, with redraws), then removed on
-the owner's request. Measured with `experiments.mutation_test` on the 36
+(`mutate_v3.txt`, 9 instructions). For a few hours two checks were added as
+well (at most 3 words changed, only words of a world word list, with redraws),
+then removed on the owner's request. Then, also on the owner's request, every
+mutation prompt got one context line ("The sentence below is a rule that a wild
+animal follows.") and the two instructions that rewrote the most words were
+dropped ("a little stronger", "say this rule in slightly different words"):
+`mutate_v4.txt`, 7 instructions. Measured with `experiments.mutation_test` on the 36
 founder sentences of both species (8 seeds each, and 30 mutations in a row from
 each), temperature 1.2, no selection. gemma4:12b judged whether each gene still
 gives a usable rule for its slot (the question of `gene_timeline --judge`):
 
-| | Before (v2) | v3 with the checks (removed) | **v3 alone (today)** |
-|---|---|---|---|
-| mutations that succeed | 99 % | 88 % (2.4 attempts each) | **100 %** |
-| words changed per mutation · big edits (≥ 4 words) | 2.7 · 28 % | 1.8 · 0 % | **3.1 · 39 %** |
-| different mutants per sentence (of 8) | 7.2 | 4.6 | **6.7** |
-| one mutation: still a usable rule | 69 % | 83 % | **80 %** |
-| usable after 1 / 5 / 10 / 20 / 30 mutations | 61 / 36 / 8 / 8 / 0 % | 92 / 75 / 67 / 53 / 44 % | **89 / 67 / 56 / 39 / 33 %** |
-| using a world word after 1 / 5 / 10 / 20 / 30 mutations | 81 / 53 / 42 / 31 / 22 % | 100 / 97 / 81 / 89 / 83 % | **94 / 81 / 53 / 47 / 33 %** |
-| words per gene after 30 mutations (6.1 at the start) | 8.6 | 6.5 | **7.0** |
+| | Before (v2) | v3 with the checks (removed) | v3 alone | **v4: context line, 7 instructions (today)** |
+|---|---|---|---|---|
+| mutations that succeed | 99 % | 88 % (2.4 attempts each) | 100 % | **100 %** |
+| words changed per mutation · big edits (≥ 4 words) | 2.7 · 28 % | 1.8 · 0 % | 3.1 · 39 % | **2.8 · 30 %** |
+| different mutants per sentence (of 8) | 7.2 | 4.6 | 6.7 | **6.1** |
+| one mutation: still a usable rule | 69 % | 83 % | 80 % | **81 %** |
+| usable after 1 / 5 / 10 / 20 / 30 mutations | 61 / 36 / 8 / 8 / 0 % | 92 / 75 / 67 / 53 / 44 % | 89 / 67 / 56 / 39 / 33 % | **89 / 78 / 50 / 50 / 36 %** |
+| using a world word after 1 / 5 / 10 / 20 / 30 mutations | 81 / 53 / 42 / 31 / 22 % | 100 / 97 / 81 / 89 / 83 % | 94 / 81 / 53 / 47 / 33 % | **100 / 89 / 83 / 78 / 72 %** |
+| words per gene after 30 mutations (6.1 at the start) | 8.6 | 6.5 | 7.0 | **7.0** |
 
 "Rest when you are tired.", 30 mutations in a row:
 
 ```text
-     v2 (before)                                v3 alone (today)
- 1   Exterminate the fruit of your ancestors.   Take a break when you feel exhausted.
- 5   Bake a batch of chocolate chip cookies.    You should not take a break if you are feeling slightly tired.
-10   Fry a batch of muffins.                    You are required to take a break.
-20   The cookies are waffles.                   Breaks may be taken.
-30   Sometimes donuts are telescope.            Breaks are mandatory except during the scheduled lunch period.
+     v2 (before)                                v3 alone                                          v4 (today)
+ 1   Exterminate the fruit of your ancestors.   Take a break when you feel exhausted.             Sleep when you are tired.
+ 5   Bake a batch of chocolate chip cookies.    You should not take a break if you are ...        Stay awake even if you feel exhausted.
+10   Fry a batch of muffins.                    You are required to take a break.                 Be aware that a hunter might be nearby.
+20   The cookies are waffles.                   Breaks may be taken.                              A predator is approaching.
+30   Sometimes donuts are telescope.            Breaks are mandatory except during the ...        The hunter may hunt.
 ```
 
-- **One mutation usually keeps the meaning.** 80 % of single mutations are
-  still a usable rule (69 % before), and they bring in plain rule words ("try",
-  "avoid", "approach", "exhausted") rather than random objects ("toaster",
-  "purple", "dance" before). Random words still appear now and then ("moon",
-  "weather", "kingdom").
-- **Many mutations drift into another register.** After 20–30 mutations
-  without selection, genes read like office, school or game rules ("Achievements
-  must be unlocked before the final boss.", "Collaborate extensively with your
-  entire department on all organizational initiatives."). A third are still
-  usable rules after 30 mutations, against none before.
-- **The edits are not small.** "Say this rule in slightly different words"
-  rewrites 5.4 words and jumps in 48 % of cases; "a little stronger" changes 4.2
-  words. The checks had held edits to 1.8 words, and kept genes in the world
-  much longer (83 % using a world word after 30 mutations).
+- **One mutation usually keeps the meaning.** About 80 % of single mutations
+  are still a usable rule (69 % before), and they bring in plain rule words
+  ("try", "avoid", "approach") rather than random objects ("toaster", "purple",
+  "dance" before).
+- **The context line keeps genes about animals.** Without it (v3), genes
+  drifted into office, school or game rules after 20–30 mutations ("Achievements
+  must be unlocked before the final boss."); only 33 % still used a word of the
+  world after 30. With it, 72 % do, and the genes read like animal behaviour
+  ("Stay hidden.", "Fight if cornered.", "Hide when a predator is nearby.").
+- **What still drifts:** genes bring in wildlife that the simulation doesn't
+  have ("Avoid the village unless you are very hungry.", "Stay within the
+  forest.", distances in miles), and they can wander into another slot's topic
+  (the rest gene above ends as a rule about hunters). "Remove a condition, or
+  make it simpler" gives the fewest usable rules (41 %): it can strip a gene
+  down to one word.
+- **Edits are smaller than in v3 but not small:** 2.8 words on average, 30 %
+  of them 4 words or more ("add a short condition" adds 4.9).
+- **Rules weaken a little.** Without "a little stronger", "a little weaker" has
+  no counterpart: genes with firm words (always, never, must, only, every) fall
+  from 25 % to 8–14 % over the lineages (19–25 % with v3), while hedging words
+  (may, might, try, sometimes) rise to 14–19 %.
 - **Judge:** strict; it also rejects sensible paraphrases ("Keep your distance
   from other creatures.") and unwise but clear rules ("Rest only when you feel
   unsafe."), so every column understates the meaningful genes.

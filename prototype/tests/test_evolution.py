@@ -10,15 +10,16 @@ from promptevo.genome import ACTIONS, LOCI
 from promptevo.sim import Simulation
 from promptevo.species import PREDATOR
 
-OLD_RULES = {"p_mut": 1.0, "mutation_prompts": "prompts/mutate_v2.txt", "mutation_tries": 1}   # before 2026-10-08
+OLD_RULES = {"p_mut": 1.0, "mutation_prompts": "prompts/mutate_v2.txt", "mutation_tries": 1,
+             "mutation_context": None}                                       # mutation before 2026-10-08
 
 
 def test_guards_and_instructions():
     assert clean('Here is the new sentence: "Eat fast when hungry" and more') == "Eat fast when hungry."
     assert not valid("Eat.", "eat.", 12) and not valid("x " * 20, "y", 12)
-    for f in ("prompts/mutate_v2.txt", "prompts/mutate_v3.txt"):
+    for f in ("prompts/mutate_v2.txt", "prompts/mutate_v3.txt", "prompts/mutate_v4.txt"):
         ins = load_instructions(f)
-        assert len(ins) >= 9 and len(set(ins)) == len(ins) and not any(i.startswith("#") for i in ins)
+        assert len(ins) >= 7 and len(set(ins)) == len(ins) and not any(i.startswith("#") for i in ins)
 
 
 def test_mutator_sends_only_the_gene(reg_pools):
@@ -72,6 +73,18 @@ def test_rejected_mutants_are_drawn_again(reg_pools):
     new, k, seed = m.mutate_text("eat", "Eat whenever food is close.", np.random.default_rng(0))
     assert new == "Eat whenever food is very close." and m.stats["calls"] == 3
     assert dict(m.stats["rejected"]) == {"invalid": 1, "unchanged": 1}
+
+
+def test_context_line_comes_first(reg_pools):
+    reg, _ = reg_pools
+    sent = []
+    m = Mutator(load_config("small", {"evolution": {"p_mut": 1.0}}), reg,
+                lambda prompt, seed: sent.append(prompt) or "Eat whenever food is very close.", "fake")
+    m.mutate_text("eat", "Eat whenever food is close.", np.random.default_rng(0))
+    context = "The sentence below is a rule that a wild animal follows."
+    assert m.context == context and sent[0].startswith(context + "\n") and '"Eat whenever food is close."' in sent[0]
+    old = Mutator(load_config("small", {"evolution": OLD_RULES}), reg, lambda prompt, seed: "x", "fake")
+    assert old.prompt(0, "Eat.") == TEMPLATE.format(instruction=old.instructions[0], text="Eat.")   # no context
 
 
 def _run(cfg, seed, ticks=600):

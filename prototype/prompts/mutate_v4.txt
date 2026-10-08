@@ -1,0 +1,14 @@
+# Mutation instructions v4 (2026-10-08): small random edits to what the rule says.
+# For each mutation one line is drawn at random and sent to the mutator LLM with the gene
+# sentence and the fixed context line evolution.mutation_context, nothing else: no world
+# details, no other genes, no fitness. Lines starting with # are ignored; add a line to add one.
+# v3 had two more, dropped because they rewrote the most words: "Make the rule in this
+# sentence a little stronger." (4.2 words) and "Say this rule in slightly different words."
+# (5.4 words, 48 % jumps; results/mutation_test_v3.md).
+Make the rule in this sentence a little weaker.
+Change when this rule applies.
+Add a short condition to this rule.
+Remove a condition from this rule, or make it simpler.
+Change how near, how far or how much this rule is about.
+Make this rule say the opposite.
+Change one word of this rule into a related word.

@@ -55,7 +55,7 @@ lives only in `prototype/`. A Unity version is on the roadmap
 | `actions.py` | Behaviour executors | `EXECUTORS[action](agent, world, prey, predators, cfg, rng) -> cells moved` for both species, including `do_hunt` (run, strike, kill, leave a carcass, eat from one, digest); `cells` (1 walking, the species' `speed` running, never beyond stamina); an action with nothing to act on in sight calls `_invalid`: a random walk (`_wander`), counted as invalid |
 | `genome.py` | Genes | `ACTIONS`, `LOCI` (the prey's: one gene per action); `Allele`; `Genome(alleles, species)`; `AlleleRegistry` for both species (dedup, `genes()` → action → text, `genome_key()`, `make_genome(genes, origin, species)`, `dump_jsonl`); `crossover_uniform` |
 | `founder.py` | Allele files → genomes | `AllelePools(registry, data_dir, version=None, control_file="control_alleles_v1.json", species=PREY)`: `sample_founder`, `sample_control`, `neutral_genome`, `contrast_pair(locus or action)`; the predator files start with `predator_` |
-| `evolution/mutation.py` | Mutation | one blind small change by the mutator LLM: `TEMPLATE`, `load_instructions(path)`, guards (`clean`, `valid`), `words`, `Mutator` (`mutate(genome, rng) -> (genome, events)`, `mutate_text(locus, text, rng) -> (text or None, instruction index, seed)` with up to `tries` attempts, `attempt` (one call, with the reason of a rejection), `reject(new, old)`, `stats` with `calls` and `rejected`) |
+| `evolution/mutation.py` | Mutation | one blind small change by the mutator LLM: `TEMPLATE`, `load_instructions(path)`, guards (`clean`, `valid`), `words`, `Mutator` (`mutate(genome, rng) -> (genome, events)`, `mutate_text(locus, text, rng) -> (text or None, instruction index, seed)` with up to `tries` attempts, `attempt` (one call, with the reason of a rejection), `reject(new, old)`, `prompt(k, text)` (the context line, instruction k and the gene), `stats` with `calls` and `rejected`) |
 | `sim.py` | The simulation | `Agent` (`species` from its genome, `stamina`, `digest`, `killer`), `Counters`, `Simulation` (`agents` = prey, `predators`, `members(species)`, counters per species in `cs` with `c` = prey; `step`, `decide(agents)` one batch per species, `run`, `finish`, `summary`, `stats_row`) |
 | `backends/base.py` | Brain protocol | `Query(genome_key, genes, obs, species)`; `Backend` protocol (`name`, `decide(queries) -> [n, actions of the species]`); `batch_actions` (one species per batch); `normalise` |
 | `backends/random_policy.py` | Uniform brain | `RandomBackend` |
@@ -198,9 +198,10 @@ The scripted predators' keys (`count`, `chase_radius`, `turn_p`,
 | `p_mut` | 0.03 | chance per gene per child that the mutator LLM changes it |
 | `shuffled` | false | control C3: decide with another living animal's genome |
 | `random_founders` | false | control C4: founders with random-text genes |
-| `mutation_prompts` | prompts/mutate_v3.txt | the mutation instructions, one drawn at random per mutation ([04 §5](04-genome-and-evolution.md#5-mutation)); `mutate_v2.txt` until 2026-10-07 |
+| `mutation_prompts` | prompts/mutate_v4.txt | the mutation instructions, one drawn at random per mutation ([04 §5](04-genome-and-evolution.md#5-mutation)); `mutate_v2.txt` until 2026-10-07 |
 | `temperature` | 1.2 | sampling temperature of the mutator LLM |
 | `max_words` | 12 | maximum length of a gene in words (longer answers are rejected; replaces `max_action_words` and `max_temperament_words` since 2026-10-07) |
+| `mutation_context` | "The sentence below is a rule that a wild animal follows." | a fixed line before every mutation prompt, the same for every gene (null: none; since 2026-10-08) |
 | `mutation_tries` | 5 | a rejected answer is drawn again, up to this many attempts (1 before 2026-10-08) |
 
 ### `backend`
@@ -312,7 +313,8 @@ let the LLM decide directly. Their usage is in their docstrings and in
 | `data/observations_v1.jsonl` | the near / far observation set of the code before 2026-10-07 (E1 results in [06](06-experiments-and-results.md)); today's brains can't read it |
 | `prompts/teacher_v5.md` | decision prompt of the prey ([05](05-decision-backends.md#the-prompt)) |
 | `prompts/predator_v3.md` | decision prompt of the predators |
-| `prompts/mutate_v3.txt` | the 9 mutation instructions (small edits of the rule), one per line ([04 §5](04-genome-and-evolution.md#5-mutation)) |
+| `prompts/mutate_v4.txt` | the 7 mutation instructions (small edits of the rule), one per line ([04 §5](04-genome-and-evolution.md#5-mutation)) |
+| `prompts/mutate_v3.txt` | the first 9 small-edit instructions (2026-10-08, morning) |
 | `prompts/mutate_v2.txt` | the 16 random-change instructions used from 2026-10-02 to 2026-10-07 (`mutation_test --rules old`) |
 | `prompts/novel_v1.md` | prompt for brand-new alleles (parked dataset pipeline) |
 
@@ -336,7 +338,7 @@ real models: `pytest -m ollama` (needs Ollama and `policy.model`) and
 | `test_stamina.py` | moving costs stamina and energy, standing still brings stamina back at a price until it is full; no stamina, no move (a predator with 1.5 points runs 1 cell); a carcass feeds two other predators, not the killer, then rots; no carcass with 0 portions; stamina and carcasses sensed and written; the keyword brain rests when out of breath, goes for carcasses, reads "tired" as out of breath |
 | `test_predators.py` | hunt runs 2 cells, strikes, feeds and leaves a carcass; hunt with no prey in sight searches; a kill removes the prey (cause, killer id) and the predator digests without moving or deciding; predators breed with their own genes; newcomers below each floor; prey move at most 1 cell per tick and predators 2, never beyond their stamina; one registry holds both species |
 | `test_genome.py` | allele pools, registry dedup and genome keys, crossover |
-| `test_evolution.py` | guards and instruction lists, a rejected answer drawn again, the mutator sends only the instruction and the gene (fake LLM), rejected answers, no LLM → no mutation, determinism, population bounds, shuffled control (each species uses its own genomes), no mutation → no new alleles, decisions per action in `stats.csv` (both species) |
+| `test_evolution.py` | guards and instruction lists, a rejected answer drawn again, the context line comes first (none with the old rules), the mutator sends only the instruction and the gene (fake LLM), rejected answers, no LLM → no mutation, determinism, population bounds, shuffled control (each species uses its own genomes), no mutation → no new alleles, decisions per action in `stats.csv` (both species) |
 | `test_metrics.py` | entropy, JSD, mutual information, directed ΔP, Spearman |
 | `test_gene_report.py` | `gene_report` on a short run: fitness averages to 1.00 in every slot, frequencies add up to the population; an unfinished run is rebuilt from its events |
 | `test_gene_timeline.py` | a hand-made run with known numbers (shares, sweep timing, depth, families, gene dropping); invariants on a short unfinished run (slot shares add up, lineages end at founder texts, dropped shares of a slot add up to 1); sweep counts under inheritance alone; `--test` start tick; the judge with a fake model (budget, cache); a run with other slots (10 before 2026-10-07) is read with its own slots; `--species predator` follows the predators and keeps the two species apart |
@@ -367,6 +369,6 @@ student exercises ([02 §5](02-lab1.md#5-suggested-activities)).
 | A brain | a class with `name` and `decide(queries) -> [n, k]` in `backends/`; register it in `factory.make_backend` | a batch holds one species (`base.batch_actions`); return rows that sum to 1 in that species' action order |
 | A sense | a field in `perception.Observation` or `PredatorObservation`, computed in `sense`, rendered in `obs_text.render` | keep values discrete (cache hits); update the rule-based brain if it should react |
 | An action | a name in the species' action tuple in `species.py` (one gene per action, so this also adds a locus), an executor in `actions.EXECUTORS`, a line in the species' prompt (`prompts/teacher_v5.md` or `predator_v3.md`), alleles in its founder and contrast files, keywords in `rule_based.ACTION_WORDS` (and a default in `prey_logits` or `predator_logits`), a relevance tag in `perception.RELEVANT_TAG`, a letter in `render.ACTION_CHAR` (prey) | the action list is part of the JSON schema (`points_schema(actions)`); the founder and contrast files need the new slot; the rule-based brain and E1 fail with a `KeyError` without the keywords and the relevance tag; without a letter the map shows `?` |
-| A mutation instruction | a line in `prompts/mutate_v3.txt` | it is drawn at random like the others; measure it with `experiments.mutation_test` |
+| A mutation instruction | a line in `prompts/mutate_v4.txt` | it is drawn at random like the others; measure it with `experiments.mutation_test` |
 | A crossover scheme | a function like `crossover_uniform`, called in `Simulation._birth` | keep loci homologous |
 | A world feature | `world.py` (generation, `regrow_food`, movement) plus keys in `world:` | keep randomness in the world's streams; add a test |

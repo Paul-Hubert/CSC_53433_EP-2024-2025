@@ -82,8 +82,9 @@ evolution:
   random_founders: false      # C4 control
   # Mutation (rev. 2026-10-02): one operator. The mutator LLM (ollama.mutator_model) gets one
   # instruction drawn at random from this file plus the gene sentence, nothing else.
-  # Rev. 2026-10-08: small edits of the rule (v3; v2 = random word edits).
-  mutation_prompts: prompts/mutate_v3.txt
+  # Rev. 2026-10-08: small edits of the rule (v4; v2 = random word edits) after a fixed context line.
+  mutation_prompts: prompts/mutate_v4.txt
+  mutation_context: "The sentence below is a rule that a wild animal follows."   # same for every gene (null: none)
   temperature: 1.2            # mutator sampling temperature (results/mutation_test.md)
   max_words: 12               # guard: longer answers are rejected
   mutation_tries: 5           # a rejected answer is drawn again (new instruction and seed), up to 5 attempts
