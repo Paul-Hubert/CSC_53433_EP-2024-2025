@@ -147,6 +147,8 @@ def one_run(variant: str, kill_p: float, seed: int, ticks: int, brain: str = "ke
             "kills": sim.cs["prey"].deaths.get("predator", 0),
             "prey_starved": sim.cs["prey"].deaths.get("starvation", 0),
             "pred_starved": sim.cs["predator"].deaths.get("starvation", 0),
+            "prey_migrated": sim.cs["prey"].deaths.get("migrated", 0),
+            "pred_migrated": sim.cs["predator"].deaths.get("migrated", 0),
             "prey_ticks": int(sum(s[1] for s in series) * 100),
             "founders_added": sim.cs["prey"].immigrants + sim.cs["predator"].immigrants,
             "hatched": sim.cs["prey"].hatched + sim.cs["predator"].hatched,

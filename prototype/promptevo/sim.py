@@ -17,6 +17,11 @@ least m prey within their vision (the same, local); evolution.egg_bank: below th
 egg laid by a pair in the last evolution.egg_ticks ticks hatches (a delayed birth with real
 parents and generation) before any newcomer with founder genes.
 
+Cap rule (rev. 2026-10-09, per species `cap_rule`): "migrate" lets births happen at the cap;
+at the end of the tick, random animals of a species over its cap (never that tick's babies)
+leave the world (deaths with cause "migrated") until it is back at the cap. "block" (before):
+no births at the cap.
+
 The backend is only called for (species, genome, observation) triples not yet seen in this
 run; identical situations reuse the stored distribution (big speed-up with an LLM brain).
 Events of predators carry "species": "predator"; prey events keep their earlier format.
@@ -109,6 +114,7 @@ class Simulation:
         self.rng_act = self.streams.get("actions")          # moves and kill rolls
         self.rng_mut = self.streams.get("mutation")
         self.rng_litter = self.streams.get("litter")        # litter sizes
+        self.rng_migrate = self.streams.get("migration")    # who leaves above the cap
         self.rng_food = self.streams.get("food")
         self.world = World(cfg, ws.get("world"))
         self.registry = registry or AlleleRegistry()
@@ -314,6 +320,8 @@ class Simulation:
             if dead:
                 gone = {id(a) for a, _ in dead}
                 self._set_members(sp, [a for a in self.members(sp) if id(a) not in gone])
+        for sp in (PREY, PREDATOR):
+            self._migrate(sp)
         self.world.regrow_food(self.rng_food)
         self.world.age_carcasses()
         for sp in (PREY, PREDATOR):
@@ -351,7 +359,7 @@ class Simulation:
 
     def _breed(self, sp: Species) -> None:
         sc = species_cfg(self.cfg, sp)
-        cap = int(sc.cap)
+        cap = int(sc.cap) if (sc.get("cap_rule") or "block") == "block" else 10 ** 9   # migrate: no limit here
         q = float(sc.get("prey_per_predator") or 0) if sp.name == "predator" else 0.0
         if q:                                     # predators breed only while there are q prey each
             cap = min(cap, int(len(self.agents) / q))
@@ -374,6 +382,21 @@ class Simulation:
                 if b is not a and not b.bred and mate_ready(b, sc) and cheb(a.y, a.x, b.y, b.x) <= 1:
                     self._birth([a, b], room=cap - len(self.members(sp)))
                     break
+
+    def _migrate(self, sp: Species) -> None:
+        """cap_rule migrate: random animals (uniform, so no gene is favoured; this tick's babies stay)
+        leave until the species is back at its cap."""
+        sc = species_cfg(self.cfg, sp)
+        ms = self.members(sp)
+        excess = len(ms) - int(sc.cap)
+        if excess <= 0 or (sc.get("cap_rule") or "block") != "migrate":
+            return
+        older = [i for i, a in enumerate(ms) if a.born < self.t]
+        pool = older if len(older) >= excess else list(range(len(ms)))
+        leave = {int(i) for i in self.rng_migrate.choice(pool, size=excess, replace=False)}
+        for i in sorted(leave):
+            self._die(ms[i], "migrated")
+        self._set_members(sp, [a for i, a in enumerate(ms) if i not in leave])
 
     def _hunting_ground(self, a: Agent, sc) -> bool:
         """predators.breed_prey_seen m (off when 0): a predator breeds only with at least m prey

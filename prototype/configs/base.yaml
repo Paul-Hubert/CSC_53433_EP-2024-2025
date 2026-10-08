@@ -21,6 +21,7 @@ agents:                       # the prey animals
   init_pop: 68                # 30 and 60 in the 64 x 64 world; scaled by area
   floor: 10
   cap: 135
+  cap_rule: migrate           # at the cap births go on; random older animals leave (rev. 2026-10-09; block = no births)
   vision: 20                  # cells (Chebyshev); was 12 with only near/far until 2026-10-07
   energy_max: 100.0
   energy_start: 60.0
@@ -47,6 +48,7 @@ predators:                    # genetic animals like the prey since 2026-10-07: 
   init_pop: 14                # 6 and 15 in the 64 x 64 world; scaled by area
   floor: 3                    # newcomers from the predator founder pool below this
   cap: 34
+  cap_rule: migrate
   vision: 20                  # same as the prey
   energy_max: 100.0
   energy_start: 60.0
