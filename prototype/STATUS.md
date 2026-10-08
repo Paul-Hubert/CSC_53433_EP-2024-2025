@@ -128,7 +128,7 @@ JEV run test (results/runs/jev_test, 96 x 96, seed 1234, 1 000 ticks): 7.6 min =
 ## Background jobs
 | Job | Started | Log | Progress file | State |
 |---|---|---|---|---|
-| JEV + egg bank 96 x 96, seed 1234, 20 000 ticks or 10 h (`--backend jev --ticks 20000 --minutes 600 --snapshots 20 --set evolution.egg_bank=true --set evolution.egg_ticks=2000 --out results/runs/jev_eggs`; f1da89a) | 2026-10-08 | logs/jev_eggs.log | logs/run_jev_eggs.progress.json | running |
+| JEV + egg bank 96 x 96, seed 1234, 20 000 ticks or 10 h (`--backend jev --ticks 20000 --minutes 600 --snapshots 20 --set evolution.egg_bank=true --set evolution.egg_ticks=2000 --out results/runs/jev_eggs`; f1da89a) | 2026-10-08 | logs/jev_eggs.log | logs/run_jev_eggs.progress.json | stopped 23:01 by the owner at t 8 600 (egg bank not a valid idea): 131 + 6 hatched, 0 founders, crashes went on |
 | JEV + cover 20 % 96 x 96, seed 1234, 20 000 ticks or 10 h (same, `--set world.cover_fraction=0.2 --set world.cover_seek=6 --out results/runs/jev_cover`; f1da89a) | 2026-10-08 | logs/jev_cover.log | logs/run_jev_cover.progress.json | running |
 
 ## Open issues
