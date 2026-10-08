@@ -9,7 +9,7 @@ small edits of the rule; word list and word-change limit removed on request, mea
 
 ## Next action
 JEV brain ready (2026-10-08, owner): `docker compose -f docker/compose.yaml up -d jev`, then `--backend jev`;
-mutator qwen3.5:0.8b on the CPU (Ollama). To do: batching (owner: later), long JEV run (gate, E1, 1 000-tick test done: Gate results).
+mutator qwen3.5:0.8b on the CPU (Ollama). To do: batching (owner: later). Running (owner): JEV + egg bank and JEV + cover (Background jobs; crash options f1da89a: results/crash_v3.md, best in the screen = predators.prey_per_predator 3).
 Mutation v4 2026-10-08: context line + 7 instructions (mutate_v4.txt), redraws; word list + change limit removed
 (owner). Long LLM run with v4 stopped by the owner at t 7 000 (Key numbers); not yet written up in 06/09. To
 continue it: the same command (Background jobs) replays from the cache. WAIT for owner
@@ -128,7 +128,8 @@ JEV run test (results/runs/jev_test, 96 x 96, seed 1234, 1 000 ticks): 7.6 min =
 ## Background jobs
 | Job | Started | Log | Progress file | State |
 |---|---|---|---|---|
-| **Long LLM run, mutation v4** 96 x 96, seed 1234, 20 000 ticks or 24 h (`--backend llm --ticks 20000 --minutes 1440 --snapshots 20 --out results/runs/long_v4_llm`; commit 5d60b77) | 2026-10-08 04:32 | logs/long_v4_llm.log | logs/run_long_v4_llm.progress.json | stopped 12:14 by the owner (stop file), tick 7 000 |
+| JEV + egg bank 96 x 96, seed 1234, 20 000 ticks or 10 h (`--backend jev --ticks 20000 --minutes 600 --snapshots 20 --set evolution.egg_bank=true --set evolution.egg_ticks=2000 --out results/runs/jev_eggs`; f1da89a) | 2026-10-08 | logs/jev_eggs.log | logs/run_jev_eggs.progress.json | running |
+| JEV + cover 20 % 96 x 96, seed 1234, 20 000 ticks or 10 h (same, `--set world.cover_fraction=0.2 --set world.cover_seek=6 --out results/runs/jev_cover`; f1da89a) | 2026-10-08 | logs/jev_cover.log | logs/run_jev_cover.progress.json | running |
 
 ## Open issues
 - Own git server mirror: waiting for the URL + auth from the owner (see
