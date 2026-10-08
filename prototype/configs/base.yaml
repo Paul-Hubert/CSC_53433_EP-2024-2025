@@ -10,8 +10,8 @@ world:
   mountain_fraction: 0.0       # share of cells that are mountain (impassable)
   noise_octaves: [16, 8, 4]    # heightmap noise, used only when a fraction above is > 0
   min_walkable_connected: 0.60
-  food_initial_fraction: 0.08
-  food_regrow_p: 0.0007       # chance per empty cell per tick; tuned 2026-10-01 for the flat world (food-limited, below cap)
+  food_initial_fraction: 0.3   # rev. 2026-10-08 (owner: food quick and plentiful); 0.08 before
+  food_regrow_p: 0.005        # chance per empty cell per tick (≈ 200 ticks to regrow); 0.0007 from 2026-10-01 (food-limited, below cap)
   food_water_bonus: 2.0        # regrowth multiplier near water (no effect without water)
   water_bonus_radius: 3
 perception:                   # both species (rev. 2026-10-07)
@@ -37,7 +37,8 @@ agents:                       # the prey animals
   maturity: 150
   max_age: 1500
   mate_energy: 50.0
-  child_energy: 40.0
+  child_energy: 40.0          # per baby, paid by the parents (shared)
+  litter: [2, 4]              # babies per mating, uniform; each its own genes and mutations (rev. 2026-10-08; 1 before)
   energy_low: 30.0
   energy_high: 70.0
   wander_turn_p: 0.25         # random walk of an animal whose chosen action has nothing in sight
@@ -67,7 +68,8 @@ predators:                    # genetic animals like the prey since 2026-10-07: 
   maturity: 150
   max_age: 1500
   mate_energy: 50.0
-  child_energy: 40.0
+  child_energy: 40.0          # per baby, paid by the parents (shared)
+  litter: [2, 4]              # babies per mating, uniform; each its own genes and mutations (rev. 2026-10-08; 1 before)
   energy_low: 30.0
   energy_high: 70.0
   wander_turn_p: 0.25

@@ -108,6 +108,7 @@ class Simulation:
         self.rng_sampling = self.streams.get("sampling")
         self.rng_act = self.streams.get("actions")          # moves and kill rolls
         self.rng_mut = self.streams.get("mutation")
+        self.rng_litter = self.streams.get("litter")        # litter sizes
         self.rng_food = self.streams.get("food")
         self.world = World(cfg, ws.get("world"))
         self.registry = registry or AlleleRegistry()
@@ -172,27 +173,40 @@ class Simulation:
             self.cs[sp.name].immigrants += 1
         return a
 
-    def _birth(self, parents: list[Agent]) -> None:
+    def _litter_size(self, parents: list[Agent], sc, room: int) -> int:
+        """Babies from one mating (rev. 2026-10-08, before 1): drawn uniformly from sc.litter
+        [min, max], cut (not below min) so that no parent pays more energy than it has (each baby
+        costs the parents child_energy, shared), and cut to the room left under the cap."""
+        lo, hi = (int(x) for x in (sc.get("litter") or (1, 1)))
+        k = int(self.rng_litter.integers(lo, hi + 1))
+        share = sc.child_energy / len(parents)
+        affordable = min(int((p.energy - 1e-9) // share) for p in parents)
+        return max(0, min(max(lo, min(k, affordable)), room))
+
+    def _birth(self, parents: list[Agent], room: int = 1) -> None:
+        """A litter (see _litter_size); every baby gets its own crossover and its own mutations."""
         sp = parents[0].genome.sp
         sc = species_cfg(self.cfg, sp)
-        if len(parents) == 2:
-            g = crossover_uniform(parents[0].genome, parents[1].genome, self.rng_mut)
-        else:
-            g = parents[0].genome
-        g, muts = self.mutator.mutate(g, self.rng_mut)
+        k = self._litter_size(parents, sc, room)
         share = sc.child_energy / len(parents)
-        for p in parents:
-            p.energy -= share
-            p.offspring += 1
-            p.bred = True
         gen = max(p.generation for p in parents) + 1
-        child = self._new_agent(parents[0].y, parents[0].x, sc.child_energy, g, gen,
-                                tuple(p.id for p in parents))
-        self.cs[sp.name].births += 1
-        self._log("birth", sp, id=child.id, parents=list(child.parents), gen=gen,
-                  genome=list(g.alleles), mutations=muts)
-        if self.cfg.evolution.get("egg_bank"):
-            self.eggs[sp.name].append((self.t, [p.genome for p in parents], child.parents, gen))
+        for p in parents:
+            p.energy -= share * k
+            p.offspring += k
+            p.bred = True
+        for _ in range(k):
+            if len(parents) == 2:
+                g = crossover_uniform(parents[0].genome, parents[1].genome, self.rng_mut)
+            else:
+                g = parents[0].genome
+            g, muts = self.mutator.mutate(g, self.rng_mut)
+            child = self._new_agent(parents[0].y, parents[0].x, sc.child_energy, g, gen,
+                                    tuple(p.id for p in parents))
+            self.cs[sp.name].births += 1
+            self._log("birth", sp, id=child.id, parents=list(child.parents), gen=gen,
+                      genome=list(g.alleles), mutations=muts, litter=k)
+            if self.cfg.evolution.get("egg_bank"):
+                self.eggs[sp.name].append((self.t, [p.genome for p in parents], child.parents, gen))
 
     def _hatch(self, sp: Species) -> bool:
         """Egg bank: hatch a random egg laid in the last egg_ticks ticks (crossover and mutation
@@ -347,7 +361,7 @@ class Simulation:
                 if len(self.members(sp)) >= cap:
                     return
                 if a.action == "mate" and not a.bred and mate_ready(a, sc):
-                    self._birth([a])
+                    self._birth([a], room=cap - len(self.members(sp)))
             return
         # One partner's choice is enough (rev. 2026-10-07): an animal that chose mate breeds with a
         # ready partner next to it, whatever that partner is doing. Before, both had to choose mate.
@@ -358,7 +372,7 @@ class Simulation:
                 continue
             for b in list(members):
                 if b is not a and not b.bred and mate_ready(b, sc) and cheb(a.y, a.x, b.y, b.x) <= 1:
-                    self._birth([a, b])
+                    self._birth([a, b], room=cap - len(self.members(sp)))
                     break
 
     def _hunting_ground(self, a: Agent, sc) -> bool:

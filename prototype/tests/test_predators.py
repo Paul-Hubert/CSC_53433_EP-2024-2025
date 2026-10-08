@@ -80,12 +80,15 @@ def test_predators_breed_with_their_own_genes(tmp_path):
         x.age, x.energy, x.action, x.digest = 200, 90.0, "mate", 0
     n = len(sim.predators)
     sim._breed(PREDATOR)
-    child = sim.predators[-1]
-    assert len(sim.predators) == n + 1 and child.species == "predator" and child.parents == (p.id, q.id)
-    assert len(child.genome.alleles) == len(PREDATOR.loci) and all(a.startswith("predator.") for a in child.genome.alleles)
+    k = len(sim.predators) - n                             # a litter of 2-4 (rev. 2026-10-08)
+    assert 2 <= k <= 4
+    for child in sim.predators[-k:]:
+        assert child.species == "predator" and child.parents == (p.id, q.id)
+        assert len(child.genome.alleles) == len(PREDATOR.loci) and all(a.startswith("predator.") for a in child.genome.alleles)
     sim.finish()
     births = [json.loads(l) for l in (tmp_path / "events.jsonl").read_text().splitlines() if '"birth"' in l]
-    assert births[-1]["species"] == "predator" and births[-1]["id"] == child.id
+    assert [b["id"] for b in births[-k:]] == [c.id for c in sim.predators[-k:]]
+    assert all(b["species"] == "predator" and b["litter"] == k for b in births[-k:])
 
 
 def test_one_partner_choosing_mate_is_enough():
@@ -106,11 +109,12 @@ def test_one_partner_choosing_mate_is_enough():
         a.bred = b.bred = False
         n = len(members)
         sim._breed(sp)
-        assert len(sim.members(sp)) == n + 1 and sim.members(sp)[-1].parents == (a.id, b.id), sp.name
+        k = len(sim.members(sp)) - n                        # a litter of 2-4
+        assert 2 <= k <= 4 and all(c.parents == (a.id, b.id) for c in sim.members(sp)[-k:]), sp.name
         a.bred = b.bred = False
         b.energy = 20.0                                     # partner not ready: no birth
         sim._breed(sp)
-        assert len(sim.members(sp)) == n + 1, sp.name
+        assert len(sim.members(sp)) == n + k, sp.name
 
 
 def test_predators_follow_each_other():

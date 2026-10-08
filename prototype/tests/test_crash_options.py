@@ -83,7 +83,7 @@ def test_predators_breed_only_with_enough_prey():
     sim.agents[0].y, sim.agents[0].x = 22, 22
     p.action = "mate"
     sim._breed(PREDATOR)
-    assert sim.cs["predator"].births == 1
+    assert 2 <= sim.cs["predator"].births <= 4                    # a litter
 
 
 def test_egg_bank_refills_the_floor_with_real_offspring():
@@ -94,10 +94,11 @@ def test_egg_bank_refills_the_floor_with_real_offspring():
     (a.y, a.x), (b.y, b.x) = (20, 20), (20, 21)
     a.action = "mate"
     sim._breed(PREY)
-    assert sim.cs["prey"].births == 1 and len(sim.eggs["prey"]) == 1
+    n = sim.cs["prey"].births                                   # a litter: one egg per baby
+    assert 2 <= n <= 4 and len(sim.eggs["prey"]) == n
     sim.agents = []                                              # every prey animal dies
     sim.step()
     c = sim.cs["prey"]
-    assert c.hatched == 1 and c.immigrants == cfg.agents.floor - 1      # one egg, then founders
+    assert c.hatched == n and c.immigrants == cfg.agents.floor - n      # the eggs, then founders
     hatched = [x for x in sim.agents if x.parents == (a.id, b.id)]
-    assert len(hatched) == 1 and hatched[0].generation == 1
+    assert len(hatched) == n and all(x.generation == 1 for x in hatched)
