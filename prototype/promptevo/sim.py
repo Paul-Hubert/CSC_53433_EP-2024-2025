@@ -10,6 +10,13 @@ Stamina (since 2026-10-07): each cell moved costs one point of stamina and energ
 (cost_move); a tick without moving brings stamina back (stamina_regen), which costs extra
 energy (cost_regen) until stamina is full.
 
+Against boom-bust crashes (2026-10-08, off by default; experiments/crash_sweep.py):
+predators.prey_per_predator q lets predators breed only while there are at least q prey per
+predator (a cap that follows the prey, Leslie-Gower), predators.breed_prey_seen m only with at
+least m prey within their vision (the same, local); evolution.egg_bank: below the floor an
+egg laid by a pair in the last evolution.egg_ticks ticks hatches (a delayed birth with real
+parents and generation) before any newcomer with founder genes.
+
 The backend is only called for (species, genome, observation) triples not yet seen in this
 run; identical situations reuse the stored distribution (big speed-up with an LLM brain).
 Events of predators carry "species": "predator"; prey events keep their earlier format.
@@ -81,6 +88,7 @@ class Counters:
     exhausted: int = 0           # animal-ticks that began without stamina to move a cell
     births: int = 0
     immigrants: int = 0
+    hatched: int = 0             # egg bank: eggs hatched below the floor
     deaths: Counter = field(default_factory=Counter)
     actions: Counter = field(default_factory=Counter)
     backend_time: float = 0.0
@@ -117,6 +125,7 @@ class Simulation:
         self.agents: list[Agent] = []               # living prey animals
         self.predators: list[Agent] = []            # living predators
         self.lifespans: dict[str, list[int]] = {name: [] for name in SPECIES}
+        self.eggs: dict[str, list[tuple]] = {name: [] for name in SPECIES}   # (t laid, parents, generation)
         for _ in range(int(cfg.agents.init_pop)):
             self._spawn_founder(PREY, immigrant=False)
         for _ in range(int(cfg.predators.init_pop)):
@@ -182,6 +191,28 @@ class Simulation:
         self.cs[sp.name].births += 1
         self._log("birth", sp, id=child.id, parents=list(child.parents), gen=gen,
                   genome=list(g.alleles), mutations=muts)
+        if self.cfg.evolution.get("egg_bank"):
+            self.eggs[sp.name].append((self.t, [p.genome for p in parents], child.parents, gen))
+
+    def _hatch(self, sp: Species) -> bool:
+        """Egg bank: hatch a random egg laid in the last egg_ticks ticks (crossover and mutation
+        now, as at a birth). False if the bank is off or empty."""
+        ec = self.cfg.evolution
+        if not ec.get("egg_bank"):
+            return False
+        eggs = self.eggs[sp.name]
+        eggs[:] = [e for e in eggs if self.t - e[0] <= int(ec.get("egg_ticks") or 2000)]
+        if not eggs:
+            return False
+        laid, genomes, parents, gen = eggs.pop(int(self._rng(sp).integers(len(eggs))))
+        g = crossover_uniform(genomes[0], genomes[1], self.rng_mut) if len(genomes) == 2 else genomes[0]
+        g, muts = self.mutator.mutate(g, self.rng_mut)
+        y, x = self.world.random_cell(self._rng(sp))
+        a = self._new_agent(y, x, species_cfg(self.cfg, sp).energy_start, g, gen, parents)
+        self.cs[sp.name].hatched += 1
+        self._log("birth", sp, id=a.id, parents=list(parents), gen=gen, genome=list(g.alleles),
+                  mutations=muts, laid=laid)
+        return True
 
     def _die(self, a: Agent, cause: str) -> None:
         sp = a.genome.sp
@@ -273,7 +304,8 @@ class Simulation:
         self.world.age_carcasses()
         for sp in (PREY, PREDATOR):
             while len(self.members(sp)) < int(species_cfg(cfg, sp).floor):
-                self._spawn_founder(sp, immigrant=True)
+                if not self._hatch(sp):
+                    self._spawn_founder(sp, immigrant=True)
         self.t += 1
         if self.t % int(cfg.sim.stats_every) == 0:
             self.log.stats(self.stats_row())
@@ -306,6 +338,9 @@ class Simulation:
     def _breed(self, sp: Species) -> None:
         sc = species_cfg(self.cfg, sp)
         cap = int(sc.cap)
+        q = float(sc.get("prey_per_predator") or 0) if sp.name == "predator" else 0.0
+        if q:                                     # predators breed only while there are q prey each
+            cap = min(cap, int(len(self.agents) / q))
         members = self.members(sp)
         if not self.cfg.evolution.sexual:
             for a in list(members):
@@ -316,7 +351,8 @@ class Simulation:
             return
         # One partner's choice is enough (rev. 2026-10-07): an animal that chose mate breeds with a
         # ready partner next to it, whatever that partner is doing. Before, both had to choose mate.
-        seekers = [a for a in members if a.action == "mate" and not a.bred and mate_ready(a, sc)]
+        seekers = [a for a in members if a.action == "mate" and not a.bred and mate_ready(a, sc)
+                   and self._hunting_ground(a, sc)]
         for a in seekers:
             if len(self.members(sp)) >= cap or a.bred:
                 continue
@@ -324,6 +360,15 @@ class Simulation:
                 if b is not a and not b.bred and mate_ready(b, sc) and cheb(a.y, a.x, b.y, b.x) <= 1:
                     self._birth([a, b])
                     break
+
+    def _hunting_ground(self, a: Agent, sc) -> bool:
+        """predators.breed_prey_seen m (off when 0): a predator breeds only with at least m prey
+        within its vision (a local version of prey_per_predator)."""
+        m = int(sc.get("breed_prey_seen") or 0) if a.species == "predator" else 0
+        if not m:
+            return True
+        v = int(sc.vision)
+        return sum(1 for b in self.agents if cheb(a.y, a.x, b.y, b.x) <= v) >= m
 
     # --- running -------------------------------------------------------------
     def stats_row(self) -> dict:
@@ -381,7 +426,7 @@ class Simulation:
 
     def _species_summary(self, sp: Species) -> dict:
         c, ms, life = self.cs[sp.name], self.members(sp), self.lifespans[sp.name]
-        return {"pop_final": len(ms), "births": c.births, "immigrants": c.immigrants,
+        return {"pop_final": len(ms), "births": c.births, "immigrants": c.immigrants, "hatched": c.hatched,
                 "deaths": dict(c.deaths),
                 "mean_lifespan": round(float(np.mean(life)), 1) if life else None,
                 "max_gen": max((a.generation for a in ms), default=0),

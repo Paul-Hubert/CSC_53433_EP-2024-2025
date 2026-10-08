@@ -1,7 +1,13 @@
 """Headless grid world: terrain (water/mountain), food and carcasses. Plan §A4.
 
 Predators were scripted here until 2026-10-07; they are now genetic animals (sim.py, actions.py).
-A predator's kill leaves a carcass (since 2026-10-07) that other predators can eat from."""
+A predator's kill leaves a carcass (since 2026-10-07) that other predators can eat from.
+
+Two options against boom-bust crashes (2026-10-08, off by default; experiments/crash_sweep.py):
+- world.cover_fraction: patches of cover (thickets) where predators can't see or kill a prey
+  animal; fleeing prey run into cover within world.cover_seek cells.
+- world.patches: ridges (mountain, 1 cell thick) split the world into patches x patches areas,
+  each joined to its neighbours by one gap of world.wall_gap cells."""
 from __future__ import annotations
 
 from collections import deque
@@ -101,6 +107,8 @@ class World:
         self.food = (rng_world.random((self.h, self.w)) < wc.food_initial_fraction) & self.walkable
         self.carcasses: list[Carcass] = []
         self.portions_eaten = 0             # carcass portions eaten so far (stats)
+        # drawn last, so worlds without cover are the same as before
+        self.cover = self._make_cover(rng_world) if float(wc.get("cover_fraction") or 0) > 0 else None
 
     def _make_terrain(self, rng: np.random.Generator) -> np.ndarray:
         wc = self.cfg.world
@@ -110,7 +118,27 @@ class World:
         t = np.full((self.h, self.w), GRASS, dtype=np.int8)
         t[hmap < lo] = WATER
         t[hmap > hi] = MOUNTAIN
+        k = int(wc.get("patches") or 0)
+        if k > 1:                              # ridges between k x k patches, one gap per ridge segment
+            g = int(wc.get("wall_gap") or 4)
+            for j in range(1, k):
+                t[j * self.h // k, :] = MOUNTAIN
+                t[:, j * self.w // k] = MOUNTAIN
+            for i in range(k):
+                for j in range(1, k):
+                    cx, cy = (2 * i + 1) * self.w // (2 * k) - g // 2, (2 * i + 1) * self.h // (2 * k) - g // 2
+                    t[j * self.h // k, cx:cx + g] = GRASS
+                    t[cy:cy + g, j * self.w // k] = GRASS
         return t
+
+    def _make_cover(self, rng: np.random.Generator) -> np.ndarray:
+        """Clustered cover on walkable cells: the top cover_fraction of a noise map."""
+        noise = value_noise(self.h, self.w, [8, 4], rng)
+        thr = np.quantile(noise[self.walkable], 1 - float(self.cfg.world.cover_fraction))
+        return (noise >= thr) & self.walkable
+
+    def in_cover(self, y: int, x: int) -> bool:
+        return self.cover is not None and bool(self.cover[y, x])
 
     # --- queries -----------------------------------------------------------
     def is_walkable(self, y: int, x: int) -> bool:
@@ -122,9 +150,15 @@ class World:
 
     def nearest_food(self, y: int, x: int, radius: int) -> tuple[int, int, int] | None:
         """(fy, fx, distance) of the nearest food within radius (Chebyshev), else None."""
+        return self._nearest_cell(self.food, y, x, radius)
+
+    def nearest_cover(self, y: int, x: int, radius: int) -> tuple[int, int, int] | None:
+        return None if self.cover is None else self._nearest_cell(self.cover, y, x, radius)
+
+    def _nearest_cell(self, mask: np.ndarray, y: int, x: int, radius: int) -> tuple[int, int, int] | None:
         y0, y1 = max(0, y - radius), min(self.h, y + radius + 1)
         x0, x1 = max(0, x - radius), min(self.w, x + radius + 1)
-        pts = np.argwhere(self.food[y0:y1, x0:x1])
+        pts = np.argwhere(mask[y0:y1, x0:x1])
         if len(pts) == 0:
             return None
         pts = pts + (y0, x0)

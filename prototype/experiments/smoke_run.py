@@ -1,5 +1,6 @@
-"""Smoke run: python -m experiments.smoke_run [--profile full] --ticks 5000 [--backend rule_based|llm]
+"""Smoke run: python -m experiments.smoke_run [--profile full] --ticks 5000 [--backend rule_based|llm|jev]
                                             [--world terrain_preview] [--minutes 720]
+                                            [--set evolution.egg_bank=true --set world.cover_fraction=0.2]
 
 The default world is the full one, 96 x 96 (since 2026-10-07: in the 48 x 48 small world
 the LLM-read prey didn't hold against the predators, and in 64 x 64 the few predators
@@ -20,6 +21,9 @@ Long runs:
 - Events and stats are flushed every 500 ticks and alleles.jsonl is saved every 5 000, so a
   hard stop (power cut) loses little; gene_report reads such a run.
 - Windows is asked not to sleep while the run goes; run_info.json records what ran.
+
+--set section.key=value (repeatable) changes one setting of the merged config for this run; the
+value is read as YAML (true, 0.2, [1, 2]). run_info.json keeps the command and the settings.
 """
 from __future__ import annotations
 
@@ -30,6 +34,8 @@ import sys
 import time
 import traceback
 from pathlib import Path
+
+import yaml
 
 from promptevo.backends.factory import MutatorUnavailable, make_backend, make_rewriter, mutator_client
 from promptevo.config import CONFIG_DIR, ROOT, load_config, resolve
@@ -122,9 +128,21 @@ def main() -> None:
     ap.add_argument("--no-mutation", action="store_true", help="no gene mutation (no mutator LLM needed)")
     ap.add_argument("--minutes", type=float, default=None,
                     help="stop after this much wall-clock time, even before --ticks (time-boxed runs)")
+    ap.add_argument("--set", action="append", default=[], metavar="SECTION.KEY=VALUE",
+                    help="change one setting, e.g. evolution.egg_bank=true (repeatable; value read as YAML)")
     a = ap.parse_args()
+    over = {"evolution": {"p_mut": 0.0}} if a.no_mutation else {}
+    for item in a.set:
+        path, _, value = item.partition("=")
+        *sections, key = path.strip().split(".")
+        if not sections or not _:
+            raise SystemExit(f"--set wants section.key=value, got {item!r}")
+        node = over
+        for sec in sections:
+            node = node.setdefault(sec, {})
+        node[key] = yaml.safe_load(value)
     cfg = load_config(a.profile, extra_files=[CONFIG_DIR / "worlds" / f"{a.world}.yaml"] if a.world else None,
-                      overrides={"evolution": {"p_mut": 0.0}} if a.no_mutation else None)
+                      overrides=over or None)
     name = a.backend or cfg.backend.name
     backend = make_backend(name, cfg, strict=True)        # a failed model call stops the run, uncached
     client = client_from_config(cfg) if name == "llm" else None    # the Ollama brain
@@ -172,13 +190,13 @@ def main() -> None:
     elif why != "ticks":
         print(f"stopped at t={sim.t} ({why}). To resume, run the same command again: "
               "the part already done replays from the cache.")
-    keep = {k: s[k] for k in ("ticks", "pop_final", "births", "immigrants", "deaths",
+    keep = {k: s[k] for k in ("ticks", "pop_final", "births", "immigrants", "hatched", "deaths",
                               "mean_lifespan", "max_gen", "memo_hit_rate", "invalid_rate", "exhausted_share",
                               "backend_s", "alleles", "mutations")}
     print("prey:", json.dumps(keep))
     print("prey actions:", s["action_share"])
     pr = s["predators"]
-    print("predators:", json.dumps({k: pr[k] for k in ("pop_final", "births", "immigrants", "deaths", "kills",
+    print("predators:", json.dumps({k: pr[k] for k in ("pop_final", "births", "immigrants", "hatched", "deaths", "kills",
                                                        "portions", "mean_lifespan", "max_gen", "memo_hit_rate",
                                                        "invalid_rate", "exhausted_share")}))
     print("predator actions:", pr["action_share"])

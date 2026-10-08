@@ -151,6 +151,7 @@ def sense(agent, world, prey, predators, cfg) -> Observation | PredatorObservati
         food = "none" if nf is None else "here" if nf[2] == 0 else band(nf[2], scale)
         dp = min((cheb(agent.y, agent.x, p.y, p.x) for p in predators), default=None)
         return Observation(energy, food, band(dp, scale), animal, ready, age, scale, stamina)
-    dq = min((cheb(agent.y, agent.x, b.y, b.x) for b in prey if not b.killed), default=None)
+    dq = min((cheb(agent.y, agent.x, b.y, b.x) for b in prey              # prey in cover are hidden
+              if not b.killed and not world.in_cover(b.y, b.x)), default=None)
     _, dc = edible_carcass(agent, world)
     return PredatorObservation(energy, band(dq, scale), animal, ready, age, scale, stamina, band(dc, scale))

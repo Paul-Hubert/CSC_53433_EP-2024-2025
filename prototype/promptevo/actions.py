@@ -91,10 +91,19 @@ def do_eat(agent, world, prey, predators, cfg, rng) -> int:
 
 
 def do_flee(agent, world, prey, predators, cfg, rng) -> int:
+    """Run away from the nearest predator; with cover in the world (off by default), stay in
+    cover or run into cover within world.cover_seek cells instead."""
     p, d = _nearest(agent, predators)
     if p is None or d > cfg.agents.vision:
         return _invalid(agent, world, cfg, rng)
-    return _go(agent, world, p.y, p.x, rng, cells(agent, cfg, run=True), away=True)
+    n = cells(agent, cfg, run=True)
+    if world.cover is not None:
+        if world.in_cover(agent.y, agent.x):
+            return 0
+        c = world.nearest_cover(agent.y, agent.x, int(cfg.world.get("cover_seek") or 0))
+        if c is not None:
+            return _go(agent, world, c[0], c[1], rng, n, stop=0)
+    return _go(agent, world, p.y, p.x, rng, n, away=True)
 
 
 def do_follow(agent, world, prey, predators, cfg, rng) -> int:
@@ -126,14 +135,26 @@ def _meal(agent, pc, gain) -> None:
     agent.digest = round(pc.digest_ticks * gain / pc.kill_gain)
 
 
+def strike_p(agent, target, predators, pc) -> float:
+    """kill_p, divided by 1 + interference x (other predators within interference_radius of the
+    target): crowding predators get in each other's way (Beddington-DeAngelis; off when 0)."""
+    c = float(pc.get("interference") or 0)
+    if not c:
+        return float(pc.kill_p)
+    r = int(pc.get("interference_radius") or 3)
+    n = sum(1 for q in predators if q is not agent and cheb(q.y, q.x, target.y, target.x) <= r)
+    return float(pc.kill_p) / (1 + c * n)
+
+
 def do_hunt(agent, world, prey, predators, cfg, rng) -> int:
     """Run toward the nearest prey animal or carcass this predator may eat from (up to `speed`
     cells, stopping next to it). Next to a carcass: eat a portion (carcass_gain). Next to a prey
     animal: strike, killing it with probability kill_p; the kill feeds the predator (kill_gain)
     and leaves a carcass with carcass_portions portions for other predators. The simulation
-    removes the killed prey."""
+    removes the killed prey. Prey in cover are hidden (world.cover, off by default); other
+    predators near the target lower kill_p (predators.interference, off by default)."""
     pc = cfg.predators
-    target, d = _nearest(agent, prey, pred=lambda b: not b.killed)
+    target, d = _nearest(agent, prey, pred=lambda b: not b.killed and not world.in_cover(b.y, b.x))
     c, dc = edible_carcass(agent, world)
     if c is not None and (target is None or dc <= d):
         target, d = c, dc                    # a carcass is a sure meal: it goes first on a tie
@@ -147,7 +168,7 @@ def do_hunt(agent, world, prey, predators, cfg, rng) -> int:
         target.eaters.add(agent.id)
         world.portions_eaten += 1
         _meal(agent, pc, pc.carcass_gain)
-    elif rng.random() < pc.kill_p:
+    elif rng.random() < strike_p(agent, target, predators, pc):
         target.killed, target.killer = True, agent.id
         _meal(agent, pc, pc.kill_gain)
         if int(pc.carcass_portions) > 0:
