@@ -347,7 +347,7 @@ def describe(aids, g: Genes, edit=None, words_of=None, world_of=None, kind_of=No
 
 
 def mutation_sets(run: Run, g: Genes, sc: dict, mt: dict | None) -> dict:
-    produced = [a for a in run.alleles if g.mutant(a)]
+    produced = [a for a in run.alleles if g.mutant(a) and run.alleles[a]["locus"] in run.loci]   # this species only
     living = lambda s: sorted({a for i in s["ids"] for a in run.genome[i] if g.mutant(a)})
     most = max(sc["snaps"], key=lambda s: sum(g.mutant(a) for i in s["ids"] for a in run.genome[i])
                / max(1, len(s["ids"])))                  # the checkpoint where mutants were most common
@@ -477,7 +477,7 @@ def report(run: Run, g: Genes, sc, rows, sw, lead, sets, drop, fit, beh, sense, 
          f"Checkpoints every {a.every} ticks; gene dropping with {a.drops} random inheritances; behaviour per "
          f"{a.window} ticks. Data: `{tag}_timeline.csv` (every checkpoint and slot), `.json`, and the charts in `.html`.", "",
          "## 1. The gene pool over time", "",
-         "Means over the 10 slots. *Mutants*: share of the living animals' genes that are mutants. *Depth*: "
+         f"Means over the {len(run.loci)} slots. *Mutants*: share of the living animals' genes that are mutants. *Depth*: "
          "mutations since a founder text. *World*: share of genes using a word of the animal's world. "
          "*Effective*: 1 / Σ share² (how many equally common genes the slot amounts to). *Overlap*: words "
          "shared by two animals with different texts in a slot (Jaccard).", "",
@@ -770,7 +770,8 @@ def page(run: Run, g: Genes, sc, rows, sh, sw, beh, md_lines, tag: str) -> str:
     if beh and beh[0]["actions"]:
         body += ["<h2>Behaviour</h2>", '<div class="card"><h3>Share of decisions per action, per window</h3>']
         acol = {"eat": "#2e8b57", "flee": "#c23b22", "follow": "#2a7ab9", "wander": "#9a8c2a",
-                "rest": "#7a7a7a", "mate": "#c2571a", "attack": "#7a3fb0"}       # wander, attack: older runs
+                "rest": "#7a7a7a", "mate": "#c2571a", "attack": "#7a3fb0",       # wander, attack: older runs
+                "hunt": "#c23b22"}                                                # predators
         series = [(a, [((w["from"] + w["to"]) / 2, w["actions"][a]) for w in beh if w["actions"]], acol[a])
                   for a in beh[0]["actions"]]
         top = max(v for _, s_, _ in series for _, v in s_) * 1.1

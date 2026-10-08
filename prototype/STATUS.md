@@ -9,9 +9,8 @@ small edits of the rule; word list and word-change limit removed on request, mea
 
 ## Next action
 Mutation v4 2026-10-08: context line + 7 instructions (mutate_v4.txt), redraws; word list + change limit removed
-(owner). RUNNING (owner: "run a very long simulation"): results/runs/long_v4_llm, see Background jobs; when done:
-`gene_timeline --species prey|predator`, gene_report, write up in 06/11. Stop: create logs/run_long_v4_llm.stop;
-resume: same command (cache replays). WAIT for owner
+(owner). Long LLM run with v4 stopped by the owner at t 7 000 (Key numbers); not yet written up in 06/09. To
+continue it: the same command (Background jobs) replays from the cache. WAIT for owner
 (../Docs/prompt-genome/09 §4): #10 keep the values (predators at their cap with both brains) or let food limit
 them; cost ≈ 12 calls per tick (5 000 ticks ≈ 6.5 h); G2 handling
 (all-zero answers → neutral answer? cleaner control sentences? prompt iteration 1/3?); founder pools H1
@@ -92,6 +91,11 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
   usable after 1/10/30 mutations 61/8/0 %, 92/67/44 %, 89/56/33 %; world word after 30: 22, 83, 33 %; words changed
   2.7, 1.8, 3.1. v3 alone drifts into office/game language. v4 (context + 7): usable 89/50/36 %, world word after 30
   72 %, 2.8 words; wildlife words (village, forest), slot drift, firm words 25 → 8-14 %. results/mutation_test_*.md.
+- LLM long run v4 (2026-10-08, 96 x 96, seed 1234, results/runs/long_v4_llm): owner stop at t 7 000 (7 h 42 min, 68 373
+  calls, 0 failures). Cycles ≈ 3 500 ticks: predators at cap → prey at floor (t 1 500, 5 000) → predators at floor
+  (t 2 000, 5 500); each floor = whole line replaced by newcomers (evolution restarts), max gen 11 / 7. 312 mutations;
+  no prey mutant > 33 %, 1 predator mutant 64 % (drift); mutants 91-95 % world words, judged usable 74-100 %; "No
+  preference." mutates into vague texts ("Preference for water."). results/long_v4_llm{,_predator}_timeline.md.
 - LLM brain, 12 h (2026-10-05/06, seed 1234 continues llm_60min): 57 061 ticks, 79 667 calls, 0 failures, 812
   mutations, peak generation 114. Rescued line thrived (29 animals, t 6-20k), then died out (t 27 337); 874
   newcomers in 30k ticks, no second rescue. Predation trap: kills ≈ constant → 1.9 vs 3.8 per 1 000
@@ -99,7 +103,6 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
   82 → 54 %. Sweeps = drift (gene dropping: 16 mutants to 50 % vs 18 (13-24) by inheritance alone);
   "Never fight." not confirmed after t 5 269. Salad mate gene: P(mate) −7.7 points (gene_swap).
   results/llm_long_timeline.md/.html, Docs/prompt-genome/11.
-- Earlier 2026-10-07 predator checks (LLM small 48 x 48 and 64 x 64, 2 000 ticks each): notes/archive.md, 06 §5.12-13.
 - All 4 options (9aaac2d): one partner's mate is enough, predators follow (4 genes), full world 96 x 96 (prey 68/cap 135,
   predators 14/cap 34), breeding line in teacher_v4 / predator_v2; small predator cap 6. rule_based, no mutation, 5 000
   ticks, 3 seeds: full prey 74-93 (never at the floor), predators 15-21, 200-266 births, 18-19 gens; small prey 22-25,
@@ -126,8 +129,7 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
 ## Background jobs
 | Job | Started | Log | Progress file | State |
 |---|---|---|---|---|
-| LLM check stamina 96 x 96, 2 000 ticks, seed 1234 (`--out results/runs/check_stamina_llm --minutes 180`) | 2026-10-07 18:53 | logs/check_stamina_llm.log | logs/run_check_stamina_llm.progress.json | done 21:31 (2 000 ticks) |
-| **Long LLM run, mutation v4** 96 x 96, seed 1234, 20 000 ticks or 24 h (`--backend llm --ticks 20000 --minutes 1440 --snapshots 20 --out results/runs/long_v4_llm`; commit 5d60b77) | 2026-10-08 04:32 | logs/long_v4_llm.log | logs/run_long_v4_llm.progress.json | running |
+| **Long LLM run, mutation v4** 96 x 96, seed 1234, 20 000 ticks or 24 h (`--backend llm --ticks 20000 --minutes 1440 --snapshots 20 --out results/runs/long_v4_llm`; commit 5d60b77) | 2026-10-08 04:32 | logs/long_v4_llm.log | logs/run_long_v4_llm.progress.json | stopped 12:14 by the owner (stop file), tick 7 000 |
 
 ## Open issues
 - Own git server mirror: waiting for the URL + auth from the owner (see
