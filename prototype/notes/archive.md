@@ -117,3 +117,12 @@ GPU: 60 decisions in 29 s (0.48 s/decision). Gate answers before 2026-10-01 were
 | gemma4:26b | sign acc 0.99 | ΔP 0.62 | MI_G founders 0.244 | MI_G random 0.314 | gib/founder→neutral 0.20 / 0.13 | G1 ✔ | G2 ✘ |
 Both gemma4 sizes read directed genes well, but irrelevant/shuffled text moved behaviour as much as founder
 genes (gate wants founders ≥ 2× random). Control texts contain world words (mountains, river, bread...).
+
+## Moved from STATUS.md › Key numbers (2026-10-08)
+- LLM brain, 12 h (2026-10-05/06, seed 1234 continues llm_60min): 57 061 ticks, 79 667 calls, 0 failures, 812
+  mutations, peak generation 114. Rescued line thrived (29 animals, t 6-20k), then died out (t 27 337); 874
+  newcomers in 30k ticks, no second rescue. Predation trap: kills ≈ constant → 1.9 vs 3.8 per 1 000
+  animal-ticks at 29 vs 11 animals. Mutants 75 % of genes at t 24k, world words 97 → 78 %, judged usable
+  82 → 54 %. Sweeps = drift (gene dropping: 16 mutants to 50 % vs 18 (13-24) by inheritance alone);
+  "Never fight." not confirmed after t 5 269. Salad mate gene: P(mate) −7.7 points (gene_swap).
+  results/llm_long_timeline.md/.html, Docs/prompt-genome/11.
