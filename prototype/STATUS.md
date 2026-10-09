@@ -128,7 +128,7 @@ JEV run test (results/runs/jev_test, 96 x 96, seed 1234, 1 000 ticks): 7.6 min =
 ## Background jobs
 | Job | Started | Log | Progress file | State |
 |---|---|---|---|---|
-| JEV + litters + food + migrate 96 x 96, seed 1234, 10 h (`nohup .venv/Scripts/python.exe -m experiments.smoke_run --backend jev --seed 1234 --ticks 50000 --minutes 600 --snapshots 25 --out results/runs/jev_migrate`; 1ed0331) | 2026-10-09 03:55 | logs/jev_migrate.log | logs/run_jev_migrate.progress.json | running (pid 81676) |
+| JEV + litters + food + migrate 96 x 96, seed 1234, 10 h (`nohup .venv/Scripts/python.exe -m experiments.smoke_run --backend jev --seed 1234 --ticks 50000 --minutes 600 --snapshots 25 --out results/runs/jev_migrate`; 1ed0331) | 2026-10-09 03:58 | logs/jev_migrate.log | logs/run_jev_migrate.progress.json | running (pid 6832; first try failed at t 152: the Ollama app shut down at 03:55:53, now a bare `ollama serve`, logs/ollama_serve.log) |
 | JEV + cover 20 % 96 x 96, seed 1234, 20 000 ticks or 10 h (same, `--set world.cover_fraction=0.2 --set world.cover_seek=6 --out results/runs/jev_cover`; f1da89a) | 2026-10-08 | logs/jev_cover.log | logs/run_jev_cover.progress.json | killed ≈ 00:15 (system low on memory) after t 13 000: 171 prey + 3 predator newcomers; data to t 13 000, alleles to t 10 000, no summary |
 
 ## Open issues
