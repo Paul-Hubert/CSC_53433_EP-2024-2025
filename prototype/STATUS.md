@@ -92,11 +92,11 @@ JEV run test (results/runs/jev_test, 96 x 96, seed 1234, 1 000 ticks): 7.6 min =
   usable after 1/10/30 mutations 61/8/0 %, 92/67/44 %, 89/56/33 %; world word after 30: 22, 83, 33 %; words changed
   2.7, 1.8, 3.1. v3 alone drifts into office/game language. v4 (context + 7): usable 89/50/36 %, world word after 30
   72 %, 2.8 words; wildlife words (village, forest), slot drift, firm words 25 → 8-14 %. results/mutation_test_*.md.
-- LLM long run v4 (2026-10-08, 96 x 96, seed 1234, results/runs/long_v4_llm): owner stop at t 7 000 (7 h 42 min, 68 373
-  calls, 0 failures). Cycles ≈ 3 500 ticks: predators at cap → prey at floor (t 1 500, 5 000) → predators at floor
-  (t 2 000, 5 500); each floor = whole line replaced by newcomers (evolution restarts), max gen 11 / 7. 312 mutations;
-  no prey mutant > 33 %, 1 predator mutant 64 % (drift); mutants 91-95 % world words, judged usable 74-100 %; "No
-  preference." mutates into vague texts ("Preference for water."). results/long_v4_llm{,_predator}_timeline.md.
+- JEV + litters + food + migrate (2026-10-09, results/runs/jev_migrate, seed 1234): 10 h = 22 817 ticks, 324 369 calls,
+  0 failures, 0 newcomers. Prey 120-135 (one dip to 103 / predators 13 at t ≈ 21k), predators 28-34; generations 132 / 119.
+  Prey deaths 57 % migrated, 28 % killed, 15 % starved. Prey flee 7 → 18 % of decisions, kills per 1 000 prey-ticks 2.29 → 1.93.
+  Flee slot: "...run into them immediately" 97 %, then "...do so immediately" 83 % (JEV reads it as flee). Sweeps at the
+  inheritance-alone rate (mutants to 50 %: prey 7 vs 9, predators 6 vs 10). No judge (GPU = JEV). results/jev_migrate*_timeline.md.
 - Crashes (2026-10-08, results/crash_v1-v5.md, `crash_sweep`: floors 0, no mutation, 8 seeds x 20 000 ticks; brain = the
   LLM's own answers from long_v4_llm by situation, `llm_table`; it crashes like the LLM: 0/8 lasted). Lasted: cap 25 8/8
   (predators pinned at cap), prey_per_predator 3 24/24 (owner: bad logic), cover 20 % 5/8, ridges 0/8, egg bank (owner:
@@ -128,7 +128,7 @@ JEV run test (results/runs/jev_test, 96 x 96, seed 1234, 1 000 ticks): 7.6 min =
 ## Background jobs
 | Job | Started | Log | Progress file | State |
 |---|---|---|---|---|
-| JEV + litters + food + migrate 96 x 96, seed 1234, 10 h (`nohup .venv/Scripts/python.exe -m experiments.smoke_run --backend jev --seed 1234 --ticks 50000 --minutes 600 --snapshots 25 --out results/runs/jev_migrate`; 1ed0331) | 2026-10-09 03:58 | logs/jev_migrate.log | logs/run_jev_migrate.progress.json | running (pid 6832; first try failed at t 152: the Ollama app shut down at 03:55:53, now a bare `ollama serve`, logs/ollama_serve.log) |
+| JEV + litters + food + migrate 96 x 96, seed 1234, 10 h (`nohup .venv/Scripts/python.exe -m experiments.smoke_run --backend jev --seed 1234 --ticks 50000 --minutes 600 --snapshots 25 --out results/runs/jev_migrate`; 1ed0331) | 2026-10-09 03:58 | logs/jev_migrate.log | logs/run_jev_migrate.progress.json | done 13:58 (time limit, t 22 817; first try failed at t 152: the Ollama app shut down at 03:55:53, now a bare `ollama serve`, logs/ollama_serve.log) |
 | JEV + cover 20 % 96 x 96, seed 1234, 20 000 ticks or 10 h (same, `--set world.cover_fraction=0.2 --set world.cover_seek=6 --out results/runs/jev_cover`; f1da89a) | 2026-10-08 | logs/jev_cover.log | logs/run_jev_cover.progress.json | killed ≈ 00:15 (system low on memory) after t 13 000: 171 prey + 3 predator newcomers; data to t 13 000, alleles to t 10 000, no summary |
 
 ## Open issues

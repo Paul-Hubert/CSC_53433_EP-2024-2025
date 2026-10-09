@@ -126,3 +126,10 @@ genes (gate wants founders ≥ 2× random). Control texts contain world words (m
   82 → 54 %. Sweeps = drift (gene dropping: 16 mutants to 50 % vs 18 (13-24) by inheritance alone);
   "Never fight." not confirmed after t 5 269. Salad mate gene: P(mate) −7.7 points (gene_swap).
   results/llm_long_timeline.md/.html, Docs/prompt-genome/11.
+
+## Moved from STATUS.md › Key numbers (2026-10-09)
+- LLM long run v4 (2026-10-08, 96 x 96, seed 1234, results/runs/long_v4_llm): owner stop at t 7 000 (7 h 42 min, 68 373
+  calls, 0 failures). Cycles ≈ 3 500 ticks: predators at cap → prey at floor (t 1 500, 5 000) → predators at floor
+  (t 2 000, 5 500); each floor = whole line replaced by newcomers (evolution restarts), max gen 11 / 7. 312 mutations;
+  no prey mutant > 33 %, 1 predator mutant 64 % (drift); mutants 91-95 % world words, judged usable 74-100 %; "No
+  preference." mutates into vague texts ("Preference for water."). results/long_v4_llm{,_predator}_timeline.md.
