@@ -130,7 +130,7 @@ JEV run test (results/runs/jev_test, 96 x 96, seed 1234, 1 000 ticks): 7.6 min =
 ## Background jobs
 | Job | Started | Log | Progress file | State |
 |---|---|---|---|---|
-| JEV + litters + food + migrate 96 x 96, seed 1234, 10 h (`nohup .venv/Scripts/python.exe -m experiments.smoke_run --backend jev --seed 1234 --ticks 50000 --minutes 600 --snapshots 25 --out results/runs/jev_migrate`; 1ed0331) | 2026-10-09 03:58 | logs/jev_migrate.log | logs/run_jev_migrate.progress.json | done 13:58 (time limit, t 22 817; first try failed at t 152: the Ollama app shut down at 03:55:53, now a bare `ollama serve`, logs/ollama_serve.log) |
+| JEV 1 h, same world and seed, mutator gemma4:26b on the CPU (`... --set mutator.model=gemma4:26b --out results/runs/jev_cover_hungry_1h_g26`; f0d6d8b) | 2026-10-09 21:04 | logs/jev_cover_hungry_1h_g26.log | logs/run_jev_cover_hungry_1h_g26.progress.json | running (pid 63500) |
 | JEV 1 h, evolution-test world (192 x 192, kill_p 0.5, food 0.0015, hungry cover 20 %, caps 270 / 68), seed 1234 (`--backend jev --seed 1234 --ticks 5000 --minutes 60 --snapshots 5 --out results/runs/jev_cover_hungry_1h`; 8ea7698) | 2026-10-09 18:11 | logs/jev_cover_hungry_1h.log | logs/run_jev_cover_hungry_1h.progress.json | done 19:11 (t 1 293, gen 8 / 7; prey deaths 39 % killed, 38 % starved, 23 % migrated; 325 + 35 mutations, results/jev_cover_hungry_1h_mutations.md; first try 18:07 failed: JEV engine CUDA error, container restarted itself) |
 
 ## Open issues
