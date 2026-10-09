@@ -163,14 +163,18 @@ After crossover, each of the child's genes mutates with probability
 `evolution.p_mut` = 0.03. A prey child gets 0.15 mutations on average, and
 about 14 % of prey children (1 − 0.97⁵) get at least one. For a predator
 child it's 0.12 and 11 % (1 − 0.97⁴). Predator genes mutate exactly like prey
-genes, with the same instructions, model and guards.
+genes, with the same instructions, model and guards. Since litters (2026-10-09)
+every baby of a litter gets its own crossover and its own mutation draws
+([03 §8](03-world-and-simulation.md#8-reproduction)), so siblings usually
+differ. The measured rates match: 147–150 mutations per 1 000 prey births and
+115–116 per 1 000 predator births.
 
 ### One operator: the LLM makes a small random change
 
 For each mutating gene, the code draws one instruction at random from
 `prompts/mutate_v4.txt` (since 2026-10-08) and sends it, with the gene sentence
 and one fixed context line (`evolution.mutation_context`), to the mutator model
-(`ollama.mutator_model`, gemma4:12b):
+(`mutator.model`, below):
 
 ```text
 The sentence below is a rule that a wild animal follows.
@@ -190,7 +194,8 @@ drawn is random, so mutation stays blind: the mutator never sees the world's
 details, the other genes, the gene's slot or how well the animal does. Randomness comes from three places: the instruction
 drawn, the seed (drawn from the simulation's `mutation` stream, so a run can be
 replayed) and the sampling temperature (`evolution.temperature`, 1.2). Answers
-are cached in `cache/ollama.sqlite`.
+are cached in `cache/ollama.sqlite` (`cache/mutator.sqlite` for a mutator on an
+OpenAI-compatible server).
 
 From 2026-10-02 to 2026-10-07 the 16 instructions of `prompts/mutate_v2.txt`
 asked for random word edits, some of them big ("Randomly change the meaning of
@@ -202,8 +207,44 @@ edits (`mutate_v3.txt`, 9 instructions, no context line) is kept for the
 record.
 
 There is no other way for a gene to change. Without a mutator model
-(`ollama.mutator_model: null`, or `smoke_run --no-mutation`), children only
+(`mutator.model: null`, or `smoke_run --no-mutation`), children only
 recombine their parents' genes. To add an instruction, add a line to the file.
+
+### The mutator model
+
+The mutator has its own section, `mutator.*`, and its own address, separate
+from the brain's (since 2026-10-08):
+
+| Period | Model | Where | Why |
+|---|---|---|---|
+| 2026-10-02 to 2026-10-08 | gemma4:12b (the LLM brain's model) | Ollama, GPU | one model for both jobs, no model swaps |
+| since 2026-10-08 | qwen3.5:0.8b | Ollama, CPU (`options: {num_gpu: 0, num_ctx: 1024}`) | the JEV brain fills the GPU ([05](05-decision-backends.md)); a small model was thought enough, since mutations are random anyway |
+| tried 2026-10-09 | gemma4:26b | Ollama, CPU | owner: bigger CPU models are fine; `--set mutator.model=gemma4:26b` |
+
+On 2026-10-09 the two CPU models ran the same 1-hour JEV run (seed 1234, the
+world of [03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world);
+[06 §5.22](06-experiments-and-results.md#522-a-bigger-cpu-mutator)):
+
+| | qwen3.5:0.8b | gemma4:26b |
+|---|---|---|
+| Answers rejected by the guards and drawn again | 22 % | 3 % |
+| Words changed per prey mutation | 5.2 | 2.4 |
+| Prey mutations changing 4 or more words | 64 % | 24 % |
+| "Change one word …": words changed | 4.2 | 1.0 |
+| Mutants using a word of the animal's world (prey / predators) | 88 % / 69 % | 95 % / 94 % |
+| Different mutants / mutations | 321 / 325 | 224 / 357 (75 made more than once) |
+| Time per call on the CPU (16-core Ryzen 9 9950X3D) | 0.4 s | 0.9 s |
+| Memory while loaded | about 2 GB | about 19 GB |
+
+gemma4:26b follows the small-edit instructions and keeps nearly every mutant a
+readable rule ("Rest only when you feel safe." → "Rest only when you feel
+unsafe."), but it often gives the same answer to the same request, so it offers
+fewer new variants. qwen3.5:0.8b rewrites most of the sentence and often loses
+the meaning ("No preference." → "Nobody prefers me."). gemma4:26b is a
+mixture-of-experts model, which runs only part of its weights per token, so it
+is faster on the CPU than the dense gemma4:12b (1.1 s). Its process holds the
+whole model file in RAM, about twice what Ollama reports. The default is still
+qwen3.5:0.8b; switching means setting `mutator.model: gemma4:26b`.
 
 ### Guards
 
@@ -213,8 +254,8 @@ capitalise, end with a full stop) and `valid` (1–12 words, set by
 `evolution.max_words`; different from the old text; plain characters only). A
 rejected answer is drawn again, with a new instruction and seed, up to 5
 attempts (`evolution.mutation_tries`; one attempt before 2026-10-08). The guards
-check form, never meaning: about 99 % of answers pass, so nearly every mutation
-happens. Setting `mutation_prompts` to `prompts/mutate_v2.txt` and
+check form, never meaning: with gemma4 about 97–99 % of answers pass, with
+qwen3.5:0.8b 78 %; after the redraws nearly every mutation happens. Setting `mutation_prompts` to `prompts/mutate_v2.txt` and
 `mutation_tries` to 1 gives back the mutation of 2026-10-02.
 
 Two more checks were tried on 2026-10-08 and removed the same day on the
@@ -373,11 +414,18 @@ if it:
 3. chooses `mate` next to a ready partner of its species, or is that ready
    partner (since 2026-10-07 one partner's choice is enough; before, both had
    to choose `mate`),
-4. while its species is below its cap.
+4. and, with the old cap rule (`block`, before 2026-10-09), while its species
+   is below its cap. Since then births go on at the cap and random animals
+   migrate away instead
+   ([03 §9](03-world-and-simulation.md#9-population-limits-cap-and-floor)).
+
+A mating gives 2–4 babies since 2026-10-09, each with its own genes, so a pair
+that breeds often spreads its genes fast.
 
 Since 2026-10-07 the two species evolve together. The prey's flee genes face
 predators whose hunt genes evolve, and the other way round. Predators are
-fewer than the prey: 15–21 in the full world and about 5 in the small one
+fewer than the prey: about 66 against 265 in the 192 × 192 world and 6 against
+38 in the small one
 ([03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)),
 so chance (drift) weighs more on their genes than on the prey's.
 
@@ -387,14 +435,32 @@ frequencies), never used to choose parents. How it is measured, and what
 230-generation runs with predators showed, is in
 [10 — Natural selection in long runs](10-natural-selection-runs.md).
 
-Two things weaken selection, and both are watched in the experiments:
+Four things weaken selection, and all are watched in the experiments:
 
 - **Newcomers.** Founders added at the floor bring fresh founder genes. If
-  they are frequent, they swamp what selection has achieved. Each species has
-  its own floor; predators reach theirs more often.
-- **The cap.** At the cap, births depend on free slots rather than on finding
-  food. That's why food regrowth was tuned to keep the Lab 1 population below
-  the cap ([03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)).
+  they are frequent, they swamp what selection has achieved, and a crash that
+  empties a species restarts its evolution from the founders: in the long
+  gemma run of 2026-10-08 both species were wiped and refilled this way
+  ([06 §5.18](06-experiments-and-results.md#518-the-long-llm-run-with-mutation-v4)).
+  Since litters and migration (2026-10-09) no run has needed a newcomer.
+- **The cap.** With the old rule (`block`), births at the cap depend on free
+  slots rather than on finding food. That's why food regrowth was first tuned
+  to keep the population below the cap.
+- **Random deaths.** With migration, an animal that leaves is picked at random:
+  its genes don't matter. When migration was most of the deaths (57 % of prey
+  deaths in the 10-hour JEV run with plentiful food), gene shares moved about
+  as much as chance alone predicts
+  ([06 §5.20](06-experiments-and-results.md#520-jev-runs-egg-bank-cover-litters-and-migration)).
+  Less food, more dangerous predators and cover brought migration down to
+  20–23 % of prey deaths with the JEV brain
+  ([06 §5.21](06-experiments-and-results.md#521-an-evolution-test-world)).
+- **Small differences.** About 135–270 prey means a gene needs an advantage of
+  a few percent to beat chance. Doubling the world and the populations on
+  2026-10-09 was meant to help here.
+
+The C3 control below and a common-garden test (evolved against founder
+genomes in the same world, gate G4) are the ways to show that a change is
+selection and not chance.
 
 ## 7. Experimental controls
 
@@ -439,4 +505,12 @@ themselves is an open decision
 Both tools read the prey by default; `--species predator` reads the
 predators' genes. They take the slots from the run itself, so runs made before
 2026-10-07, with 10 slots, stay readable. `gene_swap` reads prey slots only and
-needs a run made with the current 5 prey genes.
+needs a run made with the current 5 prey genes. Until 2026-10-08
+`gene_timeline`'s table "What mutation offers" counted the mutants of both
+species in each species' report; it now counts only the species read.
+
+**Every mutation of a run:** `python -m experiments.mutation_list results/runs/<run>`
+writes `results/<run>_mutations.md`: for each mutant gene of both species its
+slot, parent text, new text, the instruction drawn, words changed, whether it
+uses a word of the animal's world, the most living carriers at once and the
+carriers at the end. It prints a summary per instruction.

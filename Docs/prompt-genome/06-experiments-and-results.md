@@ -15,7 +15,12 @@ and every result so far, dated. The full plan with sessions and budgets is
 > Since the same day predators are genetic animals, and both species see 20
 > cells with distances in bands ([03 §3](03-world-and-simulation.md#3-predators)).
 > §5.11 used the 5-gene genome with the old world; §5.12 is the first run of
-> today's world.
+> that world.
+>
+> **Since 2026-10-08/09** the brain for runs is JEV-9B, the mutator a CPU model,
+> a mating gives 2–4 babies, animals migrate away at their species' cap, and the
+> world is 192 × 192 with hungrier prey, deadlier predators and cover
+> (§5.19–5.22, [03](03-world-and-simulation.md)).
 
 ## Contents
 
@@ -512,15 +517,184 @@ Files: `mutation_test_old_rules`, `mutation_test_v3_draft`, `_v3_draft_max5`,
 - **Caveat:** no selection and one model; in a run, a gene meets only about
   0.03 mutations per generation.
 
+### 5.18 The long LLM run with mutation v4
+
+2026-10-08, the first run with mutation v4: gemma4:12b as brain and mutator,
+the 96 × 96 world with stamina and carcasses, seed 1234, 20 000 ticks or 24 h
+(`results/runs/long_v4_llm`). The owner stopped it at tick 7 000, after 7 h
+42 min: 68 373 model calls, no failure.
+
+**Boom and bust.** Both species cycled about every 3 500 ticks. Predators sat
+at their cap of 34 and kills rose from about 3 to 8–9 per 1 000 prey-ticks;
+the prey fell to their floor of 10 (ticks 1 500 and 5 000); the predators then
+starved to their floor of 3 (ticks 2 000 and 5 500); the prey rebounded to
+their cap of 135. Deaths: 914 prey killed and 928 starved; 326 predators
+starved.
+
+**Evolution restarted at every crash.** At the floor, newcomers with founder
+genes replaced each line: all prey were newcomers at tick 5 000 (mean
+generation 0), and so were all predators at ticks 2 000 and 5 500. The run
+reached only generation 11 for prey and 7 for predators.
+
+**Genes.** 312 mutations, matching the rate (150 per 1 000 prey births, 116
+per 1 000 predator births). No prey mutant passed 33 % of its slot; one
+predator mutant reached 64 %. Rises matched random inheritance, except two
+founder "No preference." genes in the prey's flee and follow slots, which
+reached 91 % (P 0.012) in the line that then died out. Mutants kept a world
+word (91 % prey, 95 % predators) and the judge called 74–94 % of prey genes and
+92–100 % of predator genes usable. New weak spot: the neutral gene "No
+preference." isn't a rule, and v4 turns it into vague text ("Preference for
+water.", 26 % of the prey's mate slot; "No preference for any distance.", 64 %
+of the predators' hunt slot). `results/long_v4_llm_timeline.md` and
+`long_v4_llm_predator_timeline.md`.
+
+The owner then asked how to avoid the crashes, since newcomers with founder
+genes "destroy the evolution model" (§5.19).
+
+### 5.19 Boom and bust: how to stop the crashes
+
+2026-10-08 and 09. Predator–prey models are prone to boom and bust, and here
+the mechanism is clear: predators at their cap kill at an almost constant rate
+(each kill is followed by 50 ticks of digestion), so as the prey get fewer,
+each prey animal's risk rises until they collapse; then the predators starve.
+
+**Method** (`experiments/crash_sweep.py`, `results/crash_v1-v10.md`). Floors at
+0, so no newcomer rescues anyone and an extinction is final; no mutation; 8
+seeds; 20 000 ticks (10 000 in the 192 × 192 world); a run stops at the first
+extinction. The keyword brain was no use: its prey flee well and survived
+(crash_v1). The keyword brain with the LLM's action mix (`llmlike`) held out
+too. What crashed like the gemma run was the LLM's own answers looked up by
+situation (`llmtable`, [05 §8](05-decision-backends.md#8-stand-ins-for-screening)):
+0 of 8 runs lasted, each time the prey crashed and the predators starved.
+
+**Results** (`llmtable` brain; "lasted" = both species alive at the end):
+
+| Mechanism | Lasted | Notes |
+|---|---|---|
+| Rules of 2026-10-08 | 0/8 (1/24 over `kill_p` 0.1–0.2) | median 10 000 ticks to the first extinction |
+| Lower predator cap: 25 / 20 / 15 | 8/8 · 8/8 · 7/8 | predators pinned at the cap 87–96 % of the time |
+| Terrain (water and mountains) | 6/8 | |
+| Cover with food: 10 % / 20 % / 10 % without fleeing to it | 3/8 · 5/8 · 3/8 | |
+| Predator interference c = 1 / 3 | 2/8 · 7/8 | c = 3 failed at `kill_p` 0.15–0.2 (10/24 overall) |
+| Predators breed only with ≥ 3 / 4 / 5 prey each | 24/24 each over `kill_p` 0.1–0.2 | with 3, kills stayed 54–56 % of prey deaths; owner: "the worst logic", nobody could count |
+| Same, local: ≥ 5 / 10 / 15 prey in sight | 1/24 · 6/24 · 20/24 | predators gather where prey still are |
+| Ridges: 3 × 3 / 4 × 4 patches | 0/8 · 0/8 | predators died out first |
+| Egg bank (floors refilled by eggs) | 24/24 rescued | 0 founders needed, but the crashes went on; owner: not a valid idea |
+| Litters of 2–4 + food 0.005 / 0.3, births blocked at the cap | 8/8 (also with cover 20 %) | prey at their cap 76 %, predators 95 %; kills 92 % of prey deaths |
+| … + migration at the cap | 8/8 | prey births 5 300 → 21 200; prey deaths 63 % migrated, 26 % killed, 10 % starved; generations at tick 20 000: prey 42 → 114, predators 31 → 106 |
+| 192 × 192, doubled populations, `kill_p` 0.2, food 0.003, hungry cover 20 % | 8/8 (10 000 ticks) | prey ≈ 270, predators ≈ 64 (one dip to 4); deaths 62 % migrated, 23 % killed, 14 % starved |
+| … + `kill_p` 0.5, food 0.0015, 10 % at the start | 8/8 | deaths 50 % migrated, 26 % killed, 24 % starved |
+| One shared cap of 500 instead of 270 / 68 | 2/8 | predators multiplied to 250–330 |
+| … + predator litters of 1–2 / one cub and adult at 300 | 1/8 · 0/8 | slow predators were pushed out by migration |
+
+What the owner kept: litters of 2–4, migration at the cap and separate caps
+per species. The shared cap was reverted the same day. The other mechanisms
+stay in the code as options, off ([03](03-world-and-simulation.md)).
+`smoke_run --set section.key=value` switches any of them on for a run.
+
+### 5.20 JEV runs: egg bank, cover, litters and migration
+
+With the JEV brain ([05 §7](05-decision-backends.md#7-jev-a-distilled-decision-model))
+and the qwen3.5:0.8b CPU mutator, 96 × 96, seed 1234:
+
+| Run | Rules | Outcome |
+|---|---|---|
+| `jev_eggs` (2026-10-08) | egg bank | owner stop at tick 8 600 (1 h): both floors hit again and again, 131 prey and 6 predator eggs hatched, 0 founders; generations 37 / 26 |
+| `jev_cover` (2026-10-08) | cover 20 % with food | killed by Claude Code at tick ≈ 13 000 (machine low on memory): 171 prey and 3 predator newcomers, prey crashes about every 2 000 ticks (four by tick 9 000) |
+| `jev_migrate` (2026-10-09) | litters, food 0.005 / 0.3, migration | 10 h, 22 817 ticks, 324 369 calls, no failure, no newcomer |
+
+**The 10-hour run** was stable: prey 120–135 almost all the time (one dip to
+103, with predators down to 13, near tick 21 000), predators 28–34, generations
+132 (prey) and 119 (predators). Prey deaths: 57 % migrated, 28 % killed, 15 %
+starved. Over the run prey fled more (7 % → 18 % of decisions) and ate less
+(57 % → 39 %); kills per 1 000 prey-ticks fell from 2.29 to 1.93, and predators
+hunted more (60 % → 66 %).
+
+Genes that took over: for the prey "Only look for food when energy is low."
+(99 %), "Keep your distance from other animals." (97 %), "Rest when you are
+tired." (93 %) and the mutant "Mate whenever food is plentiful." (74 %); for
+the predators "Hunt when hungry." (100 %), "Hunt first, mate later." (100 %) and
+"Listen whenever you feel hungry, not just after eating." in the rest slot
+(100 %). The prey's flee gene drifted into text that JEV still reads as
+"flee": "Run into any wild animal you encounter." (88 %), then "If you see any
+wild animals, run into them immediately." (97 %), then "If you see any wild
+animals, do so immediately." (83 % at the end).
+
+**No proof of selection.** Sweeps came as often as random inheritance alone
+predicts: 7 prey mutants reached 50 % against 9 (6–13) expected, 6 predator
+mutants against 10. A few genes had fitness just above 1 (the eat and
+keep-distance genes: 1.03–1.04, lower bound 1.00). The meaning judge couldn't
+run, since JEV holds the GPU. `results/jev_migrate_timeline.md` and
+`jev_migrate_predator_timeline.md`. The owner: "stable but doesn't prove any
+gene evolution" (§5.21).
+
+### 5.21 An evolution-test world
+
+Why the 10-hour run showed no selection: most deaths were random migrations,
+food was everywhere (15 % starved), breeding was easy, and with about 135 prey
+a gene needs an advantage of several percent to beat chance. Proposed: let the
+weakest migrate, deadlier predators, seasons, hungry cover, a bigger
+population. The owner chose (2026-10-09): food regrowth 0.005 → 0.003 → 0.0015
+and 10 % food at the start, `kill_p` 0.2 → 0.5, hungry cover on 20 % of cells,
+and a 192 × 192 world with doubled populations (caps 270 / 68)
+([03 §13](03-world-and-simulation.md#13-reference-numbers-for-the-lab-1-world)).
+
+In the screen this world lasted 8 of 8 runs (§5.19). The keyword brain gives
+prey ≈ 265, predators ≈ 66, no newcomers, and prey deaths 33 % killed, 25 %
+starved, 42 % migrated.
+
+**1-hour JEV run** (`results/runs/jev_cover_hungry_1h`, qwen3.5:0.8b mutator):
+1 293 ticks, generation 8 / 7, prey ≈ 265, predators ≈ 67, no newcomer, no
+failure. Prey deaths: 39 % killed, 38 % starved, 23 % migrated, so most deaths
+now depend on behaviour. Prey decisions: eat 56 %, mate 17 %, follow 13 %, rest
+10 %, flee 5 %; predators: hunt 44 %, mate 28 %, follow 24 %, rest 5 %. Too
+short to show selection. The first try failed after a few seconds on a JEV
+CUDA error ([05 §7](05-decision-backends.md#7-jev-a-distilled-decision-model)).
+
+Cover is neither an action nor an observation nor a gene
+([03 §1](03-world-and-simulation.md#cover-since-2026-10-09)): it can favour
+genes that flee or rest more, not genes that use cover on purpose.
+
+### 5.22 A bigger CPU mutator
+
+The small CPU mutator made big edits in the 1-hour run (5.2 words per prey
+mutation, 64 % changed 4 words or more). The owner: bigger CPU models are fine,
+RAM and speed don't matter much. A quick check on the CPU (16-core Ryzen 9
+9950X3D, 7 instructions × 2 genes, `num_gpu: 0`):
+
+| Model | Time per call | Words changed | "Change one word" on "Rest when you are tired." |
+|---|---|---|---|
+| qwen3.5:0.8b | 0.4 s | 4.1 | "Rest now that you are rested." |
+| gemma4:12b | 1.1 s | 3.1 | "Sleep when you are tired." |
+| gemma4:26b (mixture of experts) | 0.9 s | 2.9 | "Sleep when you are tired." |
+
+Then the same 1-hour JEV run with gemma4:26b
+(`--set mutator.model=gemma4:26b`, `results/runs/jev_cover_hungry_1h_g26`):
+1 369 ticks (1 293 with qwen), and much better mutations, but less variety
+([04 §5](04-genome-and-evolution.md#the-mutator-model) has the full table):
+2.4 words changed per prey mutation against 5.2, "change one word" 1.0 word
+against 4.2, 95 % of mutants with a world word against 88 %, 3 % of answers
+rejected against 22 %, but 224 different mutants from 357 mutations against
+321 from 325. Examples: "Rest only when you feel safe." → "Rest only when you
+feel unsafe." (the most widespread mutant, 23 carriers), "Stay close to other
+animals." → "Stay far from other animals.", "Hunt only when you are hungry." →
+"Hunt only when you are full." Mutation lists:
+`results/jev_cover_hungry_1h_mutations.md` and
+`jev_cover_hungry_1h_g26_mutations.md` (`experiments/mutation_list.py`).
+
+Memory: gemma4:26b holds about 19 GB of RAM on the CPU. With the two other test
+models still loaded, free memory fell to 1 GB and Claude Code stopped a
+background watcher; unloading them freed 11 GB.
+
 ### Summary
 
-| Gate | Status (2026-10-01) |
+| Gate | Status (2026-10-09) |
 |---|---|
-| G1 Semantics | ✔ for gemma4 12b and 26b (small gate) |
-| G2 Information | ✘, open problem |
-| G3 Locality | not measured on the LLM brain yet (needs the full E1 suite) |
-| G4 Evolution | not measured (evolution matrix not written yet) |
-| G5 Throughput | ≈ 4 decisions/s on a 16 GB GPU, far below 50 → fails at the current settings |
+| G1 Semantics | ✔ for gemma4 12b and 26b (small gate) and for JEV-9B (gate and E1) |
+| G2 Information | ✘: gemma is moved by random text; JEV ignores it, but its MI_G (0.135–0.143) is below 0.25 |
+| G3 Locality | ✔ on JEV-9B (E1: locality 0.10, ρ 0.39); not measured on gemma |
+| G4 Evolution | not measured (evolution matrix not written yet); the 10-hour JEV run showed sweeps at the drift rate (§5.20) |
+| G5 Throughput | gemma ≈ 4 decisions/s; JEV ≈ 12 decisions/s one at a time, 9–13 per second in runs; still below 50 |
 
 ## 6. Known issues and open questions
 
@@ -537,7 +711,7 @@ Files: `mutation_test_old_rules`, `mutation_test_v3_draft`, `_v3_draft_max5`,
      to behaviour. The plan allows three documented prompt iterations.
    - **The threshold.** The ideal keyword interpreter scores MI_G 0.229 < 0.25.
      Whether G2's MI_G threshold stays is an owner decision.
-2. **Throughput (G5).** ≈ 4 decisions/s against 50 targeted. Levers: workers
+2. **Throughput (G5).** ≈ 4 decisions/s against 50 targeted (gemma; JEV ≈ 12, [05 §7](05-decision-backends.md#7-jev-a-distilled-decision-model)). Levers: workers
    and `OLLAMA_NUM_PARALLEL`, a longer decision period, smaller populations,
    the persistent cache across runs, table mode for request-limited setups, a
    lab server, or LLM-at-birth.
@@ -563,6 +737,37 @@ Files: `mutation_test_old_rules`, `mutation_test_v3_draft`, `_v3_draft_max5`,
    `experiments.status` reported live jobs as `DEAD?` on Windows (signal 0 is
    Ctrl+C there, not a liveness probe); the ASCII map used one letter for two
    meanings.
+8. **Crashes and newcomers (2026-10-08, solved for now).** The predator–prey
+   cycles emptied a species every few thousand ticks, and founder newcomers
+   restarted its evolution (§5.18). Litters, migration and separate caps keep
+   both species alive without newcomers (§5.19–5.21). One shared cap brings the
+   crashes back.
+9. **Selection not shown yet.** In the stable runs, sweeps come as often as
+   chance alone predicts (§5.20). The evolution-test world (§5.21) makes most
+   deaths depend on behaviour; a long run with the C3 control and a
+   common-garden test are needed.
+10. **Genes can drift into odd text that still works.** JEV read "If you see any
+    wild animals, run into them immediately." in the flee slot as "flee", and
+    it took over (§5.20). The neutral gene "No preference." isn't a rule, and
+    mutation turns it into vague text (§5.18).
+11. **Cover is invisible to the brain** (§5.21): it can't evolve a use of cover.
+    Adding cover to the prey's observation needs the prompt, the gate and the
+    screen redone.
+12. **The small CPU mutator rewrites too much** (5.2 words per mutation,
+    §5.22). gemma4:26b keeps edits small but repeats itself and needs about
+    19 GB of RAM.
+13. **Operations** (2026-10-08 and 09):
+    - The Ollama desktop app's updater shut its server down twice (03:55 and
+      16:27 on 2026-10-09) with an update pending, which stops the mutator. A
+      run then stops cleanly at the next birth. Install the update, or run the
+      bare `ollama serve`, before long runs.
+    - The JEV engine died once on a CUDA error; Docker restarted it (§5.21).
+    - Claude Code stops its own background tasks when the machine is low on
+      memory (it stopped the JEV cover run). Long runs are started detached
+      (`nohup … &`), as the project's CLAUDE.md says, and survive it.
+14. **Fixed on 2026-10-08:** `gene_timeline`'s table of produced mutants counted
+    both species in each species' report, said "10 slots" for 5, and its chart
+    page failed for the predators (no colour for `hunt`).
 
 ## 7. Next experiments
 
@@ -573,8 +778,10 @@ In the order of the plan (`prototype/STATUS.md` holds the live position):
 2. **Full E1 suite on the LLM brain:** `e1_sensitivity --backend llm`, about
    5 500 decisions, ≈ 45–60 min. Gives G3 (locality) and a larger G1/G2
    sample.
-3. **More LLM runs on the Lab 1 world** (several seeds, longer): population
-   dynamics under the LLM brain, and world tuning if needed.
+3. **Long JEV runs in the evolution-test world** (§5.21), with the mutator
+   chosen (§5.22), next to a C3 SHUFFLED control run in the same world:
+   selection shows in the real run and not in the control. Then a
+   common-garden test of evolved against founder genomes.
 4. **Evolution matrix E4 and common garden E5** (scripts not written yet):
    conditions C1 FULL, C2 NO-MUT, C3 SHUFFLED, C4 RANDOM-FOUNDERS, C5
    RULE-BASED; then allele-frequency and lineage analysis, G4, and the go/no-go
@@ -605,10 +812,22 @@ python -m experiments.smoke_run --backend llm --ticks 2000 --minutes 180 --seed 
 python -m experiments.mutation_test --temps 1.2 --tag mutation_test_v4                     # 5.17, today's rules (≈ 6 min)
 python -m experiments.mutation_test --temps 1.2 --rules old --tag mutation_test_old_rules  # 5.17, the rules before (≈ 4 min)
 python -m experiments.mutation_test --temps 1.2 --tries 1 --tag mine                     # a variant
+python -m experiments.smoke_run --backend llm --ticks 20000 --minutes 1440 --seed 1234 --snapshots 20 --out results/runs/long_v4_llm   # 5.18 (code of 5d60b77; stopped at 7 000)
+python -m experiments.gene_timeline results/runs/long_v4_llm --judge --tag long_v4_llm                                               # 5.18, also --species predator
+python -m experiments.llm_table results/runs/long_v4_llm                       # 5.19: the LLM's answers by situation (no model calls)
+python -m experiments.crash_sweep --variants baseline,cap25,lg3,cover20 --kill-p 0.1,0.15,0.2 --seeds 8 --ticks 20000 --tag mine   # 5.19 (≈ 20 min on 28 cores)
+nohup python -m experiments.smoke_run --backend jev --seed 1234 --ticks 50000 --minutes 600 --snapshots 25 --out results/runs/jev_migrate > logs/jev_migrate.log 2>&1 &   # 5.20 (code of 1ed0331)
+nohup python -m experiments.smoke_run --backend jev --seed 1234 --ticks 5000 --minutes 60 --snapshots 5 --out results/runs/jev_cover_hungry_1h > logs/jev_cover_hungry_1h.log 2>&1 &   # 5.21 (code of 8ea7698)
+nohup python -m experiments.smoke_run --backend jev --seed 1234 --ticks 5000 --minutes 60 --snapshots 5 --set mutator.model=gemma4:26b --out results/runs/jev_cover_hungry_1h_g26 > logs/jev_cover_hungry_1h_g26.log 2>&1 &   # 5.22
+python -m experiments.mutation_list results/runs/jev_cover_hungry_1h_g26       # 5.22: every mutation of a run
+python -m experiments.smoke_run --backend rule_based --no-mutation --seed 1234 --ticks 5000 --snapshots 0 --out results/runs/ref_1009_full_1234   # 03 §13 (also seeds 7, 42; --profile small)
 ```
 
 §5.12–5.14 ran the code of the commits in brackets (smaller worlds, older
-rules, no stamina): check them out to rerun those exactly.
+rules, no stamina): check them out to rerun those exactly. The same goes for
+§5.18–5.21, which ran world settings that changed afterwards (the 96 × 96
+world, plentiful food, `kill_p` 0.1). The JEV runs need the JEV server and the
+mutator running ([07](07-setup-and-usage.md)).
 
 The gate writes `results/teacher_gate.md`. Rename it per model to keep both,
 as was done for the committed files.

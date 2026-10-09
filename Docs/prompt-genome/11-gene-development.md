@@ -14,6 +14,13 @@ one gene) and `gene_report.py`. Results: `prototype/results/llm_long_timeline.md
 > animals saw 12 cells; since 2026-10-07 predators are genetic animals and both
 > species see 20 cells ([03 §3](03-world-and-simulation.md#3-predators)).
 > `gene_timeline --species predator` follows the predators' genes.
+>
+> **Later long runs (2026-10-08/09).** A 7 000-tick gemma run with mutation v4
+> ([06 §5.18](06-experiments-and-results.md#518-the-long-llm-run-with-mutation-v4)) and a
+> 10-hour JEV run with litters and migration, 132 generations without newcomers
+> ([06 §5.20](06-experiments-and-results.md#520-jev-runs-egg-bank-cover-litters-and-migration)),
+> were read with the same `gene_timeline`. In both, sweeps came about as often as
+> random inheritance predicts.
 
 ## Contents
 

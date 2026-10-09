@@ -31,7 +31,11 @@ The world is a 2D grid of square cells with hard borders (no wrap-around).
 
 | | `full` profile (the values in `base.yaml`; `smoke_run`'s default since 2026-10-07) | `small` profile (tests, quick checks) |
 |---|---|---|
-| Size | 96 × 96 cells (64 × 64 until 2026-10-07) | 48 × 48 cells |
+| Size | 192 × 192 cells since 2026-10-09 (96 × 96 from 2026-10-07, 64 × 64 before) | 48 × 48 cells |
+
+The world doubled in width and height on 2026-10-09, together with the
+populations, to give evolution more room (§13 and
+[06 §5.21](06-experiments-and-results.md#521-an-evolution-test-world)).
 
 - **Movement** goes to any of the 8 neighbours (king moves). Walking covers
   one cell per tick; running (`hunt`, `flee`) covers up to `speed` cells: 2 for
@@ -68,23 +72,65 @@ on with 15 % water and 10 % mountains:
 python -m experiments.smoke_run --world terrain_preview
 ```
 
+### Cover (since 2026-10-09)
+
+Cover is thickets: clustered patches of ground where a prey animal is safe.
+It is on by default on 20 % of the cells (`world.cover_fraction`, 0 = none).
+
+- **Hidden prey.** Predators don't see a prey animal standing in cover: it is
+  left out of their observation (§5) and of their `hunt` target, so it can't
+  be struck (§6).
+- **Hungry cover.** No food grows in cover (`world.cover_food: false`), and none
+  is placed there at the start. Hiding and eating compete.
+- **Fleeing into cover.** A fleeing prey animal already in cover stays where it
+  is. One with cover within `world.cover_seek` = 6 cells runs into it instead of
+  running away. Otherwise it runs away as before (§6).
+- **Not an action, observation or gene.** The brain never hears about cover:
+  there is no "hide" action, prey don't sense where cover is, and no gene slot
+  is about it. Cover only changes how `flee` is carried out and what predators
+  see. So it can favour genes that make prey flee or rest more, but not genes
+  that use cover on purpose. Adding cover to the prey's observation would be the
+  next step.
+
+The patches are the top 20 % of a two-octave value-noise map (cell sizes 8 and
+4) over walkable cells. They are drawn after everything else, so a world
+without cover is the same as before. On 2026-10-08 cover was first tried with
+food in it (`cover_food: true`) as a way to stop crashes
+([06 §5.19](06-experiments-and-results.md#519-boom-and-bust-how-to-stop-the-crashes)).
+
+### Ridges (option, off)
+
+`world.patches` = k splits the world into k × k areas with mountain ridges one
+cell thick, each ridge segment with one gap of `world.wall_gap` cells in its
+middle. Tried on 2026-10-08 against crashes, it made things worse: predators
+couldn't reach prey across the ridges and died out (06 §5.19). It is off
+(`patches: 0`).
+
 ## 2. Food
 
 - A cell holds at most one food item. Only prey animals eat food.
-- **Start:** each walkable cell has food with probability
-  `food_initial_fraction` = 0.08.
-- **Regrowth:** every tick, each empty walkable cell grows a food item with
-  probability `food_regrow_p`. In Lab 1 this is **0.0007** and the same for
-  every cell, so food appears uniformly at random.
+- **Start:** each walkable cell outside cover has food with probability
+  `food_initial_fraction` = **0.1**.
+- **Regrowth:** every tick, each empty walkable cell outside cover grows a food
+  item with probability `food_regrow_p` = **0.0015** (about 670 ticks to regrow
+  an eaten cell), the same for every such cell, so food appears uniformly at
+  random. Cover never grows food (§1).
   - With water (terrain preview only), cells within `water_bonus_radius` = 3
     of water regrow `food_water_bonus` = 2 × faster. The preview uses
     `food_regrow_p` = 0.001.
 - **Eating** removes the item and gives the animal `eat_gain` = 25 energy, up
   to `energy_max` = 100.
 
-On an empty map, regrowth would produce about 1.6 items per tick on the small
-grid (48 × 48 × 0.0007) and 6.5 on the full grid. In practice the steady
-state is set by how fast the animals eat.
+On an empty map, regrowth would produce about 44 items per tick on the full
+grid (192 × 192 × 0.8 × 0.0015) and 2.8 on the small grid. In practice the
+steady state is set by how fast the animals eat.
+
+| Date | `food_regrow_p` | `food_initial_fraction` | Why |
+|---|---|---|---|
+| 2026-10-01 | 0.0007 | 0.08 | tuned so the prey stay limited by food, below their cap (§13) |
+| 2026-10-08 | 0.005 | 0.3 | owner: food quick and plentiful, against crashes ([06 §5.19](06-experiments-and-results.md#519-boom-and-bust-how-to-stop-the-crashes)) |
+| 2026-10-09 | 0.003 | 0.3 | owner: a bit slower, with the 192 × 192 world |
+| 2026-10-09 | 0.0015 | 0.1 | owner: lower still, so that food matters for selection ([06 §5.21](06-experiments-and-results.md#521-an-evolution-test-world)) |
 
 ## 3. Predators
 
@@ -103,13 +149,23 @@ What is specific to predators (`predators.*`):
 |---|---|---|
 | `speed` | 2 | cells per tick when hunting, against 1 for a fleeing prey animal; every other move walks one cell (§4) |
 | `stamina_max` | 30 | half the prey's 60: 15 ticks of running from full (§4) |
-| `kill_p` | 0.1 | chance that a strike kills; a hunting predator strikes when it is next to its prey (distance ≤ 1) after its move |
+| `kill_p` | 0.5 | chance that a strike kills; a hunting predator strikes when it is next to its prey (distance ≤ 1) after its move. 0.1 until 2026-10-09, then 0.2 and 0.5 the same day (owner, §13) |
 | `kill_gain` | 60 | energy from one kill, up to `energy_max` = 100 |
 | `digest_ticks` | 50 | after a kill the predator stays still for 50 ticks, pays only `cost_rest` (plus `cost_regen` while its stamina comes back) and doesn't decide; after a carcass portion, 25 ticks (in proportion to the energy) |
 | `carcass_portions` | 2 | a kill leaves a carcass on the prey's cell with one portion each for up to 2 other predators, never the killer (0: no carcass, the rule before) |
 | `carcass_gain` | 30 | energy from one portion |
 | `carcass_ticks` | 100 | a carcass rots away after 100 ticks, eaten or not |
-| `init_pop` / `floor` / `cap` | 14 / 3 / 34 (`small`: 4 / 3 / 6) | population limits (§9) |
+| `init_pop` / `floor` / `cap` | 28 / 3 / 68 (`small`: 4 / 3 / 6; 14 / 3 / 34 in the 96 × 96 world) | population limits (§9) |
+| `litter` | [2, 4] | babies per mating, the same as the prey (§8) |
+
+Three more options came out of the crash exploration of 2026-10-08 and are off
+by default ([06 §5.19](06-experiments-and-results.md#519-boom-and-bust-how-to-stop-the-crashes)):
+
+| Option | Effect | Result in the screen |
+|---|---|---|
+| `interference` c, `interference_radius` r | a strike succeeds with `kill_p` / (1 + c × other predators within r cells of the prey): crowding predators get in each other's way | c = 3 lasted 7/8 at `kill_p` 0.1 but failed at 0.15–0.2 |
+| `prey_per_predator` q | predators breed only while there are at least q prey per predator in the whole world | lasted 24/24, but the owner rejected it: no animal could know the head count |
+| `breed_prey_seen` m | a predator breeds only with at least m prey within its vision (the local version) | weak: predators gather where prey still are |
 
 Everything else uses the same values as the prey: energy, costs, stamina
 recovery, maturity, age limit, mating energy and vision (20 cells). A predator
@@ -135,6 +191,10 @@ sat at their floor up to 10 % of the time in the full world. `kill_p` 0.07, a
 digestion of 80 ticks or a slower recovery (1.5 per tick) left the predators at
 their cap and the prey at 96–120.
 
+On 2026-10-09 `kill_p` went to 0.2, then 0.5, to make more deaths depend on
+behaviour. Kills rose less than the kill chance: each kill is followed by 50
+ticks of digestion, and that caps how often a predator can kill (§13).
+
 ## 4. Animals
 
 "Animal" means either species here. Prey and predators have the same state and
@@ -151,7 +211,7 @@ predator's meals, offspring). Predators also count down their digestion (§3).
 
 | Parameter | Prey | Predators | Meaning |
 |---|---|---|---|
-| `init_pop` | 68 (`small`: 24) | 14 (`small`: 4) | animals at tick 0, with founder genomes |
+| `init_pop` | 136 (`small`: 24; 68 in the 96 × 96 world) | 28 (`small`: 4; 14 before) | animals at tick 0, with founder genomes |
 | `energy_start` | 60 | 60 | energy of a founder or newcomer |
 | `energy_max` | 100 | 100 | energy cap |
 | `maturity` | 150 | 150 | ticks before an animal is an adult and can mate |
@@ -191,13 +251,15 @@ The same for both species:
 | Eating a food item (prey) | +25 (`eat_gain`) |
 | A kill (predators) | +60 (`kill_gain`) |
 | A carcass portion (predators) | +30 (`carcass_gain`) |
-| Having a child | −20 per parent (half of `child_energy` = 40) |
+| Having a litter | −20 per parent for each baby (half of `child_energy` = 40): −40 to −80 for 2–4 babies (§8) |
 
 ### Death
 
 - **Starvation:** energy at or below 0 (both species).
 - **Old age:** age above 1 500 ticks (both species).
 - **Predator:** a prey animal killed by a hunting predator (§6).
+- **Migrated** (since 2026-10-09): above its cap, a random animal of the species
+  leaves the world (§9). It is logged as a death with cause `migrated`.
 
 ## 5. Perception: what an animal knows
 
@@ -237,7 +299,7 @@ Until then animals saw 12 cells, with two bands: near (≤ 3) and far.
 |---|---|---|
 | `energy` | low, medium, high | same thresholds |
 | `stamina` | low, medium, high | low < 10 ≤ medium ≤ 20 < high, of 30 |
-| `prey` | adjacent, close, medium, far, none | nearest prey animal |
+| `prey` | adjacent, close, medium, far, none | nearest prey animal not in cover (prey in cover are hidden, §1) |
 | `carcass` | adjacent, close, medium, far, none | nearest carcass it may eat from: portions left, not its own kill, not eaten from yet |
 | `animal` | adjacent, close, medium, far, none | nearest other predator |
 | `animal_ready` | true / false | is that predator ready to mate? Seen up to 20 cells |
@@ -255,8 +317,9 @@ to mate only within 4 cells (`partner_range` 4), so far partners were
 invisible and the few predators rarely met. Setting `partner_range: 4` gives
 back that rule.
 
-Animals don't sense directions, terrain, how many animals or how much food
-there is, or anything about another animal beyond whether it is ready to mate.
+Animals don't sense directions, terrain, cover, how many animals or how much
+food there is, or anything about another animal beyond whether it is ready to
+mate.
 A prey animal doesn't know whether a predator is hunting or digesting, nor how
 much stamina it has left.
 
@@ -287,11 +350,11 @@ LLM never handles movement itself.
 | Species | Action | What the executor does each tick | Searches instead when |
 |---|---|---|---|
 | prey | `eat` | On a food cell: eat (no move). Otherwise walk one cell toward the nearest visible food and eat on arrival in the same tick. | no food within 20 cells |
-| prey | `flee` | Run away from the nearest predator, `speed` cells per tick (1 for prey). | no predator within 20 cells |
+| prey | `flee` | Run away from the nearest predator, `speed` cells per tick (1 for prey). With cover (§1): stay put when already in cover, or run into cover within 6 cells instead. | no predator within 20 cells |
 | both | `follow` | Walk toward the nearest other animal of its species; stay put once adjacent. Predators have it since 2026-10-07. | no other animal of its kind within 20 cells |
 | both | `rest` | Stay still; costs only 0.2 energy per tick, plus 0.3 while stamina comes back. | never |
 | both | `mate` | Walk toward the nearest mate-ready animal of its species; next to it, they breed (§8), whatever the partner chose. | no mate-ready partner within 20 cells |
-| predator | `hunt` | Run toward the nearest prey animal or carcass it may eat from, up to 2 cells per tick, stopping next to it. Next to a carcass: eat a portion (+30, then 25 ticks of digestion). Next to a prey animal (distance ≤ 1), strike: the prey dies with probability `kill_p` = 0.1. A kill feeds the predator (+60), starts its digestion (§3) and leaves a carcass for up to two other predators. | no prey or carcass it may eat from within 20 cells |
+| predator | `hunt` | Run toward the nearest prey animal (not in cover) or carcass it may eat from, up to 2 cells per tick, stopping next to it. Next to a carcass: eat a portion (+30, then 25 ticks of digestion). Next to a prey animal (distance ≤ 1), strike: the prey dies with probability `kill_p` = 0.5. A kill feeds the predator (+60), starts its digestion (§3) and leaves a carcass for up to two other predators. | no prey outside cover and no carcass it may eat from within 20 cells |
 
 **An action with nothing to act on makes the animal search.** If there is
 nothing in sight for the chosen action, the animal wanders instead: a
@@ -354,34 +417,75 @@ so a slow brain makes the run slower but never changes its result.
 
 ## 8. Reproduction
 
-**Sexual (default, `evolution.sexual: true`).** A child is born when two
+**Sexual (default, `evolution.sexual: true`).** A litter is born when two
 animals of the same species:
 
 - at least one of them chose `mate` at its last decision (since 2026-10-07; before, both had to),
 - are both mate-ready (age ≥ 150 ticks and energy ≥ 50),
 - are adjacent (Chebyshev distance ≤ 1),
-- haven't bred yet in this decision period,
+- haven't bred yet in this decision period.
 
-and their species is below its cap. The child's genome is a crossover of the
-two parents followed by mutation
-([04 — Genome and evolution](04-genome-and-evolution.md)). Each parent pays 20
-energy. The child appears on the first parent's cell with 40 energy, and its
+**Litters (since 2026-10-09; one child before).** A mating makes 2–4 babies
+(`litter: [2, 4]` for both species, drawn uniformly from the `litter` random
+stream). Every baby gets its own crossover of the two parents and its own
+mutations ([04 — Genome and evolution](04-genome-and-evolution.md)), so
+siblings usually differ. Each baby costs the parents `child_energy` = 40,
+shared (20 each), and starts with 40 energy on the first parent's cell. Its
 generation is the larger parent generation + 1.
 
+The litter is cut back, never below 2, so that no parent pays more energy than
+it has: a parent at 50 energy pays for 2 babies and keeps 10, a parent at 100
+can pay for 4. With the old cap rule (`block`, §9) it is also cut to the places
+left under the cap. `litter: [1, 1]` gives the old rule. `birth` events carry
+the litter size.
+
 **Asexual (`evolution.sexual: false`, the old lab's regime).** A single
-mate-ready animal that chose `mate` copies its genome (plus mutation) and pays
-the full 40 energy.
+mate-ready animal that chose `mate` copies its genome (plus mutation, per baby)
+and pays the full 40 energy per baby.
 
 ## 9. Population limits: cap and floor
 
 | Parameter | Prey (`agents.*`) | Predators (`predators.*`) | Effect |
 |---|---|---|---|
-| `cap` | 135 (`small`: 40) | 34 (`small`: 6) | no births while the species is at its cap |
+| `cap` | 270 (`small`: 40; 135 in the 96 × 96 world) | 68 (`small`: 6; 34 before) | the species' limit (below) |
+| `cap_rule` | `migrate` | `migrate` | what happens at the cap (below) |
 | `floor` | 10 | 3 | if fewer remain, newcomers with fresh founder genomes are added at random cells |
 
-Newcomers are logged as `immigrant` events and counted in `stats.csv`. They
-keep a species alive while its behaviour is poor. For example, predators with a
-random brain survive only because of their floor (§13).
+**Cap rule `migrate` (since 2026-10-09).** Births go on at the cap. At the end
+of the tick, if a species is above its cap, randomly chosen animals of that
+species leave the world until it is back at the cap. They are logged as deaths
+with cause `migrated`. Every animal is equally likely to leave, so leaving
+favours no gene; only babies born in that tick are spared. With plentiful food
+migration was the most common death (57–63 % of prey deaths); in the hungrier,
+deadlier world of §13 it fell to 50 % in the screen and 20–23 % in the JEV runs
+([06 §5.20–5.21](06-experiments-and-results.md#520-jev-runs-egg-bank-cover-litters-and-migration)).
+
+**Cap rule `block` (before 2026-10-09).** No births while the species is at its
+cap. With litters, populations then sat at their caps and most births just
+filled free places.
+
+**One shared cap (tried 2026-10-09, reverted the same day).** One cap of 500
+for both species together (`sim.cap`), with migration over the total. In the
+screen the crashes came back: without their own cap, predators multiplied to
+250–330 and ate the prey out (2 of 8 runs lasted); with slower-breeding
+predators the prey filled the 500 places and migration pushed the predators out
+(0 of 8). The separate predator cap is what keeps predators in check
+([06 §5.19](06-experiments-and-results.md#519-boom-and-bust-how-to-stop-the-crashes)).
+
+**Floors and newcomers.** Newcomers are logged as `immigrant` events and
+counted in `stats.csv`. They keep a species alive while its behaviour is poor.
+For example, predators with a random brain survive only because of their floor
+(§13). But a newcomer brings founder genes, so a crash that empties a species
+restarts its evolution. With litters and migration no newcomer was needed in
+any run since 2026-10-09.
+
+**Egg bank (option, off).** `evolution.egg_bank` refills the floor with eggs
+instead of founders: every birth lays an egg (the parents' genomes), and below
+the floor a random egg from the last `egg_ticks` = 2 000 ticks hatches as a
+delayed birth, with crossover and mutation at hatching and its real parents
+and generation. Founders come only if no egg is left. It kept lineages going
+through crashes, but the crashes went on, and the owner judged it not a valid
+idea (2026-10-08).
 
 ## 10. One tick, in order
 
@@ -392,7 +496,7 @@ random brain survive only because of their floor (§13).
    predators done digesting). Digesting predators don't decide.
 2. **Prey act** in a random order, then pay the tick's energy cost and spend
    or recover stamina (§4).
-3. **Prey breed:** an animal that chose `mate` and a ready partner next to it produce a child (§8).
+3. **Prey breed:** an animal that chose `mate` and a ready partner next to it produce a litter of 2–4 (§8).
 4. **Predators act** in a random order and pay their energy cost. A hunting
    predator can kill, which leaves a carcass, or eat from a carcass (§6); a
    digesting one stays still.
@@ -400,17 +504,21 @@ random brain survive only because of their floor (§13).
 6. **Killed prey are removed**, with cause `predator` and the killer's id.
 7. **Age and die:** ages increase by 1; animals with energy ≤ 0 starve, animals
    older than 1 500 ticks die of old age.
-8. **Food regrows** (§2) and **carcasses rot**: eaten-up ones and those 100
+8. **Migrate:** a species above its cap loses random animals, except this
+   tick's babies, until it is back at the cap (`cap_rule: migrate`, §9).
+9. **Food regrows** (§2) and **carcasses rot**: eaten-up ones and those 100
    ticks old are removed.
-9. **Floors:** newcomers are added to each species below its floor.
-10. Every `sim.stats_every` = 100 ticks, a row is written to `stats.csv`.
+10. **Floors:** newcomers are added to each species below its floor (eggs
+    first if the egg bank is on, §9).
+11. Every `sim.stats_every` = 100 ticks, a row is written to `stats.csv`.
 
 ## 11. Randomness and reproducibility
 
 - There is no global random generator. Each part of the simulation draws from
   its own named stream (`promptevo/rng.py`): `world`, `agents` (prey founders
   and newcomers), `predators` (predator founders and newcomers), `sampling`,
-  `actions` (moves and kill rolls), `mutation` and `food`. Changing one part,
+  `actions` (moves and kill rolls), `mutation`, `food`, `litter` (litter sizes)
+  and `migration` (who leaves above the cap). Changing one part,
   for example how food regrows, doesn't shift the random numbers used
   elsewhere.
 - The world can have its own seed (`Simulation(..., world_seed=...)`), so many
@@ -428,12 +536,12 @@ random brain survive only because of their floor (§13).
 
 | File | Content |
 |---|---|
-| `events.jsonl` | one line per event: `founder`, `immigrant` (id, genome), `birth` (child id, parents, generation, genome, mutations with the locus, parent and new allele, instruction number and new text), `death` (cause, age, generation, food eaten or a predator's meals (kills and carcass portions), offspring; `killer` when a predator killed it). Predator events carry `"species": "predator"`; prey events have no `species` field. |
+| `events.jsonl` | one line per event: `founder`, `immigrant` (id, genome), `birth` (child id, parents, generation, genome, mutations with the locus, parent and new allele, instruction number and new text, `litter` size since 2026-10-09; a hatched egg also has `laid`, the tick its egg was laid), `death` (cause `predator`, `starvation`, `old_age` or `migrated`, age, generation, food eaten or a predator's meals (kills and carcass portions), offspring; `killer` when a predator killed it). Predator events carry `"species": "predator"`; prey events have no `species` field. |
 | `stats.csv` | every 100 ticks: `t, pop, mean_energy, mean_stamina, exhausted, mean_gen, max_gen, births, immigrants, deaths_starve, deaths_pred, deaths_age, decisions, backend_queries, invalid, alleles`, decisions per action `act_eat` … `act_mate`, then the predators' columns with the prefix `pred_` (`pred_pop` … `pred_invalid`, with `pred_portions` in place of `deaths_pred`, then `pred_act_hunt` … `pred_act_mate`). `deaths_pred` counts prey killed by predators, `pred_portions` carcass portions eaten, `exhausted` animal-ticks that began without stamina for one cell; counts are cumulative; `alleles` covers both species. Runs before the stamina change have no stamina or portion columns. |
 | `alleles.jsonl` | every allele seen in the run, both species: id, locus, text, origin, parent allele, operator (`llm#<n>`: the mutation instruction drawn), model, seed (the lineage of every gene) |
 | `final_population.json` | the living animals at the end: id, generation, genome (allele ids); predators carry `"species": "predator"` |
-| `run_info.json` | what ran: command, git commit, Ollama version and model digests, brain, seed, the main config sections |
-| `summary.json` | totals for the prey at the top level (births, newcomers, deaths by cause, mean lifespan, maximum generation, decisions, brain queries, memo hit rate, brain time, invalid rate, share of animal-ticks out of breath `exhausted_share`, share of each action), the same for the predators under `predators` (plus `kills` and `portions`), mutation counts, number of alleles, event hash; why the run stopped, minutes, model calls not answered by the cache, failures |
+| `run_info.json` | what ran: command (with any `--set` changes), git commit, Ollama version and model digests, the mutator (API, host, model, digest), the JEV checkpoint for `--backend jev`, brain, seed, the main config sections |
+| `summary.json` | totals for the prey at the top level (births, newcomers, hatched eggs, deaths by cause, mean lifespan, maximum generation, decisions, brain queries, memo hit rate, brain time, invalid rate, share of animal-ticks out of breath `exhausted_share`, share of each action), the same for the predators under `predators` (plus `kills` and `portions`), mutation counts, number of alleles, event hash; why the run stopped, minutes, model calls not answered by the cache, failures |
 
 Long runs are safe to stop. `events.jsonl` and `stats.csv` are flushed every
 500 ticks and `alleles.jsonl` is saved every 5 000. Creating
@@ -454,6 +562,52 @@ columns. `gene_report` and `gene_timeline` still read them
 ([08 §4](08-code-and-config-reference.md#4-scripts-experiments)).
 
 ## 13. Reference numbers for the Lab 1 world
+
+Measured on 2026-10-09 with the current settings: 192 × 192, caps 270 / 68
+with migration, litters of 2–4, food regrowth 0.0015 and 10 % at the start,
+hungry cover on 20 % of cells, `kill_p` 0.5. Keyword brain, no mutation, 5 000
+ticks, populations from tick 1 000 onward, seeds 1234, 7 and 42
+(`results/runs/ref_1009_<profile>_<seed>`).
+
+| | full (192 × 192, caps 270 / 68) | small (48 × 48, caps 40 / 6) |
+|---|---|---|
+| **Prey:** mean population | 264–268 (264.2 / 267.8 / 267.4) | 38 (38.1 / 37.8 / 37.8) |
+| Time at the floor / at the cap | 0 % / 2–29 % | 0 % / 22–29 % |
+| Births (5 000 ticks) | 8 293–9 046 | 1 106–1 197 |
+| Deaths: predator / starvation / migrated | 2 817–2 859 / 1 905–2 366 / 2 945–4 149 | 317–337 / 341–388 / 393–488 |
+| Mean lifespan · generations reached | 143–154 ticks · 28–29 | 153–164 ticks · 29 |
+| Newcomers | 0 | 0 |
+| Mean stamina (of 60) · animal-ticks out of breath | 25–38 · 1–6 % | 34–41 · 1–2 % |
+| **Predators:** mean population | 66 (66.1 / 66.5 / 66.0) | 6 (5.9 / 5.9 / 6.0) |
+| Time at the floor (3) / at the cap | 0 % / 46–56 % | 0 % / 90–98 % |
+| Births · newcomers | 1 757–1 786 · 0 | 162–173 · 0 |
+| Kills · carcass portions eaten | 2 817–2 859 · 4 972–5 024 | 317–337 · 495–533 |
+| Deaths: starvation / old age / migrated | 507–526 / 0 / 1 191–1 234 | 2–3 / 0 / 158–169 |
+| Mean lifespan · generations reached | 180–183 ticks · 27–28 | 168–182 ticks · 25–27 |
+| Invalid actions (the animal searches instead, §6): prey / predators | 1 % / 13–16 % | 0–1 % / 1 % |
+| Memo hit rate: prey / predators | 65–80 % / 46–58 % | 55–59 % / 71–76 % |
+
+Decisions in the full world: prey eat 60 %, rest 15 %, flee 12 %, follow 10 %,
+mate 3 %; predators hunt 72 %, rest 14 %, follow 8 %, mate 6 %.
+
+- **Fast turnover.** About 6 generations per 1 000 ticks (4–6 before), and
+  animals live 140–180 ticks (228–1 380 before). In the screen with the LLM's
+  answers, migration instead of blocked births tripled the generations reached
+  ([06 §5.20](06-experiments-and-results.md#520-jev-runs-egg-bank-cover-litters-and-migration)).
+- **Deaths mostly depend on behaviour.** Of the keyword prey's deaths, 33 % are
+  kills, 25 % starvation and 42 % migration. JEV-read prey eat and flee worse:
+  in the JEV runs of this world 39 % were killed, 38 % starved and 20–23 %
+  migrated ([06 §5.21](06-experiments-and-results.md#521-an-evolution-test-world)).
+- **Predators search more.** 13–16 % of predator decisions find no prey in
+  sight, against 0–6 % before: the world is bigger and prey hide in cover.
+- **No crashes** in these runs or in the no-rescue screen of this world with the
+  LLM's own answers (8 of 8 lasted 10 000 ticks; 06 §5.19). The random brain
+  wasn't measured again.
+
+One keyword tick takes about 17 ms in the full world (5 000 ticks ≈ 1.4 min) and
+1 ms in the small one.
+
+### 2026-10-07: the 96 × 96 world, before litters, migration and cover
 
 Measured on 2026-10-07, after the stamina change, with the keyword brain and
 no mutation, 5 000 ticks, populations from tick 1 000 onward, seeds 1234, 7 and

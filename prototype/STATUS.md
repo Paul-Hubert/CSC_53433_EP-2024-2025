@@ -4,22 +4,20 @@
 > `notes/archive.md`. Plan: `../Docs/redesign/08-phase0-spike-plan.md`.
 
 ## Position
-Session: S1.3 done locally, S4.3 gate run · Last updated: 2026-10-08 (stamina + speed + carcasses; mutation v3:
-small edits of the rule; word list and word-change limit removed on request, measured; JEV brain + CPU mutator)
+Session: S1.3 done locally, S4.3 gate run · Last updated: 2026-10-09 (JEV brain, CPU mutator; litters 2-4, migration
+at the caps; evolution-test world 192 x 192; ../Docs/prompt-genome 01-11 + README and README.md documented to here)
 
 ## Next action
-JEV brain ready (2026-10-08, owner): `docker compose -f docker/compose.yaml up -d jev`, then `--backend jev`;
-mutator qwen3.5:0.8b on the CPU (Ollama). To do: batching (owner: later). Running (owner): JEV + egg bank and JEV + cover (Background jobs; crash options f1da89a: results/crash_v3.md, best in the screen = predators.prey_per_predator 3).
-Mutation v4 2026-10-08: context line + 7 instructions (mutate_v4.txt), redraws; word list + change limit removed
-(owner). Long LLM run with v4 stopped by the owner at t 7 000 (Key numbers); not yet written up in 06/09. To
-continue it: the same command (Background jobs) replays from the cache. WAIT for owner
-(../Docs/prompt-genome/09 §4): #10 keep the values (predators at their cap with both brains) or let food limit
-them; cost ≈ 12 calls per tick (5 000 ticks ≈ 6.5 h); G2 handling
-(all-zero answers → neutral answer? cleaner control sentences? prompt iteration 1/3?); founder pools H1
-(prey v2 + predator v2). Then longer LLM runs with both species + `gene_timeline --species prey|predator`. Gate rerun
-on gemma4:12b with teacher_v5 + obs v2 done 2026-10-08 (`--tag gemma4-12b_v5`, Gate results); then E1 on the LLM brain in the background:
-`nohup python -m experiments.e1_sensitivity --backend llm --tag llm_points > logs/e1_llm.log 2>&1 &`
-(≈ 5 500 decisions, ≈ 50 min). Then several-seed LLM runs on the Lab 1 world (S6 prep).
+JEV brain (2026-10-08, owner): `docker compose -f docker/compose.yaml up -d jev`, then `--backend jev`; mutator on the
+CPU in Ollama (qwen3.5:0.8b; gemma4:26b better edits, 19 GB RAM). To do: batching (owner: later). Long runs detached
+(nohup), see Background jobs. WAIT for owner (../Docs/prompt-genome/09 §4): #11 default mutator (qwen3.5:0.8b or
+gemma4:26b, its temperature); #12 cover in the prey's observation; #13 more selective deaths if needed; #14 the neutral
+gene "No preference."; G2 handling (all-zero answers → neutral answer? cleaner control sentences? prompt iteration
+1/3?); founder pools H1 (prey v2 + predator v2). Then a long JEV run in the evolution-test world next to a C3
+SHUFFLED control run, `gene_timeline --species prey|predator`, `mutation_list`, and a common-garden test (G4).
+Gate rerun on gemma4:12b with teacher_v5 + obs v2 done 2026-10-08 (`--tag gemma4-12b_v5`); E1 on JEV done
+(results/e1_jev.md); E1 on gemma: `nohup python -m experiments.e1_sensitivity --backend llm --tag llm_points >
+logs/e1_llm.log 2>&1 &` (≈ 5 500 decisions, ≈ 50 min).
 
 ## Progress
 - [~] S1 scaffold ✔, Ollama probe ✔ (gemma4 26b, 12b), founder pool drafted ✔ · H1 founder pool approved ☐

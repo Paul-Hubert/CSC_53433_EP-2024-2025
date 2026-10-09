@@ -11,9 +11,10 @@ stated otherwise.
 3. [Run with the rule-based brain](#3-run-with-the-rule-based-brain)
 4. [Check a new model](#4-check-a-new-model)
 5. [Run with the LLM brain](#5-run-with-the-llm-brain)
-6. [Read the outputs](#6-read-the-outputs)
-7. [Long jobs](#7-long-jobs)
-8. [Troubleshooting](#8-troubleshooting)
+6. [Run with the JEV brain](#6-run-with-the-jev-brain)
+7. [Read the outputs](#7-read-the-outputs)
+8. [Long jobs](#8-long-jobs)
+9. [Troubleshooting](#9-troubleshooting)
 
 ---
 
@@ -153,7 +154,38 @@ export OLLAMA_API_KEY=...            # PowerShell: $env:OLLAMA_API_KEY = "..."
 Never write the key into a file. Alternatively, run `ollama signin` and use a
 cloud model tag through the local server.
 
-## 6. Read the outputs
+## 6. Run with the JEV brain
+
+The decision brain for runs since 2026-10-08
+([05 §7](05-decision-backends.md#7-jev-a-distilled-decision-model)). Two
+servers must be up: JEV in Docker on the GPU, and the mutator in Ollama on the
+CPU. Details and the one-time download are in `prototype/docker/README.md`.
+
+```bash
+docker compose -f docker/compose.yaml up -d      # JEV; 5-8 min until "healthy"
+docker compose -f docker/compose.yaml ps         # wait for (healthy)
+ollama pull qwen3.5:0.8b                         # the default mutator, on the CPU
+python -m experiments.jev_check                  # speed, contrast genes, mutator
+python -m experiments.smoke_run --backend jev --ticks 500 --snapshots 1
+```
+
+Speed in the 192 × 192 world: about 2.8 s per tick (1 hour ≈ 1 300 ticks). The
+mutator adds little: qwen3.5:0.8b takes 0.4 s per call, gemma4:26b 0.9 s, and a
+1-hour run makes about 400 calls.
+
+**Change a setting for one run** with `--set section.key=value` (repeatable;
+the value is read as YAML). `run_info.json` keeps the command:
+
+```bash
+python -m experiments.smoke_run --backend jev --set mutator.model=gemma4:26b --set world.cover_fraction=0.1
+python -m experiments.smoke_run --set agents.litter=[1,1] --set predators.litter=[1,1] --set agents.cap_rule=block --set predators.cap_rule=block   # the reproduction rules before 2026-10-09
+```
+
+A bigger CPU mutator needs RAM: gemma4:26b holds about 19 GB while loaded.
+Models stay loaded a few minutes after their last call; unload one at once
+with `ollama stop <model>`.
+
+## 7. Read the outputs
 
 A run writes to `results/runs/<name>/` ([03 §12](03-world-and-simulation.md#12-what-a-run-writes-to-disk)).
 
@@ -176,7 +208,7 @@ print(len(births), "births,", len(mutations), "mutations")
 print(alleles[mutations[0]["child"]] if mutations else "no mutation yet")
 ```
 
-## 7. Long jobs
+## 8. Long jobs
 
 Jobs longer than a few minutes should run in the background with a log file:
 
@@ -194,7 +226,15 @@ the cache grow instead:
 python -c "import sqlite3; print(sqlite3.connect('cache/policy.sqlite').execute('select count(*) from kv').fetchone()[0])"
 ```
 
-## 8. Troubleshooting
+`smoke_run` itself writes `logs/run_<name>.progress.json` every 500 ticks
+(tick, populations, births, mutations), so `experiments.status` follows it too.
+
+**Start long runs detached** (`nohup … &`), not as a task of an assistant
+session: Claude Code stops its own background tasks when the machine runs low
+on memory, and it stopped a JEV run that way on 2026-10-08. A detached run
+survives, and stops cleanly through `logs/run_<name>.stop`.
+
+## 9. Troubleshooting
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
@@ -203,8 +243,13 @@ python -c "import sqlite3; print(sqlite3.connect('cache/policy.sqlite').execute(
 | Call times vary between about 1.5 s and 35 s | the GPU is shared with other work (training jobs, games, a Unity editor) | stop the other GPU work, or accept slower runs (results don't change, the simulation waits) |
 | Answers come slowly and the model "thinks" | a thinking model with reasoning on | `ollama.think: false` |
 | A long run disappears; the system is low on memory | other applications use most of the RAM | close them, or use a smaller model |
-| `gene mutation uses the Ollama model … but the server didn't answer` | since 2026-10-02 every run mutates genes with the mutator model, whatever the brain | start Ollama and `ollama pull gemma4:12b`, or add `--no-mutation` |
+| `gene mutation uses the Ollama model … but the server didn't answer` (before 2026-10-08) | since 2026-10-02 every run mutates genes with the mutator model, whatever the brain | start Ollama and pull the mutator model, or add `--no-mutation` |
 | A rerun asks the LLM again for everything | the cache key includes the model digest and the prompt's hash, so a new `ollama pull` or an edited prompt starts fresh (the switch to `teacher_v2.md` on 2026-10-07 is such a change). Before 2026-10-01 a bug kept the request cache (`cache/ollama.sqlite`) empty. | expected after a model or prompt change |
 | `experiments.status` shows `DEAD?` for a running job | old liveness check on Windows: `os.kill(pid, 0)` sends Ctrl+C there (signal 0) instead of probing (fixed 2026-10-01) | update the code |
 | The gate's output got overwritten | `teacher_gate` always writes `results/teacher_gate.md` | copy it per model after each run |
 | `RuntimeError: Ollama /api/chat failed after 3 tries` | server not running, wrong host, or model not pulled | `ollama list`, `ollama serve`, check `ollama.host` |
+| A run stops with `Ollama /api/chat failed … actively refused it` minutes after it started, and the Ollama app's log ends with "shutting down ollama server" | the Ollama desktop app's updater shuts its server down when an update is pending, and doesn't always start it again (twice on 2026-10-09) | install the update, then rerun (the run resumes from the cache); or run the bare `ollama serve` for the run |
+| The Ollama app runs but nothing answers on port 11434 | the same: the update failed and the server wasn't restarted | quit and reopen the app, or install the update |
+| A JEV run stops with `/v1/completions failed … connection was aborted` | the vLLM engine died (once, "CUDA error: unknown error", 2026-10-09); Docker restarts the container | wait for `docker compose ps` to show healthy (≈ 4 min), then rerun |
+| A background run or watcher "was stopped because the system is running low on memory" | Claude Code stops its own background tasks under memory pressure | start runs detached (§8); unload models you don't need (`ollama stop`); a CPU mutator like gemma4:26b needs about 19 GB |
+| `gene mutation uses the model … at http://localhost:11434 (ollama API), but the server didn't answer` | the mutator server isn't running (since 2026-10-08 the mutator has its own `mutator.*` address) | start Ollama and `ollama pull qwen3.5:0.8b`, or add `--no-mutation` |

@@ -50,8 +50,8 @@ neural networks:
    │              PROMPT = actions + genes + situation                │
    │                                  │                               │
    │                                  ▼                               │
-   │                 BRAIN (local LLM via Ollama, or rule-based)      │
-   │                                  │ points for 5 actions          │
+   │          BRAIN (JEV-9B, an LLM via Ollama, or rule-based)        │
+   │                                  │ scores for 5 actions          │
    │                                  ▼                               │
    │                  probabilities ──► draw one action               │
    │                                  │                               │
@@ -62,12 +62,15 @@ neural networks:
    │      energy, predators, ageing ──► who survives and mates        │
    │                                  │                               │
    │                                  ▼                               │
-   └──── child genome = crossover(parent A, parent B) + mutation ─────┘
-                             (an LLM makes one random change)
+   └── 2-4 children, each crossover(parent A, parent B) + mutation ───┘
+                   (a small LLM on the CPU makes one random change)
 ```
 
 The diagram shows a prey animal. A predator goes through the same loop with 4
 sentences and the actions hunt, follow, rest and mate; its prey are part of its world.
+Since 2026-10-09 a mating makes a litter of 2–4, and a species at its cap loses
+random animals to migration instead of stopping births
+([03 §8–9](03-world-and-simulation.md#8-reproduction)).
 
 ## Design choices and why
 

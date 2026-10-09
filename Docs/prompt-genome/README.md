@@ -28,6 +28,15 @@ world the animals live in.
 > fast, and a kill leaves a carcass for two more predators
 > ([03 §3](03-world-and-simulation.md#3-predators)). Runs use the 96 × 96 world
 > by default, and one partner's choice is enough to breed.
+>
+> **2026-10-08/09:** the **JEV-9B brain** (vLLM in Docker) decides, about three
+> times as fast as gemma, and genes mutate through a small model on the CPU. A
+> mating makes **2–4 babies**, and at a species' cap random animals **migrate**
+> away instead of births stopping: both species now live without crashes or
+> founder newcomers. The world is **192 × 192** with doubled populations,
+> hungrier prey, deadlier predators and **cover**, so that deaths depend on
+> behaviour and selection can show
+> ([06 §5.18–5.22](06-experiments-and-results.md#518-the-long-llm-run-with-mutation-v4)).
 
 ## Documents
 
@@ -35,11 +44,11 @@ world the animals live in.
 |---|---|---|
 | 01 | [Overview](01-overview.md) | the idea, why the lab changes, how it works, design choices, glossary |
 | 02 | [Lab 1](02-lab1.md) | the flat world, learning goals, how to run it, suggested activities, compute budget, the bridge to the terrain and foliage labs |
-| 03 | [World and simulation](03-world-and-simulation.md) | grid, food, the two species (prey and predators), energy, perception and distance bands, actions, decisions, reproduction, tick order, outputs, reference numbers |
-| 04 | [Genome and evolution](04-genome-and-evolution.md) | loci, alleles, founder pool, crossover, blind LLM mutation with real examples, selection, controls |
-| 05 | [The brain: decision backends](05-decision-backends.md) | random, rule-based and LLM brains; the prompt; points mode; caching; Ollama settings; model choice; measured costs |
-| 06 | [Experiments, metrics and results](06-experiments-and-results.md) | metrics, gates G1–G5, every result so far, known issues, next experiments |
-| 07 | [Setup, usage and troubleshooting](07-setup-and-usage.md) | install, run with and without a model, check a model, read outputs, long jobs, fixes |
+| 03 | [World and simulation](03-world-and-simulation.md) | grid and cover, food, the two species (prey and predators), energy, perception and distance bands, actions, decisions, reproduction and litters, caps and migration, tick order, outputs, reference numbers |
+| 04 | [Genome and evolution](04-genome-and-evolution.md) | loci, alleles, founder pool, crossover, blind LLM mutation with real examples, the mutator models, selection, controls |
+| 05 | [The brain: decision backends](05-decision-backends.md) | random, rule-based, LLM and JEV brains; the prompt; points mode; caching; Ollama settings; model choice; measured costs; stand-ins for screening |
+| 06 | [Experiments, metrics and results](06-experiments-and-results.md) | metrics, gates G1–G5, every result so far (including the crash exploration and the JEV runs), known issues, next experiments |
+| 07 | [Setup, usage and troubleshooting](07-setup-and-usage.md) | install, run with and without a model, run with JEV, change a setting per run, check a model, read outputs, long jobs, fixes |
 | 08 | [Code and configuration reference](08-code-and-config-reference.md) | modules, every configuration key, every script, tests, data, how to extend |
 | 09 | [Status, decisions and roadmap](09-status-and-roadmap.md) | where things stand, timeline, decisions taken and pending, roadmap |
 | 10 | [Natural selection in long runs](10-natural-selection-runs.md) | 230-generation runs with (scripted) predators, how the gene report measures which genes did best, marked genes, drift |
@@ -57,10 +66,11 @@ world the animals live in.
 cd prototype
 python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
-pytest -q                                              # 69 tests, no model needed
-python -m experiments.smoke_run                        # Lab 1 world (96 × 96), rule-based brain, ≈ 22 s
-ollama pull gemma4:12b
-python -m experiments.smoke_run --backend llm --ticks 500   # the LLM brain for both species, ≈ 50 min on a 16 GB GPU (--profile small: 10 min)
+pytest -q                                              # 100 tests, no model needed
+python -m experiments.smoke_run                        # Lab 1 world (192 × 192), rule-based brain, ≈ 1.5 min
+ollama pull qwen3.5:0.8b                               # the mutator, on the CPU
+docker compose -f docker/compose.yaml up -d            # the JEV brain (07 §6)
+python -m experiments.smoke_run --backend jev --ticks 500   # JEV for both species, ≈ 25 min on a 16 GB GPU
 ```
 
 ## Related material

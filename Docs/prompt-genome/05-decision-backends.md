@@ -15,7 +15,9 @@ use the same brain, each with its own prompt (since 2026-10-07). Code:
 4. [`llm`: the LLM brain](#4-llm-the-llm-brain)
 5. [Choosing the model](#5-choosing-the-model)
 6. [What the LLM brain costs](#6-what-the-llm-brain-costs)
-7. [Parked: Laya](#7-parked-laya)
+7. [`jev`: a distilled decision model](#7-jev-a-distilled-decision-model)
+8. [Stand-ins for screening](#8-stand-ins-for-screening)
+9. [Parked: Laya](#9-parked-laya)
 
 ---
 
@@ -40,7 +42,8 @@ Pick a brain by name with `--backend` or `backend.name` in the config:
 |---|---|---|---|
 | `random` | nothing | instant | null model: does behaviour matter? |
 | `rule_based` | nothing | ≈ 1 ms per tick | fast reference, CPU-only work, debugging, control C5 |
-| `llm` | Ollama + a model | ≈ 0.5 s per new decision (gemma4:12b, desktop GPU) | the real experiment |
+| `llm` | Ollama + a model | ≈ 0.5 s per new decision (gemma4:12b, desktop GPU) | the LLM experiment until 2026-10-08 |
+| `jev` | vLLM in Docker + JEV-9B (§7) | ≈ 0.08 s per new decision (12 per second) | the decision brain since 2026-10-08 |
 | `laya` | parked | — | — |
 
 ## 2. `random`: the null model
@@ -412,7 +415,92 @@ less: the memo answered 35 % of prey and 47 % of predator decisions. With
 Use `--profile small` for short LLM checks (about 10 minutes per 500 ticks
 before the stamina change).
 
-## 7. Parked: Laya
+## 7. `jev`: a distilled decision model
+
+Since 2026-10-08 (owner: decisions smart and fast) the default brain for runs
+is **JEV-9B** (`autotrust/JEV-9B`, revision `b63f651c`, pinned in `jev.revision`).
+It is a frozen Qwen3.5-9B with "System 1": a LoRA adapter and a decision head
+that answer a typed question in one forward pass, without generating text.
+Code: `promptevo/backends/jev_backend.py`; server setup: `prototype/docker/README.md`.
+
+**How a decision is asked.** The prompt is the same species prompt as the LLM
+brain's (`teacher_v5.md`, `predator_v3.md`: world rules, genes, situation),
+without the answer instruction, wrapped in JEV's template:
+
+```text
+[kind] choice
+[state] <the species prompt with genes and situation>
+[question] Which action does this animal take now?
+[options]
+A) eat
+B) flee
+...
+[decision]:
+```
+
+One `/v1/completions` request per decision, `max_tokens` 1, restricted to the
+option letters, with log-probabilities. The backend adds the head's bias
+(`decision_head.json`), divides by the calibrated temperature
+(`calibration.json`) and takes a softmax over the options. The options are
+always in the species' action order, since the model changes some answers when
+only the order changes. Answers are cached (`cache/jev.sqlite`), and a failed
+call stops the run cleanly.
+
+**Serving.** vLLM runs JEV in a Docker container (`promptevo-jev`, port 8000,
+`jev.host`), quantised to FP8 on the fly: 10.5 GiB of weights, 14.4 GB of the
+16 GB card in use. Start-up takes 5–8 minutes. The model must be the
+`autotrust/JEV-9B` repo: the `prithivMLmods/JEV-9B-GGUF` files are the bare
+backbone, without adapter or head. Because JEV fills the GPU, the mutator runs
+on the CPU ([04 §5](04-genome-and-evolution.md#the-mutator-model)).
+
+**How well it reads genes** (gate and E1, 2026-10-08,
+[06](06-experiments-and-results.md#4-gates-g1g5)):
+
+| | gemma4:12b (teacher_v5) | JEV-9B |
+|---|---|---|
+| Directed sign accuracy · mean ΔP | 0.88 · 0.44 | 1.00 · 0.38 |
+| MI_G founders / random text | 0.239 / 0.265 | 0.143 / 0.014 |
+| Gibberish → neutral / founder → neutral | 0.115 / 0.097 | 0.010 / 0.056 |
+| G1 · G2 | ✔ · ✘ | ✔ · ✘ (only MI_G < 0.25) |
+
+JEV ignores irrelevant text, which gemma didn't, so the 2× margin of G2
+passes. But genes move it less than situations do: MI_G stays below 0.25.
+
+**Speed.** About 12 decisions per second one at a time. In runs: 0.46 s per
+tick in the 96 × 96 world early on, 1.6 s per tick with about 170 animals
+(10-hour run, 22 817 ticks, 324 369 calls), 2.8 s per tick with about 335
+animals in the 192 × 192 world (1 hour ≈ 1 300 ticks). gemma4:12b took about
+4 s per tick in the 96 × 96 world.
+
+**Reliability.** The JEV runs had no failed calls, with one exception: on
+2026-10-09 at 18:07 the vLLM engine died with "CUDA error: unknown error" after
+443 178 answers. Docker restarted the container on its own (restart policy
+`unless-stopped`), and it was healthy again 4 minutes later. Windows logged no
+driver error. The run that hit it stopped cleanly and was started again.
+
+## 8. Stand-ins for screening
+
+`experiments/crash_sweep.py` needs hundreds of 20 000-tick runs, far too many
+for a real brain, so it uses fast stand-ins (2026-10-08,
+[06 §5.19](06-experiments-and-results.md#519-boom-and-bust-how-to-stop-the-crashes)):
+
+- **`llmtable`: the LLM's own answers, by situation.** `experiments/llm_table.py`
+  rebuilds the cache keys of `cache/policy.sqlite` for the 400 longest-carried
+  genomes of a run and every possible situation, and averages the answers it
+  finds per situation, weighted by how long each genome lived
+  (`data/llm_table_long_v4.json`, from the gemma run of 2026-10-08: 2 439 of
+  4 860 prey situations and 1 637 of 4 050 predator situations). No model call
+  is made. Genes have no effect in it: every animal is the average animal. 1–4 %
+  of decisions fall on a missing situation and use `llmlike`.
+- **`llmlike`: the keyword brain with the LLM's action mix.** Fixed per-action
+  offsets on the keyword brain's scores, fitted until both species' action
+  shares match the gemma run within 3 points.
+
+Only `llmtable` reproduced the gemma run's crashes (0 of 8 runs lasted without
+rescue); the keyword brain and `llmlike` held out, because what matters is when
+an animal flees or mates, not how often.
+
+## 9. Parked: Laya
 
 The first design used **Laya**, a small local "typed decision" model, as the
 brain, with a large LLM teaching it to read genes (distillation). On
