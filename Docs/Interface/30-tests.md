@@ -21,7 +21,7 @@ T4 and T5 are described in [32](32-integrity-prompts-and-ci.md).
 
 | Helper | Does |
 |---|---|
-| `WorldBuilder` | builds a world in code: `new WorldBuilder(seed).Flat(20, 20).Food(…).Species("Rabbit", s => s.Action<EatAction>().Sense<…>()).Build()`; no scene needed |
+| `WorldBuilder` | builds a world in code: `new WorldBuilder(seed).Flat(20, 20).Food(…).Species("prey", s => s.Action<EatAction>().Sense<…>()).Build()`; no scene needed |
 | `ScriptedBrain` | answers given vectors per (species, observation) or a function; counts calls and batches; can delay answers by N `Advance` calls |
 | `FakeMutator` | answers mutation prompts with a scripted function (e.g. append "quickly"); records every prompt; can delay or fail |
 | `FakeClock` driver | advances ticks without Play mode, switches wait modes, varies ticks per call |
@@ -54,7 +54,7 @@ Format: **id** — given → expect *(rules)*.
 
 - **T-SPACE-01** — an animal moved by an intent of 0.37 m → its position changed by exactly that vector, nothing snapped *(SPACE-01)*.
 - **T-SPACE-02** — distances between points with different heights → horizontal Euclidean; a replaced distance function is used by every sense and action *(SPACE-02, SPACE-06)*.
-- **T-SPACE-03** — 10 000 random intents (fleeing into corners, running at walls, NavMesh edges) → no animal ever outside the rectangle or on non-walkable ground *(SPACE-03, SPACE-04, MOVE-01)*.
+- **T-SPACE-03** — 10 000 random intents (fleeing into corners, running at walls, NavMesh edges) → no animal ever outside the rectangle or on non-walkable ground *(SPACE-03, SPACE-04, MOVE-02)*.
 - **T-SPACE-04** — two candidates at the same distance → the same one chosen in 100 runs and with the candidates inserted in reverse order *(SPACE-07, SPACE-08)*.
 - **T-SPACE-05** *(T2)* — the same world run with 1, 3 and 10 ticks per call, and with `Time.fixedDeltaTime` 0.02 and 0.005 → identical hashes *(SPACE-10, SPACE-11)*.
 - **T-SPACE-06** *(T2)* — views hidden versus shown, interpolation on or off → identical hashes *(SPACE-12)*.
@@ -73,10 +73,10 @@ Format: **id** — given → expect *(rules)*.
 
 ### Species and food web
 
-- **T-SPEC-01** — display names "Rabbit" and "Wolf" → situation texts and prompts use them; renaming changes the text and the cache key *(SPEC-01, SPEC-20)*.
+- **T-SPEC-01** — species `prey` and `predator` → situation texts and prompts use their names and labels; renaming `predator` to "wolf" changes the text and the cache key *(SPEC-01, SPEC-20)*.
 - **T-SPEC-02** — a genome of one species offered to another → rejected; crossover across species throws *(SPEC-04, GENE-06)*.
-- **T-SPEC-03** — wolves striking rabbits → the rabbits' threats are {Wolf}, derived; adding a lynx diet entry adds Lynx without other changes *(SPEC-10, SPEC-12)*.
-- **T-SPEC-04** — a cannibal species → hunts kin, never itself *(SPEC-11)*.
+- **T-SPEC-03** — the predator striking prey → the prey's threats are {predator}, derived; adding a "lynx" species that strikes prey adds lynx without other changes *(SPEC-10, SPEC-12)*.
+- **T-SPEC-04** — a cannibal species → hunts kin, never itself; its threats include itself, so its flee action runs from kin *(SPEC-11)*.
 - **T-SPEC-05** — a grazer next to a carcass and a hunter next to food → no interaction happens *(SPEC-13)*.
 - **T-SPEC-06** *(T2)* — `AddSpecies` from a template at tick 300 → new id, own population, streams and allele namespace; relations inherited both ways; other species' events unchanged up to tick 300 *(SPEC-30, SPEC-31, RAND-03)*.
 - **T-SPEC-07** *(T2)* — a species goes extinct (no floor) → its id is never reused; a later new species gets a new id *(SPEC-32)*.
@@ -87,7 +87,7 @@ Format: **id** — given → expect *(rules)*.
 - **T-ANIM-02** — a declared stat with a maximum → written above it, reads the maximum; age is present without any module; no stamina module → no stamina stat *(ANIM-10, ANIM-11, ANIM-22)*.
 - **T-ANIM-03** — a trait with default 60, a number gene setting 75, another multiplying by 1.5, one setting 500 with range [1, 120] → 75, 90, 120; no gene → 60; unchanged after 1 000 ticks *(ANIM-15, ANIM-16, ANIM-17, GENE-04)*.
 - **T-ANIM-04** — the energy table of [05 §4](05-animals-stats-and-life-cycle.md#4-metabolism-energy-and-stamina-reference-modules), one case per row (walk 1 m, run 2 m, rest, other action still, recovering, busy, graze, kill, portion) → exact energy and stamina after one tick *(ANIM-20, ANIM-21, ANIM-22)*.
-- **T-ANIM-05** — stamina 0.6 and an intent of 2 m → moves 0.6 m; stamina 0 → doesn't move, whatever the action *(ANIM-21, MOVE-02)*.
+- **T-ANIM-05** — stamina 0.6 and an intent of 2 m → moves 0.6 m; stamina 0 → doesn't move, whatever the action *(ANIM-21, MOVE-03)*.
 - **T-ANIM-06** — a busy animal for 3 ticks → no decision, no movement, busy cost paid, stamina recovers; decides at the start of the 4th tick *(ANIM-30, DEC-02, DEC-01)*.
 - **T-ANIM-07** — digestion after a kill and after a portion → 50 and 25 ticks, reason "digesting" recorded *(ANIM-31)*.
 - **T-ANIM-08** — a baby born this tick → age 1 after the death phase; adult at age 150 *(ANIM-35, ANIM-36)*.
@@ -102,8 +102,8 @@ Format: **id** — given → expect *(rules)*.
 - **T-SENSE-04** — band boundaries: distances 0.99, 1.0, 1.01, 4.0, 4.01, 10.0, 20.0, 20.01 → adjacent, adjacent, close, close, medium, medium, far, none; an item within reach → here *(SENSE-20)*.
 - **T-SENSE-05** — edges [4, 1, 10], [1, 4, 25] with vision 20 → validation errors *(SENSE-21)*.
 - **T-SENSE-06** — readiness: a ready partner at 15 m with partner range 20 and 4 → "ready to mate" written, then not written *(06 §4)*.
-- **T-SENSE-07** — observation-space size of the reference species → 4 860 and 4 050; above the threshold → V-50 *(SENSE-05)*.
-- **T-SENSE-08** — golden situation texts (V1 and V2, unit "cells") for the 48 reference situations → byte-identical to the prototype's texts *(SENSE-10, SENSE-11, SENSE-12, SENSE-13)*.
+- **T-SENSE-07** — observation-space size of the reference species → 29 160 (prey, with the cover sense) and 4 050; above the threshold → V-50 *(SENSE-05)*.
+- **T-SENSE-08** — situation texts (V1 and V2) for the 48 reference situations → equal to the snapshot pinned from the first accepted run (`Tests/Golden/situations.json`), every distance in meters, never "cells" *(SENSE-10, SENSE-11, SENSE-12, SENSE-13)*.
 - **T-SENSE-09** — a batched raycast sense versus the same sense evaluated one animal at a time → same tokens for 500 animals *(SENSE-31)*.
 - **T-SENSE-10** — a camera sense with a brain that rejects attachments → V-51; with one that accepts them → those queries never hit the memo unless a cache key is given *(SENSE-41)*.
 
@@ -112,17 +112,19 @@ Format: **id** — given → expect *(rules)*.
 - **T-ACT-01** — conformance suite over every `AnimalAction` in the project: has a name unique in its species, a description; in a world with nothing in sight → searches, flagged once per decision; never changes another animal *(ACT-01, ACT-04, ACT-06)*.
 - **T-ACT-02** — a chosen action over 4 ticks with a moving target → the target is looked up each tick *(ACT-02)*.
 - **T-ACT-03** — each reference action (eat, flee, follow, rest, mate, hunt, hide) in a placed scene → the intent of [07 §4](07-actions-and-locomotion.md#4-reference-actions): target, walk or run, stop distance *(ACT-03)*.
-- **T-ACT-04** — eat 0.8 m from an item → walks to it and grazes in the same tick *(ACT-10, MOVE-03)*.
+- **T-ACT-04** — eat 0.8 m from an item → walks to it and grazes in the same tick *(ACT-10, MOVE-04)*.
 - **T-ACT-05** — strike, scavenge, graze at 1.01 m and 0.99 m (graze 0.51 and 0.49) → no interaction, interaction *(ACT-10)*.
 - **T-ACT-06** — 10 000 strikes with kill chance 0.5 → 50 % within 4 standard errors; a kill leaves a carcass, makes the hunter busy, adds the gain *(ACT-11)*.
 - **T-ACT-07** — a hunter next to two prey → strikes at most once per tick; a surviving prey struck by a second hunter the same tick can die *(ACT-12)*.
 - **T-ACT-08** — mate next to a ready partner → no birth in the act phase; the birth happens in the breed phase *(ACT-13)*.
 - **T-ACT-09** — static check: no action class reads `TextGene` values or allele texts *(ACT-20)*.
 - **T-ACT-10** — hunt with a carcass and a prey at the same distance → goes for the carcass *(07 §4)*.
-- **T-MOVE-01** — walk and run intents with traits 1 and 2 m → 1 and 2 m moved (stamina allowing); never past the stop distance *(MOVE-02, MOVE-03)*.
+- **T-MOVE-01** — walk and run intents with speed traits 1 and 2 m → 1 and 2 m moved in a straight line (stamina allowing); never past the stop distance; two species with different speeds move differently *(MOVE-03, MOVE-04)*.
 - **T-MOVE-02** — flee from a hunter → distance grows each tick in open ground; in a corner the animal slides or sidesteps and is never stuck for more than 3 ticks *(MOVE-04)*.
 - **T-MOVE-03** — wandering for 100 000 ticks → turns on 25 % of ticks (± 4 s.e.), only by ±45° or ±90°; new heading when blocked *(MOVE-05)*.
-- **T-MOVE-04** — the metres reported by the motor equal the distance actually moved and are what metabolism charges *(MOVE-06)*.
+- **T-MOVE-04** — the meters reported by the locomotion equal the distance actually moved and are what metabolism charges, plus the locomotion's extra cost *(MOVE-06, ANIM-20)*.
+- **T-MOVE-06** — a test locomotion that ignores the intent's direction (turns it by 30° and halves it) → the tick goes on with where the animal really is: metabolism, interactions and the next senses use the actual position; no error *(MOVE-01, MOVE-06)*.
+- **T-MOVE-07** — a subclass of the kinematic locomotion that forbids steep slopes, given to one species only → that species never climbs above the limit, the other does *(MOVE-07)*.
 - **T-MOVE-05** *(T2)* — the three act orders on the same seed → different but each reproducible hashes; sequential orders see earlier moves, simultaneous sees the start state *(ACT-30, ACT-31, ACT-32)*.
 
 ### Decisions, brains, prompts
@@ -137,13 +139,14 @@ Format: **id** — given → expect *(rules)*.
 - **T-DEC-08** — two animals that differ only in a number gene the brain doesn't read → one memo key *(DEC-31)*.
 - **T-DEC-09** — a brain failing every call, strict → the run stops cleanly with all outputs; non-strict → uniform rows, failures counted, nothing stored in memo or cache *(DEC-34, DEC-40, RAND-20)*.
 - **T-DEC-10** — points answers {eat: 120, flee: −5}, all zeros, a missing action → repaired by DEC-41 (or rejected as documented) *(DEC-41)*.
-- **T-DEC-11** — keyword brain golden cases from the prototype: the genome of the prototype's Lab 1 activity C in "energy low, food close, predator close, no animal" → eat 0.31, flee 0.69 (± 0.01); the predator genome at energy low / high with prey medium → hunt 0.95 / 0.32 *(08 §6)*.
+- **T-DEC-11** — keyword brain: the vectors of the reference genomes in the 48 situations equal the pinned snapshot; and the directions the prototype showed hold: with "Eat whenever food is close." and "Always run away, whatever happens." in "energy low, food close, predator close", flee > eat; the predator genome "Hunt only when you are hungry." hunts more at energy low than high *(08 §6)*.
 - **T-DEC-12** — keyword brain directed tests: for each contrast pair, "Always…" gives the action more probability than "Never…" in every relevant observation; control sentences change nothing *(08 §6, CTRL-10)*.
 - **T-PROMPT-01** — an assembled prompt → header, then one line per action in order, rules from the modules present, genes block `- label: "sentence"`, situation, ask *(PROMPT-01, PROMPT-02)*.
 - **T-PROMPT-02** — run speed changed from 2 to 3 → the rule line says three (or 3) *(PROMPT-03)*.
-- **T-PROMPT-03** — the prototype's frozen prompts with the golden genes and situations → byte-identical to the prototype's prompts *(PROMPT-04)*.
+- **T-PROMPT-03** — the default assembled prompts of both species for the reference genomes and situations → equal to the pinned snapshot (the example of 08 §7 among them); a frozen prompt with `{genes}`, `{situation}`, `{ask}` gets exactly those filled in *(PROMPT-04)*.
 - **T-PROMPT-04** — a one-character change in a template → a new prompt id and a cache miss *(PROMPT-05, DEC-33)*.
 - **T-PROMPT-05** *(editor)* — the species inspector's preview equals the prompt the brain receives for the same animal *(PROMPT-06)*.
+- **T-PROMPT-06** — the species header, an action's line and a rule line edited in the inspector → the prompt changes accordingly; the answer instruction has no inspector field and comes from the brain class (the points and JEV brains give different endings) *(PROMPT-07)*.
 
 ### Genes, alleles, genomes
 
@@ -157,6 +160,7 @@ Format: **id** — given → expect *(rules)*.
 - **T-GENE-08** — 10 000 crossovers → each locus from parent A in 50 % (± 4 s.e.), independent between loci; siblings of a litter differ when parents differ *(GENE-30, GENE-32)*.
 - **T-GENE-09** — asexual reproduction → the baby's genome equals the parent's before mutation *(GENE-31)*.
 - **T-GENE-10** — founder pools frozen: two runs with different seeds → the same pool contents and allele ids for founders *(GENE-21)*.
+- **T-GENE-11** — gene component settings: no neutral allele → the pool has none; a changed neutral text → founders use it; neutral marked "doesn't mutate" → over 10 000 babies its allele is never mutated, while the other alleles of the gene are *(GENE-24, MUT-22)*.
 
 ### Mutation
 
@@ -166,7 +170,7 @@ Format: **id** — given → expect *(rules)*.
 - **T-MUT-04** — a `FakeMutator` whose every answer is rejected → after 5 tries the inherited allele stays; counters record the rejections by reason *(MUT-04, MUT-05, MUT-13)*.
 - **T-MUT-05** — a deck file with comments and blank lines → only instruction lines are drawn; adding a line adds an instruction *(MUT-10)*.
 - **T-MUT-06** — the prompt the mutator receives → exactly MUT-11's text (golden), with and without a context line; it contains no world data, no other gene *(MUT-11, CORE-07)*.
-- **T-MUT-07** — cleaning and guards, golden cases from the prototype (quoted answers, "Here is the new sentence: …", two sentences, 13 words, same as parent with other case, only punctuation changed, forbidden characters) → the prototype's results *(MUT-12)*.
+- **T-MUT-07** — cleaning and guards, the cases MUT-12 lists (quoted answers, "Here is the new sentence: …", two sentences, 13 words, same as parent with other case, only punctuation changed, forbidden characters) → the prototype's results *(MUT-12)*.
 - **T-MUT-08** — the same mutation prompt and seed twice through the cache → one model call *(MUT-14)*.
 - **T-MUT-09** — Gaussian mutation near the range edges → always clamped; same seed, same value *(MUT-20)*.
 - **T-MUT-10** — answers delivered in a different order or later (fake delays) → identical genomes and events *(MUT-30, RAND-11)*.
@@ -193,6 +197,7 @@ Format: **id** — given → expect *(rules)*.
 - **T-TICK-01** — a recording phase inserted between each pair of phases → the reference order of TICK-04; a test phase added or removed runs or vanishes without other changes *(TICK-01, TICK-04, TICK-07)*.
 - **T-TICK-02** — a phase changes the world → only later phases of the same tick see it *(TICK-02)*.
 - **T-TICK-03** — decisions read the state after the previous tick's floor phase (a newcomer added at the floor decides at the next tick start) *(TICK-05)*.
+- **T-TICK-04** — a prey animal that chose mate, next to a ready partner, and is killed later in the act phase → no litter: breeding runs after all animals acted *(TICK-06, REPRO-05)*.
 - **T-RAND-01** — static check: no `UnityEngine.Random`, unseeded `System.Random`, `Guid.NewGuid` or time-based seeds in the runtime assembly *(RAND-01)*.
 - **T-RAND-02** — extra draws inserted into the food stream → births, act order and mutations unchanged *(RAND-02, RAND-03)*.
 - **T-RAND-03** — a world seed fixed and the run seed varied → same map and initial food, different runs *(RAND-04)*.
@@ -229,6 +234,11 @@ the recipes of [22](22-extending-recipes.md) refer to.
 | T-DEC brain template | every `Brain` | row shape, sum, order; same query same answer; failure behaviour |
 | T-MUT template | every `MutationOperator` | receives only gene and allele; same seed same result; result passes the gene kind's checks or is rejected |
 | T-TICK phase template | every `TickPhase` | runs on an empty world; declares what it waits for; doesn't break the hash of an unchanged world when disabled and re-enabled |
+| T-MOVE locomotion template | every `Locomotion` | never ends a tick on non-walkable ground or outside; reports the meters actually moved; a stuck animal moves again within 3 ticks; extra cost ≥ 0; batch and single-animal versions agree |
+
+These suites, together with each reference module's unit tests, grade the first
+step of the teaching path: a student's reimplementation of a reference module
+passes when the reference's tests pass ([22 §0](22-extending-recipes.md#0-the-teaching-path)).
 
 ## 5. Invariants checked every tick in test worlds
 
@@ -245,9 +255,8 @@ length and species.
 | **R-01** | **Pinned hashes**: for each reference scene and seeds 1234, 7, 42, the events hash after 2 000 ticks (keyword brain) is stored in `Tests/Golden/hashes.json`. A change fails the test; re-pinning is a deliberate commit that states why. | RAND-11 |
 | **R-02** | **Statistical ranges** over 5 seeds × 5 000 ticks: mean populations, time at floor and cap, deaths by cause, mean lifespan, generations, kills, searching rate, memo hit rate, within the ranges recorded when the reference was accepted (first accepted Unity runs; the prototype's numbers in `Docs/prompt-genome/03` §13 as a sanity check). | ACT-33 |
 | **R-03** | **No crashes**: in the Lab 1 full world with the keyword brain, no species needs a newcomer over 10 000 ticks in 8 of 8 seeds. | POP-05 |
-| **R-04** | **Equivalences**: Freeze = Responsive; 1 = 10 ticks per frame; rendering on = off; Mono = IL2CPP build (SHOULD). | SPACE-11, SPACE-14, RAND-12 |
+| **R-04** | **Equivalences** on the CI machine: Freeze = Responsive; 1 = 10 ticks per frame; rendering on = off. Hashes are never compared across machines (RAND-12). | SPACE-11, SPACE-14 |
 | **R-05** | **Replay**: a 500-tick run with a recording `ScriptedBrain` and `FakeMutator` caches, rerun → 0 calls, same hash. | RAND-21, MUT-14, DEC-33 |
 | **R-06** | **Soak**: 100 000 ticks, keyword brain, full world → no exception, invariants hold, memory stable (less than 5 % growth after tick 10 000). | — |
 | **R-07** | **Performance**: one tick of the full world (340 animals, keyword brain) under 2 ms on the CI machine; 0 bytes allocated per tick in the act phase after warm-up (GC recorder). | 20 §9 |
-| **R-08** | **Prototype fixtures** (optional, if the Python exporter is written): situation texts, keyword-brain vectors, mutation cleaning and genome keys for 500 random cases match the prototype's. | SENSE-13, 08 §6, MUT-12 |
-| **R-09** | **Analysis tools**: the prototype's `gene_report` and `gene_timeline` read a Unity run written in compatibility mode without error. | OUT-05 |
+| **R-08** | **Analysis tools**: the prototype's `gene_report` and `gene_timeline` read a Unity run written in compatibility mode without error. | OUT-05 |

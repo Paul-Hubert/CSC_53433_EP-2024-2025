@@ -1,9 +1,10 @@
 # 07 — Actions and locomotion
 
 The brain chooses an action; the action does the work, every tick until the
-next decision. An action picks a target, produces an **intent** (a direction, a
-speed, where to stop), the **motor** turns the intent into movement over the
-ground, and contacts trigger **interactions** (graze, strike, scavenge, hide).
+next decision. An action picks a target and produces an **intent** (a
+direction, walk or run, how far at most), the species' **locomotion** turns the
+intent into movement over the ground, and contacts trigger **interactions**
+(graze, strike, scavenge).
 
 ## 1. Actions
 
@@ -13,9 +14,10 @@ ground, and contacts trigger **interactions** (graze, strike, scavenge, hide).
   next decision (or until the animal becomes busy or dies). It looks for its
   target again each tick, so it follows a moving target.
 - **ACT-03 (MUST)** Each tick an action produces at most one intent and at most
-  one interaction. An intent is: stay; move toward a point and stop at a
-  distance; move away from a point; or wander. It says whether the animal walks
-  or runs.
+  one interaction. An intent is a direction (or none: stay), whether the animal
+  walks or runs, and optionally the farthest it should go this tick (to stop at a
+  target). Helpers build the usual intents: toward a point stopping at a
+  distance, away from a point, wander.
 - **ACT-04 (MUST)** **Nothing to act on → search.** When the action has no target
   in sight (no food, threat, kin, prey, carcass, ready partner, cover within the
   animal's vision), the animal wanders instead and the choice is counted as
@@ -29,32 +31,43 @@ ground, and contacts trigger **interactions** (graze, strike, scavenge, hide).
 
 ## 2. Locomotion
 
-- **MOVE-01 (MUST)** An intent is carried out by the world's motor, which moves
-  the animal at most `speed` metres this tick along the intended direction,
-  never onto non-walkable ground and never past the world's borders.
-- **MOVE-02 (MUST)** Walking covers up to the `walkSpeed` trait (reference 1 m per
-  tick); running covers up to `runSpeed` (reference prey 1, predators 2). Both
-  are also limited by stamina (ANIM-21).
-- **MOVE-03 (MUST)** Moving toward a target stops at the requested stop distance
-  (0 = arrive, e.g. at a food item; 1 m = next to an animal) and never
-  overshoots it in the same tick.
-- **MOVE-04 (MUST)** Moving away goes in the direction that increases the
-  distance from the point. Blocked by a border or an obstacle, the motor slides
-  along it; if no direction helps, the animal takes a random sidestep (its own
-  random stream) rather than staying stuck forever.
+Each species has one **locomotion** component. An action only says where it
+wants to go; the locomotion decides what actually happens, and whatever it does
+is the tick's result (owner decision). The reference locomotion is kinematic: no
+rigid bodies, no physics.
+
+- **MOVE-01 (MUST)** Each species has exactly one locomotion component. It
+  receives each animal's intent and moves the animal. Whatever it does (exactly
+  along the direction, sliding along an obstacle, or something else for a
+  physics locomotion) is the result of the tick; no other module assumes the
+  intent was followed exactly.
+- **MOVE-02 (MUST)** Whatever the locomotion, an animal never ends a tick on
+  non-walkable ground or outside the world (SPACE-03, SPACE-04).
+- **MOVE-03 (MUST)** Speeds belong to the species: its walking and running
+  speeds are traits of its locomotion (reference: prey walk 1 and run 1 m per
+  tick, predators walk 1 and run 2). Movement is also limited by stamina
+  (ANIM-21).
+- **MOVE-04 (MUST)** The reference **kinematic** locomotion moves in a straight
+  line along the intended direction, by the smallest of the speed, the stamina
+  and the intent's maximum distance, so moving toward a target never overshoots
+  its stop distance. Blocked by a border or an obstacle, it slides along it; if
+  that makes no progress, the animal takes a random sidestep (its own random
+  stream) rather than staying stuck.
 - **MOVE-05 (MUST)** Wandering is a persistent random walk: the animal keeps its
   heading, and with probability `wanderTurnP` (reference 0.25) per tick turns by
   one of ±45° or ±90°; blocked, it picks a new random heading. It walks.
-- **MOVE-06 (MUST)** The motor returns the metres actually moved; metabolism and
-  stamina use that number.
-- **MOVE-07 (SHOULD)** Motors are replaceable: straight lines on flat ground
-  (Lab 1), terrain-aware sliding (water, steepness, obstacles), or a NavMesh
-  (paths around obstacles). Movement costs MAY depend on slope.
+- **MOVE-06 (MUST)** The locomotion reports the meters actually moved;
+  metabolism and stamina use that number. A locomotion MAY add costs of its own
+  (slopes, mud, water).
+- **MOVE-07 (SHOULD)** Locomotion is a base class meant to be inherited:
+  terrain-aware movement with slope costs, NavMesh paths around obstacles,
+  physics with rigid bodies, later a learned controller. Each species can have
+  its own (owner decision: these come later; the reference is kinematic).
 
-**Reference (prototype, grid).** Steps go to one of 8 neighbour cells, the one
+**Reference (prototype, grid).** Steps went to one of 8 neighbour cells, the one
 that most reduces (or increases) the straight-line distance, with random
-tie-breaks. The Unity reference replaces this with straight-line steering; the
-behaviour to keep is the same: approach, stop next to it, run away, wander.
+tie-breaks. The Unity reference replaces this with straight lines; the behaviour
+to keep is the same: approach, stop next to it, run away, wander.
 
 ## 3. Interactions
 
@@ -94,7 +107,8 @@ Options recorded from the prototype:
 - **Flee into cover** (prototype behaviour, an option of flee): a fleeing animal
   already in cover stays put; with cover within `coverSeek` (6 m) it runs into
   it instead of running away. Off in the Unity reference, where hide is its own
-  action; on, it reproduces the prototype.
+  action, sense and gene (owner decision); on, it reproduces the prototype for
+  comparison (scenario S06).
 - **Predator interference** (off, rejected): a strike succeeds with
   `killP / (1 + c × n)`, n = other hunters within r m of the target.
 
@@ -122,9 +136,9 @@ first and whether a prey animal moves before a hunter strikes.
 
   | Policy | Order | Notes |
   |---|---|---|
-  | **Species in turn** (reference, prototype) | species in the world's species order; within a species, animals one by one in a fresh random order each tick | prey move before predators strike |
+  | **Species in turn** (default, owner decision; the prototype's order) | species in the world's species order; within a species, animals one by one in a fresh random order each tick | prey move before predators strike |
   | **All mixed** | every animal of every species one by one, in one fresh random order each tick | owner's alternative: no species goes first |
-  | **Simultaneous** | every animal computes its intent from the same state; all move; then interactions resolve in a fresh random order | easiest to batch; contested items go to the first in the random order |
+  | **Simultaneous** | every animal computes its intent from the same state; all move; then interactions resolve in a fresh random order | easiest to batch; contested items go to a random winner (owner decision) |
 
 - **ACT-31 (MUST)** In the sequential policies an animal acts on the state left
   by those before it (positions, eaten items, kills). In the simultaneous policy

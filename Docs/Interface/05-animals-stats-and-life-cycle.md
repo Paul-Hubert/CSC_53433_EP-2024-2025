@@ -47,13 +47,18 @@ individuals because genes set it.
 Natural traits for number genes: maximum stamina, stamina recovery, walking and
 running speed, vision, maturity age, litter size, kill chance.
 
+**Reference.** The reference species have no number genes, so every trait keeps
+the prototype's value (owner decision); number genes are an extension
+(scenario S12).
+
 ## 4. Metabolism: energy and stamina (reference modules)
 
 - **ANIM-20 (MUST)** Each living animal pays its metabolism once per tick, after
-  it acted, based on what it did that tick: metres moved, the action chosen,
-  whether it was busy.
-- **ANIM-21 (MUST)** With a stamina module, an animal never moves more metres in
-  a tick than its stamina; each metre moved costs one point. An animal without
+  it acted, based on what it did that tick: the meters it actually moved (as
+  reported by its locomotion, MOVE-06), the action chosen, whether it was busy.
+  A locomotion component MAY add its own costs (slopes, terrain), [07 §2](07-actions-and-locomotion.md#2-locomotion).
+- **ANIM-21 (MUST)** With a stamina module, an animal never moves more meters in
+  a tick than its stamina; each meter moved costs one point. An animal without
   stamina for any movement stays where it is, whatever it chose.
 - **ANIM-22 (MUST)** Gains never raise a stat above its maximum.
 - **ANIM-23 (SHOULD)** "Did not move" means moved less than a small epsilon
@@ -66,7 +71,7 @@ running speed, vision, maturity age, litter size, kill chance.
 | Start: founder or newcomer | 60 | full |
 | Start: baby | 40 (paid by the parents, [11](11-reproduction-and-population.md)) | full |
 | Maximum | 100 | prey 60, predators 30 |
-| Tick with movement | −0.7 (base) − 0.5 per metre | −1 per metre |
+| Tick with movement | −0.7 (base) − 0.5 per meter | −1 per meter |
 | Tick without movement, action rest | −0.2 | +2, up to the maximum |
 | Tick without movement, any other action | −0.7 | +2, up to the maximum |
 | Extra while stamina recovers (not full, no movement) | −0.3 | — |
@@ -75,7 +80,7 @@ running speed, vision, maturity age, litter size, kill chance.
 | Kill (predators) | +60 | — |
 | Carcass portion (predators) | +30 | — |
 
-So walking one metre costs 1.2 energy, a predator running 2 m costs 1.7, and a
+So walking one meter costs 1.2 energy, a predator running 2 m costs 1.7, and a
 predator has 15 ticks of full-speed running from full stamina. Stamina is
 sensed as levels: prey low < 20 ≤ medium ≤ 40 < high; predators low < 10 ≤
 medium ≤ 20 < high. Energy levels: low < 30 ≤ medium ≤ 70 < high.

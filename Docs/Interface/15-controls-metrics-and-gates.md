@@ -65,7 +65,9 @@ single edits (founders with one gene mutated by the mutator).
 
 **Status in the prototype (2026-10-09).** G1 passes (gemma4 12b and 26b, JEV-9B).
 G2 fails: gemma is moved by random text as much as by real genes; JEV ignores
-random text but genes move it too little (MI_G 0.14 < 0.25). G3 passes on JEV
+random text but genes move it too little (MI_G 0.14 < 0.25). G2 stays a gate even
+though these models fail it (owner decision); it is tracked, not blocking
+([32](32-integrity-prompts-and-ci.md)). G3 passes on JEV
 (locality 0.10, ρ 0.39). G4 not measured; a 10-hour JEV run showed gene sweeps at
 the rate drift predicts. G5 fails (gemma ≈ 4, JEV ≈ 12 decisions/s). The keyword
 brain passes G1 by construction and gives the reference numbers for tests.

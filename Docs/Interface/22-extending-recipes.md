@@ -8,6 +8,22 @@ the templates ([30](30-tests.md)).
 The running example: **water and thirst**. The terrain lab adds lakes; animals
 get thirsty, sense water, can choose to drink, and a gene says when.
 
+## 0. The teaching path
+
+The reference modules are written exactly like student modules (ARCH-11), so
+the course can go in two steps (owner decision):
+
+1. **Reimplement what exists.** A reference module is replaced by an empty class
+   of the same base class (`EvoSim ▸ Exercises ▸ Replace with stub`); its unit
+   tests and the conformance suite of its kind ([30](30-tests.md)) grade the
+   student's version, and the world runs with it. A natural order, from the
+   smallest to the largest: `RestAction`, `LevelSense`, `Starvation`, `EatAction`,
+   `NearestAnimalSense`, `FleeAction`, `HideAction`, `Stamina`, `Litter`,
+   `UniformCrossover`, `KinematicLocomotion`, `HuntAction`, `KeywordBrain`,
+   `LlmMutation`.
+2. **Invent.** Then students add their own: the recipes below, or ideas of their
+   own, each with its tests.
+
 ## 1. A stat: thirst
 
 ```csharp
@@ -214,25 +230,79 @@ the order; copy *T-TICK phase template*.
 
 ## 10. A species
 
-Duplicate the Rabbit, rename it ("Deer"), change its display name, body,
-parameters and founder sentences; put a diet entry on the Wolf ("strike Deer
-+80"). The food web window shows the new edges and the threats update by
-themselves. A cannibal species simply lists itself in its diet.
+Duplicate the prey, rename it ("deer"), change its display name, body,
+parameters and founder sentences; put a diet entry on the predator ("strike
+deer +80"). The food web window shows the new edges and the threats update by
+themselves. A cannibal species simply lists itself in its diet: its animals then
+flee from their own kind like from any threat.
 
-## 11. Hide instead of flee into cover
+## 11. Hide and flee
 
-The reference prey has both: a `FleeAction` (with *flee into cover* off) and a
-`HideAction` with its `NearestCoverSense` child and its gene. Remove the hide
-prefab to get a prey that can only run; turn *flee into cover* on to get the
-prototype's behaviour. Scenario S06 compares the three ([31](31-scenarios.md)).
+The reference prey has both, as separate actions, genes and senses: a
+`FleeAction` (with *flee into cover* off), a `HideAction` with its gene, and the
+`NearestCoverSense`. Remove the hide action and the cover sense to get a prey
+that can only run; turn *flee into cover* on as well to get the prototype's
+behaviour. Scenario S06 compares the three ([31](31-scenarios.md)).
 
-## 12. Act order, decision timing, speciation
+## 12. Act order and decision timing
 
-- Act order: a setting of the `ActPhase` (species in turn, all mixed,
+- Act order: a setting of the `ActPhase` (species in turn by default, all mixed,
   simultaneous).
 - Decision period and staggering: settings of the World and, per species, of an
   optional `DecisionSchedule` module.
-- Speciation: add a `SpeciationRule` phase. A simple one: every 500 ticks, if the
-  animals of a species split into two groups whose genome keys share fewer than
-  half their alleles, the smaller group becomes a new species with
-  `World.AddSpecies` (it inherits relations, SPEC-31).
+- Species added during a run: `World.AddSpecies` (SPEC-30). Rules that decide
+  *when* to split a species (speciation) are left for later (owner decision).
+
+## 13. A sense: is a threat chasing me?
+
+A cannibal flees from its own kind, but it can't tell a hungry neighbour from a
+peaceful one. This sense says whether the nearest threat is coming for it:
+
+```csharp
+public class ChasedSense : Sense
+{
+    static readonly string[] tokens = { "no", "yes" };
+    [SerializeField] float vision = 20f;
+    public override IReadOnlyList<string> Tokens => tokens;
+
+    public override int Read(Animal a, SenseContext s)
+    {
+        var threat = s.NearestAnimal(a, AnimalSet.Threats, vision);
+        if (threat == null) return 0;
+        var t = threat.Animal;
+        bool hunting = t.Action >= 0 && t.Species.Actions[t.Action] is HuntAction;
+        return hunting && s.CurrentTarget(t) == a ? 1 : 0;   // the hunter's target this tick
+    }
+
+    public override string Write(int t, TextStyle style) =>
+        style == TextStyle.V2 ? (t == 1 ? "Something is chasing me." : "Nothing is chasing me.")
+                              : $"Chased: {tokens[t]}.";
+}
+```
+
+Checklist: the observation space doubles; `CurrentTarget` is read from the state
+at the start of the tick (SENSE-04); copy *T-SENSE template*.
+
+## 14. A locomotion: slopes cost more
+
+```csharp
+public class SlopeLocomotion : KinematicLocomotion
+{
+    [SerializeField] float maxSlopeDegrees = 35f, energyPerMeterClimbed = 0.3f;
+
+    public override float Move(Animal a, Intent intent, float stamina, MoveContext c)
+    {
+        Vector3 ahead = a.Position + intent.Direction;
+        if (c.Ground.SlopeDegrees(a.Position, ahead) > maxSlopeDegrees)
+            intent = intent.Stay();                               // too steep: don't go
+        return base.Move(a, intent, stamina, c);
+    }
+
+    public override float ExtraCost(Animal a, Vector3 from, Vector3 to) =>
+        Mathf.Max(0f, to.y - from.y) * energyPerMeterClimbed;
+}
+```
+
+Give the predator a `SlopeLocomotion` and leave the prey kinematic, and the two
+species now move differently over the same terrain. Checklist: V-13 (exactly one
+locomotion per species); MOVE-02 still holds; copy *T-MOVE locomotion template*.

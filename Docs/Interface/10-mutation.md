@@ -90,8 +90,10 @@ other animals."
   sentence. The prototype used these until 2026-10-02 and dropped them as blunt
   ("Rest when you are tired." → "Rest when you are tired when tired."); they
   remain useful for runs without any model.
-- **MUT-22 (MAY)** An operator may be switched off for one gene (e.g. the neutral
-  "No preference." could be exempt; an open owner question).
+- **MUT-22 (MAY)** An operator may be switched off for one gene. Whether a
+  gene's neutral allele ("No preference.") may mutate is a setting of the gene's
+  component (GENE-24, owner decision); the reference lets it mutate, as the
+  prototype did.
 
 ## 4. Asynchronous mutation and eggs
 
@@ -108,6 +110,7 @@ lays eggs whose genomes are completed while they incubate
   on.
 - **MUT-32 (MUST)** A baby hatches only with its genome complete. If the answers
   aren't in when it is due to hatch, the tick waits (SPACE-13).
-- **MUT-33 (SHOULD)** With an incubation of a few ticks the answers are usually in
-  before hatching, so the world never waits for the mutator. With no incubation
-  (the prototype) the birth waits in the same tick.
+- **MUT-33 (SHOULD)** The reference has no incubation (owner decision): the
+  birth waits for the mutator in the same tick, as in the prototype. Setting an
+  incubation of a few ticks hides the mutator's latency: the answers are
+  usually in before hatching, so the world doesn't wait.

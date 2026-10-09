@@ -18,7 +18,7 @@
 | 1 | **Sense** | picks who decides (DEC-01); builds spatial indexes; reads every sense of every deciding animal (batched raycasts) | — |
 | 2 | **Ask brains** | memo lookups; sends one batch per brain | — |
 | 3 | **Choose actions** | stores answers in the memo and cache; draws each animal's action | the brains |
-| 4 | **Act** | in the act order (ACT-30): each animal's action → intent → motor → interactions; then its metabolism; busy animals count down | — |
+| 4 | **Act** | in the act order (ACT-30): each animal's action → intent → locomotion → interactions; then its metabolism; busy animals count down | — |
 | 5 | **Breed** | conceives litters (REPRO-02), lays eggs, draws and sends mutation requests | — |
 | 6 | **Hatch** | eggs due this tick become animals | the mutator |
 | 7 | **Deaths** | removes killed animals; every animal ages by 1; starvation; old age | — |
@@ -31,11 +31,10 @@ Then the tick count grows by one.
 
 - **TICK-05 (MUST)** Decisions use the state at the start of the tick, i.e. after
   the previous tick's floor phase.
-- **TICK-06 (SHOULD)** The prototype breeds each species right after it acts
-  (prey act, prey breed, predators act, predators breed). The reference runs one
-  breed phase after all animals acted. The difference only affects an animal
-  that would breed and then be killed later in the same tick; an implementation
-  MAY offer the prototype's order as an option of the act phase.
+- **TICK-06 (MUST)** Breeding is its own phase, after all animals acted (owner
+  decision). The prototype bred each species right after it acted (prey act,
+  prey breed, predators act, predators breed); the difference only affects an
+  animal that would breed and then be killed later in the same tick.
 - **TICK-07 (MUST)** Phases run in the same order in every tick; a phase that has
   nothing to do (no decisions due, no eggs) returns at once.
 
@@ -77,8 +76,9 @@ Then the tick count grows by one.
 - **RAND-11 (MUST)** The same configuration, seed and answer caches give the same
   hash on the same platform and build, whatever the wait mode, frame rate, ticks
   per frame, and whether anything is rendered.
-- **RAND-12 (SHOULD)** The hash also matches across scripting backends and
-  machines when floating-point results agree; this is not guaranteed.
+- **RAND-12 (MAY)** Hashes are compared on one machine only (owner decision).
+  Across machines and scripting backends floating-point results may differ, and
+  so may hashes; nothing relies on them matching.
 - **RAND-13 (MUST)** Two different seeds give different hashes.
 
 ## 4. Stopping and resuming

@@ -48,16 +48,18 @@ lab): the detail map is the cell grid, eating removes the grass.
 - **ENV-12 (MUST)** Cover is optional: a world without a cover module behaves as
   if no point were in cover.
 - **ENV-13 (SHOULD)** Using cover is a behaviour the brain can choose, with its
-  own action ("hide"), its own sense ("cover: 2-4 m away") and its own gene, in
-  competition with fleeing ([07](07-actions-and-locomotion.md)).
+  own action ("hide"), its own sense ("Cover: 1-4 meters away.") and its own
+  gene, in competition with fleeing ([07](07-actions-and-locomotion.md)). The
+  Unity reference does exactly this (owner decision).
 
 **Reference (Python).** 20 % of walkable ground is cover: the top 20 % of a
 two-octave value-noise map, so it comes in clustered patches (thickets). In the
 prototype cover is not an action, not a sense and not a gene: a *fleeing* prey
 animal already in cover stays put, and one with cover within 6 m runs into it
 instead of running away. The Unity reference splits this into a separate hide
-action (owner decision); the old coupling stays available as an option of the
-flee action ([07 §4](07-actions-and-locomotion.md#4-reference-actions)).
+action, sense and gene (owner decision); the old coupling stays documented as
+an option of the flee action, off, used only to compare with the prototype
+([07 §4](07-actions-and-locomotion.md#4-reference-actions)).
 
 ## 3. Entities
 

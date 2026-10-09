@@ -1,75 +1,64 @@
 # 40 — Open questions
 
-Blind spots found while writing the contract, and decisions still to take. Each
-names the documents it affects and a proposed default; until the owner decides,
-the default holds.
+The questions of the first draft were answered by the owner on 2026-10-09 (the
+README's second-round table lists every decision). This page keeps what those
+answers settled, where it landed in the documents, and what is still open or
+deferred.
 
-## 1. Decisions for the course owner
+## 1. Settled in the second round
 
-| # | Question | Proposed default | Affects |
+| Question | Decision | Now in |
+|---|---|---|
+| Reference values in continuous space | the prototype's values unchanged; Euclidean distances, straight-line movement; the first accepted Unity runs become the new reference numbers | README, 02, 07, 14, 30 R-02 |
+| Speed | set per species, on its locomotion component | 07 MOVE-03, 20 §3.7 |
+| Unit word in texts | "meters" | 06 SENSE-12/13, 08 §7 |
+| Prompts | the answer instruction is hard-coded in each brain; header, action lines and rule lines are inspector fields | 08 PROMPT-07 |
+| Observation wording | in each sense's code; labels and thresholds in the inspector | 06 SENSE-10 |
+| Act order | species in turn by default; simultaneous: random winner | 07 ACT-30 |
+| Breeding | its own phase, after the act phase | 12 TICK-06 |
+| Eggs | no incubation by default; a few ticks may hide the mutator's latency | 10 MUT-33, 11 REPRO-21 |
+| Number genes | none in the reference; traits keep the prototype's values | 05 §3, 09 |
+| Species names | `prey` and `predator` | 04 §5, 20 §2 |
+| Cannibals | flee from their own kind; "is a cannibal chasing me?" is a student sense | 04 SPEC-11, 22 §13 |
+| Hide and flee | separate actions, genes and senses | 03, 04 §5, 07 §4, 08 §6 |
+| G2 | stays a gate, tracked rather than blocking | 15 §3, 32 §2 |
+| Neutral gene, founder pools, caps | configured on their components | 09 GENE-24, 10 MUT-22, 11 |
+| Platform and teaching | Unity; reference modules written like student modules; students reimplement them first, then invent | 20 ARCH-11, 22 §0, 30 §4 |
+| Real time | not by default | 02 SPACE-15 |
+| Physics | kinematic by default; an action gives only a direction and the locomotion decides | 07 §2, 20 §3.7 |
+| Floating-point determinism | per machine only | 12 RAND-12, 30 R-04, 32 |
+| Answer cache | a local JSON file | 14, 20 §3.11 |
+| Python golden fixtures | dropped | 30 (R-08 removed, snapshots pinned from Unity runs instead) |
+| Unity version | the owner moves the project to 6000.3 before starting | README, 20 ARCH-10 |
+| CI hardware | the owner's machine as a self-hosted runner | 32 §1, §4 |
+
+## 2. Still open
+
+| # | Question | Default until decided | Affects |
 |---|---|---|---|
-| 1 | **Reference values in continuous space.** Euclidean distance shrinks the vision disc to about 75 % of the prototype's 20-cell square, and straight-line steering is faster than 8-neighbour steps on diagonals. Retune, or keep the prototype's numbers? | keep them, measure the first accepted Unity runs, and make those the new references (R-02) | 02, 06, 14, 30 |
-| 2 | **Unit word in texts**: "m" (honest in Unity) or "cells" (the prototype's text, its caches and gate results stay comparable)? | "m"; "cells" for comparison runs | 06, 08 |
-| 3 | **Generated or frozen prompts.** Generated prompts never contradict the settings but differ from the prototype's, so gates must be measured again. | generated; the prototype's frozen prompts in the comparison scenes | 08, 32 |
-| 4 | **Default act order**: species in turn (the prototype) or all mixed? | species in turn, so the references hold; all mixed as a lab variant (S19) | 07, 12 |
-| 5 | **Breeding inside or after the act phase** (TICK-06). | after all animals acted | 12 |
-| 6 | **Eggs**: incubation by default (0 = the prototype, or a few ticks to hide the mutator's latency)? Can eggs be eaten? Do they count toward the cap? Where are they laid? | 4 ticks; not eaten; not counted; at the first parent's position | 10, 11 |
-| 7 | **Number genes**: which traits first (stamina, speed, vision, litter size)? Are they written in the prompt ("Stamina: high")? Is a cost compulsory? | stamina and vision first; not in the prompt; a cost recommended, warned about (V-47) | 05, 09 |
-| 8 | **Species names**: how are runtime species named ("Rabbit 2", a name from a list, an LLM-made name)? Do founder sentences use species names ("Run from wolves") or roles ("Run from predators")? | numbered names; founder sentences use roles, so they work in any world | 04, 09 |
-| 9 | **Speciation criterion** (if any): genetic distance, geography, a teacher's button? | none by default; a teacher's button and the S11 example | 04, 22 |
-| 10 | **Cannibals and kin**: should a cannibal flee from its own kind, and still follow and mate with it? | yes: threats include itself; follow and mate unchanged | 04, 07 |
-| 11 | **Hide versus flee**: keep the prototype's *flee into cover* anywhere? | only in the comparison scenes; hide is its own action elsewhere | 03, 07 |
-| 12 | **G2 failing** (random text moves gemma; genes move JEV too little): which brain is the class default, and is MI_G ≥ 0.25 kept? | keyword brain by default, JEV on a lab server; the threshold stays until the owner decides (prototype decision 2) | 08, 15, 32 |
-| 13 | **The neutral gene** "No preference." mutates into vague rules: exempt it from mutation? (prototype decision 14) | not exempt (MUT-22 allows it per gene) | 10 |
-| 14 | **Founder pools** are drafts awaiting review (H1). | use them as they are | 09 |
-| 15 | **Lab 1 platform**: the Python prototype, Unity, or both during the transition? | both: Python for the first sessions, Unity when T0–T3 are green | — |
+| 1 | **Default brain in class**: the keyword brain on every laptop, or JEV served from the owner's machine (or a lab server) to the whole class? | keyword brain by default; JEV opt-in | 08, 14 |
+| 2 | **Founder pools** (H1), including the new draft hide sentences ("Hide when a predator is close.", "Stay in cover when danger is near.", "Hide only when you are tired.", "Leave cover to find food when hungry.") and the hide contrast pair | use them as they are | 09 |
+| 3 | **The keyword brain's hide scores** (proposed in 08 §6): cover here 3.0 … none −2.0, −3.0 with no threat in sight | as proposed; tune with S06 | 08 |
+| 4 | **Eggs in the world**: can they be eaten? Do they count toward the cap? With no incubation this doesn't arise yet. | not eaten; not counted; laid at the first parent's position | 11 |
 
-## 2. Technical blind spots
+## 3. Deferred by the owner ("later")
 
-- **Real time.** The owner chose lockstep. A real-time mode (decisions applied
-  when they arrive, on old observations) could still be useful for demos and VR
-  interaction; it is allowed only as a labelled, non-reproducible mode (SPACE-15).
-- **Physics and learned locomotion.** The reference motors are kinematic. A
-  physics motor (rigid bodies) or a learned locomotion controller (a DRL policy
-  that turns an intent into joint torques, as in the quadruped IK scenes of the
-  repository) fits the `Motor` interface, but floating-point physics breaks the
-  events hash across machines. Such motors stay outside the determinism
-  guarantee; the brain/intent split keeps them possible.
-- **Camera senses.** Whether a JEV-style decision model can read images is not
-  known; a vision-language model per decision is costly, and image queries
-  can't be memoised (SENSE-41). A coarse cache key (e.g. a downsampled hash)
-  needs a measurement of how often it repeats.
-- **Floating-point determinism across machines.** Pinned hashes (R-01) are per
-  platform and scripting backend. CI pins them on its own runner.
-- **The answer cache** is a JSON-lines file per brain in this proposal, not the
-  prototype's SQLite, so Unity can't reuse the prototype's caches. A shared class
-  cache (on a lab server) would save most of the LLM cost; format and location
-  are open.
-- **Golden fixtures from Python** (R-08) need a small exporter in
-  `prototype/experiments/`. Worth it only if exact text and keyword-brain parity
-  matter; otherwise drop R-08.
-- **Simultaneous act order and fairness.** Contested items go to the first in a
-  random order; alternatives (nearest wins, split) change behaviour and are not
-  specified.
-- **Slope and terrain costs.** Allowed (SPACE-06) but not specified: how much more
-  energy and stamina does uphill cost, and does the brain know (a slope sense)?
-- **Directions in observations.** The prototype senses distances only. Directions
-  (ahead, left, right, behind) multiply the observation space by 4 per sense;
-  worth it only with a brain that uses them.
-- **Scale.** Plain C# lists are enough up to a few thousand animals. Beyond that,
-  spatial queries and metabolism can move to Burst jobs without changing the
-  module API; the brain remains the bottleneck.
-- **Unity upgrade.** 6000.3 will change soon. The fenced files (ARCH-10) are the
-  HTTP clients, waiting, NavMesh queries and the ray batch helper; the rest uses
-  stable APIs.
-- **CI hardware.** T4 needs a self-hosted runner with a 16 GB GPU, Docker and
-  Ollama; T0–T3 need a Unity license secret or a self-hosted Unity runner.
+| Topic | What is ready for it now |
+|---|---|
+| Speciation (when to split a species) | `World.AddSpecies` and the relation inheritance rules (SPEC-30/31), scenario S11 |
+| Names of species created during a run | species ids are never reused (SPEC-32) |
+| Camera senses | the attachment rules (SENSE-40/41) and scenario S24 with a fake brain |
+| A real-time mode | SPACE-15 keeps it outside the measurements |
+| Physics, slopes, NavMesh, learned locomotion | the inheritable `Locomotion` base class (20 §3.7) and the slope recipe (22 §14) |
+| Directions and angles in observations | senses are free to add tokens; the observation-space warning (V-50) |
+| Scale beyond a few hundred animals | the seams of 20 §10 |
+| A shared answer cache for a class | the cache key (DEC-33) doesn't depend on where the file lives |
 
-## 3. Rules that may change after the first Unity runs
+## 4. Rules to revisit after the first Unity runs
 
 | Rule | Why it may change |
 |---|---|
-| SENSE-05 threshold (100 000 situations) | the memo's real hit rate with continuous positions |
+| ACT-10 reaches (0.5 m graze, 1 m strike) | continuous movement at 2 m per tick may need larger reaches to avoid near-misses |
 | REPRO-03 (nearest partner) | the prototype took the first ready partner in its list; nearest may change breeding rates |
-| ACT-10 reaches (0.5 m graze, 1 m strike) | continuous movement may need larger reaches to avoid near-misses at speed 2 |
+| SENSE-05 threshold (100 000 situations) | the memo's real hit rate with 29 160 prey situations |
 | R-02 ranges | measured afresh on the first accepted runs |

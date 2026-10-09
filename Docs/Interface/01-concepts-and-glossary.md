@@ -9,13 +9,13 @@
  numbers)│      │  (discrete)  (+ situation    (batched,   over the       an   │
          │      │               text)          cached)     species'     action │
          │      │                                          actions             │
-         │      │                    action ──► intent ──► motor ──► interactions
-         │      │                    (repeated every tick until the next decision)
+         │      │  action ──► intent ──► locomotion ──► interactions           │
+         │      │  (repeated every tick until the next decision)               │
          │      │                                                              │
-         │      │  metabolism ─► deaths ─► mating ─► eggs ─► (mutation) ─► births
+         │      │  metabolism ─► deaths ─► mating ─► (mutation) ─► births      │
          │      │  environment: food regrows, carcasses rot, ...               │
          │      └──────────────────────────────────────────────────────────────┘
-         └──── number genes set traits at birth (e.g. stamina) ──────────────────
+         └──── number genes set traits at birth (e.g. stamina) ─────────────────
 ```
 
 - Nobody programs which behaviour is good. Animals that eat, escape and mate
@@ -35,7 +35,7 @@
   reproduction follow only from the world rules and the animals' behaviour.
 - **CORE-02 (MUST)** Every behaviour-relevant feature (a sense, an action, a
   gene, a stat, a resource, a population rule, a mutation operator, a brain, a
-  tick phase, a motor) is a module behind a documented interface. Adding,
+  tick phase, a locomotion) is a module behind a documented interface. Adding,
   removing or replacing one needs no change to core code.
 - **CORE-03 (MUST)** No species, action, sense or gene name is special in core
   code. The prey/predator ecology of the prototype is a *configuration* of
@@ -48,7 +48,7 @@
   (a module needing per-animal data declares a stat or a trait, [05](05-animals-stats-and-life-cycle.md)).
 - **CORE-06 (MUST)** The brain never moves an animal or changes the world. It
   returns probabilities over the actions of the animal's species; everything
-  else is done by actions, the motor and the tick phases.
+  else is done by actions, the locomotion and the tick phases.
 - **CORE-07 (MUST)** Mutation is blind: a mutation operator sees the gene it
   changes (and, for text genes, at most one fixed context line), never the
   animal, its fitness, the world or the other genes.
@@ -100,9 +100,9 @@
 | **Observation** | The tuple of tokens of all the species' senses for one animal at one decision. |
 | **Band** | A distance range with a name: adjacent, close, medium, far, none. |
 | **Situation text** | The observation written as text for the brain. |
-| **Action** | A behaviour the brain can choose (eat, flee, hide, hunt, …). It chooses a target, produces an **intent** (where to move, how fast) and may trigger an **interaction**. |
+| **Action** | A behaviour the brain can choose (eat, flee, hide, hunt, …). It chooses a target, produces an **intent** (a direction, walk or run, how far at most) and may trigger an **interaction**. |
 | **Search** | What an action does when it has nothing to act on in sight: a random walk. Counted as an invalid choice. |
-| **Motor** | The module that turns an intent into movement over the ground (flat, terrain, NavMesh). |
+| **Locomotion** | The species' module that turns an intent into movement over the ground: kinematic straight lines in the reference; terrain, NavMesh or physics subclasses later. |
 | **Interaction** | A contact effect: graze, strike, eat a carcass portion, enter cover. |
 | **Act order** | The order in which animals act within a tick (species in turn, all mixed, or simultaneous). |
 | **Decision period** | Ticks between two decisions (4 in the reference). |

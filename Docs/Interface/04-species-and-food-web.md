@@ -40,7 +40,10 @@ the **food web**.
   | scavenge | carcasses of a species | eat one portion within reach |
 
 - **SPEC-11 (MUST)** A species may hunt any species, including its own
-  (cannibalism). An animal never targets itself.
+  (cannibalism). An animal never targets itself. A cannibal species is among
+  its own threats, so its animals flee from their own kind like from any
+  threat. Knowing whether a threat is *chasing* you is not a reference sense; it
+  is a student exercise ([22](22-extending-recipes.md)).
 - **SPEC-12 (MUST)** The **threats** of a species are the species whose diet
   strikes it. They are derived from the food web, not configured twice. Senses
   and actions that refer to "threats", "prey" or "kin" resolve these sets from
@@ -78,17 +81,20 @@ the **food web**.
 
 ## 5. Reference: the Lab 1 ecology
 
-Two species, as in the prototype (2026-10-09):
+Two species with the ids and names `prey` and `predator` (owner decision), the
+prototype's parameters, and one change: hiding in cover is the prey's own
+action, sense and gene.
 
-| | Prey ("Animal") | Predator ("Predator") |
+| | `prey` | `predator` |
 |---|---|---|
-| Actions, in order | eat, flee, follow, rest, mate | hunt, follow, rest, mate |
+| Actions, in order | eat, flee, hide, follow, rest, mate | hunt, follow, rest, mate |
 | Text genes | one per action, same order | one per action, same order |
-| Senses, in situation-text order | energy level, stamina level, food, nearest threat ("Predator"), nearest kin with readiness ("Animal"), age | energy level, stamina level, nearest prey ("Prey"), nearest edible carcass ("Carcass"), nearest kin with readiness ("Other predator"), age |
+| Number genes | none | none |
+| Senses, in situation-text order | energy level, stamina level, food, nearest threat ("Predator"), nearest cover ("Cover"), nearest kin with readiness ("Animal"), age | energy level, stamina level, nearest prey ("Prey"), nearest edible carcass ("Carcass"), nearest kin with readiness ("Other predator"), age |
 | Diet | graze the food layer (+25) | strike prey (kill chance 0.5, +60, leaves a carcass), scavenge prey carcasses (+30) |
-| Threats (derived) | predators | none |
+| Threats (derived) | predator | none |
 | Hidden from threats in cover | yes | — |
 
-The Unity reference scenes also contain a variant of the prey with a hide
-action, a cover sense and a hide gene (owner decision), and the scenarios of
-[31](31-scenarios.md) use up to six species.
+The prototype's prey has no hide action and no cover sense: its flee action runs
+into cover instead. That variant is kept for comparison (scenario S06). The
+scenarios of [31](31-scenarios.md) use up to six species.

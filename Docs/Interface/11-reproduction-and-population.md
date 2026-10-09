@@ -48,11 +48,13 @@ a parent at 100 can pay for 4.
   crossover, the pending mutations, the conception tick and the hatch tick
   (conception + `incubation` ticks).
 - **REPRO-21 (MUST)** `incubation` = 0 means the babies hatch in the same tick,
-  as in the prototype.
+  as in the prototype. It is the reference value (owner decision); a few ticks
+  MAY be set to hide the mutator's latency (MUT-33).
 - **REPRO-22 (MUST)** Eggs are not animals: they don't sense, decide, move, eat,
   breed or count toward caps. They hatch in the hatch phase, in conception order.
 - **REPRO-23 (MAY)** Eggs can be targets of a diet (egg eaters) or be destroyed
-  by an environment rule. A destroyed egg never hatches and is recorded.
+  by an environment rule. A destroyed egg never hatches and is recorded. In the
+  reference, eggs can't be eaten.
 - **REPRO-24 (MUST)** Hatching waits for the egg's genome to be complete
   (MUT-32), creates the animal as in REPRO-12, and records a birth event with
   the litter size and the mutations.

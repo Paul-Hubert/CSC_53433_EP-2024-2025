@@ -99,6 +99,7 @@ T = 1.
 | follow | kin adjacent −0.5, close −0.5, medium 0.3, far 0.3, none −2.5 |
 | rest | −0.5; +0.5 if energy high and the threat is none or far; plus a catch-breath push by stamina: low +2.0, medium +0.3, high 0 |
 | mate | if the kin is ready, the animal is adult and its energy isn't low: kin adjacent 2.5, close 2.5, medium 1.5, far 1.0; else −3.0 |
+| hide (Unity addition, proposed) | no threat in sight: −3.0; else by the cover: here 3.0, adjacent 2.5, close 2.0, medium 0.5, far −0.5, none −2.0; +0.5 when the threat is adjacent or close |
 
 **Default scores (predator).** hunt: by the nearer of prey and carcass, adjacent
 3.5, close 3.0, medium 2.0, far 1.0, none 1.5 (searching), plus the energy push;
@@ -111,7 +112,9 @@ mate: as the prey.
    *rarely, seldom, hardly* −1.2; *always, whatever happens, at all costs* +2.5;
    *whenever, often, usually, eagerly, quickly* +1.2; *sometimes, occasionally,
    maybe* +0.3. With no intensity word, a word of the action itself (eat: *eat,
-   food, feed, graze, forage*; flee: *flee, run, escape, hide, danger, predator*;
+   food, feed, graze, forage*; flee: *flee, run, escape, danger, predator* (the
+   prototype also counted *hide* here; with a hide action it moves there); hide:
+   *hide, cover, shelter, thicket*;
    follow: *follow, stay close, group, companion, herd, pack*; rest: *rest, sleep,
    stay still, wait, save energy, stop, catch your breath, recover*; mate: *mate,
    partner, breed, offspring*; hunt: *hunt, chase, attack, kill, prey, strike,
@@ -173,15 +176,19 @@ order changes. Measured: about 12 decisions per second.
 - **PROMPT-03 (MUST)** Numbers in rule lines come from the configuration
   (placeholders filled from the modules' settings), so the prompt never
   contradicts the world. The prototype's prompts hard-code them.
-- **PROMPT-04 (SHOULD)** A species MAY use a **frozen** prompt text with the
+- **PROMPT-04 (MAY)** A species may use a **frozen** prompt text with the
   placeholders `{genes}`, `{situation}` and `{ask}` instead of the assembled one,
-  for example the prototype's prompts below, to compare with its results and
-  reuse its caches.
+  for example the prototype's prompts below.
 - **PROMPT-05 (MUST)** The prompt id (a hash of the template or of the assembled
   text with placeholders) is part of the cache key.
 - **PROMPT-06 (MUST)** The editor shows the full prompt for a chosen animal or
   situation, with an estimate of its token count, checked against the brain's
   limit.
+- **PROMPT-07 (MUST)** Every part except the answer instruction is a text field
+  in the inspector: the species' header, each action's line, each module's rule
+  lines (owner decision). The answer instruction ("Distribute 100 points…") is
+  hard-coded in each brain, as in the prototype, because the brain's parsing
+  depends on it.
 
 **Reference: the prototype's prey prompt** (`teacher_v5`):
 
@@ -242,8 +249,48 @@ Situation: {situation}
 {ask}
 ```
 
-In the assembled prompt, each line above comes from a module: the header from
-the species, the action lines from the actions, "If the chosen action has
-nothing to act on…" from the search rule, the speed and stamina lines from the
-motor and the stamina stat, the breeding lines from the mating rule, the carcass
-line from the carcass system, the instincts paragraph from the genes block.
+**Reference: the Unity default prey prompt**, as the inspector fields assemble
+it for a founder in one situation. Numbers come from placeholders such as
+`{predator.Locomotion.runSpeed}`; the last line is the points brain's hard-coded
+answer instruction.
+
+```text
+You decide what a wild animal does next in a simple world.
+
+Actions:
+- eat: go to the nearest visible food and eat it
+- flee: run away from the nearest predator
+- hide: go to the nearest cover and stay in it; predators can't see or catch an animal in cover
+- follow: move toward the nearest other animal
+- rest: stay still to catch your breath and save energy
+- mate: walk to the nearest ready partner in sight and breed with it
+If the chosen action has nothing to act on in sight (no food, predator, cover,
+animal or ready partner), the animal searches the surroundings instead.
+Animals move 1 meter per step. Predators run 2 meters per step when they hunt,
+but they have 30 stamina against an animal's 60, so a long chase tires them first.
+Every meter moved costs stamina. Standing still brings it back, which costs some
+energy until stamina is full. Without stamina an animal cannot move.
+Breeding needs only one of the two to choose mate: an adult that chooses mate
+breeds as soon as it reaches a ready partner, whatever the partner is doing.
+
+This animal's instincts (its genes). They define its personality: follow them
+even when they seem unwise. Instincts that are meaningless have no effect.
+- eat: "Eat whenever food is close."
+- flee: "Run from any predator you see."
+- hide: "Hide when a predator is close."
+- follow: "Stay close to other animals."
+- rest: "Rest when you are tired."
+- mate: "Look for a partner when energy is high."
+
+Situation: Energy: low. Stamina: high. Food: 1-4 meters away. Predator: 4-10 meters away. Cover: 1-4 meters away. Animal: none within 20 meters. Age: adult.
+
+Distribute 100 points across the actions according to how likely this animal is to choose each.
+```
+
+Where each part comes from: the header from the species; the action lines from
+the actions; "If the chosen action has nothing to act on…" from the search rule;
+the speed lines from the locomotion components; the stamina lines from the
+stamina stat; the breeding lines from the mating rule; the carcass line (in the
+predator's prompt) from the carcass system; the instincts paragraph and the
+genes from the genes block; the situation from the senses; the last line from
+the brain.

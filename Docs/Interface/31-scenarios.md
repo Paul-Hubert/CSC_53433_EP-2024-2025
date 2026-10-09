@@ -20,9 +20,10 @@ Expectations are of three kinds:
 name: S06 Hide versus flee
 scene: Scenes/Lab1_Full
 variants:
-  flee-only:      { remove: [Rabbit/Actions/hide], set: { Rabbit/Actions/flee/FleeAction/fleeIntoCover: false } }
-  prototype:      { remove: [Rabbit/Actions/hide], set: { Rabbit/Actions/flee/FleeAction/fleeIntoCover: true } }
-  hide-and-flee:  { set: { Rabbit/Actions/flee/FleeAction/fleeIntoCover: false } }
+  hide-and-flee:  {}                                                       # the reference prey
+  flee-only:      { remove: [prey/Actions/hide, prey/Senses/Cover] }
+  prototype:      { remove: [prey/Actions/hide, prey/Senses/Cover],
+                    set: { prey/Actions/flee/FleeAction/fleeIntoCover: true } }
 seeds: [1234, 7, 42, 99, 2026]
 ticks: 5000
 brain: Keyword
@@ -30,7 +31,7 @@ expect:
   - invariants
   - deterministic                              # each variant and seed twice → same hash
   - "kills(hide-and-flee) < kills(flee-only) in >= 4/5 seeds"
-  - "share(Rabbit, hide) > 0.02 in hide-and-flee"
+  - "share(prey, hide) > 0.02 in hide-and-flee"
 tier: T3
 ```
 
@@ -52,13 +53,13 @@ point `EvoSim.Batch.RunScenario` both read these assets.
 | S08 | Cannibals | diet includes own species | keyword | T2 |
 | S09 | Food chain of three | 3 species, multiple threats | keyword | T3 |
 | S10 | Six-species web | 6 species, a pure scavenger | keyword, then LLM | T3 / T4 |
-| S11 | Speciation | species created at run time | keyword | T2 |
+| S11 | A species added during a run | `World.AddSpecies` at a given tick | keyword | T2 |
 | S12 | Number genes | stamina gene with and without a cost | keyword | T3 |
 | S13 | Mutation operators | LLM deck, intensity ladder, none | fake mutator, then real | T2 / T4 |
 | S14 | Eggs and slow mutators | incubation × mutator delay | keyword + fake mutator | T2 |
-| S15 | Observation wording | V1 / V2, unit word | LLM | T4 |
+| S15 | Observation wording | V1 / V2 | LLM | T4 |
 | S16 | Water and thirst | new stat, sense, action, gene | keyword | T3 |
-| S17 | Terrain and NavMesh | ground and motor modules | keyword | T3 |
+| S17 | Terrain and locomotion | ground module, locomotion subclasses | keyword | T3 |
 | S18 | Moving carcasses | an entity that moves | keyword | T2 |
 | S19 | Act orders | species in turn, all mixed, simultaneous | keyword | T3 |
 | S20 | Cap rules | migrate, block | keyword | T3 |
@@ -83,9 +84,10 @@ only by starvation, old age or migration; food count settles (its mean over
 ticks 2 000–3 000 varies by less than 20 % between halves).
 
 ### S02 Lab 1 reference
-The prototype's ecology as Unity modules: prey (eat, flee with *flee into cover*,
-follow, rest, mate), predators (hunt, follow, rest, mate), hungry cover, carcasses,
-litters, migration, 192 × 192. **Expect**: R-01 hashes; R-02 ranges; no newcomer in
+The reference ecology of [04 §5](04-species-and-food-web.md#5-reference-the-lab-1-ecology):
+`prey` (eat, flee, hide, follow, rest, mate; a cover sense; *flee into cover*
+off), `predator` (hunt, follow, rest, mate), the prototype's parameters, hungry
+cover, carcasses, litters, migration, no incubation, 192 × 192. **Expect**: R-01 hashes; R-02 ranges; no newcomer in
 10 000 ticks (R-03); prey deaths split between killed, starved and migrated, none
 of them above 70 % of the total.
 
@@ -113,8 +115,8 @@ way (G1 on the new locus), and over a long run the hide and flee genes'
 frequencies are reported by the gene pool tools.
 
 ### S07 No cover
-S02 without the cover module (and without hide). **Expect**: validation reports
-no error (hide and cover removed together); more prey killed than in S02 in
+S02 without the cover module, the hide action and the cover sense. **Expect**:
+validation reports no error (all three removed together); more prey killed than in S02 in
 ≥ 4/5 seeds.
 
 ### S08 Cannibals
@@ -135,9 +137,10 @@ Two grazers, two mid hunters, one apex hunter, one pure scavenger (scavenge only
 (its meals are all portions); the food web window shows every edge; tick time
 within twice S02's.
 
-### S11 Speciation
-S03 with a `SpeciationRule` that splits the prey at tick 1 000 by position (east
-and west halves). **Expect**: a `species_created` event; the new species has a new
+### S11 A species added during a run
+S03 with a test script that calls `World.AddSpecies` at tick 1 000, moving the
+prey of the west half into a new species cloned from the prey (deciding *when*
+to split, speciation, is left for later). **Expect**: a `species_created` event; the new species has a new
 id, its own cap, floor and streams; it is hunted by the predators (inherited
 relation); events of other species before tick 1 000 are unchanged.
 
@@ -158,14 +161,14 @@ recorded; on 100 mutated founder sentences, the judge prompt
 finds at least 80 % still usable rules after one mutation.
 
 ### S14 Eggs and slow mutators
-S03 with incubation 0, 3, 10 and a `FakeMutator` answering after 0, 2 or 5
-`Advance` calls. **Expect**: for one incubation value, the same hash whatever the
+S03 with incubation 0 (the reference), 3 and 10, and a `FakeMutator` answering
+after 0, 2 or 5 `Advance` calls. **Expect**: for one incubation value, the same hash whatever the
 delay; with incubation ≥ the delay, the world never waits on the mutator (wait
 counter 0); with incubation 0, it waits at each birth tick.
 
 ### S15 Observation wording
-The gate's observation set with V1 and V2, unit "cells" and "m". **Expect**
-(T4): G1 holds in every variant; differences in action shares between V1 and V2
+The gate's observation set with V1 and V2 (distances in meters). **Expect**
+(T4): G1 holds in both; differences in action shares between V1 and V2
 are reported (Lab activity F).
 
 ### S16 Water and thirst
@@ -176,10 +179,12 @@ drink action and its gene (the recipes of [22](22-extending-recipes.md)).
 with the keyword brain.
 
 ### S17 Terrain and NavMesh
-Terrain preview (15 % water, 10 % mountains) with the sliding motor and with the
-NavMesh motor. **Expect**: invariants (no animal on water or mountain); with the
-NavMesh motor, fewer hunts end in "stuck" sidesteps; both deterministic on one
-machine.
+Terrain preview (15 % water, 10 % mountains) with the kinematic locomotion for
+both species, then a slope locomotion ([22 §14](22-extending-recipes.md#14-a-locomotion-slopes-cost-more))
+for the predator only, then (once written) a NavMesh locomotion. **Expect**:
+invariants (no animal on water or mountain); with slopes, the predator never
+climbs past its limit and pays more energy on hills; with the NavMesh, fewer
+hunts end in "stuck" sidesteps; all deterministic on one machine.
 
 ### S18 Moving carcasses
 Hunters get a "drag" action that moves a carcass 1 m per tick toward cover.
@@ -221,9 +226,10 @@ tick follow the period; with staggering, the largest batch is below half the
 unstaggered one.
 
 ### S26 Names in genes
-The predator species renamed from "Wolf" to "Shadow", with prey genes that say
-"Run from any wolf you see.". **Expect** (T4, LLM): P(flee) when a "Shadow" is
-close drops compared with "Wolf" for that gene; the editor flags the gene
+The predator species named "wolf" in one run and "shadow" in another, its
+threat-sense label following the name, with the prey gene "Run from any wolf you
+see.". **Expect** (T4, LLM): P(flee) when a "shadow" is close is lower than when
+a "wolf" is; the editor flags the gene
 (V-23). Shows that names are part of what the brain reads.
 
 ### S27 Lab 1 with an LLM

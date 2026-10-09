@@ -16,7 +16,7 @@
 ## 2. Reference values
 
 Values of the prototype on 2026-10-09 (`configs/base.yaml`), one cell read as one
-metre. "small" is the profile for tests and quick checks.
+meter, kept exactly (owner decision). "small" is the profile for tests and quick checks.
 
 ### World
 
@@ -27,10 +27,10 @@ metre. "small" is the profile for tests and quick checks.
 | decision period | 4 | ticks |
 | sampling temperature | 1.0 | — |
 | stats interval | 100 | ticks |
-| act order | species in turn | — |
+| act order | species in turn (simultaneous: random winner for contested items) | — |
 | wait mode | responsive in the editor, freeze in batch mode | — |
 | text style | V1 | — |
-| unit word | "m" ("cells" reproduces the prototype's text) | — |
+| unit word in texts | "meters" | — |
 
 ### Ground (terrain preview only; Lab 1 is flat)
 
@@ -73,7 +73,7 @@ metre. "small" is the profile for tests and quick checks.
 
 ### Species
 
-| Parameter | Prey | Predators | Unit |
+| Parameter | `prey` | `predator` | Unit |
 |---|---|---|---|
 | initial population | 136 (small 24) | 28 (small 4) | animals |
 | floor | 10 | 3 | animals |
@@ -82,10 +82,11 @@ metre. "small" is the profile for tests and quick checks.
 | maximum energy | 100 | 100 | energy |
 | start energy (founders, newcomers) | 60 | 60 | energy |
 | base cost | 0.7 | 0.7 | energy per tick |
-| move cost | 0.5 | 0.5 | energy per metre |
+| move cost | 0.5 | 0.5 | energy per meter |
 | rest cost | 0.2 | 0.2 | energy per tick |
-| walk speed (trait) | 1 | 1 | m per tick |
-| run speed (trait) | 1 (flee) | 2 (hunt) | m per tick |
+| locomotion | kinematic, straight lines | kinematic, straight lines | — |
+| walk speed (trait of the locomotion) | 1 | 1 | m per tick |
+| run speed (trait of the locomotion) | 1 (flee) | 2 (hunt) | m per tick |
 | maximum stamina (trait) | 60 | 30 | m |
 | stamina recovery | 2 | 2 | per tick without moving |
 | recovery cost | 0.3 | 0.3 | energy per tick |
@@ -95,6 +96,7 @@ metre. "small" is the profile for tests and quick checks.
 | mate energy | 50 | 50 | energy |
 | child energy | 40 | 40 | energy per baby, shared by the parents |
 | litter | 2–4 | 2–4 | babies |
+| incubation | 0 | 0 | ticks (a few ticks hide the mutator's latency) |
 | wander turn probability | 0.25 | 0.25 | per tick |
 | graze gain | 25 | — | energy |
 | kill chance (trait) | — | 0.5 | per strike |
@@ -123,6 +125,7 @@ ticks), one shared cap.
 | Service | Parameter | Value |
 |---|---|---|
 | world default brain | — | keyword (the prototype's `rule_based`) |
+| answer cache | format, place | a local JSON-lines file per brain |
 | Ollama points brain | model | gemma4:12b |
 | | host | `http://localhost:11434` (or a cloud host with a key from an environment variable) |
 | | parallel requests | 2 |

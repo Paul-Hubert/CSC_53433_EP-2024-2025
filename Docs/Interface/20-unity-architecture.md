@@ -37,14 +37,22 @@ recommendations (SHOULD) for any other implementation of the contract.
 - **ARCH-09** *Logic is testable without a scene.* Modules take their inputs from
   context objects that tests can build in code ([30](30-tests.md)).
 - **ARCH-10** *Version-specific code is fenced.* HTTP, waiting and NavMesh calls
-  live in a few files, so the coming Unity upgrade touches little.
+  live in a few files, so a later Unity upgrade touches little. (The owner moves
+  the project to 6000.3 before work starts.)
+- **ARCH-11** *The reference modules are student code.* Every reference sense,
+  action, gene, stat, locomotion, rule, brain and phase derives from the same
+  public base classes a student uses, with no internal shortcut. The teaching
+  path relies on it: students first reimplement existing components against
+  their tests, then invent their own ([22](22-extending-recipes.md)).
+- **ARCH-12** *Scale can change later without touching modules' meaning.* Phases
+  call modules on lists of animals; storage, spatial queries and views sit
+  behind interfaces (§10). Nothing is optimised now.
 
 ## 2. The GameObject tree
 
 ```
 Lab1 World                                [World]  seed, wait mode, act order, decision period
 ├── Ground                                [FlatGround] | [TerrainGround]+Terrain | [NavMeshGround]
-├── Motor                                 [StraightMotor] | [SlidingMotor] | [NavMeshMotor]
 ├── Environment
 │   ├── Grass                             [FoodGrid]       initial 0.1, regrow 0.0015, no food in cover
 │   ├── Thickets                          [CoverLayer]     20 %, hides prey from their threats
@@ -67,37 +75,43 @@ Lab1 World                                [World]  seed, wait mode, act order, d
 │   ├── Environment                       [EnvironmentPhase]
 │   ├── Floor                             [FloorPhase]
 │   └── Record                            [RecordPhase]
-├── Rabbit                                [Species] name "Animal", brain: JEV
-│   ├── Body                              [Body] → Rabbit view prefab
+├── Prey                                  [Species] id and name "prey", brain: JEV
+│   ├── Body                              [Body] → prey view prefab
+│   ├── Locomotion                        [KinematicLocomotion] walk 1, run 1 m per tick
 │   ├── Stats                             [Energy] [Stamina] [Metabolism]
 │   ├── Senses                            (situation-text order = this order)
 │   │   ├── Energy                        [LevelSense] stat energy, 30 / 70
 │   │   ├── Stamina                       [LevelSense] stat stamina, 20 / 40
 │   │   ├── Food                          [NearestResourceSense] layer "Grass"
 │   │   ├── Predator                      [NearestAnimalSense] set Threats
+│   │   ├── Cover                         [NearestCoverSense]
 │   │   ├── Animal                        [NearestAnimalSense] set Kin, readiness on
 │   │   └── Age                           [AgeSense]
 │   ├── Actions                           (probability / prompt / option order = this order)
 │   │   ├── eat    (prefab Eat)           [EatAction]  [TextGene]
-│   │   ├── flee   (prefab Flee)          [FleeAction] [TextGene]
+│   │   ├── flee   (prefab Flee)          [FleeAction] [TextGene]   flee into cover: off
 │   │   ├── hide   (prefab Hide)          [HideAction] [TextGene]
-│   │   │   └── Cover                     [NearestCoverSense]   ← a sense can travel with its action
 │   │   ├── follow (prefab Follow)        [FollowAction] [TextGene]
 │   │   ├── rest   (prefab Rest)          [RestAction] [TextGene]
 │   │   └── mate   (prefab Mate)          [MateAction] [TextGene]
-│   ├── Genes
-│   │   └── Stamina gene                  [NumberGene] trait stamina.max, 45 / 60 / 75
-│   ├── Life                              [Diet] [MatingRule] [Litter] [UniformCrossover] [Incubation]
+│   ├── Life                              [Diet] [MatingRule] [Litter] [UniformCrossover] [Incubation 0]
 │   │                                     [Starvation] [OldAge] [CapRule] [FloorRule]
-│   └── Mutation                          [LlmMutation] deck mutate_v4  [GaussianMutation] σ 5
-└── Wolf                                  [Species] name "Predator"
-    └── ...                               [HuntAction] [Diet: strike Rabbit +60, scavenge Rabbit +30] ...
+│   └── Mutation                          [LlmMutation] deck mutate_v4
+└── Predator                              [Species] id and name "predator"
+    ├── Locomotion                        [KinematicLocomotion] walk 1, run 2 m per tick
+    └── ...                               [HuntAction] [Diet: strike prey +60, scavenge prey +30] ...
 ```
 
 The sub-GameObjects ("Senses", "Actions", "Life") are only folders: discovery
 looks at the whole subtree. Order matters only *within a kind*: the n-th
 `AnimalAction` found depth-first is action n, wherever it sits. The inspector of
 the species shows the resulting orders ([21](21-editor-tooling.md)).
+
+A sense may also travel inside its action's prefab (a Hide prefab carrying its
+Cover sense); it then takes its place in depth-first order, which moves it in
+the situation text. A number gene (a stamina gene, scenario S12) would sit under
+a `Genes` folder with a `GaussianMutation` beside the LLM mutation; the
+reference species have none (owner decision).
 
 ## 3. Base classes
 
@@ -125,7 +139,7 @@ public abstract class TickPhase : WorldModule
     public abstract void Run(TickContext t);
 }
 
-/// Something phases and modules use: ground, motor, layers, brains, recorder.
+/// Something phases and modules use: ground, layers, brains, recorder.
 public abstract class WorldService : WorldModule { }
 ```
 
@@ -197,7 +211,7 @@ drawing; both give the same events hash (RAND-11), and a test checks it.
 /// A kind of animal. Configure it with child components; subclass it only for hooks.
 public class Species : MonoBehaviour
 {
-    [SerializeField] string displayName = "Rabbit";             // what the brain reads (SPEC-01)
+    [SerializeField] string displayName = "prey";               // what the brain reads (SPEC-01)
     [SerializeField] Brain brain;                               // null = the World's default
     [SerializeField, TextArea(2, 6)] string promptHeader =
         "You decide what a wild animal does next in a simple world.";
@@ -282,9 +296,9 @@ public class Stamina : SpeciesModule
     public float Budget(Animal a) => a[Value];
 
     /// Called by the metabolism after the animal acted.
-    public void Settle(Animal a, float metresMoved, Energy energy)
+    public void Settle(Animal a, float metersMoved, Energy energy)
     {
-        if (metresMoved > Units.Epsilon) { a[Value] -= metresMoved; return; }
+        if (metersMoved > Units.Epsilon) { a[Value] -= metersMoved; return; }
         if (a[Value] < a.Trait(Max))
         {
             a[Value] = Mathf.Min(a.Trait(Max), a[Value] + regenPerTick);
@@ -293,7 +307,7 @@ public class Stamina : SpeciesModule
     }
 
     public override void WritePromptRules(PromptWriter w) => w.Rule(
-        "Every metre moved costs stamina. Standing still brings it back, which costs some " +
+        "Every meter moved costs stamina. Standing still brings it back, which costs some " +
         "energy until stamina is full. Without stamina an animal cannot move.");
 }
 ```
@@ -382,7 +396,7 @@ public class EatAction : AnimalAction
     {
         var food = c.NearestResource(a, layerName);             // within vision, diet-checked
         if (food == null) { c.Search(); return; }               // ACT-04
-        c.WalkTo(food.Position, stopAt: 0f);                    // MOVE-03
+        c.WalkTo(food.Position, stopAt: 0f);                    // MOVE-04
         c.OnArrival(Interaction.Graze(food));                   // ACT-10
     }
 
@@ -417,7 +431,65 @@ public class HuntAction : AnimalAction
 (ACT-06). Custom interactions implement `IInteraction { float Reach; void
 Apply(Animal actor, InteractionContext c); }`.
 
-### 3.7 Genes
+### 3.7 Locomotion
+
+Each species has one locomotion component. An action only gives a direction
+(and walk or run, and how far at most); the locomotion decides what happens,
+and whatever it does is the tick's result (MOVE-01).
+
+```csharp
+/// How a species moves. Inherit it for terrain, NavMesh or physics movement.
+public abstract class Locomotion : SpeciesModule
+{
+    [SerializeField] protected float walkSpeed = 1f, runSpeed = 1f;    // meters per tick
+    public TraitId WalkSpeed { get; private set; }
+    public TraitId RunSpeed { get; private set; }
+
+    public override void Declare(SpeciesBuilder b)
+    {
+        WalkSpeed = b.DeclareTrait("speed.walk", walkSpeed, min: 0f, max: 100f);
+        RunSpeed  = b.DeclareTrait("speed.run",  runSpeed,  min: 0f, max: 100f);
+    }
+
+    /// Move one animal this tick; return the meters actually moved (MOVE-06).
+    public abstract float Move(Animal a, Intent intent, float staminaBudget, MoveContext c);
+
+    /// Extra energy this movement costs (slopes, mud). None in the reference.
+    public virtual float ExtraCost(Animal a, Vector3 from, Vector3 to) => 0f;
+
+    /// The act phase calls this for a group; override it to move many animals at once (ARCH-12).
+    public virtual void MoveAll(IReadOnlyList<Animal> group, IReadOnlyList<Intent> intents,
+                                MoveContext c, Span<float> moved)
+    {
+        for (int i = 0; i < group.Count; i++)
+            moved[i] = Move(group[i], intents[i], c.StaminaBudget(group[i]), c);
+    }
+}
+
+/// The reference: straight lines, no physics (MOVE-04).
+public class KinematicLocomotion : Locomotion
+{
+    public override float Move(Animal a, Intent intent, float stamina, MoveContext c)
+    {
+        if (intent.IsStay) return 0f;
+        float speed = a.Trait(intent.Run ? RunSpeed : WalkSpeed);
+        float d = Mathf.Min(speed, stamina, intent.MaxDistance);
+        Vector3 reached = c.Ground.SlideTo(a.Position, a.Position + intent.Direction * d);
+        if (d > 0f && c.Distance(a.Position, reached) < Units.Epsilon)          // stuck
+            reached = c.Ground.SideStep(a.Position, d, c.Stream(Species, "actions"));
+        float moved = c.Distance(a.Position, reached);
+        a.Position = reached;
+        return moved;
+    }
+}
+```
+
+Later subclasses (owner decision: not now): `TerrainLocomotion` (slower and
+costlier uphill, no steep slopes), `NavMeshLocomotion` (paths around
+obstacles), `PhysicsLocomotion` (a rigid body pushed toward the direction; it
+may not go exactly there, which is fine).
+
+### 3.8 Genes
 
 ```csharp
 public abstract class Gene : SpeciesModule
@@ -459,7 +531,7 @@ Founder sentences live in an `AllelePool` ScriptableObject when several species
 or prefabs share them; the inspector checks every sentence with the mutation
 guards (GENE-22).
 
-### 3.8 Mutation
+### 3.9 Mutation
 
 ```csharp
 public abstract class MutationOperator : SpeciesModule
@@ -499,7 +571,7 @@ public class LlmMutation : MutationOperator
 }
 ```
 
-### 3.9 Brains
+### 3.10 Brains
 
 ```csharp
 public abstract class Brain : WorldService
@@ -526,12 +598,12 @@ cache. All of its `async` code uses `ConfigureAwait(false)` and never touches
 Unity objects, so the `Freeze` mode can block the main thread on it without a
 deadlock.
 
-### 3.10 Other modules
+### 3.11 Other modules
 
 | Contract | Module(s) |
 |---|---|
 | Ground (SPACE-04) | `FlatGround`, `TerrainGround` (heightmap, water level, maximum steepness, tree footprints), `NavMeshGround` |
-| Motor (MOVE-01) | `StraightMotor`, `SlidingMotor` (slides along non-walkable ground), `NavMeshMotor` (`NavMesh.Raycast`, `NavMesh.CalculatePath` toward far targets, paths cached per target for a few ticks) |
+| Locomotion (MOVE-01), one per species | `KinematicLocomotion` (reference); later `TerrainLocomotion` (slope costs, steepness), `NavMeshLocomotion` (`NavMesh.Raycast`, `NavMesh.CalculatePath` toward far targets, paths cached per target for a few ticks), `PhysicsLocomotion` |
 | Resource layers (ENV-01) | `FoodGrid`, `TerrainGrassFood` (the terrain's detail layer is the grid) |
 | Cover (ENV-10) | `CoverLayer` (noise patches), `TerrainCover` (from tree instances or a detail layer) |
 | Entities (ENV-20) | `EntitySystem<T>`; `CarcassSystem`, `EggSystem` |
@@ -547,7 +619,7 @@ deadlock.
 | Randomness | `RandomStreams` → `RandomStream` (PCG32 seeded from SHA-256 of seed and name) |
 | Recording | `RunRecorder` (files of [13](13-outputs-and-recording.md), Newtonsoft JSON with sorted keys, running SHA-256), `LiveStatistics` (for the editor graphs) |
 | Views | `Body` (the view prefab of a species), `AnimalView` (holds the animal id; no `Update`), `ViewPool` |
-| Speciation | `SpeciationRule : TickPhase` (optional) calling `World.AddSpecies` |
+| Species added during a run | `World.AddSpecies`; a speciation rule deciding when to split (a `TickPhase`) is left for later (owner decision) |
 | Controls | settings on the World and on the evolution modules ([15](15-controls-metrics-and-gates.md)) |
 
 ## 4. Initialisation order
@@ -559,7 +631,7 @@ the first error:
    species above it is an error (SPEC-05).
 2. **Find world modules.** Services and phases under the World but not under a
    species, in hierarchy order. Phases keep that order (TICK-01).
-3. **Initialise services**: random streams from the seed, ground, motor, layers,
+3. **Initialise services**: random streams from the seed, ground, layers,
    entity systems, brains, cache, mutator, recorder.
 4. **Collect each species' modules**, keeping only those whose nearest `Species`
    is this one:
@@ -594,7 +666,7 @@ public class ActPhase : TickPhase
         foreach (var group in t.ActGroups(order))
         {
             foreach (var a in group) t.Plan(a);       // the action's Act → intent and interaction
-            foreach (var a in group) t.Move(a);       // the motor, limited by speed and stamina
+            foreach (var a in group) t.Move(a);       // the species' locomotion, speed and stamina
             foreach (var a in group) t.Interact(a);   // within reach after moving, diet-checked
             foreach (var a in group) t.Settle(a);     // metabolism, stamina, busy countdown
         }
@@ -638,7 +710,7 @@ public class ChooseActionsPhase : TickPhase
 Assets/EvoSim/
   Runtime/          EvoSim.Runtime.asmdef        Core/ Phases/ Genes/ Senses/ Actions/ Stats/
                                                  Reproduction/ Population/ Mutation/ Environment/
-                                                 Ground/ Brains/ Recording/ Views/
+                                                 Ground/ Locomotion/ Brains/ Recording/ Views/
   Http/             EvoSim.Http.asmdef           HttpBrain, Ollama, JEV, mutator clients (ARCH-10)
   Editor/           EvoSim.Editor.asmdef         inspectors, windows, validation UI (Editor only)
   Testing/          EvoSim.Testing.asmdef        WorldBuilder, ScriptedBrain, FakeMutator, Golden
@@ -672,7 +744,7 @@ need jobs.
   (ARCH-07).
 - **Profiling.** One `ProfilerMarker` per phase and per brain call.
 - **Upgrade.** Everything version-specific sits in `EvoSim.Http`, `NavMeshGround`,
-  `NavMeshMotor` and the ray batch helper.
+  `NavMeshLocomotion` and the ray batch helper.
 
 ## 9. Performance budget
 
@@ -685,3 +757,22 @@ need jobs.
 
 LLM brains dominate everything else: JEV answers about 12 queries per second, so
 the memo, the answer cache and batching matter far more than C# speed.
+
+## 10. Designed to scale (later)
+
+Nothing is optimised now: a few hundred animals and plain C# lists are enough,
+and the brain is the bottleneck. The seams below let a later version handle
+thousands of animals without changing what any module means (ARCH-12).
+
+| Seam | Now | Later, without touching module meaning |
+|---|---|---|
+| Batch entry points | phases call `Sense.ReadAll`, `AnimalAction.ActAll`, `Locomotion.MoveAll`, `DeathRule.CheckAll`, whose defaults loop over the single-animal methods | a module overrides the batch method with a Burst job; its single-animal method stays as the readable reference and the test oracle |
+| Animal storage | `Animal` objects in a list per species; stats and traits in small arrays reached through `StatId` and `TraitId` | struct-of-arrays storage in `Core`; `Animal` becomes a handle with the same accessors |
+| Spatial queries | `ISpatialIndex`: a uniform hash grid rebuilt per phase | a k-d tree, or a Burst-built grid, behind the same interface |
+| Raycasts | one `RaycastCommand` batch per sense phase | unchanged |
+| Brains | one request per brain per tick, answer cache, memo | several servers per brain, requests split across them |
+| Views | pooled GameObjects | instanced rendering (`Graphics.RenderMeshInstanced`) |
+
+The single-animal methods stay the ones students write and read; batch versions
+are optional optimisations that must pass the same conformance suites
+([30 §4](30-tests.md#4-conformance-suites-for-students-modules)).

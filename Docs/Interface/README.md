@@ -12,9 +12,10 @@ function or file layout is part of the contract. Python numbers appear as
 numeric agreement with Python is **not** required.
 
 The Unity system differs from the prototype on purpose in a few places, decided
-with the course owner on 2026-10-09 (table below): space is continuous,
-everything is a replaceable component, any number of species eat each other
-through a food web, genes can be sentences or numbers.
+with the course owner in two rounds on 2026-10-09 (tables below): space is
+continuous, everything is a replaceable component, any number of species eat
+each other through a food web, genes can be sentences or numbers, and hiding in
+cover is its own behaviour.
 
 ## Contents
 
@@ -89,17 +90,20 @@ has at least one test.
 
 | Quantity | Unit | Python prototype |
 |---|---|---|
-| Distance | metre (m), measured on the horizontal plane | one grid cell |
+| Distance | meter (m), measured on the horizontal plane | one grid cell |
 | Time | tick (one simulation step) | one tick |
-| Speed | metres per tick | cells per tick |
-| Energy, stamina | points; stamina = metres an animal can move before it must stop | points; cells |
+| Speed | meters per tick | cells per tick |
+| Energy, stamina | points; stamina = meters an animal can move before it must stop | points; cells |
 
-The reference values convert one cell to one metre. Distances in Python are
-Chebyshev (a diagonal step counts as 1); here they are Euclidean, so a vision
-disc of 20 m covers about 75 % of the area of Python's 20-cell square. Retune
-when comparing numbers ([14](14-configuration-reference.md)).
+The reference values convert one cell to one meter and are otherwise **kept
+exactly as in the prototype** (owner decision). Distances in Python are
+Chebyshev (a diagonal step counts as 1); here they are Euclidean and movement
+goes in straight lines, so a vision disc of 20 m covers about 75 % of the area
+of Python's 20-cell square. The first accepted Unity runs become the new
+reference numbers ([30](30-tests.md), R-02). Texts the brain reads say
+"meters".
 
-## Decisions taken with the course owner (2026-10-09)
+## Decisions taken with the course owner (2026-10-09, first round)
 
 | Topic | Decision |
 |---|---|
@@ -123,8 +127,39 @@ when comparing numbers ([14](14-configuration-reference.md)).
 | Defaults | One text gene per action (free genes allowed), prompts generated from components (frozen text optional), log files in Python's formats, Python's phase order as the default, reference brains = random, keyword, Ollama points, JEV choice; owner-rejected options documented as off; Newtonsoft JSON and the Unity Test Framework; numbered rules; contract pinned to `1324b43`. |
 | Integrity prompts | Both: checks that the brain reads genes, and prompts for coding agents that audit an implementation; used in CI and by hand. |
 
+## Decisions, second round (2026-10-09)
+
+| Topic | Decision |
+|---|---|
+| Space and distance | Continuous, Euclidean distance, straight-line movement. |
+| Speed | Set per species (walking and running speeds of the species' locomotion component). |
+| Reference values | Exactly the prototype's (one cell = one meter); no number genes in the reference species. |
+| Units in texts | "meters". |
+| Prompts | The answer instruction is hard-coded in each brain, as in the prototype. Everything else (header, the line explaining each action, rule lines) is set in the inspector. |
+| Observations | Their wording is written in each sense's code; labels and thresholds in the inspector. Distance only for now; angles later. |
+| Act order | Species in turn by default. Simultaneous order: contested items go to a random winner. |
+| Breeding | In its own phase, after the act phase. |
+| Eggs | No incubation by default; a few ticks of incubation can hide the mutator's latency. |
+| Species names | `prey` and `predator`. |
+| Speciation | None; later. Adding species at run time stays possible. |
+| Cannibals | Flee from their own kind. Knowing whether a cannibal is following you is a sense a student can write. |
+| Hide and flee | Separate actions, separate genes, separate senses (cover). |
+| Gates | G2 stays even though current models fail it. |
+| Neutral gene, founder pools, caps | Configured on their components (the gene, the cap rule…). |
+| Teaching path | The reference modules are written exactly like student modules. Students first reimplement existing components against their tests, then invent their own. |
+| Real time | Not by default; maybe later. |
+| Movement | Kinematic by default (no rigid bodies, no physics). An action only gives a direction; the species' locomotion component decides the actual movement, and whatever it does is the tick's result. Locomotion is a component that can be inherited: slopes, terrain costs, NavMesh, physics come later as subclasses. |
+| Camera senses | Later. |
+| Determinism | Per machine only; results are never compared across machines. |
+| Answer cache | A local JSON file for now. |
+| Python golden fixtures | Dropped. |
+| Scale | Not needed now; the architecture keeps the path open. |
+| Unity | The owner upgrades the project to 6000.3 before work starts. |
+| CI hardware | The owner's machine (the one that ran the prototype) as a self-hosted runner. |
+
 ## Status
 
-Written 2026-10-09. Nothing in Unity exists yet. The Python prototype keeps
-evolving; when it changes behaviour, update the matching rule and its
-reference value, and note the commit.
+Written 2026-10-09, revised the same day after the second round of decisions.
+Nothing in Unity exists yet; the project moves to Unity 6000.3 first. The
+Python prototype keeps evolving; when it changes behaviour, update the matching
+rule and its reference value, and note the commit.

@@ -53,6 +53,10 @@ mutation, kept or lost by selection.
 - **GENE-20 (MUST)** Each gene has a founder pool: a list of alleles and, for
   text genes, a **neutral** allele ("No preference.") that is part of the pool.
   A founder genome draws each locus independently and uniformly from its pool.
+- **GENE-24 (MUST)** The founder pool and the neutral allele are configured on
+  the gene's component (owner decision): the founder values, whether a neutral
+  allele exists, its text, and whether it may mutate (MUT-22). Founder lists
+  may live in a shared asset that several gene components use.
 - **GENE-21 (MUST)** Founder pools are frozen for an experiment and shared by all
   its runs and seeds, so that runs start from the same origin.
 - **GENE-22 (MUST)** Founder sentences pass the same checks as mutated sentences
@@ -70,6 +74,7 @@ words, imperative, plain words, no numbers; plus the neutral "No preference."):
 |---|---|
 | prey eat | Eat whenever food is close. · Only look for food when energy is low. · Always finish eating before doing anything else. · Eat quickly, then move on. |
 | prey flee | Run from any predator you see. · Flee only when a predator is very close. · Stay calm unless danger is right next to you. · Run away from anything that attacks you. |
+| prey hide (Unity, new draft) | Hide when a predator is close. · Stay in cover when danger is near. · Hide only when you are tired. · Leave cover to find food when hungry. |
 | prey follow | Stay close to other animals. · Follow others when you are lost or hungry. · Keep your distance from other animals. · Follow the strongest animal nearby. |
 | prey rest | Rest when you are tired. · Never stop moving. · Rest only when you feel safe. · Save energy by resting when food is far. |
 | prey mate | Look for a partner when energy is high. · Mate with any nearby adult. · Mate only when food is plentiful. · Seek a partner before growing old. |
@@ -82,7 +87,8 @@ words, imperative, plain words, no numbers; plus the neutral "No preference."):
 unless starving."; flee: "Always run away, whatever happens." / "Never run away
 from anything."; follow: "Always follow other animals." / "Never go near other
 animals."; rest: "Always rest and stay still." / "Never rest, keep moving.";
-mate: "Always try to mate." / "Never mate."; hunt: "Always hunt, whatever
+mate: "Always try to mate." / "Never mate."; hide (new): "Always hide, whatever
+happens." / "Never hide in cover."; hunt: "Always hunt, whatever
 happens." / "Never hunt unless starving."; predator follow: "Always follow other
 predators." / "Never go near other predators."
 

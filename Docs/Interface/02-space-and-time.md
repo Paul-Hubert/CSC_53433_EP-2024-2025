@@ -9,7 +9,9 @@ where an animal stands or how it moves.
 ## 1. Space
 
 - **SPACE-01 (MUST)** An animal's position is a continuous point. Movement
-  changes it by a velocity (direction × speed) over a tick. Nothing snaps
+  changes it by a velocity (direction × speed) over a tick, in a straight line
+  in the reference. The speed belongs to the species (its locomotion
+  component, [07 §2](07-actions-and-locomotion.md#2-locomotion)). Nothing snaps
   positions to cells.
 - **SPACE-02 (MUST)** Distances are measured on the horizontal plane (x, z),
   Euclidean, through one world-level distance function that every module uses.
@@ -39,7 +41,7 @@ exists: a value-noise heightmap (three octaves) whose lowest 15 % becomes water
 and highest 10 % mountain (both impassable); only the largest connected walkable
 region is kept, and the generator retries (up to 50 times) until it covers at
 least 60 % of the world. An option splits the world into k × k areas with
-one-metre ridges, each with a gap of a few metres (tried against population
+one-meter ridges, each with a gap of a few meters (tried against population
 crashes, made them worse, off).
 
 ## 2. Spatial queries
@@ -62,7 +64,7 @@ crashes, made them worse, off).
   interval) is in ticks.
 - **SPACE-11 (MUST)** A run's result does not depend on frame rate,
   `Time.deltaTime`, `Time.fixedDeltaTime`, or how many ticks run per frame.
-  Speeds are in metres per tick.
+  Speeds are in meters per tick.
 - **SPACE-12 (MUST)** Visuals (meshes, animation, interpolation between two tick
   states) read the simulation and never write to it.
 
@@ -87,7 +89,7 @@ the simulation waits, so that a decision is never made on old observations.
 - **SPACE-15 (MAY)** A real-time mode in which answers are applied when they
   arrive (on observations that are by then old) is outside the contract: it is
   not reproducible. If built, it is labelled as such and never used for
-  measurements.
+  measurements. Not planned for now (owner decision); the reference is lockstep.
 
 ### Run controls
 
@@ -100,6 +102,6 @@ the simulation waits, so that a decision is never made on old observations.
 | Real time | k ticks per second, for watching |
 | Stop condition | a tick count, a wall-clock limit, a stop file or button, extinction of a species |
 
-**Reference.** One tick ≈ one step of one metre at walking speed. With the
+**Reference.** One tick ≈ one step of one meter at walking speed. With the
 keyword brain the prototype takes about 17 ms per tick for about 330 animals in the
 192 × 192 world (Python); a C# implementation should be well below that.

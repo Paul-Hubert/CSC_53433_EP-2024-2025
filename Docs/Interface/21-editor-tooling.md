@@ -38,6 +38,7 @@ Severity: **E** error (blocks Play), **W** warning, **I** information.
 | V-10 | E | a species without a brain and no world default | pick one |
 | V-11 | E | a brain's limits exceeded: more than 16 actions for JEV, prompt estimate above its token limit (DEC-14) | — |
 | V-12 | W | the species' signature changed since it was last accepted (SPEC-03): results and caches change | accept |
+| V-13 | E | a species without exactly one locomotion component (MOVE-01) | add `KinematicLocomotion` |
 | **References** |
 | V-20 | E | a module names a layer, entity kind or species that doesn't exist | pick from a list |
 | V-21 | W | an animal set resolves to nothing (flee with no threat, hunt with no prey) | — |
@@ -65,7 +66,7 @@ Severity: **E** error (blocks Play), **W** warning, **I** information.
 | V-50 | W / E | observation space above 100 000 (W) or 10 000 000 (E) (SENSE-05) | — |
 | V-51 | E | a sense with attachments and a brain that can't read them (SENSE-41) | — |
 | V-52 | W | the keyword brain is used and an action has no keyword pattern or default score | — |
-| V-53 | E | a frozen prompt without `{genes}`, `{situation}` or `{ask}`, or with an unknown placeholder | — |
+| V-53 | E | a prompt field (header, action line, rule line) or a frozen prompt with an unknown placeholder; a frozen prompt without `{genes}`, `{situation}` or `{ask}` | — |
 | **Services and secrets** |
 | V-60 | W | an HTTP brain or the mutator is unreachable (checked on demand: *Test connection*) | — |
 | V-61 | E | a key or token in a serialized field of a scene, prefab or asset (OUT-04) | move to an environment variable |
@@ -128,10 +129,16 @@ or *random*), switch V1/V2, see the full prompt with its token estimate, copy it
 
 ## 6. Creating things
 
-- `GameObject ▸ EvoSim ▸ New World` builds the default tree: ground, motor,
+- `GameObject ▸ EvoSim ▸ New World` builds the default tree: ground,
   environment, brains, recorder and the eleven phases.
-- `GameObject ▸ EvoSim ▸ New Species` adds a species with energy, stamina,
-  metabolism, diet, mating, litter, crossover, starvation, old age, cap and floor.
+- `GameObject ▸ EvoSim ▸ New Species` adds a species with a kinematic
+  locomotion, energy, stamina, metabolism, diet, mating, litter, crossover,
+  starvation, old age, cap and floor.
+- `EvoSim ▸ Exercises ▸ Replace with stub` swaps a reference module for an empty
+  student class of the same base class, keeping its inspector settings, so that
+  the reference module's tests grade the student's version (the teaching path,
+  [22 §0](22-extending-recipes.md#0-the-teaching-path)); `Restore reference`
+  undoes it.
 - `GameObject ▸ EvoSim ▸ Add Action / Sense / Gene` instantiates module prefabs
   from `Modules/`.
 - `Assets ▸ Create ▸ EvoSim ▸` *Allele Pool*, *Scenario*, *Mutation Deck*, and

@@ -28,26 +28,34 @@ answered once (the memo answers 50–80 % of decisions in the reference runs).
 
 - **SENSE-10 (MUST)** Each sense writes its token as a short text fragment. The
   situation text is the fragments in sense order, joined by spaces. Writing is
-  deterministic: the same observation always gives the same text.
+  deterministic: the same observation always gives the same text. The wording
+  lives in the sense's code; its label and thresholds are set in the inspector
+  (owner decision).
 - **SENSE-11 (MUST)** At least one style exists: the terse style **V1**
   ("Energy: low."). Senses MAY also write a first-person style **V2** ("I am
   hungry and weak."). The style is one setting for the whole world (or brain).
-- **SENSE-12 (MUST)** A distance fragment states the range of its band in the
-  world's unit, and "none" states the vision ("Food: 1-4 m away.", "Predator:
-  none within 20 m."), so the brain knows how far things are and how far it sees.
-- **SENSE-13 (SHOULD)** The unit word is a setting ("m", "metres", "cells"). With
-  "cells" and integer bands the reference text matches the prototype's text
-  exactly, which lets cached answers and gate results be compared.
+- **SENSE-12 (MUST)** A distance fragment states the range of its band in
+  meters, and "none" states the vision ("Food: 1-4 meters away.", "Predator:
+  none within 20 meters."), so the brain knows how far things are and how far it
+  sees.
+- **SENSE-13 (MUST)** The unit word in every text the brain reads is "meters"
+  (owner decision; the prototype said "cells").
 
-**Reference texts (prototype, unit "cells").**
+**Reference texts (Unity reference species).**
 
-| Style | Prey | Predator |
+| Style | `prey` | `predator` |
 |---|---|---|
-| V1 | `Energy: low. Stamina: high. Food: 2-4 cells away. Predator: 5-10 cells away. Animal: 11-20 cells away, ready to mate. Age: adult.` | `Energy: medium. Stamina: low. Prey: 2-4 cells away. Carcass: none within 20 cells. Other predator: none within 20 cells. Age: adult.` |
-| V2 | `I am hungry and weak. I am rested. The nearest food is 2-4 cells away. The nearest predator is 5-10 cells away. The nearest other animal is 11-20 cells away. It is ready to mate. I am an adult.` | `I have some energy. I am out of breath. The nearest prey is 2-4 cells away. No carcass within 20 cells. No other predator within 20 cells. I am an adult.` |
+| V1 | `Energy: low. Stamina: high. Food: 1-4 meters away. Predator: 4-10 meters away. Cover: here. Animal: 10-20 meters away, ready to mate. Age: adult.` | `Energy: medium. Stamina: low. Prey: 1-4 meters away. Carcass: none within 20 meters. Other predator: none within 20 meters. Age: adult.` |
+| V2 | `I am hungry and weak. I am rested. The nearest food is 1-4 meters away. The nearest predator is 4-10 meters away. I am in cover. The nearest other animal is 10-20 meters away. It is ready to mate. I am an adult.` | `I have some energy. I am out of breath. The nearest prey is 1-4 meters away. No carcass within 20 meters. No other predator within 20 meters. I am an adult.` |
+
+For the record, the prototype wrote the same prey situation (without cover) as
+`Energy: low. Stamina: high. Food: 2-4 cells away. Predator: 5-10 cells away.
+Animal: 11-20 cells away, ready to mate. Age: adult.`
 
 Details of the reference wording: on a food item V1 says `Food: here.` and V2
-`I am standing on food.`; the adjacent band reads `1 cell away`; V2 energy
+`I am standing on food.`; in cover V1 says `Cover: here.` and V2 `I am in
+cover.`, otherwise V2 says *The nearest cover is … away.* or *No cover within 20
+meters.*; the adjacent band reads `within 1 meter`; V2 energy
 levels read *I am hungry and weak.* / *I have some energy.* / *I am well fed and
 strong.*, stamina levels *I am out of breath.* / *I am getting tired.* / *I am
 rested.*; V1 adds `, ready to mate` or `, not ready to mate` to the kin fragment
@@ -66,14 +74,14 @@ mate.*
 
 **Reference.** Edges [1, 4, 10] m and vision 20 m for both species:
 
-| Token | Distance | Text (continuous) | Text (prototype, cells) |
+| Token | Distance | Text | Prototype text |
 |---|---|---|---|
-| `here` (resources only) | the item is within reach | here | here |
-| `adjacent` | ≤ 1 m | 1 m away | 1 cell away |
-| `close` | 1–4 m | 1-4 m away | 2-4 cells away |
-| `medium` | 4–10 m | 4-10 m away | 5-10 cells away |
-| `far` | 10–20 m | 10-20 m away | 11-20 cells away |
-| `none` | nothing within 20 m | none within 20 m | none within 20 cells |
+| `here` (resources, cover) | within reach, or standing in it | here | here |
+| `adjacent` | ≤ 1 m | within 1 meter | 1 cell away |
+| `close` | 1–4 m | 1-4 meters away | 2-4 cells away |
+| `medium` | 4–10 m | 4-10 meters away | 5-10 cells away |
+| `far` | 10–20 m | 10-20 meters away | 11-20 cells away |
+| `none` | nothing within 20 m | none within 20 meters | none within 20 cells |
 
 ## 4. Reference senses
 
@@ -87,16 +95,18 @@ mate.*
 | Nearest prey ("Prey") | bands + none | nearest animal of a hunted species, not killed, not hidden in cover |
 | Nearest carcass ("Carcass") | bands + none | nearest carcass this animal may eat from: portions left, not its own kill, not eaten from by it yet |
 | Nearest kin with readiness ("Animal", "Other predator") | none, or one of 4 bands × (ready, not ready) | nearest other animal of its species; whether it is ready to mate ([11](11-reproduction-and-population.md)) is seen within `partnerRange` (reference 20 m = the vision); beyond it, readiness is unknown and not written |
-| Nearest cover ("Cover", Unity addition) | here + bands + none | `here` when standing in cover |
+| Nearest cover ("Cover", prey) | here + bands + none | `here` when standing in cover; the cover the animal hides in from its threats |
 
-That gives **4 860** possible prey observations (3 × 3 × 6 × 5 × 9 × 2) and
-**4 050** predator observations (3 × 3 × 5 × 5 × 9 × 2).
+That gives **29 160** possible prey observations (3 × 3 × 6 × 5 × 6 × 9 × 2) and
+**4 050** predator observations (3 × 3 × 5 × 5 × 9 × 2). The prototype's prey,
+without the cover sense, had 4 860.
 
-Animals in the reference don't sense directions, terrain, cover (in the
-prototype), how many animals or items there are, or anything about another
-animal beyond its readiness. A prey animal doesn't know whether a predator is
-busy digesting. Natural additions: direction tokens (ahead, left, right,
-behind), terrain ahead (water, cliff), cover, thirst.
+Animals in the reference sense **distances only**: no directions or angles
+(planned for later, owner decision), no terrain, no counts of animals or items,
+nothing about another animal beyond its readiness. A prey animal doesn't know
+whether a predator is busy digesting or chasing it. Natural additions: the angle
+to each target, terrain ahead (water, cliff), thirst, "a threat is chasing me"
+([22](22-extending-recipes.md)).
 
 ## 5. Batched senses and raycasts
 

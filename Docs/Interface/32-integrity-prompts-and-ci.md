@@ -12,13 +12,17 @@ The owner's guidance: CI may call real LLMs, and its duration is not a concern.
 
 ## 1. Where each check runs
 
-| Tier | Content | Runner | Trigger | Blocks |
-|---|---|---|---|---|
-| T0–T1 | validation, static checks, EditMode tests | GitHub-hosted (game-ci) or self-hosted Unity runner | every push | merge |
-| T2 | PlayMode tests, short scenarios with fakes | same | every push | merge |
-| T3 | regression: hashes, ranges, soak, performance | self-hosted Unity runner | nightly, before a release | release |
-| T4 | brain and mutator integrity (§2), LLM scenarios S06, S10, S13, S15, S22, S26, S27 | self-hosted GPU runner with Docker (vLLM for JEV) and Ollama | nightly, manual | B-01 blocks; gates are tracked as trends |
-| T5 | coding-agent audit (§3, prompt P1) | Claude Code (GitHub Action or a scheduled cloud session) | weekly, before a release | a report a person reviews |
+All tiers run on the owner's machine (the one that ran the prototype: Windows
+11, a 16 GB RTX GPU, Docker for the JEV server, Ollama for the mutator) as a
+self-hosted GitHub Actions runner (owner decision).
+
+| Tier | Content | Trigger | Blocks |
+|---|---|---|---|
+| T0–T1 | validation, static checks, EditMode tests | every push | merge |
+| T2 | PlayMode tests, short scenarios with fakes | every push | merge |
+| T3 | regression: hashes, ranges, soak, performance | nightly, before a release | release |
+| T4 | brain and mutator integrity (§2), LLM scenarios S06, S10, S13, S15, S22, S26, S27 | nightly, manual | B-01 blocks; gates are tracked as trends |
+| T5 | coding-agent audit (§3, prompt P1) | weekly, before a release | a report a person reviews |
 
 ## 2. Brain and mutator integrity checks
 
@@ -40,8 +44,8 @@ time.
 | **B-10** | **Mutator**: the 9 × 4 founder sentences through the deck, then 10 mutations in a row without selection, judged by the judge prompt below | guards pass ≥ 70 % of first answers; ≥ 80 % usable after one mutation; usable share after 10 reported (prototype: 50 %) |
 | **B-11** | **Blindness**: the mutator's received prompts | contain only the context line, one instruction, the sentence and the reply line (MUT-11) |
 
-**Gate policy.** A gate that a model is known to fail (G2 with gemma and JEV,
-2026-10-09) is not blocking; it fails CI only when its value drops below the last
+**Gate policy.** G2 stays a gate even though gemma and JEV fail it (owner
+decision, 2026-10-09). A gate that a model is known to fail is not blocking; it fails CI only when its value drops below the last
 accepted value by more than its bootstrap margin. A new model or prompt is
 accepted by a person, who records the new values.
 
@@ -178,57 +182,69 @@ the cost of measuring it (model calls).
 ## 4. The CI pipeline
 
 ```yaml
-# .github/workflows/evosim.yml (sketch)
+# .github/workflows/evosim.yml (sketch). Every job runs on the owner's machine.
 on:
   push:
   schedule: [{ cron: "17 2 * * *" }, { cron: "17 3 * * 1" }]   # nightly T3 + T4; weekly T5
   workflow_dispatch:
+env:
+  UNITY: C:\Program Files\Unity\Hub\Editor\6000.3.x\Editor\Unity.exe
 jobs:
   editmode:                                   # T0 + T1
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, windows, unity]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/cache@v4
-        with: { path: Library, key: library-${{ hashFiles('Packages/packages-lock.json') }} }
-      - uses: game-ci/unity-test-runner@v4
-        env: { UNITY_LICENSE: "${{ secrets.UNITY_LICENSE }}", UNITY_EMAIL: "${{ secrets.UNITY_EMAIL }}",
-               UNITY_PASSWORD: "${{ secrets.UNITY_PASSWORD }}" }
-        with: { testMode: editmode, unityVersion: 6000.3.x }
+        with: { clean: false }                # keeps Library/ between runs
+      - run: '& $env:UNITY -batchmode -nographics -projectPath . -runTests -testPlatform EditMode -testResults results/editmode.xml'
   playmode:                                   # T2
     needs: editmode
-    runs-on: ubuntu-latest
-    steps: [ ...same with testMode: playmode... ]
+    runs-on: [self-hosted, windows, unity]
+    steps:
+      - uses: actions/checkout@v4
+        with: { clean: false }
+      - run: '& $env:UNITY -batchmode -nographics -projectPath . -runTests -testPlatform PlayMode -testResults results/playmode.xml'
   regression:                                 # T3
     if: github.event_name != 'push'
-    runs-on: [self-hosted, unity]
-    steps: [ checkout, "unity -batchmode -executeMethod EvoSim.Batch.RunRegression -quit" ]
+    runs-on: [self-hosted, windows, unity]
+    steps:
+      - uses: actions/checkout@v4
+        with: { clean: false }
+      - run: '& $env:UNITY -batchmode -nographics -projectPath . -executeMethod EvoSim.Batch.RunRegression -quit'
   llm-integrity:                              # T4
     if: github.event_name != 'push'
-    runs-on: [self-hosted, gpu]
+    needs: regression                         # the GPU belongs to JEV while this runs
+    runs-on: [self-hosted, windows, unity, gpu]
     steps:
-      - checkout
-      - "docker compose -f prototype/docker/compose.yaml up -d && wait for /health"   # JEV on vLLM
-      - "ollama pull qwen3.5:0.8b && ollama pull gemma4:12b"
-      - restore answer caches (actions/cache, keyed by model revisions and prompt ids)
-      - "unity -batchmode -executeMethod EvoSim.Batch.RunIntegrity -quit"            # B-01..B-11
-      - "unity -batchmode -executeMethod EvoSim.Batch.RunScenarios -tier T4 -quit"
-      - upload reports as artifacts; compare gates with the accepted values
+      - uses: actions/checkout@v4
+        with: { clean: false }
+      - run: docker compose -f prototype/docker/compose.yaml up -d   # JEV on vLLM; wait for /health
+      - run: ollama pull qwen3.5:0.8b; ollama pull gemma4:12b
+      - run: '& $env:UNITY -batchmode -nographics -projectPath . -executeMethod EvoSim.Batch.RunIntegrity -quit'          # B-01..B-11
+      - run: '& $env:UNITY -batchmode -nographics -projectPath . -executeMethod EvoSim.Batch.RunScenarios -tier T4 -quit'
+      - uses: actions/upload-artifact@v4
+        with: { name: integrity-reports, path: Reports/ }
   agent-audit:                                # T5, weekly
     if: github.event.schedule == '17 3 * * 1'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, windows, unity]
     steps:
-      - uses: anthropics/claude-code-action     # with prompt P1, read-only phase 1
+      - uses: actions/checkout@v4
+      - uses: anthropics/claude-code-action     # prompt P1, read-only phase 1
         with: { anthropic_api_key: "${{ secrets.ANTHROPIC_API_KEY }}" }
 ```
 
 Notes:
 
-- **Secrets** (`UNITY_LICENSE`, `ANTHROPIC_API_KEY`, `OLLAMA_API_KEY` for a cloud
-  model) live only in the CI's secret store and reach the code as environment
-  variables (OUT-04). T-OUT-03 checks that none leaks into outputs.
-- **Answer caches** are kept between nightly runs, keyed by model revision and
-  prompt id, so a nightly T4 run only pays for what changed. A weekly run
-  clears them to measure the models afresh.
+- **Unity** is installed and licensed on the machine, so no license secret is
+  needed. `-nographics` keeps tests off the GPU, which JEV needs almost entirely.
+- **Secrets** (`ANTHROPIC_API_KEY` for T5, `OLLAMA_API_KEY` only for a cloud
+  model) live in the repository's secret store or the machine's environment and
+  reach the code as environment variables (OUT-04). T-OUT-03 checks that none
+  leaks into outputs.
+- **Answer caches** are local JSON-lines files that stay on the machine between
+  runs, keyed by model revision and prompt id, so a nightly T4 run only pays
+  for what changed. A weekly run moves them aside to measure the models afresh.
+- **Determinism** is checked on this machine only; pinned hashes are this
+  machine's (RAND-12).
 - **Pinned models**: JEV by repository revision, Ollama models by digest; the
   reports record both. A digest change is reported as such, so a moved gate can
   be traced to the model rather than the code.
