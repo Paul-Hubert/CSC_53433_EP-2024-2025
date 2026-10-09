@@ -10,8 +10,8 @@ world:
   mountain_fraction: 0.0       # share of cells that are mountain (impassable)
   noise_octaves: [16, 8, 4]    # heightmap noise, used only when a fraction above is > 0
   min_walkable_connected: 0.60
-  food_initial_fraction: 0.3   # rev. 2026-10-08 (owner: food quick and plentiful); 0.08 before
-  food_regrow_p: 0.003        # chance per empty cell per tick (≈ 330 ticks to regrow); rev. 2026-10-09 (owner: a bit slower); 0.005 on 10-08, 0.0007 from 10-01
+  food_initial_fraction: 0.1   # rev. 2026-10-09 (owner: less food at the start); 0.3 on 10-08, 0.08 before
+  food_regrow_p: 0.0015       # chance per empty cell per tick (≈ 670 ticks to regrow); rev. 2026-10-09 (owner: lower still); 0.003, 0.005 on 10-08, 0.0007 from 10-01
   cover_fraction: 0.2         # cover (thickets, rev. 2026-10-09): predators can't see or kill prey in it; 0 = none
   cover_seek: 6               # fleeing prey run into cover within this many cells
   cover_food: false           # hungry cover: no food grows in cover, so hiding and eating compete
@@ -64,7 +64,7 @@ predators:                    # genetic animals like the prey since 2026-10-07: 
   cost_regen: 0.3
   stamina_low: 10.0
   stamina_high: 20.0
-  kill_p: 0.2                 # chance that a strike kills; a hunting predator strikes when next to its prey (0.1 until 2026-10-09)
+  kill_p: 0.5                 # chance that a strike kills; a hunting predator strikes when next to its prey (owner 2026-10-09; 0.2, 0.1 before)
   kill_gain: 60.0             # energy from one kill
   digest_ticks: 50            # after a kill the predator stays still and doesn't decide; after a carcass portion, in proportion (30 → 25 ticks)
   carcass_portions: 2         # a kill leaves a carcass: one portion each for up to 2 other predators (0 = no carcass)
