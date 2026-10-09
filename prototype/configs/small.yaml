@@ -1,4 +1,5 @@
 # Small world for tests and quick checks (48 x 48); runs use the full 96 x 96 world by default
 world: {width: 48, height: 48}
-predators: {init_pop: 4, cap: 6}              # floor 3 as in base.yaml; cap 6 keeps the prey off their floor
-agents: {init_pop: 24, cap: 40}
+predators: {init_pop: 4}                      # floor 3 as in base.yaml
+agents: {init_pop: 24}
+sim: {cap: 46}                                # all animals (one cap per species until 2026-10-09: prey 40, predators 6)

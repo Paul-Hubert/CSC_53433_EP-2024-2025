@@ -17,10 +17,10 @@ least m prey within their vision (the same, local); evolution.egg_bank: below th
 egg laid by a pair in the last evolution.egg_ticks ticks hatches (a delayed birth with real
 parents and generation) before any newcomer with founder genes.
 
-Cap rule (rev. 2026-10-09, per species `cap_rule`): "migrate" lets births happen at the cap;
-at the end of the tick, random animals of a species over its cap (never that tick's babies)
-leave the world (deaths with cause "migrated") until it is back at the cap. "block" (before):
-no births at the cap.
+Cap (rev. 2026-10-09): one cap for all animals together, sim.cap (before: one per species).
+sim.cap_rule "migrate" lets births happen at the cap; at the end of the tick, random animals of
+either species (never that tick's babies) leave the world (deaths with cause "migrated") until
+the total is back at the cap. "block": no births at the cap.
 
 The backend is only called for (species, genome, observation) triples not yet seen in this
 run; identical situations reuse the stored distribution (big speed-up with an LLM brain).
@@ -320,8 +320,7 @@ class Simulation:
             if dead:
                 gone = {id(a) for a, _ in dead}
                 self._set_members(sp, [a for a in self.members(sp) if id(a) not in gone])
-        for sp in (PREY, PREDATOR):
-            self._migrate(sp)
+        self._migrate()
         self.world.regrow_food(self.rng_food)
         self.world.age_carcasses()
         for sp in (PREY, PREDATOR):
@@ -357,46 +356,55 @@ class Simulation:
                 a.energy -= sc.cost_rest if a.action == "rest" else sc.cost_base
                 _recover(a, sc)
 
+    def _cap_rule(self) -> str:
+        return self.cfg.sim.get("cap_rule") or "block"
+
+    def _room(self, sp: Species) -> int:
+        """Births `sp` may still have now: up to the total cap (sim.cap) with cap_rule block, no
+        limit with migrate; predators.prey_per_predator q keeps predators at most prey / q."""
+        room = int(self.cfg.sim.cap) - len(self.agents) - len(self.predators) if self._cap_rule() == "block" else 10 ** 9
+        q = float(species_cfg(self.cfg, sp).get("prey_per_predator") or 0) if sp.name == "predator" else 0.0
+        if q:
+            room = min(room, int(len(self.agents) / q) - len(self.predators))
+        return room
+
     def _breed(self, sp: Species) -> None:
         sc = species_cfg(self.cfg, sp)
-        cap = int(sc.cap) if (sc.get("cap_rule") or "block") == "block" else 10 ** 9   # migrate: no limit here
-        q = float(sc.get("prey_per_predator") or 0) if sp.name == "predator" else 0.0
-        if q:                                     # predators breed only while there are q prey each
-            cap = min(cap, int(len(self.agents) / q))
         members = self.members(sp)
         if not self.cfg.evolution.sexual:
             for a in list(members):
-                if len(self.members(sp)) >= cap:
+                if self._room(sp) <= 0:
                     return
                 if a.action == "mate" and not a.bred and mate_ready(a, sc):
-                    self._birth([a], room=cap - len(self.members(sp)))
+                    self._birth([a], room=self._room(sp))
             return
         # One partner's choice is enough (rev. 2026-10-07): an animal that chose mate breeds with a
         # ready partner next to it, whatever that partner is doing. Before, both had to choose mate.
         seekers = [a for a in members if a.action == "mate" and not a.bred and mate_ready(a, sc)
                    and self._hunting_ground(a, sc)]
         for a in seekers:
-            if len(self.members(sp)) >= cap or a.bred:
+            if self._room(sp) <= 0 or a.bred:
                 continue
             for b in list(members):
                 if b is not a and not b.bred and mate_ready(b, sc) and cheb(a.y, a.x, b.y, b.x) <= 1:
-                    self._birth([a, b], room=cap - len(self.members(sp)))
+                    self._birth([a, b], room=self._room(sp))
                     break
 
-    def _migrate(self, sp: Species) -> None:
-        """cap_rule migrate: random animals (uniform, so no gene is favoured; this tick's babies stay)
-        leave until the species is back at its cap."""
-        sc = species_cfg(self.cfg, sp)
-        ms = self.members(sp)
-        excess = len(ms) - int(sc.cap)
-        if excess <= 0 or (sc.get("cap_rule") or "block") != "migrate":
+    def _migrate(self) -> None:
+        """cap_rule migrate: above the total cap, random animals leave until the total is back at
+        the cap. Uniform over both species, so no gene or species is favoured; this tick's babies stay."""
+        everyone = self.agents + self.predators
+        excess = len(everyone) - int(self.cfg.sim.cap)
+        if excess <= 0 or self._cap_rule() != "migrate":
             return
-        older = [i for i, a in enumerate(ms) if a.born < self.t]
-        pool = older if len(older) >= excess else list(range(len(ms)))
+        older = [i for i, a in enumerate(everyone) if a.born < self.t]
+        pool = older if len(older) >= excess else list(range(len(everyone)))
         leave = {int(i) for i in self.rng_migrate.choice(pool, size=excess, replace=False)}
         for i in sorted(leave):
-            self._die(ms[i], "migrated")
-        self._set_members(sp, [a for i, a in enumerate(ms) if i not in leave])
+            self._die(everyone[i], "migrated")
+        gone = {id(everyone[i]) for i in leave}
+        self.agents = [a for a in self.agents if id(a) not in gone]
+        self.predators = [a for a in self.predators if id(a) not in gone]
 
     def _hunting_ground(self, a: Agent, sc) -> bool:
         """predators.breed_prey_seen m (off when 0): a predator breeds only with at least m prey
