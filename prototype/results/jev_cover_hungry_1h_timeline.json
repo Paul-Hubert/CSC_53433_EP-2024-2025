@@ -1,0 +1,2513 @@
+{
+ "run": "jev_cover_hungry_1h",
+ "finished": true,
+ "every": 100,
+ "window": 400,
+ "drops": 500,
+ "summary": {
+  "ticks": 1293,
+  "seed": 1234,
+  "backend": "jev",
+  "pop_final": 265,
+  "births": 1872,
+  "immigrants": 0,
+  "hatched": 0,
+  "deaths": {
+   "predator": 682,
+   "starvation": 655,
+   "migrated": 406
+  },
+  "mean_lifespan": 154.1,
+  "max_gen": 8,
+  "decisions": 75911,
+  "backend_queries": 45749,
+  "memo_hit_rate": 0.394,
+  "backend_s": 3164.87,
+  "invalid_rate": 0.009,
+  "exhausted_share": 0.034,
+  "action_share": {
+   "eat": 0.561,
+   "mate": 0.17,
+   "follow": 0.129,
+   "rest": 0.095,
+   "flee": 0.045
+  },
+  "predators": {
+   "pop_final": 67,
+   "births": 372,
+   "immigrants": 0,
+   "hatched": 0,
+   "deaths": {
+    "starvation": 128,
+    "migrated": 205
+   },
+   "mean_lifespan": 191.8,
+   "max_gen": 7,
+   "decisions": 6426,
+   "backend_queries": 3504,
+   "memo_hit_rate": 0.44,
+   "backend_s": 243.04,
+   "invalid_rate": 0.027,
+   "exhausted_share": 0.0,
+   "action_share": {
+    "hunt": 0.438,
+    "mate": 0.275,
+    "follow": 0.241,
+    "rest": 0.046
+   },
+   "kills": 682,
+   "portions": 1009
+  },
+  "mutations": {
+   "tried": 326,
+   "ok": 325,
+   "calls": 416,
+   "rejected": {
+    "invalid": 91
+   }
+  },
+  "alleles": 384,
+  "events_sha": "73e4e0486355253b",
+  "stopped": "time limit",
+  "minutes": 60.1,
+  "llm_calls": 46536,
+  "failures": 0,
+  "mutation_calls": 393
+ },
+ "checkpoints": [
+  {
+   "t": 0,
+   "families": 134,
+   "common": [],
+   "pop": 134
+  },
+  {
+   "t": 100,
+   "families": 87,
+   "common": [],
+   "pop": 87
+  },
+  {
+   "t": 200,
+   "families": 63,
+   "common": [],
+   "pop": 160
+  },
+  {
+   "t": 300,
+   "families": 58,
+   "common": [],
+   "pop": 169
+  },
+  {
+   "t": 400,
+   "families": 58,
+   "common": [],
+   "pop": 259
+  },
+  {
+   "t": 500,
+   "families": 58,
+   "common": [],
+   "pop": 269
+  },
+  {
+   "t": 600,
+   "families": 57,
+   "common": [],
+   "pop": 255
+  },
+  {
+   "t": 700,
+   "families": 53,
+   "common": [],
+   "pop": 263
+  },
+  {
+   "t": 800,
+   "families": 52,
+   "common": [],
+   "pop": 264
+  },
+  {
+   "t": 900,
+   "families": 52,
+   "common": [],
+   "pop": 254
+  },
+  {
+   "t": 1000,
+   "families": 50,
+   "common": [],
+   "pop": 270
+  },
+  {
+   "t": 1100,
+   "families": 50,
+   "common": [],
+   "pop": 269
+  },
+  {
+   "t": 1200,
+   "families": 50,
+   "common": [],
+   "pop": 268
+  },
+  {
+   "t": 1293,
+   "families": 50,
+   "common": [],
+   "pop": 265
+  }
+ ],
+ "sweeps": [
+  {
+   "gene": "eat:1",
+   "slot": "eat",
+   "text": "Eat whenever food is close.",
+   "origin": "founder text",
+   "depth": 0,
+   "instruction": null,
+   "first": 0,
+   "to_25": 100,
+   "to_50": null,
+   "to_90": null,
+   "peak": 0.4792,
+   "peak_t": 1293,
+   "fixed_t": null,
+   "end": 0.4792,
+   "fate": "present, 48%",
+   "lineage": [
+    "Eat whenever food is close.  ← founder"
+   ]
+  },
+  {
+   "gene": "eat:2",
+   "slot": "eat",
+   "text": "Only look for food when energy is low.",
+   "origin": "founder text",
+   "depth": 0,
+   "instruction": null,
+   "first": 0,
+   "to_25": 400,
+   "to_50": null,
+   "to_90": null,
+   "peak": 0.3507,
+   "peak_t": 1200,
+   "fixed_t": null,
+   "end": 0.3057,
+   "fate": "present, 31%",
+   "lineage": [
+    "Only look for food when energy is low.  ← founder"
+   ]
+  },
+  {
+   "gene": "flee:1",
+   "slot": "flee",
+   "text": "Run from any predator you see.",
+   "origin": "founder text",
+   "depth": 0,
+   "instruction": null,
+   "first": 0,
+   "to_25": 200,
+   "to_50": null,
+   "to_90": null,
+   "peak": 0.2625,
+   "peak_t": 200,
+   "fixed_t": null,
+   "end": 0.1132,
+   "fate": "present, 11%",
+   "lineage": [
+    "Run from any predator you see.  ← founder"
+   ]
+  },
+  {
+   "gene": "flee:2",
+   "slot": "flee",
+   "text": "Flee only when a predator is very close.",
+   "origin": "founder text",
+   "depth": 0,
+   "instruction": null,
+   "first": 0,
+   "to_25": 800,
+   "to_50": null,
+   "to_90": null,
+   "peak": 0.2981,
+   "peak_t": 1293,
+   "fixed_t": null,
+   "end": 0.2981,
+   "fate": "present, 30%",
+   "lineage": [
+    "Flee only when a predator is very close.  ← founder"
+   ]
+  },
+  {
+   "gene": "flee:3",
+   "slot": "flee",
+   "text": "Stay calm unless danger is right next to you.",
+   "origin": "founder text",
+   "depth": 0,
+   "instruction": null,
+   "first": 0,
+   "to_25": 300,
+   "to_50": null,
+   "to_90": null,
+   "peak": 0.2722,
+   "peak_t": 300,
+   "fixed_t": null,
+   "end": 0.2189,
+   "fate": "present, 22%",
+   "lineage": [
+    "Stay calm unless danger is right next to you.  ← founder"
+   ]
+  },
+  {
+   "gene": "flee:4",
+   "slot": "flee",
+   "text": "Run away from anything that attacks you.",
+   "origin": "founder text",
+   "depth": 0,
+   "instruction": null,
+   "first": 0,
+   "to_25": 100,
+   "to_50": null,
+   "to_90": null,
+   "peak": 0.2644,
+   "peak_t": 100,
+   "fixed_t": null,
+   "end": 0.1698,
+   "fate": "present, 17%",
+   "lineage": [
+    "Run away from anything that attacks you.  ← founder"
+   ]
+  },
+  {
+   "gene": "follow:2",
+   "slot": "follow",
+   "text": "Follow others when you are lost or hungry.",
+   "origin": "founder text",
+   "depth": 0,
+   "instruction": null,
+   "first": 0,
+   "to_25": 800,
+   "to_50": null,
+   "to_90": null,
+   "peak": 0.2841,
+   "peak_t": 800,
+   "fixed_t": null,
+   "end": 0.2151,
+   "fate": "present, 22%",
+   "lineage": [
+    "Follow others when you are lost or hungry.  ← founder"
+   ]
+  },
+  {
+   "gene": "follow:3",
+   "slot": "follow",
+   "text": "Keep your distance from other animals.",
+   "origin": "founder text",
+   "depth": 0,
+   "instruction": null,
+   "first": 0,
+   "to_25": 0,
+   "to_50": null,
+   "to_90": null,
+   "peak": 0.4724,
+   "peak_t": 900,
+   "fixed_t": null,
+   "end": 0.3358,
+   "fate": "present, 34%",
+   "lineage": [
+    "Keep your distance from other animals.  ← founder"
+   ]
+  },
+  {
+   "gene": "rest:0",
+   "slot": "rest",
+   "text": "No preference.",
+   "origin": "founder text",
+   "depth": 0,
+   "instruction": null,
+   "first": 0,
+   "to_25": 0,
+   "to_50": null,
+   "to_90": null,
+   "peak": 0.2906,
+   "peak_t": 1293,
+   "fixed_t": null,
+   "end": 0.2906,
+   "fate": "present, 29%",
+   "lineage": [
+    "No preference.  ← neutral"
+   ]
+  },
+  {
+   "gene": "rest:3",
+   "slot": "rest",
+   "text": "Rest only when you feel safe.",
+   "origin": "founder text",
+   "depth": 0,
+   "instruction": null,
+   "first": 0,
+   "to_25": 700,
+   "to_50": null,
+   "to_90": null,
+   "peak": 0.3569,
+   "peak_t": 1100,
+   "fixed_t": null,
+   "end": 0.3132,
+   "fate": "present, 31%",
+   "lineage": [
+    "Rest only when you feel safe.  ← founder"
+   ]
+  },
+  {
+   "gene": "mate:1",
+   "slot": "mate",
+   "text": "Look for a partner when energy is high.",
+   "origin": "founder text",
+   "depth": 0,
+   "instruction": null,
+   "first": 0,
+   "to_25": 1000,
+   "to_50": null,
+   "to_90": null,
+   "peak": 0.2649,
+   "peak_t": 1200,
+   "fixed_t": null,
+   "end": 0.2453,
+   "fate": "present, 25%",
+   "lineage": [
+    "Look for a partner when energy is high.  ← founder"
+   ]
+  },
+  {
+   "gene": "mate:3",
+   "slot": "mate",
+   "text": "Mate only when food is plentiful.",
+   "origin": "founder text",
+   "depth": 0,
+   "instruction": null,
+   "first": 0,
+   "to_25": 800,
+   "to_50": null,
+   "to_90": null,
+   "peak": 0.2614,
+   "peak_t": 800,
+   "fixed_t": null,
+   "end": 0.0943,
+   "fate": "present, 9%",
+   "lineage": [
+    "Mate only when food is plentiful.  ← founder"
+   ]
+  },
+  {
+   "gene": "mate:4",
+   "slot": "mate",
+   "text": "Seek a partner before growing old.",
+   "origin": "founder text",
+   "depth": 0,
+   "instruction": null,
+   "first": 0,
+   "to_25": 100,
+   "to_50": null,
+   "to_90": null,
+   "peak": 0.2722,
+   "peak_t": 300,
+   "fixed_t": null,
+   "end": 0.1472,
+   "fate": "present, 15%",
+   "lineage": [
+    "Seek a partner before growing old.  ← founder"
+   ]
+  }
+ ],
+ "leaders": {
+  "eat": [
+   [
+    0,
+    "eat:1",
+    "Eat whenever food is close.",
+    0.2463
+   ],
+   [
+    600,
+    "eat:2",
+    "Only look for food when energy is low.",
+    0.3216
+   ],
+   [
+    900,
+    "eat:1",
+    "Eat whenever food is close.",
+    0.4055
+   ]
+  ],
+  "flee": [
+   [
+    0,
+    "flee:4",
+    "Run away from anything that attacks you.",
+    0.2313
+   ],
+   [
+    200,
+    "flee:1",
+    "Run from any predator you see.",
+    0.2625
+   ],
+   [
+    300,
+    "flee:3",
+    "Stay calm unless danger is right next to you.",
+    0.2722
+   ],
+   [
+    400,
+    "flee:1",
+    "Run from any predator you see.",
+    0.2394
+   ],
+   [
+    500,
+    "flee:3",
+    "Stay calm unless danger is right next to you.",
+    0.2193
+   ],
+   [
+    800,
+    "flee:2",
+    "Flee only when a predator is very close.",
+    0.2727
+   ]
+  ],
+  "follow": [
+   [
+    0,
+    "follow:3",
+    "Keep your distance from other animals.",
+    0.2761
+   ]
+  ],
+  "rest": [
+   [
+    0,
+    "rest:0",
+    "No preference.",
+    0.2687
+   ],
+   [
+    300,
+    "rest:3",
+    "Rest only when you feel safe.",
+    0.2189
+   ],
+   [
+    400,
+    "rest:2",
+    "Never stop moving.",
+    0.2201
+   ],
+   [
+    500,
+    "rest:0",
+    "No preference.",
+    0.2119
+   ],
+   [
+    600,
+    "rest:3",
+    "Rest only when you feel safe.",
+    0.2314
+   ]
+  ],
+  "mate": [
+   [
+    0,
+    "mate:4",
+    "Seek a partner before growing old.",
+    0.2463
+   ],
+   [
+    400,
+    "mate:0",
+    "No preference.",
+    0.2162
+   ],
+   [
+    500,
+    "mate:3",
+    "Mate only when food is plentiful.",
+    0.2342
+   ],
+   [
+    700,
+    "mate:1",
+    "Look for a partner when energy is high.",
+    0.2205
+   ],
+   [
+    800,
+    "mate:3",
+    "Mate only when food is plentiful.",
+    0.2614
+   ],
+   [
+    1000,
+    "mate:1",
+    "Look for a partner when energy is high.",
+    0.2593
+   ]
+  ]
+ },
+ "mutants": {
+  "produced": {
+   "n": 286,
+   "small": 0.0,
+   "big": 0.5385,
+   "words_changed": 5.2413,
+   "jumps": 0.3881,
+   "words": 6.8916,
+   "world": 0.8846,
+   "depth": 1.0874
+  },
+  "spread": {
+   "n": 30,
+   "small": 0.0,
+   "big": 0.5667,
+   "words_changed": 4.3,
+   "jumps": 0.3333,
+   "words": 6.7,
+   "world": 0.8667,
+   "depth": 1.0333
+  },
+  "most": {
+   "n": 75,
+   "small": 0.0,
+   "big": 0.52,
+   "words_changed": 5.1733,
+   "jumps": 0.3733,
+   "words": 7.2667,
+   "world": 0.8667,
+   "depth": 1.0667,
+   "t": 1293
+  },
+  "alive": {
+   "n": 75,
+   "small": 0.0,
+   "big": 0.52,
+   "words_changed": 5.1733,
+   "jumps": 0.3733,
+   "words": 7.2667,
+   "world": 0.8667,
+   "depth": 1.0667
+  },
+  "no_selection": {
+   "n": 144,
+   "small": 0.0,
+   "big": 0.5764,
+   "words_changed": 4.8333,
+   "jumps": 0.3472,
+   "words": 6.6597,
+   "world": 0.9167,
+   "depth": 1.0
+  },
+  "per_1000_births": 154.9145,
+  "tried_ok": {
+   "tried": 326,
+   "ok": 325,
+   "calls": 416,
+   "rejected": {
+    "invalid": 91
+   }
+  }
+ },
+ "gene_drop": {
+  "eat:1": {
+   "t": [
+    0,
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000,
+    1100,
+    1200,
+    1293
+   ],
+   "share": [
+    0.2463,
+    0.2644,
+    0.2687,
+    0.3077,
+    0.3436,
+    0.3086,
+    0.3059,
+    0.3422,
+    0.322,
+    0.4055,
+    0.4259,
+    0.4238,
+    0.4627,
+    0.4792
+   ],
+   "expected": [
+    0.2463,
+    0.2644,
+    0.2616,
+    0.2642,
+    0.2834,
+    0.2482,
+    0.2398,
+    0.2424,
+    0.2325,
+    0.244,
+    0.2576,
+    0.2496,
+    0.281,
+    0.2827
+   ],
+   "p_hi": [
+    1.0,
+    1.0,
+    0.424,
+    0.03,
+    0.04,
+    0.036,
+    0.066,
+    0.038,
+    0.07,
+    0.012,
+    0.008,
+    0.008,
+    0.022,
+    0.018
+   ],
+   "p_lo": [
+    1.0,
+    1.0,
+    0.686,
+    0.99,
+    0.966,
+    0.97,
+    0.952,
+    0.966,
+    0.938,
+    0.988,
+    0.992,
+    0.992,
+    0.98,
+    0.988
+   ]
+  },
+  "eat:2": {
+   "t": [
+    0,
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000,
+    1100,
+    1200,
+    1293
+   ],
+   "share": [
+    0.1418,
+    0.1609,
+    0.225,
+    0.2426,
+    0.2703,
+    0.2788,
+    0.3216,
+    0.3498,
+    0.3371,
+    0.3346,
+    0.3259,
+    0.3346,
+    0.3507,
+    0.3057
+   ],
+   "expected": [
+    0.1418,
+    0.1609,
+    0.2006,
+    0.225,
+    0.2403,
+    0.247,
+    0.3007,
+    0.3352,
+    0.3146,
+    0.3483,
+    0.3563,
+    0.3506,
+    0.3533,
+    0.3465
+   ],
+   "p_hi": [
+    1.0,
+    1.0,
+    0.146,
+    0.244,
+    0.19,
+    0.214,
+    0.35,
+    0.43,
+    0.382,
+    0.576,
+    0.64,
+    0.57,
+    0.498,
+    0.658
+   ],
+   "p_lo": [
+    1.0,
+    1.0,
+    0.926,
+    0.842,
+    0.836,
+    0.824,
+    0.676,
+    0.596,
+    0.65,
+    0.44,
+    0.372,
+    0.448,
+    0.518,
+    0.356
+   ]
+  },
+  "flee:1": {
+   "t": [
+    0,
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000,
+    1100,
+    1200,
+    1293
+   ],
+   "share": [
+    0.2239,
+    0.2414,
+    0.2625,
+    0.2485,
+    0.2394,
+    0.2082,
+    0.2039,
+    0.1711,
+    0.0985,
+    0.0945,
+    0.1074,
+    0.0967,
+    0.1567,
+    0.1132
+   ],
+   "expected": [
+    0.2239,
+    0.2414,
+    0.2706,
+    0.263,
+    0.2364,
+    0.2067,
+    0.2062,
+    0.2178,
+    0.2082,
+    0.1931,
+    0.1867,
+    0.1903,
+    0.1993,
+    0.1873
+   ],
+   "p_hi": [
+    1.0,
+    1.0,
+    0.68,
+    0.78,
+    0.502,
+    0.524,
+    0.524,
+    0.806,
+    0.97,
+    0.952,
+    0.87,
+    0.906,
+    0.696,
+    0.804
+   ],
+   "p_lo": [
+    1.0,
+    1.0,
+    0.424,
+    0.304,
+    0.546,
+    0.516,
+    0.504,
+    0.218,
+    0.038,
+    0.05,
+    0.142,
+    0.102,
+    0.314,
+    0.21
+   ]
+  },
+  "flee:2": {
+   "t": [
+    0,
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000,
+    1100,
+    1200,
+    1293
+   ],
+   "share": [
+    0.1642,
+    0.1609,
+    0.1875,
+    0.1598,
+    0.166,
+    0.1561,
+    0.1608,
+    0.2319,
+    0.2727,
+    0.2756,
+    0.2815,
+    0.2788,
+    0.2836,
+    0.2981
+   ],
+   "expected": [
+    0.1642,
+    0.1609,
+    0.1866,
+    0.1533,
+    0.165,
+    0.1645,
+    0.1412,
+    0.1646,
+    0.1714,
+    0.1704,
+    0.1817,
+    0.1873,
+    0.2157,
+    0.2072
+   ],
+   "p_hi": [
+    1.0,
+    1.0,
+    0.564,
+    0.394,
+    0.506,
+    0.636,
+    0.276,
+    0.088,
+    0.032,
+    0.044,
+    0.06,
+    0.088,
+    0.204,
+    0.13
+   ],
+   "p_lo": [
+    1.0,
+    1.0,
+    0.584,
+    0.718,
+    0.554,
+    0.434,
+    0.756,
+    0.916,
+    0.976,
+    0.962,
+    0.952,
+    0.922,
+    0.804,
+    0.878
+   ]
+  },
+  "flee:3": {
+   "t": [
+    0,
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000,
+    1100,
+    1200,
+    1293
+   ],
+   "share": [
+    0.194,
+    0.2184,
+    0.1938,
+    0.2722,
+    0.2239,
+    0.2193,
+    0.2549,
+    0.27,
+    0.2576,
+    0.2087,
+    0.2333,
+    0.2342,
+    0.2239,
+    0.2189
+   ],
+   "expected": [
+    0.194,
+    0.2184,
+    0.195,
+    0.2466,
+    0.2323,
+    0.2216,
+    0.2317,
+    0.2203,
+    0.2075,
+    0.1922,
+    0.1864,
+    0.1632,
+    0.1508,
+    0.1453
+   ],
+   "p_hi": [
+    1.0,
+    1.0,
+    0.614,
+    0.15,
+    0.63,
+    0.544,
+    0.32,
+    0.182,
+    0.184,
+    0.394,
+    0.24,
+    0.142,
+    0.15,
+    0.16
+   ],
+   "p_lo": [
+    1.0,
+    1.0,
+    0.54,
+    0.902,
+    0.416,
+    0.496,
+    0.712,
+    0.838,
+    0.834,
+    0.616,
+    0.782,
+    0.866,
+    0.862,
+    0.85
+   ]
+  },
+  "flee:4": {
+   "t": [
+    0,
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000,
+    1100,
+    1200,
+    1293
+   ],
+   "share": [
+    0.2313,
+    0.2644,
+    0.2125,
+    0.1716,
+    0.1853,
+    0.1933,
+    0.1804,
+    0.1293,
+    0.1894,
+    0.1693,
+    0.137,
+    0.145,
+    0.1455,
+    0.1698
+   ],
+   "expected": [
+    0.2313,
+    0.2644,
+    0.2247,
+    0.1919,
+    0.2102,
+    0.2125,
+    0.2259,
+    0.2209,
+    0.2314,
+    0.2369,
+    0.2416,
+    0.2539,
+    0.2306,
+    0.2568
+   ],
+   "p_hi": [
+    1.0,
+    1.0,
+    0.756,
+    0.878,
+    0.8,
+    0.722,
+    0.872,
+    0.99,
+    0.79,
+    0.86,
+    0.946,
+    0.932,
+    0.892,
+    0.86
+   ],
+   "p_lo": [
+    1.0,
+    1.0,
+    0.336,
+    0.19,
+    0.222,
+    0.326,
+    0.154,
+    0.016,
+    0.23,
+    0.146,
+    0.058,
+    0.07,
+    0.118,
+    0.142
+   ]
+  },
+  "follow:2": {
+   "t": [
+    0,
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000,
+    1100,
+    1200,
+    1293
+   ],
+   "share": [
+    0.2015,
+    0.2069,
+    0.2062,
+    0.2249,
+    0.2085,
+    0.2416,
+    0.2118,
+    0.2167,
+    0.2841,
+    0.2402,
+    0.2519,
+    0.2379,
+    0.2239,
+    0.2151
+   ],
+   "expected": [
+    0.2015,
+    0.2069,
+    0.2213,
+    0.2186,
+    0.2204,
+    0.231,
+    0.2215,
+    0.2141,
+    0.2118,
+    0.2015,
+    0.1945,
+    0.198,
+    0.1896,
+    0.1963
+   ],
+   "p_hi": [
+    1.0,
+    1.0,
+    0.824,
+    0.444,
+    0.684,
+    0.386,
+    0.614,
+    0.476,
+    0.104,
+    0.266,
+    0.186,
+    0.292,
+    0.32,
+    0.424
+   ],
+   "p_lo": [
+    1.0,
+    1.0,
+    0.266,
+    0.666,
+    0.37,
+    0.656,
+    0.438,
+    0.552,
+    0.912,
+    0.768,
+    0.828,
+    0.73,
+    0.712,
+    0.598
+   ]
+  },
+  "follow:3": {
+   "t": [
+    0,
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000,
+    1100,
+    1200,
+    1293
+   ],
+   "share": [
+    0.2761,
+    0.3103,
+    0.375,
+    0.3609,
+    0.4324,
+    0.461,
+    0.4667,
+    0.4373,
+    0.4432,
+    0.4724,
+    0.4259,
+    0.4312,
+    0.3582,
+    0.3358
+   ],
+   "expected": [
+    0.2761,
+    0.3103,
+    0.3939,
+    0.3812,
+    0.3871,
+    0.4116,
+    0.4035,
+    0.385,
+    0.3901,
+    0.3912,
+    0.3844,
+    0.3775,
+    0.3618,
+    0.3385
+   ],
+   "p_hi": [
+    1.0,
+    1.0,
+    0.832,
+    0.808,
+    0.062,
+    0.1,
+    0.068,
+    0.14,
+    0.18,
+    0.1,
+    0.266,
+    0.252,
+    0.5,
+    0.498
+   ],
+   "p_lo": [
+    1.0,
+    1.0,
+    0.238,
+    0.238,
+    0.938,
+    0.918,
+    0.948,
+    0.874,
+    0.838,
+    0.914,
+    0.744,
+    0.766,
+    0.514,
+    0.518
+   ]
+  },
+  "rest:0": {
+   "t": [
+    0,
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000,
+    1100,
+    1200,
+    1293
+   ],
+   "share": [
+    0.2687,
+    0.2759,
+    0.2125,
+    0.1953,
+    0.2046,
+    0.2119,
+    0.2157,
+    0.1521,
+    0.1818,
+    0.2126,
+    0.2296,
+    0.2491,
+    0.2425,
+    0.2906
+   ],
+   "expected": [
+    0.2687,
+    0.2759,
+    0.2248,
+    0.2064,
+    0.1928,
+    0.179,
+    0.1683,
+    0.1323,
+    0.13,
+    0.1297,
+    0.1182,
+    0.1289,
+    0.1227,
+    0.1446
+   ],
+   "p_hi": [
+    1.0,
+    1.0,
+    0.856,
+    0.826,
+    0.292,
+    0.108,
+    0.09,
+    0.272,
+    0.11,
+    0.058,
+    0.03,
+    0.032,
+    0.026,
+    0.026
+   ],
+   "p_lo": [
+    1.0,
+    1.0,
+    0.28,
+    0.314,
+    0.76,
+    0.918,
+    0.938,
+    0.752,
+    0.902,
+    0.95,
+    0.974,
+    0.968,
+    0.978,
+    0.98
+   ]
+  },
+  "rest:3": {
+   "t": [
+    0,
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000,
+    1100,
+    1200,
+    1293
+   ],
+   "share": [
+    0.2015,
+    0.2184,
+    0.2062,
+    0.2189,
+    0.2162,
+    0.2007,
+    0.2314,
+    0.289,
+    0.2765,
+    0.311,
+    0.3259,
+    0.3569,
+    0.3433,
+    0.3132
+   ],
+   "expected": [
+    0.2015,
+    0.2184,
+    0.1985,
+    0.2232,
+    0.2445,
+    0.2248,
+    0.2517,
+    0.2493,
+    0.2456,
+    0.2688,
+    0.2922,
+    0.3041,
+    0.3254,
+    0.3283
+   ],
+   "p_hi": [
+    1.0,
+    1.0,
+    0.376,
+    0.616,
+    0.83,
+    0.742,
+    0.678,
+    0.238,
+    0.296,
+    0.276,
+    0.318,
+    0.258,
+    0.42,
+    0.56
+   ],
+   "p_lo": [
+    1.0,
+    1.0,
+    0.734,
+    0.498,
+    0.204,
+    0.286,
+    0.354,
+    0.79,
+    0.732,
+    0.738,
+    0.702,
+    0.754,
+    0.602,
+    0.456
+   ]
+  },
+  "mate:1": {
+   "t": [
+    0,
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000,
+    1100,
+    1200,
+    1293
+   ],
+   "share": [
+    0.1791,
+    0.1954,
+    0.1625,
+    0.1716,
+    0.1776,
+    0.1784,
+    0.1725,
+    0.2205,
+    0.178,
+    0.2205,
+    0.2593,
+    0.2528,
+    0.2649,
+    0.2453
+   ],
+   "expected": [
+    0.1791,
+    0.1954,
+    0.1819,
+    0.1749,
+    0.1841,
+    0.1839,
+    0.2028,
+    0.2141,
+    0.2053,
+    0.2023,
+    0.2032,
+    0.2103,
+    0.1936,
+    0.1997
+   ],
+   "p_hi": [
+    1.0,
+    1.0,
+    0.918,
+    0.652,
+    0.622,
+    0.58,
+    0.76,
+    0.448,
+    0.69,
+    0.382,
+    0.24,
+    0.296,
+    0.184,
+    0.296
+   ],
+   "p_lo": [
+    1.0,
+    1.0,
+    0.17,
+    0.486,
+    0.422,
+    0.456,
+    0.27,
+    0.568,
+    0.332,
+    0.628,
+    0.77,
+    0.718,
+    0.826,
+    0.722
+   ]
+  },
+  "mate:3": {
+   "t": [
+    0,
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000,
+    1100,
+    1200,
+    1293
+   ],
+   "share": [
+    0.194,
+    0.1609,
+    0.15,
+    0.1953,
+    0.1931,
+    0.2342,
+    0.2157,
+    0.2053,
+    0.2614,
+    0.2323,
+    0.1778,
+    0.1264,
+    0.0933,
+    0.0943
+   ],
+   "expected": [
+    0.194,
+    0.1609,
+    0.1385,
+    0.2024,
+    0.1797,
+    0.1939,
+    0.1732,
+    0.1582,
+    0.1771,
+    0.1721,
+    0.1476,
+    0.1319,
+    0.1197,
+    0.103
+   ],
+   "p_hi": [
+    1.0,
+    1.0,
+    0.314,
+    0.664,
+    0.33,
+    0.144,
+    0.166,
+    0.15,
+    0.064,
+    0.144,
+    0.27,
+    0.538,
+    0.692,
+    0.534
+   ],
+   "p_lo": [
+    1.0,
+    1.0,
+    0.8,
+    0.436,
+    0.724,
+    0.88,
+    0.854,
+    0.872,
+    0.952,
+    0.868,
+    0.758,
+    0.492,
+    0.338,
+    0.502
+   ]
+  },
+  "mate:4": {
+   "t": [
+    0,
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000,
+    1100,
+    1200,
+    1293
+   ],
+   "share": [
+    0.2463,
+    0.2529,
+    0.25,
+    0.2722,
+    0.2046,
+    0.1673,
+    0.1412,
+    0.1521,
+    0.1591,
+    0.1417,
+    0.1111,
+    0.1004,
+    0.1269,
+    0.1472
+   ],
+   "expected": [
+    0.2463,
+    0.2529,
+    0.304,
+    0.3171,
+    0.2852,
+    0.273,
+    0.2497,
+    0.2482,
+    0.2373,
+    0.2414,
+    0.2157,
+    0.2112,
+    0.2006,
+    0.1939
+   ],
+   "p_hi": [
+    1.0,
+    1.0,
+    0.998,
+    0.974,
+    0.998,
+    0.998,
+    0.998,
+    0.96,
+    0.922,
+    0.942,
+    0.948,
+    0.96,
+    0.838,
+    0.728
+   ],
+   "p_lo": [
+    1.0,
+    1.0,
+    0.01,
+    0.048,
+    0.004,
+    0.002,
+    0.002,
+    0.048,
+    0.084,
+    0.062,
+    0.062,
+    0.05,
+    0.176,
+    0.286
+   ]
+  }
+ },
+ "sweeps_vs_inheritance_alone": {
+  "mutants that reached 50 %": {
+   "real": 0,
+   "median": 0.0,
+   "lo": 0.0,
+   "hi": 0.0,
+   "p_hi": 1.0
+  },
+  "mutants that reached 90 %": {
+   "real": 0,
+   "median": 0.0,
+   "lo": 0.0,
+   "hi": 0.0,
+   "p_hi": 1.0
+  },
+  "founder texts that reached 90 %": {
+   "real": 0,
+   "median": 0.0,
+   "lo": 0.0,
+   "hi": 0.0,
+   "p_hi": 1.0
+  }
+ },
+ "singled_out": null,
+ "families": {
+  "roots": [
+   {
+    "id": 0,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 1,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 2,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 3,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 4,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 5,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 6,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 7,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 8,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 9,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 10,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 11,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 12,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 13,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 14,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 15,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 16,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 17,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 18,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 19,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 20,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 21,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 22,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 23,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 24,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 25,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 26,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 27,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 28,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 29,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 30,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 31,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 32,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 33,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 34,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 35,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 36,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 37,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 38,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 39,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 40,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 41,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 42,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 43,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 44,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 45,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 46,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 47,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 48,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 49,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 50,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 51,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 52,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 53,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 54,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 55,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 56,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 57,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 58,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 59,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 60,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 61,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 62,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 63,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 64,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 65,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 66,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 67,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 68,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 69,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 70,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 71,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 72,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 73,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 74,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 75,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 76,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 77,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 78,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 79,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 80,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 81,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 82,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 83,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 84,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 85,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 86,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 87,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 88,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 89,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 90,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 91,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 92,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 93,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 94,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 95,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 96,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 97,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 98,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 99,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 100,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 101,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 102,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 103,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 104,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 105,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 106,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 107,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 108,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 109,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 110,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 111,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 112,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 113,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 114,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 115,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 116,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 117,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 118,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 119,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 120,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 121,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 122,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 123,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 124,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 125,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 126,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 127,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 128,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 129,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 130,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 131,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 132,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 133,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 134,
+    "kind": "founder",
+    "t": 0
+   },
+   {
+    "id": 135,
+    "kind": "founder",
+    "t": 0
+   }
+  ],
+  "contribution_at_end": {
+   "68": 0.0029,
+   "69": 0.0029,
+   "78": 0.0398,
+   "54": 0.0654,
+   "97": 0.0544,
+   "128": 0.0036,
+   "8": 0.0574,
+   "113": 0.0073,
+   "110": 0.0216,
+   "28": 0.0769,
+   "52": 0.044,
+   "40": 0.0074,
+   "103": 0.0611,
+   "13": 0.0755,
+   "75": 0.0755,
+   "19": 0.0079,
+   "57": 0.0236,
+   "16": 0.0323,
+   "25": 0.0183,
+   "6": 0.0426,
+   "87": 0.0259,
+   "125": 0.0192,
+   "72": 0.0345,
+   "115": 0.0117,
+   "11": 0.0211,
+   "94": 0.0154,
+   "117": 0.0209,
+   "3": 0.0156,
+   "51": 0.0088,
+   "135": 0.0064,
+   "21": 0.0192,
+   "45": 0.0204,
+   "10": 0.0081,
+   "129": 0.0054,
+   "1": 0.0058,
+   "18": 0.004,
+   "43": 0.0051,
+   "49": 0.0022,
+   "9": 0.0011,
+   "107": 0.0011,
+   "90": 0.0029,
+   "119": 0.0008,
+   "65": 0.0014,
+   "48": 0.0048,
+   "88": 0.0058,
+   "20": 0.0058,
+   "124": 0.004,
+   "79": 0.0005,
+   "46": 0.0005,
+   "84": 0.0009
+  }
+ },
+ "behaviour": [
+  {
+   "from": 0,
+   "to": 400,
+   "pop": 168.25,
+   "energy": 79.49,
+   "births_per_1000": 5.2749,
+   "kills_per_1000": 2.3626,
+   "starved_per_1000": 1.1441,
+   "newcomers": 0,
+   "lifespan": 126.9191,
+   "actions": {
+    "eat": 0.626,
+    "flee": 0.0305,
+    "follow": 0.115,
+    "rest": 0.0897,
+    "mate": 0.1388
+   }
+  },
+  {
+   "from": 400,
+   "to": 800,
+   "pop": 261.25,
+   "energy": 63.945,
+   "births_per_1000": 6.0957,
+   "kills_per_1000": 2.2297,
+   "starved_per_1000": 2.7368,
+   "newcomers": 0,
+   "lifespan": 164.8275,
+   "actions": {
+    "eat": 0.5324,
+    "flee": 0.0598,
+    "follow": 0.1343,
+    "rest": 0.1002,
+    "mate": 0.1733
+   }
+  },
+  {
+   "from": 800,
+   "to": 1200,
+   "pop": 262.0,
+   "energy": 69.4375,
+   "births_per_1000": 6.5553,
+   "kills_per_1000": 2.2615,
+   "starved_per_1000": 2.3473,
+   "newcomers": 0,
+   "lifespan": 156.1173,
+   "actions": {
+    "eat": 0.5495,
+    "flee": 0.0435,
+    "follow": 0.1323,
+    "rest": 0.096,
+    "mate": 0.1787
+   }
+  }
+ ],
+ "judge": {
+  "calls": 0,
+  "usable": {}
+ }
+}
