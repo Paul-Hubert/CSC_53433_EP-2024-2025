@@ -17,8 +17,10 @@ def terrain_cfg():
 def test_lab1_world_is_flat_with_uniform_food(cfg):
     w = World(cfg, Streams(5).get("world"))
     assert w.walkable.all() and not w.near_water.any()
-    assert np.unique(w.regrow_p).size == 1                 # same regrowth chance everywhere
-    assert abs(w.food.mean() - cfg.world.food_initial_fraction) < 0.02
+    grass = ~w.cover                                       # hungry cover since 2026-10-09: no food there
+    assert abs(w.cover.mean() - cfg.world.cover_fraction) < 0.02
+    assert np.unique(w.regrow_p[grass]).size == 1 and not w.regrow_p[w.cover].any()
+    assert not w.food[w.cover].any() and abs(w.food[grass].mean() - cfg.world.food_initial_fraction) < 0.02
 
 
 def test_world_fractions_and_connectivity(terrain_cfg):

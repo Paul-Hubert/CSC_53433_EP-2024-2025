@@ -20,7 +20,10 @@ def _ready(a, cfg_species):
 
 
 def test_options_are_off_by_default():
+    """Except cover: on by default since 2026-10-09 (20 % of cells, hungry)."""
     cfg, sim = _sim()
+    assert sim.world.cover is not None and not sim.world.food[sim.world.cover].any()
+    cfg, sim = _sim({"world": {"cover_fraction": 0}})
     assert sim.world.cover is None and not sim.world.in_cover(5, 5)
     p, a = sim.predators[0], sim.agents[0]
     assert strike_p(p, a, sim.predators, cfg.predators) == cfg.predators.kill_p
@@ -102,3 +105,13 @@ def test_egg_bank_refills_the_floor_with_real_offspring():
     assert c.hatched == n and c.immigrants == cfg.agents.floor - n      # the eggs, then founders
     hatched = [x for x in sim.agents if x.parents == (a.id, b.id)]
     assert len(hatched) == n and all(x.generation == 1 for x in hatched)
+
+
+def test_hungry_cover_never_grows_food():
+    cfg, sim = _sim({"world": {"food_regrow_p": 1.0}})
+    w = sim.world
+    w.food[:] = False
+    w.regrow_food(np.random.default_rng(0))
+    assert w.food[~w.cover].all() and not w.food[w.cover].any()
+    cfg, sim = _sim({"world": {"cover_food": True}})          # cover with food, as in the 2026-10-08 screens
+    assert sim.world.food[sim.world.cover].any()

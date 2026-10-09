@@ -4,23 +4,26 @@ world:
   # Lab 1 (2026-10-01): a flat world. No water and no mountains, so every cell is
   # walkable and food appears uniformly at random. The terrain and foliage labs change
   # this; configs/worlds/terrain_preview.yaml shows the built-in noise terrain.
-  width: 96                    # 64 x 64 until 2026-10-07 (owner: a bigger world, more predators)
-  height: 96
+  width: 192                   # rev. 2026-10-09 (owner: evolution test): 96 x 96 from 2026-10-07, 64 x 64 before
+  height: 192
   water_fraction: 0.0          # share of cells that are water (impassable)
   mountain_fraction: 0.0       # share of cells that are mountain (impassable)
   noise_octaves: [16, 8, 4]    # heightmap noise, used only when a fraction above is > 0
   min_walkable_connected: 0.60
   food_initial_fraction: 0.3   # rev. 2026-10-08 (owner: food quick and plentiful); 0.08 before
-  food_regrow_p: 0.005        # chance per empty cell per tick (≈ 200 ticks to regrow); 0.0007 from 2026-10-01 (food-limited, below cap)
+  food_regrow_p: 0.003        # chance per empty cell per tick (≈ 330 ticks to regrow); rev. 2026-10-09 (owner: a bit slower); 0.005 on 10-08, 0.0007 from 10-01
+  cover_fraction: 0.2         # cover (thickets, rev. 2026-10-09): predators can't see or kill prey in it; 0 = none
+  cover_seek: 6               # fleeing prey run into cover within this many cells
+  cover_food: false           # hungry cover: no food grows in cover, so hiding and eating compete
   food_water_bonus: 2.0        # regrowth multiplier near water (no effect without water)
   water_bonus_radius: 3
 perception:                   # both species (rev. 2026-10-07)
   bands: [1, 4, 10]           # distance bands in cells: adjacent <= 1, close <= 4, medium <= 10, far <= vision
   partner_range: 20           # cells within which an animal sees whether the nearest other one of its kind is ready to mate (4 until 2026-10-07)
 agents:                       # the prey animals
-  init_pop: 68                # 30 and 60 in the 64 x 64 world; scaled by area
+  init_pop: 136               # doubled 2026-10-09 with the 192 x 192 world (68 / cap 135 in 96 x 96)
   floor: 10
-  cap: 135
+  cap: 270
   cap_rule: migrate           # at the cap births go on; random older animals leave (rev. 2026-10-09; block = no births)
   vision: 20                  # cells (Chebyshev); was 12 with only near/far until 2026-10-07
   energy_max: 100.0
@@ -45,9 +48,9 @@ agents:                       # the prey animals
   wander_turn_p: 0.25         # random walk of an animal whose chosen action has nothing in sight
 predators:                    # genetic animals like the prey since 2026-10-07: genes, LLM brain, energy, breeding.
                               # kill_p and digest_ticks tuned 2026-10-07 (keyword brain, 4 seeds): both species coexist
-  init_pop: 14                # 6 and 15 in the 64 x 64 world; scaled by area
+  init_pop: 28                # doubled 2026-10-09 with the 192 x 192 world (14 / cap 34 in 96 x 96)
   floor: 3                    # newcomers from the predator founder pool below this
-  cap: 34
+  cap: 68
   cap_rule: migrate
   vision: 20                  # same as the prey
   energy_max: 100.0
@@ -61,7 +64,7 @@ predators:                    # genetic animals like the prey since 2026-10-07: 
   cost_regen: 0.3
   stamina_low: 10.0
   stamina_high: 20.0
-  kill_p: 0.1                 # chance that a strike kills; a hunting predator strikes when next to its prey
+  kill_p: 0.2                 # chance that a strike kills; a hunting predator strikes when next to its prey (0.1 until 2026-10-09)
   kill_gain: 60.0             # energy from one kill
   digest_ticks: 50            # after a kill the predator stays still and doesn't decide; after a carcass portion, in proportion (30 → 25 ticks)
   carcass_portions: 2         # a kill leaves a carcass: one portion each for up to 2 other predators (0 = no carcass)

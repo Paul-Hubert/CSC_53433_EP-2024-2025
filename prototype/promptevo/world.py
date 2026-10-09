@@ -5,7 +5,8 @@ A predator's kill leaves a carcass (since 2026-10-07) that other predators can e
 
 Two options against boom-bust crashes (2026-10-08, off by default; experiments/crash_sweep.py):
 - world.cover_fraction: patches of cover (thickets) where predators can't see or kill a prey
-  animal; fleeing prey run into cover within world.cover_seek cells.
+  animal; fleeing prey run into cover within world.cover_seek cells; world.cover_food false
+  (hungry cover, 2026-10-09): no food grows in cover, so hiding and eating compete.
 - world.patches: ridges (mountain, 1 cell thick) split the world into patches x patches areas,
   each joined to its neighbours by one gap of world.wall_gap cells."""
 from __future__ import annotations
@@ -109,6 +110,9 @@ class World:
         self.portions_eaten = 0             # carcass portions eaten so far (stats)
         # drawn last, so worlds without cover are the same as before
         self.cover = self._make_cover(rng_world) if float(wc.get("cover_fraction") or 0) > 0 else None
+        if self.cover is not None and wc.get("cover_food") is False:    # hungry cover: no food grows there
+            self.food &= ~self.cover
+            self.regrow_p = np.where(self.cover, 0.0, self.regrow_p)
 
     def _make_terrain(self, rng: np.random.Generator) -> np.ndarray:
         wc = self.cfg.world
