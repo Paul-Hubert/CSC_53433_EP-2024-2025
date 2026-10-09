@@ -59,7 +59,8 @@ through a food web, genes can be sentences or numbers.
 
 Each contract document lists numbered rules:
 
-> **SENSE-03 (MUST)** A sense returns exactly one token per animal and decision.
+> **SENSE-01 (MUST)** A sense reads one animal and the world and returns one
+> token from a finite list declared before the run.
 
 - **MUST**: every implementation keeps it; a test checks it.
 - **SHOULD**: the reference implementation keeps it; another implementation

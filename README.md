@@ -8,7 +8,8 @@
 > Documentation: [`Docs/prompt-genome/`](Docs/prompt-genome/README.md) ·
 > design history: [`Docs/redesign/`](Docs/redesign/README.md) · current state:
 > [`Docs/redesign/09-progress-log.md`](Docs/redesign/09-progress-log.md) · Python
-> prototype: [`prototype/`](prototype/README.md). The Unity instructions below are unchanged.
+> prototype: [`prototype/`](prototype/README.md) · contract and proposed Unity architecture:
+> [`Docs/Interface/`](Docs/Interface/README.md). The Unity instructions below are unchanged.
 
 ------
 

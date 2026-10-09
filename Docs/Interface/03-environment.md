@@ -32,7 +32,7 @@ gives ([04](04-species-and-food-web.md)).
 | Near water (terrain only) | cells within 3 m of water regrow 2 × faster |
 | In cover | no item at the start and no regrowth ("hungry cover"): hiding and eating compete |
 | Item energy | `eatGain` = 25 for the species that graze it (prey) |
-| Reach | an item is within reach when the animal stands in its cell (Python: on the same cell) |
+| Reach | an item is within reach when the animal is within 0.5 m of the item (Python: on the same cell) |
 
 The food layer can also come from the terrain's grass detail layer (foliage
 lab): the detail map is the cell grid, eating removes the grass.
