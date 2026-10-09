@@ -21,8 +21,10 @@ perception:                   # both species (rev. 2026-10-07)
   bands: [1, 4, 10]           # distance bands in cells: adjacent <= 1, close <= 4, medium <= 10, far <= vision
   partner_range: 20           # cells within which an animal sees whether the nearest other one of its kind is ready to mate (4 until 2026-10-07)
 agents:                       # the prey animals
-  init_pop: 136               # doubled 2026-10-09 with the 192 x 192 world (68 in 96 x 96)
+  init_pop: 136               # doubled 2026-10-09 with the 192 x 192 world (68 / cap 135 in 96 x 96)
   floor: 10
+  cap: 270
+  cap_rule: migrate           # at the cap births go on; random older animals leave (rev. 2026-10-09; block = no births)
   vision: 20                  # cells (Chebyshev); was 12 with only near/far until 2026-10-07
   energy_max: 100.0
   energy_start: 60.0
@@ -46,8 +48,10 @@ agents:                       # the prey animals
   wander_turn_p: 0.25         # random walk of an animal whose chosen action has nothing in sight
 predators:                    # genetic animals like the prey since 2026-10-07: genes, LLM brain, energy, breeding.
                               # kill_p and digest_ticks tuned 2026-10-07 (keyword brain, 4 seeds): both species coexist
-  init_pop: 28                # doubled 2026-10-09 with the 192 x 192 world (14 in 96 x 96)
+  init_pop: 28                # doubled 2026-10-09 with the 192 x 192 world (14 / cap 34 in 96 x 96)
   floor: 3                    # newcomers from the predator founder pool below this
+  cap: 68
+  cap_rule: migrate
   vision: 20                  # same as the prey
   energy_max: 100.0
   energy_start: 60.0
@@ -75,8 +79,6 @@ predators:                    # genetic animals like the prey since 2026-10-07: 
   energy_high: 70.0
   wander_turn_p: 0.25
 sim:
-  cap: 500                    # all animals together, prey + predators (rev. 2026-10-09; before one per species: 270 / 68)
-  cap_rule: migrate           # at the cap births go on; random older animals of either species leave; block = no births
   decision_period: 4
   sampling_temperature: 1.0
   stats_every: 100

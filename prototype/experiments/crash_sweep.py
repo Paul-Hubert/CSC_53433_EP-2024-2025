@@ -1,6 +1,6 @@
 """Do both species last without rescue? Boom-bust screening without model calls.
 
-    python -m experiments.crash_sweep [--variants baseline,cover20] [--kill-p 0.1,0.2] [--seeds 4]
+    python -m experiments.crash_sweep [--variants baseline,cap20] [--kill-p 0.1,0.2] [--seeds 4]
                                       [--ticks 20000] [--workers 24] [--brain llmlike|keyword] [--tag crash_v1]
 
 Every run has floor 0 for both species (no newcomers with founder genes: an extinction is
@@ -13,8 +13,7 @@ the keyword brain's prey flee too well to show the crashes, also with the LLM's 
 
 Per variant and kill_p: runs where both species lasted, median ticks to the first extinction
 (runs that lasted count as --ticks), who died out, population ranges, how often the predators
-sat at the cap (all animals together since 2026-10-09; before, per species), and the mean
-generation at the end (evolution time).
+sat at their cap, and the mean generation at the end (evolution time).
 Writes results/<tag>.md and .json; logs/<tag>.progress.json while it runs.
 """
 from __future__ import annotations
@@ -81,7 +80,9 @@ def make_brain(brain: str):
 NO_RESCUE = {"agents": {"floor": 0}, "predators": {"floor": 0}, "evolution": {"p_mut": 0.0}}
 VARIANTS = {   # name: (overrides, world overlay file or None, what it tests)
     "baseline": ({}, None, "current rules"),
-    # cap25 / cap20 / cap15 (a lower predator cap; results/crash_v2-v3.md) left with the per-species caps (2026-10-09)
+    "cap25": ({"predators": {"cap": 25}}, None, "predator cap 34 → 25"),
+    "cap20": ({"predators": {"cap": 20}}, None, "predator cap 34 → 20"),
+    "cap15": ({"predators": {"cap": 15}}, None, "predator cap 34 → 15"),
     "food_low": ({"world": {"food_regrow_p": 0.0005}}, None, "less food (paradox of enrichment)"),
     "terrain": ({}, "terrain_preview", "noise terrain: water and mountains"),
     "cover10": ({"world": {"cover_fraction": 0.10, "cover_seek": 6}}, None,
@@ -103,9 +104,6 @@ VARIANTS = {   # name: (overrides, world overlay file or None, what it tests)
                   "evolution": {"egg_bank": True, "egg_ticks": 2000}}, None, "lg3 + floors refilled by eggs"),
     "seen10_eggs": ({"predators": {"breed_prey_seen": 10, "floor": 3}, "agents": {"floor": 10},
                      "evolution": {"egg_bank": True, "egg_ticks": 2000}}, None, "seen10 + floors refilled by eggs"),
-    "pred_litter12": ({"predators": {"litter": [1, 2]}}, None, "predator litters of 1-2 (prey 2-4)"),
-    "pred_slow": ({"predators": {"litter": [1, 1], "maturity": 300}}, None,
-                  "predators: one cub per mating, adult at 300 ticks (prey 2-4, 150)"),
     "patches3": ({"world": {"patches": 3, "wall_gap": 4}}, None, "ridges: 3 x 3 patches, 4-cell gaps"),
     "patches4": ({"world": {"patches": 4, "wall_gap": 2}}, None, "ridges: 4 x 4 patches, 2-cell gaps"),
     "eggs": ({"agents": {"floor": 10}, "predators": {"floor": 3}, "evolution": {"egg_bank": True, "egg_ticks": 2000}},
@@ -126,7 +124,7 @@ def one_run(variant: str, kill_p: float, seed: int, ticks: int, brain: str = "ke
                       extra_files=[CONFIG_DIR / "worlds" / f"{world}.yaml"] if world else None)
     backend = make_brain(brain)
     sim = Simulation(cfg, backend, seed=seed)
-    cap = int(cfg.sim.cap)
+    cap_prey, cap_pred = int(cfg.agents.cap), int(cfg.predators.cap)
     series, extinct = [], None
     started = time.time()
     while sim.t < ticks:
@@ -143,7 +141,7 @@ def one_run(variant: str, kill_p: float, seed: int, ticks: int, brain: str = "ke
             "prey_min": int(prey.min()), "prey_mean": float(prey.mean()), "prey_max": int(prey.max()),
             "prey_cv": float(prey.std() / max(prey.mean(), 1e-9)),
             "pred_min": int(pred.min()), "pred_mean": float(pred.mean()), "pred_max": int(pred.max()),
-            "at_cap": float(np.mean(prey + pred >= cap)),
+            "pred_at_cap": float(np.mean(pred >= cap_pred)), "prey_at_cap": float(np.mean(prey >= cap_prey)),
             "gen_prey": gen(sim.agents), "gen_pred": gen(sim.predators),
             "births": sim.cs["prey"].births, "pred_births": sim.cs["predator"].births,
             "kills": sim.cs["prey"].deaths.get("predator", 0),
@@ -169,7 +167,7 @@ def summarise(runs: list[dict], ticks: int) -> list[dict]:
                      "pred_died": sum(r["extinct"] == "predators" for r in rs),
                      "prey": f"{min(r['prey_min'] for r in rs)}-{max(r['prey_max'] for r in rs)} (mean {m('prey_mean'):.0f})",
                      "pred": f"{min(r['pred_min'] for r in rs)}-{max(r['pred_max'] for r in rs)} (mean {m('pred_mean'):.0f})",
-                     "prey_cv": m("prey_cv"), "at_cap": m("at_cap"),
+                     "prey_cv": m("prey_cv"), "pred_at_cap": m("pred_at_cap"), "prey_at_cap": m("prey_at_cap"),
                      "gen_prey": float(np.mean([r["gen_prey"] or 0 for r in rs if r["extinct"] is None] or [0])),
                      "gen_pred": float(np.mean([r["gen_pred"] or 0 for r in rs if r["extinct"] is None] or [0])),
                      "founders_added": m("founders_added"), "hatched": m("hatched"),
@@ -183,13 +181,13 @@ def report(rows: list[dict], a, minutes: float) -> list[str]:
              f"brain with the LLM run's action mix), full 96 x 96 world, floor 0 for both species (no newcomers), no mutation; "
              f"{a.seeds} seeds x {a.ticks} ticks, stopped at the first extinction. {minutes:.0f} min.", "",
              "| variant | what | kill_p | lasted | median ticks | prey / predators died out first | prey min-max (mean) "
-             "| predators min-max (mean) | prey CV | all animals at the cap | generation prey / pred (lasted) "
+             "| predators min-max (mean) | prey CV | predators at cap | prey at cap | generation prey / pred (lasted) "
              "| founder newcomers / eggs hatched per run |",
-             "|---|---|---|---|---|---|---|---|---|---|---|---|"]
+             "|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for r in rows:
         lines.append(f"| {r['variant']} | {VARIANTS[r['variant']][2]} | {r['kill_p']} | {r['lasted']}/{r['n']} "
                      f"| {r['median_ticks']:.0f} | {r['prey_died']} / {r['pred_died']} | {r['prey']} | {r['pred']} "
-                     f"| {r['prey_cv']:.2f} | {r['at_cap']:.0%} "
+                     f"| {r['prey_cv']:.2f} | {r['pred_at_cap']:.0%} | {r['prey_at_cap']:.0%} "
                      f"| {r['gen_prey']:.0f} / {r['gen_pred']:.0f} | {r['founders_added']:.0f} / {r['hatched']:.0f} |")
     return lines
 
@@ -223,7 +221,7 @@ def main() -> None:
     for r in rows:
         print(f"{r['variant']:12} kill_p {r['kill_p']}: lasted {r['lasted']}/{r['n']}, median {r['median_ticks']:.0f} ticks, "
               f"died prey/pred {r['prey_died']}/{r['pred_died']}, prey {r['prey']}, pred {r['pred']}, "
-              f"at cap {r['at_cap']:.0%}")
+              f"pred at cap {r['pred_at_cap']:.0%}")
     print(f"details: {out}.md")
 
 

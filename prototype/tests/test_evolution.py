@@ -102,7 +102,7 @@ def test_simulation_is_deterministic(cfg):
 
 def test_population_bounds_and_births(cfg):
     s, sim = _run(cfg, 4, ticks=1500)
-    assert cfg.agents.floor <= s["pop_final"] and s["pop_final"] + len(sim.predators) <= cfg.sim.cap   # one cap for all
+    assert cfg.agents.floor <= s["pop_final"] <= cfg.agents.cap
     assert s["births"] > 0 and s["memo_hit_rate"] > 0.3
 
 
