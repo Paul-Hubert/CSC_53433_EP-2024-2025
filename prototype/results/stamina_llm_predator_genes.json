@@ -1,0 +1,36 @@
+{
+ "runs": [
+  "check_stamina_llm"
+ ],
+ "min_carriers": 100,
+ "stars": {},
+ "readings": {
+  "check_stamina_llm": {
+   "predator.hunt": {},
+   "predator.follow": {},
+   "predator.rest": {},
+   "predator.mate": {}
+  }
+ },
+ "readings_all_runs": {
+  "predator.hunt": {},
+  "predator.follow": {},
+  "predator.rest": {},
+  "predator.mate": {}
+ },
+ "predation": {
+  "check_stamina_llm": [
+   {
+    "from": 0,
+    "to": 10000,
+    "predator": 0,
+    "starvation": 110,
+    "pop": 29.95,
+    "kill_rate": 0.0
+   }
+  ]
+ },
+ "texts": {
+  "check_stamina_llm": {}
+ }
+}
