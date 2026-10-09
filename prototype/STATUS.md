@@ -130,7 +130,7 @@ JEV run test (results/runs/jev_test, 96 x 96, seed 1234, 1 000 ticks): 7.6 min =
 ## Background jobs
 | Job | Started | Log | Progress file | State |
 |---|---|---|---|---|
-| JEV 1 h, same world and seed, mutator gemma4:26b on the CPU (`... --set mutator.model=gemma4:26b --out results/runs/jev_cover_hungry_1h_g26`; f0d6d8b) | 2026-10-09 21:04 | logs/jev_cover_hungry_1h_g26.log | logs/run_jev_cover_hungry_1h_g26.progress.json | running (pid 63500) |
+| JEV 1 h, same world and seed, mutator gemma4:26b on the CPU (`... --set mutator.model=gemma4:26b --out results/runs/jev_cover_hungry_1h_g26`; f0d6d8b) | 2026-10-09 21:04 | logs/jev_cover_hungry_1h_g26.log | logs/run_jev_cover_hungry_1h_g26.progress.json | done 22:04 (t 1 369; vs qwen3.5:0.8b: prey words changed 2.4 vs 5.2, "one word" 1.0 vs 4.2, world word 95 vs 88 %, rejected 3 vs 22 %, but 224 distinct mutants from 357 vs 321 from 325; gemma4:26b holds ≈ 19 GB RAM on the CPU; results/jev_cover_hungry_1h_g26_mutations.md) |
 | JEV 1 h, evolution-test world (192 x 192, kill_p 0.5, food 0.0015, hungry cover 20 %, caps 270 / 68), seed 1234 (`--backend jev --seed 1234 --ticks 5000 --minutes 60 --snapshots 5 --out results/runs/jev_cover_hungry_1h`; 8ea7698) | 2026-10-09 18:11 | logs/jev_cover_hungry_1h.log | logs/run_jev_cover_hungry_1h.progress.json | done 19:11 (t 1 293, gen 8 / 7; prey deaths 39 % killed, 38 % starved, 23 % migrated; 325 + 35 mutations, results/jev_cover_hungry_1h_mutations.md; first try 18:07 failed: JEV engine CUDA error, container restarted itself) |
 
 ## Open issues
