@@ -148,4 +148,3 @@ JEV run test (results/runs/jev_test, 96 x 96, seed 1234, 1 000 ticks): 7.6 min =
   with selection too: nonsense drifts to fixation under both brains (Docs/prompt-genome/10, 11).
 - Lab 1 small world + LLM-read founders: viable only above ≈ 20 animals (predation trap); the floor
   of 10 + newcomers hides extinction. Owner levers: world/cap, predators, p_mut / v3 prompts.
-- (parked) Laya answer schema unknown; `extract_probs` falls back to choice+confidence.

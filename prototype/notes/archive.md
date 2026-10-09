@@ -133,3 +133,6 @@ genes (gate wants founders ≥ 2× random). Control texts contain world words (m
   (t 2 000, 5 500); each floor = whole line replaced by newcomers (evolution restarts), max gen 11 / 7. 312 mutations;
   no prey mutant > 33 %, 1 predator mutant 64 % (drift); mutants 91-95 % world words, judged usable 74-100 %; "No
   preference." mutates into vague texts ("Preference for water."). results/long_v4_llm{,_predator}_timeline.md.
+
+## Moved from STATUS.md › Open issues (2026-10-09)
+- (parked) Laya answer schema unknown; `extract_probs` falls back to choice+confidence.
