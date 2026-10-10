@@ -5,10 +5,9 @@ The single source of truth between implementation sessions of
 [`Docs/prompts/06-implement-unity-system.md`](../prompts/06-implement-unity-system.md).
 
 ## Next step
-M12.1: teaching-path stubs (Assets/EvoSim/Exercises/My*.cs.txt), the Exercises menu, the grading suite and the
-students' README; then M12.2: the P1 audit, phase 1 (table below), and the owner's final review.
-The editor answers again (16:05): EditMode runs go through it with `--async_tests true` (scratchpad evo.sh);
-long and model runs still use the batch copy (copyrun.sh).
+M12 waits for the owner (final review ⏸): the P1 audit table below; phase 2 fixes only the rows the owner approves.
+Open owner decisions: 40 §2 #1, #2 (golden texts), #13 (B-10 with the qwen mutator), #14 (grading).
+EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh); long runs on the batch copy.
 
 ## Milestones
 | M | State | Commit | Notes |
@@ -25,7 +24,7 @@ long and model runs still use the batch copy (copyrun.sh).
 | M9 Reference content and views | done | a021fc2 | six scenes, module prefabs, bodies, T-SPACE-06; Play-mode look not checked by eye (editor frozen) |
 | M10 Editor tooling | done | c61f043 | a world from the menus validates and runs; T-EDIT-01 for every catalogue code; windows not checked by eye |
 | M11 Samples, scenarios, verification, CI | done | e5f402d…cde9e9c, M11.5 | samples, conformance, CI, scenarios S00–S27, R-01…R-08, coverage test; EditMode 319 + T3, PlayMode 17/17; gates B-01…B-11 (Machine) |
-| M12 Teaching path and final audit | | | ⏸ |
+| M12 Teaching path and final audit | review | bb6b46a, M12.2 | 14 stubs, Exercises menu, grading suite, README; P1 phase 1 below; EditMode 336/336 (non-T3), PlayMode 17/17 ⏸ |
 
 ## Machine
 - Unity **6000.3.9f1**: `C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Unity.exe`
@@ -45,13 +44,13 @@ unity command --result-only editor_status                 # ready / compiling / 
 unity command --result-only recompile                     # then:
 unity command --result-only recompile_status              # completed, failed, errors[]
 unity command --result-only console_status                # error and warning counts
-# EditMode (T0, T1): synchronous
-unity command --timeout 330 --result-only run_tests --mode editor \
-  --filter EvoSim.Tests.EditMode --filter_type assembly --timeout 300 > Logs/editmode-cli.json
-# PlayMode (T2): must be async (entering play mode reloads the domain), then poll
+# Both modes async, then poll (a synchronous run that outlives the pipeline's 5-minute timer froze the editor);
+# --filter takes a test-name part with --filter_type testName (the whole assembly includes the 30-minute T3 soak)
+unity command --result-only run_tests --mode editor \
+  --filter EvoSim.Tests.EditMode --filter_type assembly --async_tests true --timeout 3600
 unity command --result-only run_tests --mode playmode \
   --filter EvoSim.Tests.PlayMode --filter_type assembly --async_tests true
-unity command --result-only test_status > Logs/playmode-cli.json   # until "status": "completed"
+unity command --result-only test_status > Logs/editmode-cli.json   # until "status": "completed"
 ```
 
 Read results with `grep -c '"Status": "Failed"' Logs/editmode-cli.json` or the
@@ -76,73 +75,14 @@ pass (gemma4:12b on CPU, every sum 100); B-08 pass (P(flee) wolf 0.42, shadow 0.
 to 0.04 (reported); B-10 FAIL, 68 % usable after one mutation < 80 % (40 §2 #13); B-11 pass. About 4 500 calls.
 
 ## Decisions taken while implementing
-- M0 — tests from the command line — the editor is open, so batch mode can't
-  run (rule 8); the owner asked to use the `unity` CLI and com.unity.pipeline
-  instead. Tests run in the open editor with the commands above.
-- M0 — the owner's upgrade to 6000.3.9f1 was uncommitted — committed as
-  M0.1 together with the explicit Newtonsoft package, so the lock matches
-  the manifest.
-- 20 §7 — assemblies — `EvoSim.Testing` is constrained to
-  `UNITY_INCLUDE_TESTS` (NUnit for `Stat`), so it never ships in a build;
-  Runtime and Http are auto-referenced so student scripts in
-  `Assembly-CSharp` can derive from the base classes.
-- 22, rule 7 of the prompt — samples — `Assets/EvoSim/Samples/` will get its
-  own `EvoSim.Samples` assembly (from M11), so the test assemblies can
-  reference the sample modules; 20 §7 doesn't list it.
-
-- RAND-13 — an empty world has no events, so equal hashes for any seed — the events hash chain starts from
-  SHA-256 of the seeds: h0 = SHA-256("evosim:seed:worldSeed"), h(i) = SHA-256(h(i-1) ‖ line i).
-- RAND-03/04 — which streams the world seed drives — "world" and every "world/<layer>" stream (cover map,
-  initial food), so adding a layer never changes another layer's map.
-- GENE-01 — duplicate gene labels in a species aren't in the V-catalogue — added V-14 (error).
-- SENSE-22 / ACT-05 — who declares "vision" — banded senses declare the trait "vision" (default 20); a species
-  without one uses 20 m (WorldQueries.ReferenceVision).
-- ACT-10 — reach comparisons — within reach means distance ≤ reach + 1 mm (Units.Epsilon), so an animal that stopped
-  at exactly 1 m interacts; the reaches (graze 0.5, strike 1, scavenge 1) are settings of the ActPhase, the
-  mate reach of the MatingRule.
-- ANIM-30 — when the busy countdown starts — in the tick after the animal became busy (a kill at tick t keeps
-  the hunter busy for ticks t+1…t+50; it decides at t+51).
-- ANIM-40 — kill cause name — "killed" in events; compatibility mode will write "predator" (OUT-05).
-- GENE-22 — "letters" in the allowed characters — ASCII letters only, so "é" fails V-40 (T-GENE-07).
-- CORE-03 — Species' default display name — "species" (not "prey") so core code names no species (T-CORE-08).
-- 20 §3.6 — action prompt lines — `AnimalAction.DefaultDescription` holds each reference action's line from
-  08 §7; the inspector field overrides it when not empty.
-- 20 §3.4 — the inspector's "current target" — Animal.TargetId/TargetPoint, set by the act phase (also used by
-  the "chased" sense recipe, 22 §13).
-
-- SENSE-22 — per-animal vision in texts — each text states the trait's default vision (one text per token, so
-  equal observations give equal texts, SENSE-10); per-animal vision changes the band, not the wording.
-- SPEC-20 — threat/prey sense labels — empty label = the species' display name when the set has one species
-  ("Predator" for `predator`), so renaming a species changes what the brain reads; else "Predator"/"Prey".
-- 15 §2 — the 48 situations — the prototype's own set (prototype/data/observations_v2.jsonl, copied to
-  Data/Observations), mapped onto the Unity prey (stamina high, cover none where it had none); the predator's
-  48 are energy × prey band × carcass × kin.
-- PROMPT-01 — line breaks — the reference texts keep the prototype prompts' hard wraps (JEV was trained on
-  them); the 08 §7 example is reproduced word for word (T-PROMPT-01).
-- PROMPT-01 — rule order — modules in hierarchy order; the search rule sits on the species' own GameObject (first);
-  the carcass line is written by the diet that scavenges, so it comes before the breeding line as in predator_v3.
-- T-SENSE-08 — golden file name — Tests/Golden/situations.tsv (tab-separated, easier to review) instead of .json.
-- DEC-04 — staggering and per-species periods — an optional DecisionSchedule module.
-- MUT-31 — batching rounds — one mutator batch in flight at a time; queued tries (new first tries and redraws)
-  go out together when it returns. Results don't depend on batching (tries are drawn at conception).
-- MUT-12 — guard order — as the prototype: "invalid" (empty, > maxWords, same as parent ignoring case, forbidden
-  characters) before "unchanged" (punctuation only). T-MUT-07 checks against the prototype's own clean().
-- REPRO-10 — block cap — the litter is cut to cap − living animals (eggs don't count, REPRO-22).
-- 22 — Samples — reference module defaults may name species in tooltips; T-CORE-08 checks Core, Phases, Recording.
-- OUT-05 — the prototype's names ("predator" kill cause, "pred_" columns, "<id>s" summary key) — kept in
-  Runtime/Compatibility/PrototypeFormat, outside the core folders (T-CORE-08).
-- CFG-01 — "range or unit" for numbers — T-CFG-01 accepts Range/Min or a reference value in the tooltip.
-- 20 §2 — building scenes while the editor holds an unsaved untitled scene — the builder writes an empty scene file
-  and opens it additively (NewScene additive is refused then); the owner's open scene is never touched.
-- R-01 — the scripted prey policy — flee a close threat, else eat food in sight, else mate with a ready kin, else
-  rest (2 % on the others); hashes pinned from the first run.
-- DEC-30 / R-06 — memo memory in long runs — keys stored as 128-bit hashes, identical rows shared, at most
-  World.memoCapacity keys (262 144); beyond, queries go to the brain (and its cache) again (40 §2 #11).
-- R-07 — per-tick allocations — module look-ups cached per species, species streams cached without building names,
-  carcasses pooled, index loops on the act path, spatial cells made once: full world 1.5 ms per tick, no allocation
-  in the act phase (Unity's Mono counts no per-thread allocations: R-07 reads the managed heap between two probes).
-- Answer cache folder — Library/EvoSim/AnswerCache (gitignored; deleting Library loses it); the file is
-  .jsonl per brain ("mutator-<model>" for the mutator), rows stored with round-trip precision.
+M0–M11: in [51](51-implementation-log.md). Since then:
+- 32 §2 B-02 — the 48 reference situations have no cover, so a hide gene could never matter — the hide pair's
+  relevant situations get cover "close" (the Unity prey's own sense).
+- 32 §2 B-08 — run on the reference scene with the predator renamed (wolf / shadow) through a field override.
+- 32 §2 B-10 — the judge's {topic} per slot: the prototype's table (gene_timeline.TOPIC), "hide" = "when to hide in cover".
+- 22 §0 — stubs are templates (`Exercises/My*.cs.txt`), not compiled in the package (the conformance suites would
+  run them and fail); the menu writes them to Assets/Student. Stamina/Litter stubs derive from the reference (40 §2 #10);
+  grading by the events hash (40 §2 #14).
 
 ## Disagreements between the brief and Docs/Interface
 - 20 §3.9 names the operator method `MutationOperator.Start(gene, parent, rng)`; on a MonoBehaviour Unity takes
@@ -160,6 +100,46 @@ seven states (Idle, Running, Waiting, Blocked, Paused, Stepping, Stopped), now `
 - Untracked files that aren't EvoSim's and were left alone: `Assets/MobileDependencyResolver/`, two `.cs.meta`
   in `Assets/02 - Scripts/`, `Docs/Interface/design.md`, `design.pdf`.
 
+## P1 audit, phase 1 (2026-10-10)
+Four read-only audits; nothing changed. Severity: bug (proved), risk (could go wrong / weak test), doc. Details in 51.
+
+| # | Rule | Finding | Evidence | Sev. | Proposed fix |
+|---|---|---|---|---|---|
+| 1 | ARCH-06, DEC-13, V-61 | A disabled, inactive or other World's brain is still used when pointed to: never initialized, validated (V-20/V-61) or in run_info | Species.cs:40, AskBrainsPhase.cs:95 | bug | V-10 unless the brain is an enabled service of this World |
+| 2 | V-35 | Override `World/decisionPeriod=0` bypasses the setter's clamp: divide by zero at tick 0 | FieldPath.cs:27, World.cs:88, SensePhase.cs:29 | bug | Validate in Prepare + fixture |
+| 3 | SPEC-30, CORE-08 | AddSpecies ignores its discovery report, validates nothing, keeps a duplicate display name | World.Species.cs:17-27 | bug | Unique name, validate the clone, stop on errors |
+| 4 | RAND-20, TICK-04 | Strict mutator failure stops inside Hatch after Act/Breed: no Deaths/Record that tick | MutatorService.cs:128 | bug (strict) | Stop at the next boundary + test |
+| 5 | MUT-03/05 | Gaussian at its range edge clamps to the parent value, counted as a success `{parent:X, child:X}` | GaussianMutation.cs:18, HatchPhase.cs:46 | bug | Result = parent → "unchanged" |
+| 6 | 13 §5 | `backend_s` always 0: BrainMilliseconds never added to | SpeciesCounters.cs:16, RunRecorder.cs:306 | bug | Time each batch per species |
+| 7 | SPEC-03 | Signature computed before the food web: an empty threat label hashes "Predator", later "Wolf" → false V-12 | Species.cs:183, World.cs:361 | bug (low) | Sign after DeriveRelations; reset maps |
+| 8 | ARCH-12 | `Locomotion.MoveAll` never called; `ReadAll`/`ActAll` absent: the batch seam of 20 §10 is dead | Locomotion.cs:41, ActPhase.cs:147 | bug (low) | Call the batch methods or drop the seam |
+| 9 | GENE-13 | Genome keys hash numbers at 4 decimals, the registry at the gene's precision (decimals 1) | Genome.cs:44, AlleleRegistry.cs:27 | bug (non-default) | Canonical(gene.Decimals) |
+| 10 | 13 §2, OUT-05, V-36 | No stats.csv before statsEvery; compat `failures` overwritten by a species; V-36 checks only gene-bound traits | RunRecorder.cs:123,338; SpeciesBuilder.cs:51 | bug (minor) | Header in Begin; key order; range check in DeclareTrait |
+| 11 | coverage gate | Citation regex credits test ids ("T-DEC-02" → DEC-02, 56 rules); the MUST regex misses TICK-04's form | CoverageTests.cs:28,45 | bug (test) | `(?<![A-Z]-)`; accept text after (MUST) |
+| 12 | MUT-20 (S13) | S13 filters origin "mutation", mutants are "mutant": its checks assert nothing | ScenarioTests.cs:156,167 | bug (test) | Filter "mutant", assert non-empty |
+| 13 | OUT-04 (T-OUT-03) | Sets OLLAMA_API_KEY that nothing reads; logs not scanned: can't fail | OutputPlayTests.cs:99-114 | bug (test) | Fake Ollama client on that variable; scan logs |
+| 14 | EDIT-01 | Module prefabs never validated (StaminaGene, Senses/Carcass in no scene) | EditorToolTests.cs:36-44 | bug (test) | Prepare each prefab in a species |
+| 15 | DEC-02 | No real test that a busy animal never decides (removing `\|\| a.IsBusy` passes) | SensePhase.cs:28, DecisionTests.cs:26 | risk | Busy across a decision tick |
+| 16 | RAND-20, OUT-03 | Leaving Play doesn't Stop: runs < 5 000 ticks get no alleles.jsonl / final_population / summary | RunRecorder.cs:219-241 | risk (high) | Stop on World.OnDisable, or stream alleles |
+| 17 | ARCH-06, GENE-05 | Disabling only an action leaves its gene in the genome and prompt (V-06 warning) | Ownership.cs:30 | risk | Gene of a disabled action is absent |
+| 18 | EDIT-01 | MutatorService without a client: silent, every mutation fails | MutatorService.cs:47,91 | risk | Warning when a rate > 0 |
+| 19 | ACT-04, ACT-31, ACT-13 | Conformance accepts Stay for Search; sequential visibility untested; eggs in act phase unseen | ConformanceTests.cs:137, ActPhase.cs:158 | risk | Stronger asserts (51) |
+| 20 | SPEC-10/13 | An added species' strikes use the parent's Edible | Diet.cs:95, InteractionResolver.cs:57 | risk | Resolve from the struck species |
+| 21 | ARCH-05, ACT-01, RAND-02 | Nested World undetected; duplicate sense labels / layer names / id = other name not validated | World.cs:303,349 | risk | New V-errors |
+| 22 | OUT-04, V-61 | Key check misses gsk_/ghp_/AIza/hex and `?key=`; run_info leaves `-serial`, `-auth`, Bearer unmasked | HttpChecks.cs:9, RunInfo.cs:61 | risk | Wider patterns; all serialized strings |
+| 23 | RAND-11, SPACE-12 | Views keep colliders on layer 2: a ray mask with it ties senses to rendering | ViewPool.cs:45, RayBatch.cs:53 | risk | No colliders on views; mask layer 2 |
+| 24 | ACT-20, CORE-06 | Genome/LastSituation public; T-ACT-09 scans Runtime/Actions only; contextLine not checked single-line | Animal.cs:13, ActionTests.cs:233 | risk | Widen the scan; validate |
+| 25 | EDIT-01/02, 21 §2 | Severities differ (V-20 warnings, V-02), codes reused; no severity asserts; 8 fix buttons of 25 | World.cs:324, ValidationCatalogueTests.cs:123 | risk | Own codes, assert (code, severity) |
+| 26 | weak tests | ANIM-17, ANIM-35, SENSE-04, CORE-05, REPRO-03/24, GENE-03/06, RAND-05, V-60 TestConnection | 51 | risk | Strengthen (51) |
+| 27 | SPEC-30, ACT-05, ARCH-07 | stats.csv columns fixed at row 1; mate ignores partnerRange < vision; mutable static lists in samples | RunRecorder.cs:123, WorldQueries.cs:74 | risk (low) | 51 |
+| 28 | OUT-02, RAND-03, SPEC-05, GENE-12 | species_created has no id; one act-order stream; asymmetric nesting rule; llm#n is 0-based | SimEvent.cs:24, ActPhase.cs:57 | doc | Reword the contract |
+| 29 | citations | ANIM-31, SPACE-04/06, SENSE-10…13, ENV-12, ACT-02, SPACE-13 cited by the wrong tests | 51 | doc | Fix descriptions |
+
+Clean: no global or unseeded randomness, no deciding iteration over hash sets, ties by id, async answers applied by
+index, Freeze = Responsive path, animals as data, MUT-11 prompt, TICK-04 and ACT-30/31/32 orders, no secret in the
+repository, every genome of 8 real runs rebuilt from the events (no run with a mutation yet).
+
 ## Rule coverage
-Every MUST rule of 01–22 is cited by a passing test (CoverageTests.EveryMustRuleIsCited, from M11.3). Whether each
-citing test really checks its rule is item 1 of the P1 audit (M12.2).
+Every MUST rule of 01–22 is cited (CoverageTests, but see audit row 11). No real test: DEC-02. Weak only: ACT-04,
+ACT-13, ACT-31, ANIM-17, ANIM-30 (half), ANIM-31, ANIM-35, CORE-05, SENSE-04, RAND-05, REPRO-03, GENE-03. Untested
+parts: OUT-04 (logs), EDIT-01 (prefabs), EDIT-02 (fix buttons), REPRO-20, REPRO-24, GENE-32, MUT-13.
