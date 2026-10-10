@@ -21,6 +21,7 @@ namespace EvoSim
             if (Application.isEditor) return;
             Args = PlayerArgs.Parse(Environment.GetCommandLineArgs());
             foreach (var p in Args.Problems) Debug.LogWarning("EvoSim player: " + p);
+            if (Args.WindowWidth > 0) Screen.SetResolution(Args.WindowWidth, Args.WindowHeight, FullScreenMode.Windowed);
             World.Configuring += Configure;
         }
 
@@ -43,7 +44,8 @@ namespace EvoSim
             Args.ApplyTo(UnityEngine.Object.FindAnyObjectByType<RunCapture>());
             if (Args.QuitAtEnd) w.gameObject.AddComponent<QuitWhenStopped>().World = w;
             Debug.Log($"EvoSim player: scene {w.gameObject.scene.name}, {(said.Length > 0 ? said : "the scene's settings")}" +
-                      $"{(Args.QuitAtEnd ? ", quit at the end" : "")}; files under {RunCapture.Resolve(".")}");
+                      $"{(Args.QuitAtEnd ? ", quit at the end" : "")}; files under {RunCapture.Resolve(".")}; " +
+                      $"screen {Screen.width}x{Screen.height} {Screen.fullScreenMode}, dpi {Screen.dpi:0}");
         }
     }
 
@@ -60,7 +62,9 @@ namespace EvoSim
             var capture = FindAnyObjectByType<RunCapture>();
             bool written = capture == null || !capture.isActiveAndEnabled || capture.Finished;
             if (!written && Time.unscaledTime - stoppedAt < 30f) return;
-            Debug.Log($"EvoSim player: run stopped ({World.StopReason}) at tick {World.Tick}, events hash {World.Events.Hash}; quitting");
+            var overlay = FindAnyObjectByType<RunOverlay>();
+            Debug.Log($"EvoSim player: run stopped ({World.StopReason}) at tick {World.Tick}, events hash {World.Events.Hash}; " +
+                      $"pace {(overlay != null ? overlay.PaceSummary() : "not measured (no overlay)")}; screen {Screen.width}x{Screen.height} {Screen.fullScreenMode}; quitting");
             Application.Quit();
         }
     }

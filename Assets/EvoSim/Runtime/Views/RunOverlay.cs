@@ -28,9 +28,9 @@ namespace EvoSim
         Rect runPanel, animalPanel;
         float scale = 1f;
 
-        // Pacing, measured over about a second of real time.
-        float windowStart = -1f, waitingSince = -1f;
-        int windowTicks, windowFrames, windowStartTick;
+        // Pacing, measured over about a second of real time; and over the whole run (from its second second).
+        float windowStart = -1f, waitingSince = -1f, runStart = -1f, runSeconds;
+        int windowFrames, windowStartTick, runFrames, runStartTick, windows;
 
         public World World { get => world; set => world = value; }
         public RunNumbers Numbers => numbers;
@@ -40,6 +40,16 @@ namespace EvoSim
         /// <summary>Real seconds the current tick has waited, or 0.</summary>
         public float WaitingSeconds => waitingSince < 0f ? 0f : Time.unscaledTime - waitingSince;
         public bool Visible { get => visible; set => visible = value; }
+        /// <summary>The lowest one-second frame rate of the run so far (the first second, loading, is left out).</summary>
+        public float MinFramesPerSecond { get; private set; } = float.PositiveInfinity;
+        /// <summary>The most animals alive at once so far.</summary>
+        public int MostLiving { get; private set; }
+
+        /// <summary>The run's pace in one line: mean ticks/s against the target, mean and lowest FPS, most animals alive.</summary>
+        public string PaceSummary() =>
+            runSeconds <= 0f ? "no pace measured yet" :
+            $"{(numbers.Tick - runStartTick) / runSeconds:0.00} ticks/s (target {TargetText()}), {runFrames / runSeconds:0} FPS mean, " +
+            $"{(float.IsInfinity(MinFramesPerSecond) ? 0f : MinFramesPerSecond):0} FPS lowest, {MostLiving} animals at most, over {runSeconds:0} s";
 
         void Update()
         {
@@ -56,14 +66,24 @@ namespace EvoSim
             {
                 TicksPerSecond = (world.Tick - windowStartTick) / (now - windowStart);
                 FramesPerSecond = windowFrames / (now - windowStart);
+                if (++windows >= 2 && world.State != RunState.Stopped) MinFramesPerSecond = Mathf.Min(MinFramesPerSecond, FramesPerSecond);
                 windowStart = now;
                 windowStartTick = world.Tick;
                 windowFrames = 0;
+            }
+            if (world.State != RunState.Stopped && windows >= 1)                              // the whole run, after its first second
+            {
+                if (runStart < 0f) { runStart = now; runStartTick = world.Tick; }
+                runFrames++;
+                runSeconds = now - runStart;
             }
             bool waits = world.State == RunState.Waiting || world.State == RunState.Blocked;
             if (waits && waitingSince < 0f) waitingSince = now;
             else if (!waits) waitingSince = -1f;
             numbers.Read(world);
+            int living = 0;
+            foreach (var s in numbers.Species) living += s.Living;
+            MostLiving = Mathf.Max(MostLiving, living);
         }
 
         /// <summary>Whether a screen point (origin bottom left) lies on a panel: the camera doesn't pick there.</summary>

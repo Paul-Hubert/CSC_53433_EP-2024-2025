@@ -7,7 +7,8 @@ namespace EvoSim
     /// <summary>
     /// A watched run's settings from a command line (the Windows player): -scene name, -seed n, -ticks n,
     /// -speed (ticks per second | fast | fixed), -wait (responsive | freeze), -brain (a brain's GameObject name or id),
-    /// -capture seconds (0 = start and end only, off = none), -cache folder, -run folder name, -noMutation, -quitAtEnd.
+    /// -capture seconds (0 = start and end only, off = none), -cache folder, -run folder name, -noMutation, -quitAtEnd,
+    /// -window WIDTHxHEIGHT (a window of that many pixels).
     /// Parsing and applying are separate, so tests check both without a player.
     /// </summary>
     public sealed class PlayerArgs
@@ -20,6 +21,8 @@ namespace EvoSim
         /// <summary>Seconds between captures; null = the scene's setting; negative = no capture.</summary>
         public float? Capture;
         public bool NoMutation, QuitAtEnd;
+        /// <summary>The window's size in pixels (-window 1920x1080), or 0 × 0: the player's own setting.</summary>
+        public int WindowWidth, WindowHeight;
         public readonly List<string> Problems = new List<string>();
 
         public static PlayerArgs Parse(IReadOnlyList<string> args)
@@ -58,6 +61,16 @@ namespace EvoSim
                         if (string.Equals(v, "off", StringComparison.OrdinalIgnoreCase)) p.Capture = -1f;
                         else if (float.TryParse(v, NumberStyles.Float, CultureInfo.InvariantCulture, out float s) && s >= 0f) p.Capture = s;
                         else p.Problems.Add($"-capture {v}: seconds between captures, 0 or off");
+                        break;
+                    case "-window":
+                        i++;
+                        var wh = (v ?? "").ToLowerInvariant().Split('x');
+                        if (wh.Length == 2 && int.TryParse(wh[0], out int ww) && int.TryParse(wh[1], out int hh) && ww >= 160 && hh >= 120)
+                        {
+                            p.WindowWidth = ww;
+                            p.WindowHeight = hh;
+                        }
+                        else p.Problems.Add($"-window {v}: WIDTHxHEIGHT in pixels, e.g. 1920x1080");
                         break;
                     case "-nomutation": p.NoMutation = true; break;
                     case "-quitatend": p.QuitAtEnd = true; break;

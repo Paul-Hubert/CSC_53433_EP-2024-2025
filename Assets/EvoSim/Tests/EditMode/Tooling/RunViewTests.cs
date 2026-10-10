@@ -14,7 +14,8 @@ namespace EvoSim.Tests
         public void PlayerArgumentsAreRead()
         {
             var p = PlayerArgs.Parse(new[] { "EvoSim.exe", "-scene", "HideVsFlee", "-seed", "1234", "-ticks", "600", "-speed", "20", "-wait", "freeze",
-                                             "-brain", "JEV", "-capture", "10", "-cache", "cache", "-noMutation", "-quitAtEnd", "-logFile", "p.log" });
+                                             "-brain", "JEV", "-capture", "10", "-cache", "cache", "-noMutation", "-quitAtEnd", "-logFile", "p.log",
+                                             "-window", "1920x1080", "-run", "r1" });
             Assert.AreEqual("HideVsFlee", p.Scene);
             Assert.AreEqual(1234, p.Seed);
             Assert.AreEqual(600, p.Ticks);
@@ -25,13 +26,15 @@ namespace EvoSim.Tests
             Assert.AreEqual(10f, p.Capture);
             Assert.AreEqual("cache", p.Cache);
             Assert.IsTrue(p.NoMutation && p.QuitAtEnd);
+            Assert.AreEqual((1920, 1080), (p.WindowWidth, p.WindowHeight));
+            Assert.AreEqual("r1", p.Run);
             Assert.IsEmpty(p.Problems);
 
             Assert.AreEqual(RunSpeed.Fast, PlayerArgs.Parse(new[] { "-speed", "fast" }).Speed);
             Assert.AreEqual(RunSpeed.PerFixedUpdate, PlayerArgs.Parse(new[] { "-speed", "FIXED" }).Speed);
             Assert.AreEqual(-1f, PlayerArgs.Parse(new[] { "-capture", "off" }).Capture);
-            var bad = PlayerArgs.Parse(new[] { "-seed", "x", "-speed", "0", "-wait", "maybe", "-capture", "-3" });
-            Assert.AreEqual(4, bad.Problems.Count, string.Join("; ", bad.Problems));
+            var bad = PlayerArgs.Parse(new[] { "-seed", "x", "-speed", "0", "-wait", "maybe", "-capture", "-3", "-window", "big" });
+            Assert.AreEqual(5, bad.Problems.Count, string.Join("; ", bad.Problems));
             Assert.IsNull(bad.Seed);
         }
 

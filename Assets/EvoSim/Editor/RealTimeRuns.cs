@@ -182,12 +182,87 @@ namespace EvoSim.Editor
             var overlay = Object.FindAnyObjectByType<RunOverlay>();
             var capture = Object.FindAnyObjectByType<RunCapture>();
             var recorder = w.Service<RunRecorder>();
-            string pace = overlay != null ? $"{overlay.TicksPerSecond:0.0} ticks/s, {overlay.FramesPerSecond:0} fps, waiting {overlay.WaitingSeconds:0.0} s" : "no overlay";
+            string pace = overlay != null ? $"{overlay.TicksPerSecond:0.0} ticks/s, {overlay.FramesPerSecond:0} fps, waiting {overlay.WaitingSeconds:0.0} s; run: {overlay.PaceSummary()}" : "no overlay";
             return $"playing {EditorApplication.isPlaying}, focused {UnityEditorInternal.InternalEditorUtility.isApplicationActive}, tick {w.Tick}, {w.State}" +
-                   (w.State == RunState.Stopped ? $" ({w.StopReason})" : "") + $", {pace}, views {w.ViewCount}, brain calls {w.Decisions.ModelCalls}, " +
+                   (w.State == RunState.Stopped ? $" ({w.StopReason})" : "") + (w.WaitingFor != null ? $" for {RunNumbers.Waiting(w)}" : "") +
+                   $", {pace}, waits {w.WaitCount}, views {w.ViewCount}, brain calls {w.Decisions.ModelCalls}, " +
                    $"cache {w.Decisions.CacheHits}, mutator calls {w.Mutations.ModelCalls}, mutations {w.Mutations.Successes}/{w.Mutations.Failures}, hash {w.Events?.Hash}, " +
                    $"run {recorder?.RunFolder}, captures {capture?.Captures} in {capture?.RunFolder}, sheet {capture?.ContactSheetPath}, " +
                    $"memory {System.GC.GetTotalMemory(false) / 1048576.0:0} MB managed, {UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong() / 1048576.0:0} MB native";
+        }
+
+        /// <summary>
+        /// What a watcher should see, counted tick by tick on a headless replay (step 5): hunting predators whose nearest prey
+        /// in sight is hidden in cover (they lose it), hunters targeting a hidden prey (never), prey hiding in cover, kills,
+        /// carcass portions, prey meals and food regrown, babies farther than 2 m from both parents.
+        /// </summary>
+        public static string Behaviour(string scene, int seed, int ticks, string level)
+        {
+            return Batch.WithScene(ScenePath(scene), w =>
+            {
+                w.Seed = seed;
+                w.TickLimit = ticks;
+                w.WaitMode = WaitMode.Freeze;
+                w.StartOnPlay = false;
+                string problem = SetLevel(w, level);
+                if (problem != null) return "FAILED: " + problem;
+                foreach (var r in w.GetComponentsInChildren<RunRecorder>(true)) r.WriteFiles = false;
+                if (!w.Initialize()) return "FAILED: validation: " + w.LastReport;
+                var prey = w.FindSpecies("prey");
+                var predator = w.FindSpecies("predator");
+                var food = w.Service<FoodGrid>();
+                int hunting = 0, lost = 0, targetedHidden = 0, hiding = 0, hidingInCover = 0, babies = 0, farBabies = 0, outside = 0;
+                int foodStart = food != null ? food.Count : 0;
+                var where = new System.Collections.Generic.Dictionary<int, Vector3>();
+                while (w.State != RunState.Stopped)
+                {
+                    w.Advance(1);
+                    where.Clear();
+                    foreach (var s in w.AllSpecies)
+                        foreach (var a in s.Animals)
+                        {
+                            if (a.IsGone) continue;
+                            where[a.Id] = a.Position;
+                            if (!w.Ground.Inside(a.Position) || Mathf.Abs(a.Position.y - w.Ground.Height(a.Position)) > 1e-3f) outside++;
+                        }
+                    foreach (var p in predator.Animals)
+                    {
+                        if (p.IsGone || p.CurrentAction == null || p.CurrentAction.Name != "hunt") continue;
+                        hunting++;
+                        float vision = w.Queries.Vision(p), best = float.PositiveInfinity;
+                        Animal nearest = null;
+                        foreach (var q in prey.Animals)
+                        {
+                            if (q.IsGone) continue;
+                            float d = w.Distance(p.Position, q.Position);
+                            if (d <= vision && d < best) { best = d; nearest = q; }
+                        }
+                        if (nearest != null && w.Queries.IsHiddenFrom(nearest, predator)) lost++;
+                        var target = p.TargetId >= 0 ? prey.Animals.FirstOrDefault(q => q.Id == p.TargetId && !q.IsGone) : null;
+                        if (target != null && w.Queries.IsHiddenFrom(target, predator)) targetedHidden++;
+                    }
+                    foreach (var q in prey.Animals)
+                    {
+                        if (q.IsGone || q.CurrentAction == null || q.CurrentAction.Name != "hide") continue;
+                        hiding++;
+                        if (w.Queries.InCover(q)) hidingInCover++;
+                    }
+                    foreach (var s in w.AllSpecies)
+                        foreach (var a in s.Animals)
+                        {
+                            if (a.IsGone || a.Origin != "birth" || a.BornTick != w.Tick - 1) continue;
+                            babies++;
+                            float near = float.PositiveInfinity;
+                            foreach (int id in a.Parents) if (where.TryGetValue(id, out var pp)) near = Mathf.Min(near, w.Distance(pp, a.Position));
+                            if (near > 2f) farBabies++;
+                        }
+                }
+                int foodEnd = food != null ? food.Count : 0;
+                return $"{scene} {level} seed {seed}, {w.Tick} ticks, hash {w.Events.ShortHash}: hunting predator-ticks {hunting}, nearest prey in sight hidden {lost}, " +
+                       $"hunters targeting a hidden prey {targetedHidden}; prey hide-ticks {hiding} ({hidingInCover} in cover); kills {predator.Counters.Kills}, " +
+                       $"carcass portions {predator.Counters.Portions}; prey meals {prey.Counters.Meals}, food {foodStart} then {foodEnd} (regrown {foodEnd - foodStart + prey.Counters.Meals}); " +
+                       $"babies {babies}, more than 2 m from both living parents {farBabies}; animal-ticks off the ground or outside it {outside}";
+            });
         }
 
         /// <summary>The events hash recorded in a run folder's summary.json.</summary>

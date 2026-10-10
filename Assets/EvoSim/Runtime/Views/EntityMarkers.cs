@@ -27,6 +27,7 @@ namespace EvoSim
         }
 
         readonly Dictionary<string, Pool> pools = new Dictionary<string, Pool>();
+        readonly List<Pool> ordered = new List<Pool>();                                   // iterated: never a dictionary (RAND-05)
         readonly List<EntityKind> kinds = new List<EntityKind>();
         MaterialPropertyBlock block;
 
@@ -47,7 +48,7 @@ namespace EvoSim
             ShownTick = world.Tick;
             kinds.Clear();
             kinds.AddRange(world.ServicesOf<EntityKind>());
-            foreach (var p in pools.Values) p.Shown = 0;
+            foreach (var p in ordered) p.Shown = 0;
             foreach (var k in kinds)
             {
                 var pool = PoolOf(k.Kind);
@@ -64,14 +65,14 @@ namespace EvoSim
                     if (!go.activeSelf) go.SetActive(true);
                 }
             }
-            foreach (var p in pools.Values)
+            foreach (var p in ordered)
                 for (int i = p.Shown; i < p.Items.Count; i++)
                     if (p.Items[i].activeSelf) p.Items[i].SetActive(false);
         }
 
         Pool PoolOf(string kind)
         {
-            if (!pools.TryGetValue(kind, out var p)) pools.Add(kind, p = new Pool());
+            if (!pools.TryGetValue(kind, out var p)) { pools.Add(kind, p = new Pool()); ordered.Add(p); }
             return p;
         }
 
