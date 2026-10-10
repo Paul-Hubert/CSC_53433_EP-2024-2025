@@ -27,8 +27,8 @@ namespace EvoSim.Editor
         const string ModelsFolder = Root + "/Data/Models/JEV-9B";
         const string EmptyScene = "%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n";
         const string ContextLine = "The sentence below is a rule that a wild animal follows.";
-        /// <summary>Ticks between two decisions in the reference worlds (DEC-01; owner 2026-10-11: 10, after trying 20).</summary>
-        public const int ReferenceDecisionPeriod = 10;
+        /// <summary>Ticks between two decisions in the reference worlds (DEC-01; owner 2026-10-11: back to 4 after trying 20 and 10).</summary>
+        public const int ReferenceDecisionPeriod = 4;
         static readonly string[] StaminaWords = { "I am out of breath.", "I am getting tired.", "I am rested." };
 
         // 08 §7 prompt texts (line breaks as in the prototype's prompts, which JEV was trained on).

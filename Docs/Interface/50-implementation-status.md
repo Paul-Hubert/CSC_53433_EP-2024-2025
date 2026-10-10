@@ -7,10 +7,9 @@ The single source of truth between implementation sessions of
 ## Next step
 M13 waits at its checkpoint ⏸: the owner watches HideVsFlee (Play mode, or `Builds/EvoSim/2026-10-10/EvoSim.exe`) and
 reads `Logs/EvoSim/Reports/RT-2026-10-10.md`. The owner's three M13 decisions are done (M13.4–M13.6): cache hits join the
-memo, the course's scripts build for a player, the reference scenes stagger decisions (R-01 re-pinned). Then the
-reference decision period went from 4 to 20 (M13.8) and, at the owner's request, to 10 (M13.9), checked by a 10-minute
-live L2 build run: `Logs/EvoSim/Reports/RT-2026-10-11-P10.md` (prey births kept over 600 ticks, 2.28 ticks/s, 37
-mutations, prey at their floor by tick ~1 300). Still open from M12:
+memo, the course's scripts build for a player, the reference scenes stagger decisions (R-01 re-pinned). The reference
+decision period was tried at 20 (M13.8) and 10 (M13.9, a 10-minute live L2 build run:
+`Logs/EvoSim/Reports/RT-2026-10-11-P10.md`), then set back to 4 (M13.10, owner). Still open from M12:
 40 §2 #1, #2 (golden texts), #13 (the B-10 bar), #15–#17 (wording, new codes and seams for the contract).
 EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh); long runs on the batch copy.
 
@@ -30,7 +29,7 @@ EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh
 | M10 Editor tooling | done | c61f043 | a world from the menus validates and runs; T-EDIT-01 for every catalogue code; windows not checked by eye |
 | M11 Samples, scenarios, verification, CI | done | e5f402d…cde9e9c, M11.5 | samples, conformance, CI, scenarios S00–S27, R-01…R-08, coverage test; EditMode 319 + T3, PlayMode 17/17; gates B-01…B-11 (Machine) |
 | M12 Teaching path and final audit | review | bb6b46a, 1eaa571, 66a81e5, 83019ce, M12.5 | 14 stubs, Exercises menu, README (no grading, hooks); P1 phases 1–2; EditMode 433/433 (with soak and pinned hashes), PlayMode 19/19 ⏸ |
-| M13 Real-time visual test | review | ed16db5, d155e72, 29838b3, 9140625, c9d9e0a, e735804, 5efefe4, 6f3b302, M13.9 | scenes watchable (ground, food, cover, markers, overlay, camera, capture); L0 and L2 hashes equal headless = Play = build; then memo of cache hits, player build of the project, staggered reference; EditMode 438/438, PlayMode 23/23; report RT-2026-10-10 ⏸ |
+| M13 Real-time visual test | review | ed16db5, d155e72, 29838b3, 9140625, c9d9e0a, e735804, 5efefe4, 6f3b302, 2328091, M13.10 | scenes watchable (ground, food, cover, markers, overlay, camera, capture); L0 and L2 hashes equal headless = Play = build; then memo of cache hits, player build of the project, staggered reference; EditMode 438/438, PlayMode 23/23; report RT-2026-10-10 ⏸ |
 
 ## Machine
 - Unity **6000.3.9f1**: `C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Unity.exe`
@@ -151,6 +150,10 @@ M0–M11: in [51](51-implementation-log.md). Since then:
 - R-06 (M13.9) — the soak caps the memo at 8 192 keys: at period 10 the reference memo (262 144 keys) is still filling
   between ticks 10 000 and 100 000 (13 829 → 102 249 keys, 14.8 → 19.8 MB), which the "5 % after tick 10 000" bound
   read as a leak; at period 4 it was full before tick 10 000. Capped: 20.8 → 21.0 MB.
+- DEC-01 (M13.10, owner 2026-10-11) — back to a reference period of 4 (staggered, as M13.6): `ReferenceDecisionPeriod = 4`,
+  the six scenes and the R-01 hashes are again exactly those of M13.6 (verified: PinnedHashes passes on M13.6's file), and
+  01, 08, 14 read as at M13.6. Kept from M13.8–M13.9: `-minutes`, `RealTimeRuns.FromCommandLine`, Update Reference Scenes,
+  the soak's memo cap.
 
 ## Disagreements between the brief and Docs/Interface
 - 20 §3.9 names the operator method `MutationOperator.Start(gene, parent, rng)`; on a MonoBehaviour Unity takes

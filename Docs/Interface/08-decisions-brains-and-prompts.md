@@ -2,9 +2,8 @@
 
 ## 1. When animals decide
 
-- **DEC-01 (MUST)** Every `decisionPeriod` ticks (reference 10, owner 2026-10-11,
-  after 4 and a trial of 20: a brain is asked about a third as often as at 4) every living animal
-  that is not busy decides: all together on ticks 0, 10, 20, …, or each on its own
+- **DEC-01 (MUST)** Every `decisionPeriod` ticks (reference 4) every living animal
+  that is not busy decides: all together on ticks 0, 4, 8, …, or each on its own
   ticks when decisions are staggered (DEC-04, the reference). On the other ticks only animals
   without an action decide: babies just born or hatched, newcomers, and animals
   whose busy state ended on the previous tick.

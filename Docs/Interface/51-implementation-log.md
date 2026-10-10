@@ -1324,3 +1324,8 @@ Test fallout, batch mode: R-06 failed (managed memory 28.5 → 33.5 MB) because 
 100 000 at period 10 (probe: 13 829 → 102 249 keys, 14.8 → 19.8 MB; at period 4 full, 262 144 keys, before tick 10 000, flat
 27.1–27.5 MB). The soak now caps the memo at 8 192 keys: 20.8 → 21.0 MB. ExerciseTests.StubsCompile failed once in the full
 batch run (`AssemblyBuilder.Build()` returned false, the compiler busy) and passed alone in batch and in the editor: flaky.
+
+### M13.10 (2026-10-11): back to a decision period of 4
+Owner. `ReferenceDecisionPeriod = 4`; Update Reference Scenes (10 → 4) leaves the six scenes byte-identical to M13.6;
+`Tests/Golden/hashes.json` restored from M13.6 (e735804) and PinnedHashes passes on it; 01, 08 and 14 restored to their
+M13.6 text. The trials of 20 and 10 stay above for the record.
