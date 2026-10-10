@@ -1,15 +1,14 @@
 # 50 — Implementation status
-Updated: 2026-10-10, session 1 (continuing without checkpoint stops, owner's instruction)
+Updated: 2026-10-10, M13 real-time visual test (`Docs/prompts/07-real-time-visual-test.md`) ⏸
 
 The single source of truth between implementation sessions of
 [`Docs/prompts/06-implement-unity-system.md`](../prompts/06-implement-unity-system.md).
 
 ## Next step
-M12 waits for the owner's final review ⏸. Owner 2026-10-10: no grading (40 §2 #14), a better mutator on the CPU, fix every
-audit row, an open system. Done: gemma4:26b on the CPU (M12.4); every P1 row fixed and the open system's seams (M12.5;
-table below, details in 51). Open owner decisions: 40 §2 #1, #2 (golden texts), #13 (the B-10 bar), #15–#17 (wording,
-new codes and seams for the contract). Next, when the owner wants it: the real-time visual test,
-`Docs/prompts/07-real-time-visual-test.md` (Play mode and a Windows build; flat scenes draw no ground, food or cover yet).
+M13 waits at its checkpoint ⏸: the owner watches HideVsFlee (Play mode, or `Builds/EvoSim/2026-10-10/EvoSim.exe`) and
+reads `Logs/EvoSim/Reports/RT-2026-10-10.md`. Open owner decisions from M13: memoise cache hits (problem 1 below), the
+course's scripts that block a player build (problem 8), staggered decisions for pace (problem 4). Still open from M12:
+40 §2 #1, #2 (golden texts), #13 (the B-10 bar), #15–#17 (wording, new codes and seams for the contract).
 EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh); long runs on the batch copy.
 
 ## Milestones
@@ -28,6 +27,7 @@ EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh
 | M10 Editor tooling | done | c61f043 | a world from the menus validates and runs; T-EDIT-01 for every catalogue code; windows not checked by eye |
 | M11 Samples, scenarios, verification, CI | done | e5f402d…cde9e9c, M11.5 | samples, conformance, CI, scenarios S00–S27, R-01…R-08, coverage test; EditMode 319 + T3, PlayMode 17/17; gates B-01…B-11 (Machine) |
 | M12 Teaching path and final audit | review | bb6b46a, 1eaa571, 66a81e5, 83019ce, M12.5 | 14 stubs, Exercises menu, README (no grading, hooks); P1 phases 1–2; EditMode 433/433 (with soak and pinned hashes), PlayMode 19/19 ⏸ |
+| M13 Real-time visual test | review | ed16db5, M13.2, M13.3 | scenes watchable (ground, food, cover, markers, overlay, camera, capture); L0 and L2 hashes equal headless = Play = build; EditMode 437/437, PlayMode 23/23; report RT-2026-10-10 ⏸ |
 
 ## Machine
 - Unity **6000.3.9f1**: `C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Unity.exe`
@@ -68,6 +68,27 @@ Scenario runs in the open editor (same code as `-executeMethod EvoSim.Batch.RunS
 (optional variant, seed, ticks); files go to `Logs/EvoSim/runs/<scenario>-<variant>-s<seed>-<time>/`.
 Rebuild the reference scenes and pools: `unity command --result-only menu --path "EvoSim/Build Reference Scenes"`.
 
+Real-time runs (M13), from the open editor (`R=EvoSim.Editor.RealTimeRuns`; levels L0 random brain + no mutation, L1 no
+mutation, L2 everything):
+```bash
+unity command --result-only eval --code 'return EvoSim.Editor.RealTimeRuns.PreparePlay("HideVsFlee", 1234, 600, 5f, "L2", "RUN");'
+unity command --result-only editor_play                    # settings go in through World.Configuring; the scene file is untouched
+unity command --result-only eval --code 'return EvoSim.Editor.RealTimeRuns.Status();'     # poll: tick, state, pace, hash, captures
+unity command --result-only editor_stop
+# headless, stepped from the editor loop (never blocks a CLI call); an empty scene first: WithScene refuses an open scene
+unity command --result-only eval --code 'return EvoSim.Editor.RealTimeRuns.HeadlessStart("HideVsFlee", 1234, 600, "L2", "RUN-headless");'
+unity command --result-only eval --code 'return EvoSim.Editor.RealTimeRuns.HeadlessStatus();'   # or Logs/EvoSim/realtime-headless.txt
+unity command --result-only eval --code 'return EvoSim.Editor.RealTimeRuns.Behaviour("HideVsFlee", 1234, 600, "L2");'
+```
+The player can't be built in this project (the course's scripts, problem 8): build it from a copy holding Assets/EvoSim,
+Packages and ProjectSettings, on a short path (`subst W: <scratchpad>`; a long path breaks Unity's package cache):
+`Unity.exe -batchmode -projectPath W:/buildcopy -executeMethod EvoSim.Editor.VisualPlayerBuild.BuildFromCommandLine -out
+<repo>/Builds/EvoSim/<date> -logFile …` (Windows 64, Mono, six scenes, HideVsFlee first; no settings changed). Then
+`EvoSim.exe -scene HideVsFlee -seed 1234 -ticks 600 -speed 20 [-brain Random -noMutation] -capture 10 -run NAME
+-window 1920x1080 -quitAtEnd -logFile p.log` (`-screen-fullscreen 0` alone stays fullscreen). Run files, captures and the
+answer cache land next to the exe (`Logs/EvoSim/…`, `Library/EvoSim/AnswerCache`); copy the editor's cache there to replay.
+Ollama for L2: `OLLAMA_MAX_LOADED_MODELS=1 OLLAMA_KEEP_ALIVE=2h ollama serve`, gemma4:26b warmed with num_gpu 0 (9 GB RAM).
+
 Servers (2026-10-10): JEV (vLLM container promptevo-jev, localhost:8000, model jev-decision) and Ollama 0.35.1
 (localhost:11434: the mutator gemma4:26b 001e5dafc3c7, the judge gemma4:12b 6114515d63c1, qwen3.5:0.8b de63045f2975). Gates, on the copy:
 `-executeMethod EvoSim.Integrity.RunIntegrity -checks B-02,B-03 -brain JEV [-cpu] [-judge gemma4:12b]`.
@@ -95,6 +116,12 @@ M0–M11: in [51](51-implementation-log.md). Since then:
 - Open system — every module hears births and deaths, adds stats columns, names its companions, and most reference
   methods are virtual; the seams are listed in 51 (M12.5), the students' README §3 and 40 §2 #17.
 - M12.5 — the audit fixes and the seams share one commit: they change the same files.
+- M13 — the run views are components of their own ("Run views": GroundView, EntityMarkers, RunOverlay, RunCapture; a
+  WorldCamera on the camera), outside the World's tree, added to the six reference scenes and by the scene builder; the
+  bodies were rebuilt (standing on the ground, a nose, an ActionView marker). Overlay in IMGUI: it works in a build.
+- M13 — Play settings from the CLI go in through `World.Configuring` (the player's `PlayerArgs`), never into the scene file.
+- M13 — L2 live calls happened in Play mode at 5 ticks/s (owner's choice); headless, 20 ticks/s, the build and the 10-minute
+  run replayed the answer cache. 4 105 JEV calls for an estimate of 3 300 (owner agreed at tick 536).
 
 ## Disagreements between the brief and Docs/Interface
 - 20 §3.9 names the operator method `MutationOperator.Start(gene, parent, rng)`; on a MonoBehaviour Unity takes
@@ -113,6 +140,37 @@ seven states (Idle, Running, Waiting, Blocked, Paused, Stepping, Stopped), now `
   owner's; the mutator runs on the CPU in Ollama (started for the checks).
 - Untracked files that aren't EvoSim's and were left alone: `Assets/MobileDependencyResolver/`, two `.cs.meta`
   in `Assets/02 - Scripts/`, `Docs/Interface/design.md`, `design.pdf`.
+- M13: a player build of this project fails on the course's scripts (`Assets/02 - Scripts/MeshDeformer.cs:27`
+  AssetDatabase, `…/FabricIK.cs:274-276` Handles, outside `#if UNITY_EDITOR`); built from a copy instead.
+- M13: in the editor a capture needs a drawn Game view (hidden, captures are given up after 5 s); Unity warns on Play that
+  the Input Manager is deprecated (`activeInputHandler: 0`, the owner's setting).
+- M13: a `BuildPipeline.BuildPlayer` inside the project made Unity rewrite `ProjectSettings/UnityConnectSettings.asset`
+  (format upgrade, `m_Enabled: 1`); restored from git. Build players from the copy only.
+
+## M13 real-time visual test (2026-10-10): HideVsFlee, seed 1234, 600 ticks
+Report `Logs/EvoSim/Reports/RT-2026-10-10.md` (captures in `RT-2026-10-10/`); details in 51.
+
+| Level | Headless | Play mode | Build | Note |
+|---|---|---|---|---|
+| L0 | `27c52857…` | same (5 and 20 ticks/s) | same (20 ticks/s) | left at tick 279: files complete, hash = headless 279 |
+| L2 | `1183278b…` | same (5 live, 20 replay) | same (20, 1920 × 1080; 1 tick/s for 10 min) | 4 105 JEV + 5 gemma calls, all in Play mode |
+
+Pace: replays 5.0/5, 19.9/20, 20.0/20 ticks/s at 70–120 FPS; live L2 0.55/5 (JEV serves about two prompts at a time; 248
+waits, longest 9.6 s; a mutator wait of 11.2 s at 54 FPS). Memory flat (build: private 540–567 MB over 10 min). Lab1_Full:
+119 FPS lowest with 275 animals (340 never reached at L0). Behaviour (probe on the L2 replay): 53 kills, 74 carcass
+portions, food regrown 2 424, hunters' nearest prey hidden 1 280 times and never targeted, babies within 2 m of a parent.
+
+| # | Rule | Problem | Sev. | State |
+|---|---|---|---|---|
+| 1 | DEC-30, 13 §4 | cache hits aren't memoised: a replay's `backend_queries`, `memo_hit_rate` differ from the live run's | risk | proposed (owner) |
+| 2 | SPACE-12 | RealTime views didn't interpolate (jumps 5×/s) | bug (look) | fixed M13.1 |
+| 3 | SPACE-14 | RealTime catch-up bursts after a wait | risk | fixed M13.1 |
+| 4 | DEC-01 | L2 pace = JEV throughput: all animals decide on the same tick | risk | proposed: stagger (contract) |
+| 5 | — | editor captures need a drawn Game view | risk | fixed M13.1 (give up after 5 s) |
+| 6 | ARCH-01 | `Batch.WithScene` ran on an open scene, changed and closed it (then saved by the test runner) | bug (tooling) | fixed M13.1 |
+| 7 | — | Input Manager deprecation warning on Play | look | owner's setting |
+| 8 | — | the course's scripts block any player build | risk | owner (`#if UNITY_EDITOR`) |
+| 9–11 | — | long copy path; `-screen-*` stays fullscreen; "waiting" shown while paused | look | 9, 10 worked around; 11 proposed |
 
 ## P1 audit (2026-10-10): phase 1 findings, phase 2 fixes
 Four read-only audits, then every row fixed (owner 2026-10-10). Severity: bug (proved), risk (could go wrong / weak

@@ -1199,3 +1199,65 @@ No grading (22 §0 stubs stay a way in); every reference module can be replaced 
   CarcassSystem.Create; Carcass and Egg no longer sealed. The Student assemblies reference EvoSim.Http and
   EvoSim.Samples.
 - Tests: OpenHooksTests (ten), ViewPlayTests.ViewsHearTheirAnimal.
+
+## M13 (2026-10-10): the real-time visual test
+
+Prompt `Docs/prompts/07-real-time-visual-test.md`: HideVsFlee, seed 1234, 600 ticks, level L2 (an L0 dry run first).
+Report: `Logs/EvoSim/Reports/RT-2026-10-10.md`.
+
+### What was added (M13.1, ed16db5)
+- Views (Runtime/Views), read-only, no colliders, layer 2, no random numbers: `GroundView` (one quad, a texture of one
+  pixel per cell — soil, cover, food — compared with the last painted pixels each tick, uploaded only when one changed),
+  `EntityMarkers` (pooled discs and balls per entity kind; `EntityKind.EntityAt` added for it), `RunOverlay` + `RunNumbers`
+  (IMGUI; scales with the window height, 12 px minimum; Tab hides it; the followed animal's panel), `WorldCamera` (frames
+  the four ground corners by bisection, WASD/arrows, wheel, right drag, middle drag, Q/E, F, Esc; screen-space picking;
+  following zooms to 15 m), `RunCapture` + `ContactSheet` (PNG encoded on a worker thread with
+  `ImageConversion.EncodeArrayToPNG`; start, every N s, end; sheet scaled on the GPU), `ActionView` + `ActionColors`.
+- World: RealTime interpolation (the carry), RealTime debt capped at max(1, 0.1 s of ticks), `RealTimeTicksPerSecond`,
+  the static `Configuring` event (Awake, before the start).
+- Player: `PlayerArgs` (parse and apply, testable) and `PlayerLauncher` (BeforeSceneLoad, players only; -scene loads
+  another scene without starting the first one's World; `QuitWhenStopped` waits for the captures; logs the pace).
+- Editor: `RunViews` (menu EvoSim ▸ Views ▸ Add Run Views to Reference Scenes; `ReferenceScenes` calls it),
+  `VisualPlayerBuild` (EvoSim ▸ Build ▸ Visual Player, `BuildFromCommandLine`, `BuildLater`), `RealTimeRuns`
+  (Headless, HeadlessStart/Status stepped from `EditorApplication.update`, PreparePlay through `Configuring`, Status,
+  Behaviour, HashIn); `Batch.WithScene` refuses a scene open in the editor.
+- Tests: T-SPACE-06 with the run views (4th variant; ground pixels = food and cover of the painted tick; one marker per
+  entity at its position; captures and sheet when there is a graphics device); `RunViewPlayTests` (overlay = events,
+  RealTime interpolation and pace with the Freeze hash, camera framing and picking, Configuring); `RunViewTests`
+  (arguments parsed and applied, scenes and bodies watchable).
+
+### Added while measuring (M13.2)
+- `-window WIDTHxHEIGHT` (Screen.SetResolution; Unity's `-screen-*` flags left the player fullscreen at 3840 × 2160).
+- The player's last log line has the run's pace (`RunOverlay.PaceSummary`: mean ticks/s, mean and lowest FPS, most animals).
+- `RealTimeRuns.Behaviour` also counts animal-ticks off the ground or outside it (0).
+- The full EditMode run failed StaticChecks.NoIterationOverHashCollections (RAND-05): `EntityMarkers` iterated a
+  dictionary's values. Visual only, but the rule holds everywhere: it iterates a list now.
+
+### Runs and measurements
+- L0: headless `27c5285791f2183a…`; Play 5 ticks/s (5.0, 79–82 FPS at 3840 × 2160), 20 ticks/s (19.8–20.0, 81–82 FPS),
+  both equal; left at tick 279: six files, `stopped: world disabled`, hash = `Batch.HashOf(…, 279)`; build 20 ticks/s equal.
+- L2 live, Play mode 5 ticks/s, Responsive: 21:53:24–22:11:39; 4 105 JEV calls (368 requests: mean 2.54 s, median 0.93 s,
+  p95 8.46 s, max 11.57 s; no retry); gemma4:26b 5 calls (mean 3.7 s, max 5.5 s), 11 cache hits; 16 mutations ok, 0
+  failed; 248 waits, longest 9.6 s (tick 164); FPS while waiting 53–79; the editor 1.69–2.20 GB. Paused at tick 536 (3 772
+  calls) to ask the owner, who said finish. Hash `1183278bceaf079c65c80c1ac5a3c2ce1451cc76f3fb847c0556e2b2e6252d87`.
+- L2 replays: headless (5 294 cache hits, 0 calls), Play 20 ticks/s (19.9, 70–76 FPS), build 1920 × 1080 20 ticks/s,
+  build 960 × 540 200 ticks (= headless 200 `1d88e22d…`), build 1 tick/s 10 min — all equal. `events.jsonl`,
+  `final_population.json`, `alleles.jsonl` byte-identical across the four 600-tick runs.
+- The live run's captures stop at tick 360: at 22:06:29 the FPS rose from 55 to 200 (the Game view no longer drawn); each
+  later capture was given up after 5 s and the sheet still made.
+- Counters: a live run's "model calls" are distinct texts sent (DEC-32: 4 105); the replay counts one cache hit per query
+  that reached the brain (5 294); the rows are the same.
+
+### Problem 1 in detail (DEC-30, 13 §4)
+`AskBrainsPhase.cs:48` answers a query from the cache and `continue`s; only `ChooseActionsPhase.cs:39` stores rows in the
+memo, and only for brain answers. So in a replay every later repeat of a key misses the memo and is counted again in
+`BrainQueries` (stats `backend_queries`, summary `backend_queries` and `memo_hit_rate`): live prey 3 730 / 0.222, replay
+4 797 / 0; the overlay shows "memo 0". Rows and events are identical, so no hash changes. Proposed: store the cache row in
+the memo where it is read; it changes counters only. Left to the owner (the meaning of DEC-30's "computed once").
+
+### Problem 8 in detail
+`BuildPipeline.BuildPlayer` from the project: 5 errors, all in the course's scripts compiled for the player
+(`MeshDeformer.cs(27,22)` AssetDatabase; `FabricIK.cs(274–276,13)` Handles). Not ours to edit. The copy (Assets/EvoSim,
+Packages, ProjectSettings) builds with 0 errors in about 3 min the first time (package import), seconds afterwards.
+That one in-project build attempt also made Unity rewrite `ProjectSettings/UnityConnectSettings.asset` (a format upgrade
+with `m_Enabled: 1`, 21:45); it was restored from git and nothing else in ProjectSettings changed.
