@@ -15,6 +15,8 @@ namespace EvoSim
         [SerializeField, Tooltip("The kin sense whose token says a partner is near (CTRL-10).")]
         string relevantSense = "Animal";
 
+        public override bool Mates => true;
+
         public override void Act(Animal a, ActContext c)
         {
             var partner = c.NearestReadyPartner(a);

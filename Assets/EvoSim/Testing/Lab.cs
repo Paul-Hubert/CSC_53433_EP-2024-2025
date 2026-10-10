@@ -120,7 +120,33 @@ namespace EvoSim.Testing
         public static WorldBuilder ReferencePhases(this WorldBuilder b, ActOrder order = ActOrder.SpeciesInTurn) => b
             .Phase<SensePhase>().Phase<AskBrainsPhase>().Phase<ChooseActionsPhase>()
             .Phase<ActPhase>(p => p.Order = order)
-            .Phase<DeathPhase>().Phase<EnvironmentPhase>();
+            .Phase<BreedPhase>().Phase<HatchPhase>()
+            .Phase<DeathPhase>().Phase<MigrationPhase>().Phase<EnvironmentPhase>().Phase<FloorPhase>();
+
+        /// <summary>Litters, crossover, incubation, cap and floor (11, reference values).</summary>
+        public static SpeciesSetup LifeRules(this SpeciesSetup s, int cap, int floor, int incubation = 0) => s
+            .Module<Litter>(l => l.Configure(2, 4, 40f))
+            .Module<UniformCrossover>()
+            .Module<Incubation>(i => i.Ticks = incubation)
+            .Module<CapRule>(c => c.Configure(cap))
+            .Module<FloorRule>(f => f.Floor = floor);
+
+        /// <summary>The LLM mutation with the reference deck v4 and context line (10 §2).</summary>
+        public static SpeciesSetup LlmMutation(this SpeciesSetup s, float rate = 0.03f) => s
+            .Module<LlmMutation>(m =>
+            {
+                m.Configure(Deck, "The sentence below is a rule that a wild animal follows.");
+                m.Rate = rate;
+            });
+
+        /// <summary>The reference deck v4 (Data/Decks/mutate_v4.txt) as a TextAsset.</summary>
+        public static UnityEngine.TextAsset Deck => new UnityEngine.TextAsset(System.IO.File.ReadAllText(
+            System.IO.Path.Combine(UnityEngine.Application.dataPath, "EvoSim", "Data", "Decks", "mutate_v4.txt")));
+
+        /// <summary>A mutator service with a fake client (no model).</summary>
+        public static WorldBuilder FakeMutation(this WorldBuilder b, System.Action<FakeMutator> configure = null) => b
+            .Service<MutatorService>("Mutator", m => m.Configure("fake", 1.2f, cached: false))
+            .Service<FakeMutator>("Fake mutator client", configure);
 
         /// <summary>A world with flat ground, food, cover, carcasses, eggs, prey and predators (no phases, no brain).</summary>
         public static WorldBuilder Ecology(this WorldBuilder b, float size = 48f, float cover = 0.2f, float food = 0.1f,
@@ -144,11 +170,18 @@ namespace EvoSim.Testing
             return b;
         }
 
-        /// <summary>The Lab 1 world with the reference phases and the random brain as the world's default.</summary>
+        /// <summary>
+        /// The Lab 1 small world (S03): 48 × 48, 24 prey (cap 40, floor 10), 4 predators (cap 6, floor 3), the reference
+        /// phases, LLM mutation answered by a fake mutator, and the random brain as the world's default.
+        /// </summary>
         public static WorldBuilder Lab1(this WorldBuilder b, int prey = 24, int predators = 4, float size = 48f,
-                                        ActOrder order = ActOrder.SpeciesInTurn, bool randomBrain = true)
+                                        ActOrder order = ActOrder.SpeciesInTurn, bool randomBrain = true, int incubation = 0,
+                                        int preyCap = 40, int predatorCap = 6)
         {
-            b.Ecology(size, prey: s => s.Population(prey), predator: s => s.Population(predators)).ReferencePhases(order);
+            b.Ecology(size,
+                      prey: s => s.Population(prey).LifeRules(preyCap, 10, incubation).LlmMutation(),
+                      predator: s => s.Population(predators).LifeRules(predatorCap, 3, incubation).LlmMutation())
+             .ReferencePhases(order).FakeMutation();
             if (randomBrain) b.DefaultBrain<RandomBrain>();
             return b;
         }

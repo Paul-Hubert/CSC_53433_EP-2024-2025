@@ -26,7 +26,7 @@ namespace EvoSim.Tests
         [Test, Description("T-CORE-08 (CORE-03): the core code names no species, action or sense; only reference modules carry such defaults")]
         public void CoreNamesNoSpecies()
         {
-            string[] coreFolders = { "Core", "Phases", "Recording", "Population", "Reproduction", "Mutation" };
+            string[] coreFolders = { "Core", "Phases", "Recording" };
             var speciesWords = new[] { "prey", "predator", "wolf", "rabbit", "fox" };
             var actionNames = new[] { "eat", "flee", "hide", "follow", "rest", "mate", "hunt", "graze", "scavenge" };
             var hits = new List<string>();

@@ -31,6 +31,9 @@ namespace EvoSim
         /// <summary>True for actions that rest: the metabolism charges its rest cost when the animal stays still.</summary>
         public virtual bool Rests => false;
 
+        /// <summary>True for actions that seek a partner: the breed phase breeds animals that chose one (REPRO-02).</summary>
+        public virtual bool Mates => false;
+
         public override void WritePromptRules(PromptWriter w) => w.Action(Name, Description);
 
         /// <summary>Sets the prompt line from code (WorldBuilder, tests).</summary>

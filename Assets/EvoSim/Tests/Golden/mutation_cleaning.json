@@ -1,0 +1,74 @@
+[
+{
+"parent": "Run from any predator you see.",
+"answer": "\"Run quickly from any predator you see.\"",
+"clean": "Run quickly from any predator you see.",
+"reject": null
+},
+{
+"parent": "Run from any predator you see.",
+"answer": "Here is the new sentence: Run slowly from any predator you see.",
+"clean": "Run slowly from any predator you see.",
+"reject": null
+},
+{
+"parent": "Run from any predator you see.",
+"answer": "Modified rule: flee from big predators. Also rest later.",
+"clean": "Flee from big predators.",
+"reject": null
+},
+{
+"parent": "Rest when you are tired.",
+"answer": "Rest when you are tired and the sun is high and the wind blows hard today.",
+"clean": "Rest when you are tired and the sun is high and the wind blows hard today.",
+"reject": "invalid"
+},
+{
+"parent": "Rest when you are tired.",
+"answer": "REST WHEN YOU ARE TIRED.",
+"clean": "REST WHEN YOU ARE TIRED.",
+"reject": "invalid"
+},
+{
+"parent": "Rest when you are tired.",
+"answer": "Rest, when you are tired!",
+"clean": "Rest, when you are tired!",
+"reject": "unchanged"
+},
+{
+"parent": "Eat whenever food is close.",
+"answer": "Eat whenever food is close \u00e0 la carte.",
+"clean": "Eat whenever food is close \u00e0 la carte.",
+"reject": "invalid"
+},
+{
+"parent": "Eat whenever food is close.",
+"answer": "`Eat only when food is very close`",
+"clean": "Eat only when food is very close.",
+"reject": null
+},
+{
+"parent": "Eat whenever food is close.",
+"answer": "Sure! \u201cEat whenever food is far.\u201d Hope this helps.",
+"clean": "Eat whenever food is far.",
+"reject": null
+},
+{
+"parent": "Stay close to other animals.",
+"answer": "stay far from other animals",
+"clean": "Stay far from other animals.",
+"reject": null
+},
+{
+"parent": "Stay close to other animals.",
+"answer": "   ",
+"clean": "",
+"reject": "invalid"
+},
+{
+"parent": "Stay close to other animals.",
+"answer": "New gene:\nStay near other animals.\nThat is it.",
+"clean": "Stay near other animals.",
+"reject": null
+}
+]

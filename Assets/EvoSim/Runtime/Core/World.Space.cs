@@ -36,7 +36,14 @@ namespace EvoSim
         /// <summary>The decisions of the current tick and the run's memo (08).</summary>
         public DecisionState Decisions { get; } = new DecisionState();
 
-        partial void ResetDecisions() => Decisions.Reset();
+        /// <summary>Mutation statistics of the run (MUT-05).</summary>
+        public MutationStats Mutations { get; } = new MutationStats();
+
+        partial void ResetDecisions()
+        {
+            Decisions.Reset();
+            Mutations.Clear();
+        }
 
         /// <summary>A new animal enters the spatial index.</summary>
         internal void OnAnimalAdded(Animal a) => space?.Added(a);
