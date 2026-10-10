@@ -14,8 +14,8 @@ mutation, kept or lost by selection.
   alleles are the same (GENE-10), how they are expressed, and which mutation
   operators accept them ([10](10-mutation.md)).
 - **GENE-03 (MUST)** A **text gene** is expressed only through the brain: its
-  sentence goes into the genes block of the prompt (PROMPT-02) and to the
-  keyword brain. It has no other effect.
+  sentence goes into the genes block of the prompt (PROMPT-02), and any brain
+  that reads text reads it there. It has no other effect.
 - **GENE-04 (MUST)** A **number gene** is expressed into one trait (ANIM-15): it
   sets the trait, or multiplies its default, and the result is clamped to the
   trait's range. It does not enter the prompt unless it is configured to

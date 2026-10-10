@@ -10,9 +10,9 @@ for logic (fast, no scene), **PlayMode** for whole worlds running ticks.
 |---|---|---|---|---|
 | **T0** | validation of every scene and module prefab; static checks of the code | EditMode | every push | < 1 min |
 | **T1** | unit tests of every system, conformance suites for every module | EditMode | every push | < 2 min |
-| **T2** | short whole-world runs with the keyword or a scripted brain | PlayMode | every push | < 10 min |
-| **T3** | regression: pinned hashes, statistical ranges over seeds, soak, performance | PlayMode / batch mode | nightly and before merging | < 2 h |
-| **T4** | real LLMs: brain smoke tests, gates, mutator quality, a short LLM run | batch mode on a GPU machine | nightly, and on demand | hours |
+| **T2** | short whole-world runs with the random brain or a scripted brain | PlayMode | every push | < 10 min |
+| **T3** | regression with the random and scripted brains: pinned hashes, soak, performance, mechanics scenarios | PlayMode / batch mode | nightly and before merging | < 2 h |
+| **T4** | real LLMs on the owner's computer: integrity checks, behavioural scenarios, reference ranges (R-02, R-03) | batch mode, locally | nightly; R-02 and R-03 before a release | hours to a day |
 | **T5** | coding-agent audit of the implementation against this contract | a Claude Code session | weekly and before releases | hours |
 
 T4 and T5 are described in [32](32-integrity-prompts-and-ci.md).
@@ -22,7 +22,7 @@ T4 and T5 are described in [32](32-integrity-prompts-and-ci.md).
 | Helper | Does |
 |---|---|
 | `WorldBuilder` | builds a world in code: `new WorldBuilder(seed).Flat(20, 20).Food(…).Species("prey", s => s.Action<EatAction>().Sense<…>()).Build()`; no scene needed |
-| `ScriptedBrain` | answers given vectors per (species, observation) or a function; counts calls and batches; can delay answers by N `Advance` calls |
+| `ScriptedBrain` | answers given vectors per (species, observation), or a policy function written in the test ("hide when a threat is close and cover is near"); counts calls and batches; can delay answers by N `Advance` calls. Test code only: the system ships no rule-based brain (owner decision). |
 | `FakeMutator` | answers mutation prompts with a scripted function (e.g. append "quickly"); records every prompt; can delay or fail |
 | `FakeClock` driver | advances ticks without Play mode, switches wait modes, varies ticks per call |
 | `Place` | puts animals, items, carcasses and cover at exact positions |
@@ -78,6 +78,7 @@ Format: **id** — given → expect *(rules)*.
 - **T-SPEC-03** — the predator striking prey → the prey's threats are {predator}, derived; adding a "lynx" species that strikes prey adds lynx without other changes *(SPEC-10, SPEC-12)*.
 - **T-SPEC-04** — a cannibal species → hunts kin, never itself; its threats include itself, so its flee action runs from kin *(SPEC-11)*.
 - **T-SPEC-05** — a grazer next to a carcass and a hunter next to food → no interaction happens *(SPEC-13)*.
+- **T-SPEC-08** — a diet entry pointing at eggs, which have no edible component → V-24, and no egg is ever eaten; an `Edible` added to the egg kind, incubation 20 and an egg eater → eggs are eaten and recorded as lost ("eaten"); the energy gained equals the edible's energy × the diet's scale *(SPEC-10, SPEC-15, ENV-23, REPRO-23)*.
 - **T-SPEC-06** *(T2)* — `AddSpecies` from a template at tick 300 → new id, own population, streams and allele namespace; relations inherited both ways; other species' events unchanged up to tick 300 *(SPEC-30, SPEC-31, RAND-03)*.
 - **T-SPEC-07** *(T2)* — a species goes extinct (no floor) → its id is never reused; a later new species gets a new id *(SPEC-32)*.
 
@@ -139,8 +140,7 @@ Format: **id** — given → expect *(rules)*.
 - **T-DEC-08** — two animals that differ only in a number gene the brain doesn't read → one memo key *(DEC-31)*.
 - **T-DEC-09** — a brain failing every call, strict → the run stops cleanly with all outputs; non-strict → uniform rows, failures counted, nothing stored in memo or cache *(DEC-34, DEC-40, RAND-20)*.
 - **T-DEC-10** — points answers {eat: 120, flee: −5}, all zeros, a missing action → repaired by DEC-41 (or rejected as documented) *(DEC-41)*.
-- **T-DEC-11** — keyword brain: the vectors of the reference genomes in the 48 situations equal the pinned snapshot; and the directions the prototype showed hold: with "Eat whenever food is close." and "Always run away, whatever happens." in "energy low, food close, predator close", flee > eat; the predator genome "Hunt only when you are hungry." hunts more at energy low than high *(08 §6)*.
-- **T-DEC-12** — keyword brain directed tests: for each contrast pair, "Always…" gives the action more probability than "Never…" in every relevant observation; control sentences change nothing *(08 §6, CTRL-10)*.
+- **T-DEC-11** — the random brain → uniform rows of each species' length, whatever the genes and the situation *(08 §6)*. Directed tests of the real brain (contrast pairs) are B-02 in T4 ([32](32-integrity-prompts-and-ci.md)).
 - **T-PROMPT-01** — an assembled prompt → header, then one line per action in order, rules from the modules present, genes block `- label: "sentence"`, situation, ask *(PROMPT-01, PROMPT-02)*.
 - **T-PROMPT-02** — run speed changed from 2 to 3 → the rule line says three (or 3) *(PROMPT-03)*.
 - **T-PROMPT-03** — the default assembled prompts of both species for the reference genomes and situations → equal to the pinned snapshot (the example of 08 §7 among them); a frozen prompt with `{genes}`, `{situation}`, `{ask}` gets exactly those filled in *(PROMPT-04)*.
@@ -228,7 +228,7 @@ the recipes of [22](22-extending-recipes.md) refer to.
 | Suite | Runs on | Checks |
 |---|---|---|
 | T-SENSE template | every `Sense` | tokens declared and non-empty; `Read` returns a declared index in 200 random worlds; `Write` is deterministic and non-empty for every token; nothing hidden is reported; batched equals sequential |
-| T-ACT template | every `AnimalAction` | searches when alone; intent only (no position or stat of another animal changed); description present; bound gene or V-05; keyword pattern compiles |
+| T-ACT template | every `AnimalAction` | searches when alone; intent only (no position or stat of another animal changed); description present; bound gene or V-05 |
 | T-ANIM stat template | every module declaring a stat | stays in range for 5 000 ticks; initial values for founders and babies |
 | T-ENV layer template | every `ResourceLayer` | consume once; nearest equals brute force; changes only in its phase with its own stream |
 | T-DEC brain template | every `Brain` | row shape, sum, order; same query same answer; failure behaviour |
@@ -252,11 +252,11 @@ length and species.
 
 | Id | Test | Rules |
 |---|---|---|
-| **R-01** | **Pinned hashes**: for each reference scene and seeds 1234, 7, 42, the events hash after 2 000 ticks (keyword brain) is stored in `Tests/Golden/hashes.json`. A change fails the test; re-pinning is a deliberate commit that states why. | RAND-11 |
-| **R-02** | **Statistical ranges** over 5 seeds × 5 000 ticks: mean populations, time at floor and cap, deaths by cause, mean lifespan, generations, kills, searching rate, memo hit rate, within the ranges recorded when the reference was accepted (first accepted Unity runs; the prototype's numbers in `Docs/prompt-genome/03` §13 as a sanity check). | ACT-33 |
-| **R-03** | **No crashes**: in the Lab 1 full world with the keyword brain, no species needs a newcomer over 10 000 ticks in 8 of 8 seeds. | POP-05 |
+| **R-01** | **Pinned hashes**: for each reference scene and seeds 1234, 7, 42, the events hash after 2 000 ticks (random brain, and a scripted policy for the prey) is stored in `Tests/Golden/hashes.json`. A change fails the test; re-pinning is a deliberate commit that states why. | RAND-11 |
+| **R-02** | **Statistical ranges** (T4, JEV on the owner's computer, answers cached) over 3 seeds × 2 000 ticks: mean populations, time at floor and cap, deaths by cause, mean lifespan, generations, kills, searching rate, memo hit rate, within the ranges recorded when the reference was accepted (first accepted Unity runs; the prototype's numbers in `Docs/prompt-genome/03` §13 as a sanity check). | ACT-33 |
+| **R-03** | **No crashes** (T4, before a release): in the Lab 1 full world with JEV, no species needs a newcomer over 10 000 ticks in 3 of 3 seeds. | POP-05 |
 | **R-04** | **Equivalences** on the CI machine: Freeze = Responsive; 1 = 10 ticks per frame; rendering on = off. Hashes are never compared across machines (RAND-12). | SPACE-11, SPACE-14 |
 | **R-05** | **Replay**: a 500-tick run with a recording `ScriptedBrain` and `FakeMutator` caches, rerun → 0 calls, same hash. | RAND-21, MUT-14, DEC-33 |
-| **R-06** | **Soak**: 100 000 ticks, keyword brain, full world → no exception, invariants hold, memory stable (less than 5 % growth after tick 10 000). | — |
-| **R-07** | **Performance**: one tick of the full world (340 animals, keyword brain) under 2 ms on the CI machine; 0 bytes allocated per tick in the act phase after warm-up (GC recorder). | 20 §9 |
+| **R-06** | **Soak**: 100 000 ticks, random brain, full world → no exception, invariants hold, memory stable (less than 5 % growth after tick 10 000). | — |
+| **R-07** | **Performance**: one tick of the full world (340 animals, random brain, brain time excluded) under 2 ms on the CI machine; 0 bytes allocated per tick in the act phase after warm-up (GC recorder). | 20 §9 |
 | **R-08** | **Analysis tools**: the prototype's `gene_report` and `gene_timeline` read a Unity run written in compatibility mode without error. | OUT-05 |

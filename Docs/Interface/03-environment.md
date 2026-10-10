@@ -31,7 +31,7 @@ gives ([04](04-species-and-food-web.md)).
 | Regrowth | every tick, each empty walkable cell outside cover grows an item with probability `regrowP` = 0.0015 (≈ 670 ticks to regrow an eaten cell), the same everywhere: food appears uniformly at random |
 | Near water (terrain only) | cells within 3 m of water regrow 2 × faster |
 | In cover | no item at the start and no regrowth ("hungry cover"): hiding and eating compete |
-| Item energy | `eatGain` = 25 for the species that graze it (prey) |
+| Edible | the layer's edible component: grazed, 25 energy per item (the prototype's `eat_gain`, a prey setting there) |
 | Reach | an item is within reach when the animal is within 0.5 m of the item (Python: on the same cell) |
 
 The food layer can also come from the terrain's grass detail layer (foliage
@@ -73,6 +73,9 @@ an egg, a water hole, a fruit that falls.
   fruit rolling). It changes only in a phase, never from the visuals.
 - **ENV-22 (MUST)** An entity whose lifetime runs out, or which is used up, is
   removed in the environment phase of that tick.
+- **ENV-23 (MUST)** A resource item or an entity can be eaten only if its layer
+  or entity kind carries an edible component (SPEC-10) and the eater's diet
+  lists it. In the reference, food items and carcasses are edible; eggs are not.
 
 **Reference: carcasses.**
 
@@ -80,13 +83,15 @@ an egg, a water hole, a fruit that falls.
 |---|---|
 | Created by | a successful strike (a kill), at the killed animal's position |
 | Portions | `portions` = 2: one each for up to 2 animals other than the killer (0 = no carcass) |
+| Edible | carcasses of a species are described by that species' edible component (portions, energy, lifetime); they are scavenged |
 | Who may eat | a species whose diet lists carcasses of the killed species; not the killer; each eater at most one portion |
-| Energy | `carcassGain` = 30 per portion |
+| Energy | 30 per portion (the prototype's `carcass_gain`, a predator setting there) |
 | Lifetime | `rotTicks` = 100 ticks, eaten or not |
 | After eating | the eater is busy (digesting) for a time proportional to the energy: 25 ticks for 30 energy when a kill (60) gives 50 ([05](05-animals-stats-and-life-cycle.md)) |
 | Found by | the hunter's sense "carcass" and its hunt action (the nearer of prey and carcass; a carcass wins a tie, being a sure meal) |
 
-Eggs are entities too ([11](11-reproduction-and-population.md)).
+Eggs are entities too ([11](11-reproduction-and-population.md)); they have no
+edible component in the reference, so nothing eats them.
 
 ## 4. Options tried and rejected
 

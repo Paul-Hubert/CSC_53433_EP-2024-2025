@@ -19,9 +19,9 @@ self-hosted GitHub Actions runner (owner decision).
 | Tier | Content | Trigger | Blocks |
 |---|---|---|---|
 | T0–T1 | validation, static checks, EditMode tests | every push | merge |
-| T2 | PlayMode tests, short scenarios with fakes | every push | merge |
-| T3 | regression: hashes, ranges, soak, performance | nightly, before a release | release |
-| T4 | brain and mutator integrity (§2), LLM scenarios S06, S10, S13, S15, S22, S26, S27 | nightly, manual | B-01 blocks; gates are tracked as trends |
+| T2 | PlayMode tests, short scenarios with the random brain, scripted brains and fakes | every push | merge |
+| T3 | regression with the random and scripted brains: hashes, soak, performance, mechanics scenarios | nightly, before a release | release |
+| T4 | JEV (the default brain) and the mutator on the owner's computer: integrity (§2), behavioural scenarios S02, S04, S06, S07, S09, S10, S12, S13, S15, S16, S19, S20, S22, S26, S27, S28; reference ranges R-02 and R-03 before a release | nightly, manual | B-01 blocks; gates are tracked as trends |
 | T5 | coding-agent audit (§3, prompt P1) | weekly, before a release | a report a person reviews |
 
 ## 2. Brain and mutator integrity checks

@@ -21,7 +21,7 @@
 - Nobody programs which behaviour is good. Animals that eat, escape and mate
   leave more children, and their genes spread. There is **no fitness function**.
 - Genes are **readable**: most of them are short English sentences ("Rest when
-  you are tired."). A brain (an LLM, or a transparent keyword reader) turns the
+  you are tired."). A brain (an LLM in the reference) turns the
   sentences and the animal's situation into probabilities over its actions.
 - Ordinary code does everything physical: moving, eating, striking, breeding.
   The brain only chooses among actions.
@@ -68,7 +68,8 @@
 | **Species** | A kind of animal: its genes, senses, actions, stats, diet, reproduction, mutation and population rules. |
 | **Animal** | One individual: position, heading, stats, genome, traits, current action, counters. Data, not a GameObject. |
 | **Kin** | Other animals of the same species. |
-| **Food web, diet** | Who eats what. A species' diet lists resource layers (grazing) and species (hunting) with the energy gained. |
+| **Edible** | A component that makes the thing it sits on edible (a resource layer's items, a species' animals, carcasses, eggs…): how it is eaten (graze, strike, scavenge) and how much energy it holds. Without it, nothing can eat that thing. |
+| **Food web, diet** | Who eats what. A species' diet component lists the edible things it eats (resource layers, species, carcasses, …), optionally scaling their energy. |
 | **Threat** | A species that has the animal's species in its diet. Derived from the food web. |
 | **Resource layer** | Something edible spread over the ground, e.g. food items on a grid of cells that regrow. |
 | **Entity** | A world object with a position that is not an animal: a carcass, an egg, a water hole. May move. |

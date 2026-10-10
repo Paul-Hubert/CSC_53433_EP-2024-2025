@@ -129,10 +129,12 @@ to each target, terrain ahead (water, cliff), thirst, "a threat is chasing me"
   with such a sense can only use a brain that accepts attachments; this is
   checked before the run.
 
-## 7. Words for the keyword brain
+## 7. Words for a rule-based brain
 
-- **SENSE-50 (SHOULD)** A sense declares the words that genes may use to refer to
-  its states, with the token(s) they mean: the energy sense maps
-  *hungry, starving, low energy, weak* to `low` and *well fed, full, strong* to
-  `high`; the threat sense maps *predator, danger, threat* to "a threat is in
-  sight". The keyword brain reads these tables ([08 §6](08-decisions-brains-and-prompts.md#6-reference-brains)).
+- **SENSE-50 (MAY)** The Unity system has no keyword brain (owner decision). A
+  student who writes a rule-based brain needs to know which words in a gene
+  refer to which sense state: the energy sense's `low` is *hungry, starving, low
+  energy, weak*, its `high` is *well fed, full, strong*; the threat sense's "in
+  sight" is *predator, danger, threat*. The prototype's full tables are in
+  [08 §6](08-decisions-brains-and-prompts.md#6-reference-brains). Such tables
+  belong to that student's brain, not to the senses.

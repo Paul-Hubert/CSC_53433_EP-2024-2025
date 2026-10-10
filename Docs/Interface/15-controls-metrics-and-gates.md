@@ -17,7 +17,8 @@ of the contract because the tests ([30](30-tests.md)) and the integrity checks
   | C2 NO-MUT | mutation rate 0 (or no mutator) | how far does selection get with founder variation alone? |
   | C3 SHUFFLED | at each decision the brain reads the genes of a random *other* living animal of the same species; number genes are expressed from a random other animal's genome at birth | genes are inherited but don't affect their carrier, so any change is drift |
   | C4 RANDOM-FOUNDERS | founders get control sentences (text genes) and uniform random values in range (number genes) | can evolution climb out of nonsense? |
-  | C5 KEYWORD | the keyword brain instead of an LLM | the same experiment with a transparent brain |
+  | C5 KEYWORD | the keyword brain instead of an LLM (prototype only: the Unity system has no keyword brain; a student's rule-based brain could fill this slot) | the same experiment with a transparent brain |
+  | NULL | the random brain | does behaviour matter at all? |
   | C7 ASEXUAL | one parent, copy and mutation | the previous lab's regime |
 
 - **CTRL-02 (MUST)** The C3 draw uses the species' sampling stream, so a shuffled
@@ -49,7 +50,7 @@ information is in bits.
 
 **Test material.** An observation set of 48 situations (32 adult combinations
 of energy × food × threat × kin, plus the 16 most frequent other situations of a
-keyword-brain run); founder genomes drawn from the pools; random-text genomes
+reference run); founder genomes drawn from the pools; random-text genomes
 from the control sentences; the all-neutral genome; one contrast pair per locus;
 single edits (founders with one gene mutated by the mutator).
 
@@ -69,8 +70,9 @@ random text but genes move it too little (MI_G 0.14 < 0.25). G2 stays a gate eve
 though these models fail it (owner decision); it is tracked, not blocking
 ([32](32-integrity-prompts-and-ci.md)). G3 passes on JEV
 (locality 0.10, ρ 0.39). G4 not measured; a 10-hour JEV run showed gene sweeps at
-the rate drift predicts. G5 fails (gemma ≈ 4, JEV ≈ 12 decisions/s). The keyword
-brain passes G1 by construction and gives the reference numbers for tests.
+the rate drift predicts. G5 fails (gemma ≈ 4, JEV ≈ 12 decisions/s). In the
+prototype the keyword brain passed G1 by construction and gave the reference
+numbers; in Unity the reference numbers come from the first accepted JEV runs.
 
 ## 4. The evolution experiment
 

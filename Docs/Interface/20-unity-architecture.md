@@ -55,11 +55,14 @@ Lab1 World                                [World]  seed, wait mode, act order, d
 ├── Ground                                [FlatGround] | [TerrainGround]+Terrain | [NavMeshGround]
 ├── Environment
 │   ├── Grass                             [FoodGrid]       initial 0.1, regrow 0.0015, no food in cover
+│   │                                     [Edible]         grazed, 25 per item
 │   ├── Thickets                          [CoverLayer]     20 %, hides prey from their threats
-│   └── Carcasses                         [CarcassSystem]  2 portions, 100 ticks
+│   ├── Carcasses                         [CarcassSystem]  carcasses as each species' edible component says
+│   └── Eggs                              [EggSystem]      no [Edible]: eggs can't be eaten
 ├── Brains
-│   ├── Keyword                           [KeywordBrain]   (world default)
-│   ├── JEV                               [JevBrain]       host, model revision, strict
+│   ├── JEV                               [JevBrain]       (world default) localhost, model revision, strict
+│   ├── Gemma (optional)                  [OllamaPointsBrain] localhost, gemma4:12b
+│   ├── Random                            [RandomBrain]    the null model
 │   ├── Answer cache                      [AnswerCache]    folder, read/write
 │   └── Mutator                           [MutatorService] host, model, temperature
 ├── Recording                             [RunRecorder] [LiveStatistics]
@@ -94,12 +97,13 @@ Lab1 World                                [World]  seed, wait mode, act order, d
 │   │   ├── follow (prefab Follow)        [FollowAction] [TextGene]
 │   │   ├── rest   (prefab Rest)          [RestAction] [TextGene]
 │   │   └── mate   (prefab Mate)          [MateAction] [TextGene]
-│   ├── Life                              [Diet] [MatingRule] [Litter] [UniformCrossover] [Incubation 0]
+│   ├── Food                              [Diet] grass   [Edible] struck, 60 per kill, carcass 2 × 30, 100 ticks
+│   ├── Life                              [MatingRule] [Litter] [UniformCrossover] [Incubation 0]
 │   │                                     [Starvation] [OldAge] [CapRule] [FloorRule]
 │   └── Mutation                          [LlmMutation] deck mutate_v4
 └── Predator                              [Species] id and name "predator"
     ├── Locomotion                        [KinematicLocomotion] walk 1, run 2 m per tick
-    └── ...                               [HuntAction] [Diet: strike prey +60, scavenge prey +30] ...
+    └── ...                               [HuntAction] [Diet: prey (strike), prey carcasses (scavenge)]; no [Edible] ...
 ```
 
 The sub-GameObjects ("Senses", "Actions", "Life") are only folders: discovery
@@ -329,8 +333,6 @@ public abstract class Sense : SpeciesModule
     public abstract int Read(Animal a, SenseContext s);
     /// The text the brain reads for a token (SENSE-10).
     public virtual string Write(int token, TextStyle style) => $"{label}: {Tokens[token]}.";
-    /// Words genes may use for this sense's states, for the keyword brain (SENSE-50).
-    public virtual void DeclareKeywords(KeywordTable k) { }
 }
 
 /// For senses that cast rays: ask for rays first, read the results after one batch (SENSE-30).
@@ -374,10 +376,6 @@ public abstract class AnimalAction : SpeciesModule
     /// Every tick while this action is chosen: say where to go, and what to do on arrival.
     public abstract void Act(Animal a, ActContext c);
 
-    /// Keyword brain: the default score in an observation (08 §6).
-    public virtual float KeywordScore(ObservationView o) => 0f;
-    /// Words that mean this action in a gene.
-    public virtual string KeywordPattern => $@"\b{Name}\b";
     /// Directed tests: is this observation relevant for this action (CTRL-10)?
     public virtual bool IsRelevant(ObservationView o) => true;
 
@@ -399,8 +397,6 @@ public class EatAction : AnimalAction
         c.WalkTo(food.Position, stopAt: 0f);                    // MOVE-04
         c.OnArrival(Interaction.Graze(food));                   // ACT-10
     }
-
-    public override float KeywordScore(ObservationView o) => ...;   // 08 §6 table
 }
 ```
 
@@ -586,8 +582,7 @@ public abstract class Brain : WorldService
 
 | Brain | Class | Notes |
 |---|---|---|
-| Random | `RandomBrain` | uniform |
-| Keyword | `KeywordBrain` | reads `AnimalAction.KeywordScore`, `KeywordPattern` and the senses' keyword tables; intensity words are a setting of the brain |
+| Random | `RandomBrain` | uniform; the null model, and the brain of fast tests |
 | Ollama points | `OllamaPointsBrain : HttpBrain` | JSON schema per species, temperature 0, seed, `num_ctx`, `think: false`, parallel requests |
 | JEV choice | `JevBrain : HttpBrain` | one `/v1/completions` request with the list of prompts of the batch, `max_tokens` 1, allowed option tokens, log-probabilities, head bias, calibrated temperature |
 | Fake | `ScriptedBrain` (tests) | returns given vectors, counts calls |
@@ -607,7 +602,7 @@ deadlock.
 | Resource layers (ENV-01) | `FoodGrid`, `TerrainGrassFood` (the terrain's detail layer is the grid) |
 | Cover (ENV-10) | `CoverLayer` (noise patches), `TerrainCover` (from tree instances or a detail layer) |
 | Entities (ENV-20) | `EntitySystem<T>`; `CarcassSystem`, `EggSystem` |
-| Diet (SPEC-10) | `Diet` with entries {target, method, gain}; threats derived by the World |
+| Food (SPEC-10, SPEC-15) | `Edible` on whatever can be eaten, `Diet` on the eater (§3.12); threats derived by the World |
 | Stats | `Energy`, `Stamina`, `Metabolism` (costs per tick) |
 | Busy (ANIM-30) | `Digestion` (makes eaters busy) |
 | Mating, litters, eggs | `MatingRule`, `Litter`, `UniformCrossover`, `Incubation` |
@@ -621,6 +616,42 @@ deadlock.
 | Views | `Body` (the view prefab of a species), `AnimalView` (holds the animal id; no `Update`), `ViewPool` |
 | Species added during a run | `World.AddSpecies`; a speciation rule deciding when to split (a `TickPhase`) is left for later (owner decision) |
 | Controls | settings on the World and on the evolution modules ([15](15-controls-metrics-and-gates.md)) |
+
+### 3.12 Food: edible and diet
+
+Whether something can be eaten is a matter of components on both sides (owner
+decision): the eaten thing says *how* it is eaten and *how much* it gives; the
+eater says *what* it eats.
+
+```csharp
+/// Makes what it sits on edible: a species' animals, a resource layer's items, an entity kind.
+public class Edible : MonoBehaviour
+{
+    public EatMethod method = EatMethod.Graze;      // Graze | Strike | Scavenge
+    public float energy = 25f;                       // per item, per kill or per portion
+    [Header("Strike only: what a kill leaves")]
+    public int carcassPortions = 0;
+    public float carcassEnergy = 30f;
+    public int carcassTicks = 100;
+}
+
+/// What a species eats (SPEC-15). Targets must carry an Edible component (V-24).
+public class Diet : SpeciesModule
+{
+    [Serializable] public class Entry
+    {
+        public string target = "Grass";              // a layer, a species, "carcass:prey", "egg:prey"...
+        public float energyScale = 1f;
+    }
+    public List<Entry> eats = new();
+
+    public bool Eats(IEdibleTarget t) => ...;        // listed here and the target is edible (SPEC-13)
+}
+```
+
+Making eggs edible is then two components and no code: an `Edible` on the
+`EggSystem` and a diet entry `egg:prey` on the egg eater
+([22 §15](22-extending-recipes.md#15-food-make-eggs-edible)).
 
 ## 4. Initialisation order
 
@@ -748,7 +779,7 @@ need jobs.
 
 ## 9. Performance budget
 
-| Item | Target with the keyword brain, 340 animals |
+| Item | Target with the random brain (the brain's own time excluded), 340 animals |
 |---|---|
 | One tick, all phases | < 2 ms (the prototype: 17 ms in Python) |
 | Sense phase | spatial index rebuilt once; nearest-food search by expanding rings of cells, stopping at the first ring beyond the best distance |

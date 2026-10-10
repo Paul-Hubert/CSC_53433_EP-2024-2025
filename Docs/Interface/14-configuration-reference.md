@@ -58,9 +58,10 @@ meter, kept exactly (owner decision). "small" is the profile for tests and quick
 | cover fraction | 0.2 (0 = no cover) | of walkable ground |
 | cover noise octaves | 8, 4 | m |
 | flee into cover within (prototype option) | 6 (Unity reference: off, hide action instead) | m |
-| carcass portions | 2 (0 = no carcass) | — |
-| carcass gain | 30 | energy |
-| carcass lifetime | 100 | ticks |
+| carcass portions (on the prey's edible component) | 2 (0 = no carcass) | — |
+| carcass energy per portion (same) | 30 | energy |
+| carcass lifetime (same) | 100 | ticks |
+| eggs edible | no (no edible component) | — |
 
 ### Perception
 
@@ -98,9 +99,9 @@ meter, kept exactly (owner decision). "small" is the profile for tests and quick
 | litter | 2–4 | 2–4 | babies |
 | incubation | 0 | 0 | ticks (a few ticks hide the mutator's latency) |
 | wander turn probability | 0.25 | 0.25 | per tick |
-| graze gain | 25 | — | energy |
+| energy gained per food item (set on the food layer's edible component) | 25 | — | energy |
 | kill chance (trait) | — | 0.5 | per strike |
-| kill gain | — | 60 | energy |
+| energy gained per kill (set on the prey's edible component) | — | 60 | energy |
 | digestion | — | 50 ticks per kill, in proportion for portions | ticks |
 
 Options of the prototype, off: predator interference (c = 0, radius 3 m),
@@ -124,9 +125,10 @@ ticks), one shared cap.
 
 | Service | Parameter | Value |
 |---|---|---|
-| world default brain | — | keyword (the prototype's `rule_based`) |
+| where everything runs | — | the owner's computer, locally (owner decision) |
+| world default brain | — | JEV (the keyword brain is not part of the Unity system) |
 | answer cache | format, place | a local JSON-lines file per brain |
-| Ollama points brain | model | gemma4:12b |
+| Ollama points brain (optional) | model | gemma4:12b |
 | | host | `http://localhost:11434` (or a cloud host with a key from an environment variable) |
 | | parallel requests | 2 |
 | | context length, thinking | 4 096, off |

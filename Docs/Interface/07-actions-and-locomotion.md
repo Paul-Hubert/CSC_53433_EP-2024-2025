@@ -79,8 +79,8 @@ to keep is the same: approach, stop next to it, run away, wander.
 
   | Interaction | Effect |
   |---|---|
-  | graze | the item is consumed; the animal gains the diet's energy |
-  | strike | with probability `killP` (a trait; reference 0.5) the target is killed (ANIM-41); the hunter gains the diet's energy, becomes busy (digestion) and, if configured, a carcass appears at the target's position |
+  | graze | the item is consumed; the animal gains the item's energy (edible component × diet scale) |
+  | strike | with probability `killP` (a trait of the hunter; reference 0.5) the target is killed (ANIM-41); the hunter gains the target's energy (its species' edible component × diet scale), becomes busy (digestion) and, if the edible component says so, a carcass appears at the target's position |
   | scavenge | one portion of the carcass is eaten; the eater is recorded as having eaten from it; it gains the portion's energy and becomes busy |
   | hide | none: being in cover is a state of the position, not an interaction |
 

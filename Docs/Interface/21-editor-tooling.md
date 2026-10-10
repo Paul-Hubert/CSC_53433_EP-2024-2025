@@ -43,6 +43,8 @@ Severity: **E** error (blocks Play), **W** warning, **I** information.
 | V-20 | E | a module names a layer, entity kind or species that doesn't exist | pick from a list |
 | V-21 | W | an animal set resolves to nothing (flee with no threat, hunt with no prey) | — |
 | V-22 | W | a species with no food source in its diet | — |
+| V-24 | E | a diet entry whose target has no edible component, so it can never be eaten (SPEC-10) | add an `Edible` to the target |
+| V-25 | I | something edible that no diet lists | — |
 | V-23 | W | a gene or founder sentence mentions a species name that doesn't exist (SPEC-21) | — |
 | **Values** |
 | V-30 | E | band edges not increasing, or not below the vision (SENSE-21) | sort |
@@ -65,7 +67,6 @@ Severity: **E** error (blocks Play), **W** warning, **I** information.
 | **Observations and brains** |
 | V-50 | W / E | observation space above 100 000 (W) or 10 000 000 (E) (SENSE-05) | — |
 | V-51 | E | a sense with attachments and a brain that can't read them (SENSE-41) | — |
-| V-52 | W | the keyword brain is used and an action has no keyword pattern or default score | — |
 | V-53 | E | a prompt field (header, action line, rule line) or a frozen prompt with an unknown placeholder; a frozen prompt without `{genes}`, `{situation}` or `{ask}` | — |
 | **Services and secrets** |
 | V-60 | W | an HTTP brain or the mutator is unreachable (checked on demand: *Test connection*) | — |
@@ -83,11 +84,11 @@ seed, wait mode, act order; the phase list as a reorderable view of the
 
 | Table | Columns |
 |---|---|
-| Actions | order, name, bound gene, keyword pattern, relevance condition |
+| Actions | order, name, bound gene, relevance condition |
 | Senses | order, label, token count, example fragment (V1 and V2) |
 | Genes | locus, kind, founder pool size, mutation operator and rate |
 | Stats and traits | name, declared by, read by, written by, default, range |
-| Diet | target, method, gain; derived threats |
+| Food | what it eats (diet, energy scale), whether and how it is edible itself (method, energy, carcass); derived threats |
 | Population | initial, floor, cap, cap rule |
 
 Plus: observation-space size (e.g. "4 860 situations"), the signature, and a

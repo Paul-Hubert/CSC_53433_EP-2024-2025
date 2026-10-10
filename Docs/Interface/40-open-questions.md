@@ -1,7 +1,7 @@
 # 40 — Open questions
 
-The questions of the first draft were answered by the owner on 2026-10-09 (the
-README's second-round table lists every decision). This page keeps what those
+The questions of the first draft were answered by the owner on 2026-10-09 and
+2026-10-10 (the README's second- and third-round tables list every decision). This page keeps what those
 answers settled, where it landed in the documents, and what is still open or
 deferred.
 
@@ -31,15 +31,15 @@ deferred.
 | Python golden fixtures | dropped | 30 (R-08 removed, snapshots pinned from Unity runs instead) |
 | Unity version | the owner moves the project to 6000.3 before starting | README, 20 ARCH-10 |
 | CI hardware | the owner's machine as a self-hosted runner | 32 §1, §4 |
+| Default brain, where things run (3rd round) | all local on the owner's computer; JEV is the default brain | README, 14, 20 §2 |
+| Keyword brain (3rd round) | not part of the Unity system; documented as the prototype's brain and a student exercise; fast tests use the random brain and a test-only scripted brain | 06 SENSE-50, 08 §6, 22 §7, 30, 31 |
+| Edibility (3rd round) | by components: an edible component on what can be eaten, a diet on the eater; eggs not edible until a student adds one | 03 ENV-23, 04 SPEC-10/15, 11 REPRO-23, 20 §3.12, 22 §15 |
 
 ## 2. Still open
 
 | # | Question | Default until decided | Affects |
 |---|---|---|---|
-| 1 | **Default brain in class**: the keyword brain on every laptop, or JEV served from the owner's machine (or a lab server) to the whole class? | keyword brain by default; JEV opt-in | 08, 14 |
-| 2 | **Founder pools** (H1), including the new draft hide sentences ("Hide when a predator is close.", "Stay in cover when danger is near.", "Hide only when you are tired.", "Leave cover to find food when hungry.") and the hide contrast pair | use them as they are | 09 |
-| 3 | **The keyword brain's hide scores** (proposed in 08 §6): cover here 3.0 … none −2.0, −3.0 with no threat in sight | as proposed; tune with S06 | 08 |
-| 4 | **Eggs in the world**: can they be eaten? Do they count toward the cap? With no incubation this doesn't arise yet. | not eaten; not counted; laid at the first parent's position | 11 |
+| 1 | **Founder pools** (H1), including the new draft hide sentences ("Hide when a predator is close.", "Stay in cover when danger is near.", "Hide only when you are tired.", "Leave cover to find food when hungry.") and the hide contrast pair | use them as they are | 09 |
 
 ## 3. Deferred by the owner ("later")
 

@@ -83,12 +83,16 @@ decisions in the reference runs.
 Uniform over the species' actions. The null model: random hunters can't sustain
 themselves, which shows the brain matters.
 
-### Keyword brain (the prototype's `rule_based`)
+### Keyword brain (prototype only, not in the Unity system)
+
+The Unity system doesn't include this brain (owner decision). It is recorded
+here because the prototype's reference numbers came from it, and because writing
+a rule-based brain is a good student exercise ([22 §7](22-extending-recipes.md#7-a-brain)).
 
 A transparent "ideal interpreter": default scores from the situation plus a push
-from each gene's keywords. No model, fast, the brain for laptops without a GPU
-and for CI. Logits = defaults + gene weights; probabilities = softmax(logits / T),
-T = 1.
+from each gene's keywords. No model, fast; in the prototype, the brain for
+laptops without a GPU and for CI. Logits = defaults + gene weights;
+probabilities = softmax(logits / T), T = 1.
 
 **Default scores (prey).**
 
@@ -99,7 +103,6 @@ T = 1.
 | follow | kin adjacent −0.5, close −0.5, medium 0.3, far 0.3, none −2.5 |
 | rest | −0.5; +0.5 if energy high and the threat is none or far; plus a catch-breath push by stamina: low +2.0, medium +0.3, high 0 |
 | mate | if the kin is ready, the animal is adult and its energy isn't low: kin adjacent 2.5, close 2.5, medium 1.5, far 1.0; else −3.0 |
-| hide (Unity addition, proposed) | no threat in sight: −3.0; else by the cover: here 3.0, adjacent 2.5, close 2.0, medium 0.5, far −0.5, none −2.0; +0.5 when the threat is adjacent or close |
 
 **Default scores (predator).** hunt: by the nearer of prey and carcass, adjacent
 3.5, close 3.0, medium 2.0, far 1.0, none 1.5 (searching), plus the energy push;
@@ -112,9 +115,7 @@ mate: as the prey.
    *rarely, seldom, hardly* −1.2; *always, whatever happens, at all costs* +2.5;
    *whenever, often, usually, eagerly, quickly* +1.2; *sometimes, occasionally,
    maybe* +0.3. With no intensity word, a word of the action itself (eat: *eat,
-   food, feed, graze, forage*; flee: *flee, run, escape, danger, predator* (the
-   prototype also counted *hide* here; with a hide action it moves there); hide:
-   *hide, cover, shelter, thicket*;
+   food, feed, graze, forage*; flee: *flee, run, escape, hide, danger, predator*;
    follow: *follow, stay close, group, companion, herd, pack*; rest: *rest, sleep,
    stay still, wait, save energy, stop, catch your breath, recover*; mate: *mate,
    partner, breed, offspring*; hunt: *hunt, chase, attack, kill, prey, strike,

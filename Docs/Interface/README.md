@@ -157,6 +157,14 @@ reference numbers ([30](30-tests.md), R-02). Texts the brain reads say
 | Unity | The owner upgrades the project to 6000.3 before work starts. |
 | CI hardware | The owner's machine (the one that ran the prototype) as a self-hosted runner. |
 
+## Decisions, third round (2026-10-10)
+
+| Topic | Decision |
+|---|---|
+| Where it runs | All local on the owner's computer for now: JEV and the mutator served there; the default brain is JEV. |
+| Keyword brain | Not included in the Unity system. It stays documented as the prototype's brain and as a possible student exercise. Fast tests use the random brain and a test-only scripted brain. |
+| Edibility | Anything can be eaten or not, decided by components: the eaten thing carries an **edible** component (how it is eaten, how much energy it holds), the eater's **diet** component lists what it eats. Eggs have no edible component, so they can't be eaten until a student adds one. Everything stays modifiable. |
+
 ## Status
 
 Written 2026-10-09, revised the same day after the second round of decisions.

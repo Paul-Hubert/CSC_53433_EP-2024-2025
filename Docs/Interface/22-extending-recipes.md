@@ -19,7 +19,7 @@ the course can go in two steps (owner decision):
    student's version, and the world runs with it. A natural order, from the
    smallest to the largest: `RestAction`, `LevelSense`, `Starvation`, `EatAction`,
    `NearestAnimalSense`, `FleeAction`, `HideAction`, `Stamina`, `Litter`,
-   `UniformCrossover`, `KinematicLocomotion`, `HuntAction`, `KeywordBrain`,
+   `UniformCrossover`, `KinematicLocomotion`, `HuntAction`, `RandomBrain`,
    `LlmMutation`.
 2. **Invent.** Then students add their own: the recipes below, or ideas of their
    own, each with its tests.
@@ -76,11 +76,6 @@ public class NearestWaterSense : Sense
         return water == null ? bands.None : bands.IndexOf(water.Value.Distance, here: 0.5f);
     }
     public override string Write(int t, TextStyle style) => $"Water: {bands.Describe(t, style)}.";
-    public override void DeclareKeywords(KeywordTable k)
-    {
-        k.Condition(@"water is (close|near)|by the water", this, "here", "adjacent", "close");
-        k.Condition(@"no water|far from water", this, "none", "far");
-    }
 }
 ```
 
@@ -104,9 +99,6 @@ public class DrinkAction : AnimalAction
         c.OnArrival(new Drink(thirst));
     }
 
-    public override float KeywordScore(ObservationView o) =>
-        o.Token("Thirst") switch { "high" => 3f, "medium" => 1f, _ => -1f };
-    public override string KeywordPattern => @"\b(drink|water|thirst|thirsty)\b";
     public override bool IsRelevant(ObservationView o) => o.Token("Water") != "none";
 
     sealed class Drink : IInteraction
@@ -141,8 +133,7 @@ the gene interesting, give the trait a cost: e.g. a `Metabolism` setting
 
 Add a `TextGene` that is not under an action and tick *free*; give it a label
 ("temperament") and founders ("Be bold.", "Be careful.", "No preference.").
-It appears in the prompt's genes block and every brain reads it; the keyword
-brain ignores it unless its words match an action.
+It appears in the prompt's genes block and every brain that reads text reads it.
 
 ## 6. A resource layer: berries
 
@@ -181,7 +172,9 @@ public class TinyNetBrain : Brain
 ```
 
 An HTTP brain derives from `HttpBrain` and only builds the request and reads the
-answer. Checklist: copy *T-DEC brain template* (row length, sums to 1, order,
+answer. A good "invent" exercise is a **rule-based brain** like the prototype's
+keyword brain (its tables are in [08 §6](08-decisions-brains-and-prompts.md#6-reference-brains)):
+transparent, fast, and a way to see where words and meaning part. Checklist: copy *T-DEC brain template* (row length, sums to 1, order,
 same query same answer, failure handling).
 
 ## 8. A mutation operator: the intensity ladder
@@ -306,3 +299,21 @@ public class SlopeLocomotion : KinematicLocomotion
 Give the predator a `SlopeLocomotion` and leave the prey kinematic, and the two
 species now move differently over the same terrain. Checklist: V-13 (exactly one
 locomotion per species); MOVE-02 still holds; copy *T-MOVE locomotion template*.
+
+## 15. Food: make eggs edible
+
+No code. Eggs exist only while they incubate, so first give the species an
+incubation above 0 (e.g. 20 ticks on its `Incubation`). Then:
+
+1. add an `Edible` to the world's `EggSystem` (method *graze*: an egg is taken
+   whole; energy 15);
+2. on the egg eater (a new species, or the predator), add a diet entry
+   `egg:prey`;
+3. give the egg eater a way to find eggs: an `EatAction` pointed at eggs, or a
+   new action, with a sense "Eggs: 1-4 meters away." if its brain should know.
+
+Validation V-24 stays quiet once the egg kind is edible; eaten eggs are recorded
+as `egg_lost` with the reason "eaten". The same two components make anything
+else edible: fruit entities, a species that was never prey, carcasses of a
+species that leaves none by default.
+

@@ -30,14 +30,22 @@ the **food web**.
 
 ## 2. The food web
 
-- **SPEC-10 (MUST)** Each species has a **diet**: a list of entries
-  *(target, method, gain)*:
+- **SPEC-10 (MUST)** Whether something can be eaten is decided by components
+  (owner decision). The eaten thing carries an **edible** component: on a
+  resource layer (its items), on a species (its living animals), on an entity
+  kind (carcasses, eggs, fruit…). The edible component says how it is eaten and
+  how much energy it holds:
 
-  | Method | Target | Effect |
+  | Method | Typical edible | Effect |
   |---|---|---|
-  | graze | a resource layer | consume an item within reach, gain its energy |
-  | strike | a species | try to kill an animal within reach; on success gain energy and maybe leave a carcass |
-  | scavenge | carcasses of a species | eat one portion within reach |
+  | graze | a resource layer's items | consume an item within reach, gain its energy |
+  | strike | a species' animals | try to kill an animal within reach; on success gain its energy and maybe leave a carcass |
+  | scavenge | carcasses (or any entity with portions) | eat one portion within reach |
+
+  Without an edible component, nothing can eat that thing, whatever the diets say.
+- **SPEC-15 (MUST)** The eater's **diet** component lists its preferences: which
+  edible things it eats (by layer, species or entity kind), each MAY scale the
+  energy gained (default × 1). A species with no diet eats nothing.
 
 - **SPEC-11 (MUST)** A species may hunt any species, including its own
   (cannibalism). An animal never targets itself. A cannibal species is among
@@ -48,8 +56,8 @@ the **food web**.
   strikes it. They are derived from the food web, not configured twice. Senses
   and actions that refer to "threats", "prey" or "kin" resolve these sets from
   the food web; each MAY override the set explicitly (e.g. flee only from wolves).
-- **SPEC-13 (MUST)** An interaction happens only if the diet allows it: an
-  animal grazes, strikes or scavenges only what its diet lists.
+- **SPEC-13 (MUST)** An interaction happens only if both sides allow it: the
+  target is edible (SPEC-10) and the eater's diet lists it (SPEC-15).
 - **SPEC-14 (SHOULD)** The editor shows the food web and warns about: a species
   with no food source; a hunter whose prey doesn't exist; a flee action with no
   threat to flee from; a cycle where every species hunts every other.
@@ -91,7 +99,9 @@ action, sense and gene.
 | Text genes | one per action, same order | one per action, same order |
 | Number genes | none | none |
 | Senses, in situation-text order | energy level, stamina level, food, nearest threat ("Predator"), nearest cover ("Cover"), nearest kin with readiness ("Animal"), age | energy level, stamina level, nearest prey ("Prey"), nearest edible carcass ("Carcass"), nearest kin with readiness ("Other predator"), age |
-| Diet | graze the food layer (+25) | strike prey (kill chance 0.5, +60, leaves a carcass), scavenge prey carcasses (+30) |
+| Edible | yes: struck, 60 energy per kill, leaves a carcass of 2 portions × 30 that rots in 100 ticks | no |
+| Diet | the food layer (grazed, 25 per item) | prey (strike, kill chance 0.5 as a trait of the hunter), prey carcasses (scavenge) |
+| Eggs | not edible (no edible component) | not edible |
 | Threats (derived) | predator | none |
 | Hidden from threats in cover | yes | — |
 

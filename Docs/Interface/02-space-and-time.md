@@ -102,6 +102,7 @@ the simulation waits, so that a decision is never made on old observations.
 | Real time | k ticks per second, for watching |
 | Stop condition | a tick count, a wall-clock limit, a stop file or button, extinction of a species |
 
-**Reference.** One tick ≈ one step of one meter at walking speed. With the
-keyword brain the prototype takes about 17 ms per tick for about 330 animals in the
-192 × 192 world (Python); a C# implementation should be well below that.
+**Reference.** One tick ≈ one step of one meter at walking speed. Without a
+model in the loop (its keyword brain) the prototype took about 17 ms per tick for
+about 330 animals in the 192 × 192 world (Python); a C# implementation should be
+well below that, the brain's own time excluded.
