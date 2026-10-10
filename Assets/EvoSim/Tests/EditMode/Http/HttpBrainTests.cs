@@ -304,5 +304,31 @@ namespace EvoSim.Tests
             Assert.AreEqual(freeze, Run(WaitMode.Responsive, cacheDir, out int r3, 15));
             Assert.AreEqual(0, r3, "replayed from the cache with zero calls");
         }
+
+        [Test, Description("DEC-30, DEC-33 (13 §4): a run replayed from the answer cache counts like the live run — per species the same decisions, brain queries after the memo and memo hits — and its model calls become cache hits")]
+        public void ReplayCountsLikeTheLiveRun()
+        {
+            string cacheDir = TempFolder("evosim-replay-counters");
+            World Run(string name)
+            {
+                var w = JevWorld(FakeJev(), 23, WaitMode.Freeze, cacheDir, name: name);
+                while (w.Tick < 120) w.Advance(1);
+                return w;
+            }
+            var live = Run("jev-live");
+            var replay = Run("jev-replay");
+            Assert.AreEqual(live.Events.Hash, replay.Events.Hash);
+            Assert.Greater(live.Decisions.ModelCalls, 0);
+            Assert.AreEqual(0, replay.Decisions.ModelCalls, "the replay asks no model");
+            Assert.Greater(replay.Decisions.CacheHits, 0);
+            foreach (var s in live.AllSpecies)
+            {
+                var r = replay.FindSpecies(s.Id).Counters;
+                Assert.Greater(s.Counters.MemoHits, 0, s.Id + ": the memo was used, so the comparison means something");
+                Assert.AreEqual(s.Counters.Decisions, r.Decisions, s.Id + " decisions");
+                Assert.AreEqual(s.Counters.BrainQueries, r.BrainQueries, s.Id + " brain queries after the memo (stats backend_queries)");
+                Assert.AreEqual(s.Counters.MemoHits, r.MemoHits, s.Id + " memo hits (summary memo_hit_rate)");
+            }
+        }
     }
 }

@@ -18,7 +18,12 @@ namespace EvoSim
             var state = World.Decisions;
             foreach (var d in state.Due)
             {
-                if (d.Answer == null) continue;
+                if (d.Answer == null)
+                {
+                    // DEC-30: a cached answer joins the memo where a live one would, so a replay counts like the live run (13 §4).
+                    if (d.Source == "cache") state.Memo.Store(d.MemoKey, d.Row);
+                    continue;
+                }
                 state.ModelCalls += d.AnswerIndex == 0 ? d.Answer.ModelCalls : 0;
                 d.Animal.Species.Counters.BrainMilliseconds += d.Answer.Milliseconds / d.Answer.Count;   // each query's share (backend_s)
                 var row = d.Answer.Row(d.AnswerIndex);
