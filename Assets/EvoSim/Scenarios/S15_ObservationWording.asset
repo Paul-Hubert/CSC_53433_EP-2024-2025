@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a848ffdcb441a8448c1b33aeb415ce1, type: 3}
+  m_Name: S15_ObservationWording
+  m_EditorClassIdentifier: EvoSim.Runtime::EvoSim.ScenarioAsset
+  title: S15 Observation wording
+  scene: Assets/EvoSim/Scenes/Lab1_Small.unity
+  set: []
+  variants:
+  - name: V1
+    brain: JEV
+    tier: T4
+    set:
+    - path: World/textStyle
+      value: V1
+    remove: []
+  - name: V2
+    brain: JEV
+    tier: T4
+    set:
+    - path: World/textStyle
+      value: V2
+    remove: []
+  seeds: d2040000070000002a000000
+  ticks: 1000
+  brain: JEV
+  expect:
+  - invariants
+  - G1 holds in V1 and V2
+  tier: T4

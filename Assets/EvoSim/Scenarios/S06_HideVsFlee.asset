@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a848ffdcb441a8448c1b33aeb415ce1, type: 3}
+  m_Name: S06_HideVsFlee
+  m_EditorClassIdentifier: EvoSim.Runtime::EvoSim.ScenarioAsset
+  title: S06 Hide versus flee
+  scene: Assets/EvoSim/Scenes/Lab1_Full.unity
+  set: []
+  variants:
+  - name: hide-and-flee
+    brain: JEV
+    tier: T4
+    set: []
+    remove: []
+  - name: flee-only
+    brain: JEV
+    tier: T4
+    set: []
+    remove:
+    - Prey/Actions/hide
+    - Prey/Senses/Cover
+  - name: prototype
+    brain: JEV
+    tier: T4
+    set:
+    - path: Prey/Actions/flee/FleeAction/fleeIntoCover
+      value: true
+    remove:
+    - Prey/Actions/hide
+    - Prey/Senses/Cover
+  seeds: d2040000070000002a00000063000000ea070000
+  ticks: 5000
+  brain: JEV
+  expect:
+  - invariants
+  - deterministic
+  - kills(hide-and-flee) < kills(flee-only) in >= 4/5 seeds
+  - share(prey, hide) > 0.02 in hide-and-flee
+  tier: T4

@@ -573,15 +573,94 @@ namespace EvoSim.Editor
             var s02 = Scenario("S02_Lab1Reference", "S02 Lab 1 reference", ScenesFolder + "/Lab1_Full.unity", 2000, "", "T4",
                                "invariants", "deterministic", "no newcomer in 10 000 ticks (R-03)");
             s02.variants = new List<ScenarioAsset.Variant> { Online("default", "JEV"), Offline("random") };
+
+            // The other scene-based scenarios of 31 §2; the ones that need code (S01, S08, S10–S14, S16, S18, S21,
+            // S22, S24, S28) are tests (Tests/EditMode/Scenarios and the systems' tests).
+            string small = ScenesFolder + "/Lab1_Small.unity", full = ScenesFolder + "/Lab1_Full.unity";
+            Scenario("S00_EmptyWorld", "S00 Empty world", ScenesFolder + "/Sandbox.unity", 1000, "Random", "T2", "invariants", "deterministic")
+                .variants = new List<ScenarioAsset.Variant> { Offline("default", "Grazer") };
+            Scenario("S04_NullBrain", "S04 Null brain", full, 2000, "Random", "T4", "invariants", "predators need newcomers in 5/5 seeds")
+                .variants = new List<ScenarioAsset.Variant> { Online("default", "Random") };
+            Scenario("S05_Controls", "S05 Controls", small, 1000, "Random", "T4", "invariants", "deterministic", "each control's defining fact")
+                .variants = new List<ScenarioAsset.Variant>
+                {
+                    Offline("C2"), Variant("C3", "Random", "T4", ("World/shuffledGenes", "true")), Variant("C4", "Random", "T4", ("World/randomFounders", "true")),
+                    Variant("C7", "Random", "T4", ("World/asexual", "true")),
+                };
+            var s06 = Scenario("S06_HideVsFlee", "S06 Hide versus flee", full, 5000, "JEV", "T4", "invariants", "deterministic",
+                               "kills(hide-and-flee) < kills(flee-only) in >= 4/5 seeds", "share(prey, hide) > 0.02 in hide-and-flee");
+            s06.seeds = new List<int> { 1234, 7, 42, 99, 2026 };
+            s06.variants = new List<ScenarioAsset.Variant>
+            {
+                Online("hide-and-flee", "JEV"),
+                Online("flee-only", "JEV", "Prey/Actions/hide", "Prey/Senses/Cover"),
+                With(Online("prototype", "JEV", "Prey/Actions/hide", "Prey/Senses/Cover"), ("Prey/Actions/flee/FleeAction/fleeIntoCover", "true")),
+            };
+            Scenario("S07_NoCover", "S07 No cover", full, 5000, "JEV", "T4", "invariants", "validation has no error", "more prey killed than S02 in >= 4/5 seeds")
+                .variants = new List<ScenarioAsset.Variant> { Online("default", "JEV", "Environment/Thickets", "Prey/Actions/hide", "Prey/Senses/Cover") };
+            Scenario("S09_FoodChain", "S09 Food chain of three", ScenesFolder + "/ThreeSpecies.unity", 5000, "Random", "T3", "invariants", "deterministic")
+                .variants = new List<ScenarioAsset.Variant> { Offline("default"), Online("jev", "JEV") };
+            Scenario("S15_ObservationWording", "S15 Observation wording", small, 1000, "JEV", "T4", "invariants", "G1 holds in V1 and V2")
+                .variants = new List<ScenarioAsset.Variant> { Variant("V1", "JEV", "T4", ("World/textStyle", "V1")), Variant("V2", "JEV", "T4", ("World/textStyle", "V2")) };
+            Scenario("S17_TerrainLocomotion", "S17 Terrain and locomotion", ScenesFolder + "/Terrain_Locomotion.unity", 2000, "Random", "T3",
+                     "invariants", "deterministic", "no animal on water or mountain")
+                .variants = new List<ScenarioAsset.Variant> { Offline("kinematic") };
+            Scenario("S19_ActOrders", "S19 Act orders", full, 2000, "Random", "T3", "invariants", "deterministic")
+                .variants = new List<ScenarioAsset.Variant>
+                {
+                    With(Offline("species-in-turn"), ("Phases/Act/ActPhase/order", "SpeciesInTurn")),
+                    With(Offline("all-mixed"), ("Phases/Act/ActPhase/order", "AllMixed")),
+                    With(Offline("simultaneous"), ("Phases/Act/ActPhase/order", "Simultaneous")),
+                };
+            Scenario("S20_CapRules", "S20 Cap rules", full, 5000, "JEV", "T4", "invariants", "generations(block) < generations(migrate) in >= 4/5 seeds")
+                .variants = new List<ScenarioAsset.Variant>
+                {
+                    Variant("migrate", "JEV", "T4", ("Prey/CapRule/mode", "Migrate"), ("Predator/CapRule/mode", "Migrate")),
+                    Variant("block", "JEV", "T4", ("Prey/CapRule/mode", "Block"), ("Predator/CapRule/mode", "Block")),
+                };
+            Scenario("S23_Scale", "S23 Scale", full, 500, "Random", "T3", "invariants", "tick time under 12 ms")
+                .variants = new List<ScenarioAsset.Variant>
+                {
+                    With(Offline("x6"), ("Prey/CapRule/cap", "1620"), ("Predator/CapRule/cap", "408"),
+                         ("Prey/Species/initialPopulation", "816"), ("Predator/Species/initialPopulation", "168")),
+                };
+            Scenario("S25_DecisionTiming", "S25 Decision timing", small, 400, "Random", "T2", "invariants", "deterministic")
+                .variants = new List<ScenarioAsset.Variant>
+                {
+                    With(Offline("period-1"), ("World/decisionPeriod", "1")), With(Offline("period-4"), ("World/decisionPeriod", "4")),
+                    With(Offline("period-8"), ("World/decisionPeriod", "8")),
+                };
+            Scenario("S26_NamesInGenes", "S26 Names in genes", small, 1000, "JEV", "T4", "P(flee | shadow close) < P(flee | wolf close)", "V-23 flags the gene")
+                .variants = new List<ScenarioAsset.Variant>
+                {
+                    Variant("wolf", "JEV", "T4", ("Predator/Species/displayName", "wolf")), Variant("shadow", "JEV", "T4", ("Predator/Species/displayName", "shadow")),
+                };
+            Scenario("S27_Lab1WithLLM", "S27 Lab 1 with an LLM", full, 500, "JEV", "T4", "no failed call", "no species needs newcomers")
+                .variants = new List<ScenarioAsset.Variant> { Online("jev", "JEV"), Online("gemma", "Ollama points") };
         }
 
-        static ScenarioAsset.Variant Offline(string name) => new ScenarioAsset.Variant
+        static ScenarioAsset.Variant Variant(string name, string brain, string tier, params (string path, string value)[] set)
         {
-            name = name, brain = "Random", tier = "T2",
+            var v = new ScenarioAsset.Variant { name = name, brain = brain, tier = tier };
+            foreach (var (path, value) in set) v.set.Add(new ScenarioAsset.Override(path, value));
+            return v;
+        }
+
+        static ScenarioAsset.Variant With(ScenarioAsset.Variant v, params (string path, string value)[] set)
+        {
+            foreach (var (path, value) in set) v.set.Add(new ScenarioAsset.Override(path, value));
+            return v;
+        }
+
+        /// <summary>A variant that makes no model call: the random brain and C2 (no mutation).</summary>
+        static ScenarioAsset.Variant Offline(string name, params string[] remove) => new ScenarioAsset.Variant
+        {
+            name = name, brain = "Random", tier = "T2", remove = new List<string>(remove),
             set = new List<ScenarioAsset.Override> { new ScenarioAsset.Override("World/noMutation", "true") },
         };
 
-        static ScenarioAsset.Variant Online(string name, string brain) => new ScenarioAsset.Variant { name = name, brain = brain, tier = "T4" };
+        static ScenarioAsset.Variant Online(string name, string brain, params string[] remove) =>
+            new ScenarioAsset.Variant { name = name, brain = brain, tier = "T4", remove = new List<string>(remove) };
 
         static ScenarioAsset Scenario(string file, string title, string scene, int ticks, string brain, string tier, params string[] expect)
         {
