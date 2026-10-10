@@ -371,6 +371,42 @@ namespace EvoSim.Editor
             life.AddComponent<OldAge>().SetMaxAge(1500);
             life.AddComponent<CapRule>().Configure(cap);
             life.AddComponent<FloorRule>().Floor = floor;
+            life.AddComponent<DecisionSchedule>().Configure(0, true);                 // staggered decisions: the reference (DEC-04, owner 2026-10-10)
+        }
+
+        /// <summary>
+        /// Gives every species of the reference scenes a staggered DecisionSchedule in its Life group, as the builder now does
+        /// (DEC-04, owner 2026-10-10), without rebuilding the scenes. Species that have a schedule are left alone.
+        /// </summary>
+        [MenuItem("EvoSim/Reference/Stagger Decisions in Reference Scenes")]
+        public static string StaggerReferenceScenes()
+        {
+            var lines = new List<string>();
+            foreach (var file in Directory.GetFiles(ScenesFolder, "*.unity"))
+            {
+                string path = file.Replace('\\', '/');
+                if (SceneManager.GetSceneByPath(path).isLoaded) { lines.Add(path + ": open in the editor, skipped"); continue; }
+                var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
+                try
+                {
+                    var added = new List<string>();
+                    foreach (var root in scene.GetRootGameObjects())
+                        foreach (var s in root.GetComponentsInChildren<Species>(true))
+                        {
+                            if (s.GetComponentInChildren<DecisionSchedule>(true) != null) continue;
+                            var life = s.transform.Find("Life");
+                            var go = life != null ? life.gameObject : s.gameObject;
+                            go.AddComponent<DecisionSchedule>().Configure(0, true);
+                            added.Add(s.name);
+                        }
+                    if (added.Count > 0) EditorSceneManager.SaveScene(scene);
+                    lines.Add($"{Path.GetFileNameWithoutExtension(path)}: {(added.Count > 0 ? string.Join(", ", added) : "nothing")}");
+                }
+                finally { EditorSceneManager.CloseScene(scene, true); }
+            }
+            string result = string.Join("\n", lines);
+            Debug.Log("EvoSim staggered decisions:\n" + result);
+            return result;
         }
 
         /// <summary>An instance of a module prefab with the pool of the given locus (prefab override when it differs).</summary>

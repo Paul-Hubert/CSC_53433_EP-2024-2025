@@ -2,8 +2,9 @@
 
 ## 1. When animals decide
 
-- **DEC-01 (MUST)** Every `decisionPeriod` ticks (reference 4: ticks 0, 4, 8, …)
-  every living animal that is not busy decides. On the other ticks only animals
+- **DEC-01 (MUST)** Every `decisionPeriod` ticks (reference 4) every living animal
+  that is not busy decides: all together on ticks 0, 4, 8, …, or each on its own
+  ticks when decisions are staggered (DEC-04, the reference). On the other ticks only animals
   without an action decide: babies just born or hatched, newcomers, and animals
   whose busy state ended on the previous tick.
 - **DEC-02 (MUST)** A busy animal never decides (ANIM-30).
@@ -11,7 +12,10 @@
   period* flags are cleared.
 - **DEC-04 (MAY)** A species may have its own decision period, and decisions may
   be staggered (an animal decides when `(tick + id) % period == 0`) to spread the
-  brain's load. Both change behaviour; both are off in the reference.
+  brain's load. Both change behaviour. The reference staggers: every species of the
+  reference scenes has a staggered schedule (owner 2026-10-10: under JEV a run is
+  about 13 % faster and never stalls ~10 s every fourth tick); its own period is off.
+  A world without a schedule decides all together, as the Python prototype does.
 
 ## 2. Queries and the brain interface
 

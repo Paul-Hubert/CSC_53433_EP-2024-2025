@@ -14,6 +14,8 @@ namespace EvoSim
         bool staggered;
 
         public int Period(World w) => period > 0 ? period : w.DecisionPeriod;
+        /// <summary>Spread decisions over the period by animal id (DEC-04).</summary>
+        public bool Staggered { get => staggered; set => staggered = value; }
 
         /// <summary>Whether this animal's periodic decision falls on this tick.</summary>
         public virtual bool IsDue(Animal a, int tick, World w)

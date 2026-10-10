@@ -133,7 +133,7 @@ namespace EvoSim.Editor
         /// Enter Play mode afterwards (editor_play); leaving Play mode forgets them.
         /// </summary>
         public static string PreparePlay(string scene, int seed, int ticks, float ticksPerSecond, string level, string runName, bool responsive = true,
-                                         float captureSeconds = 10f)
+                                         float captureSeconds = 10f, string extra = "")
         {
             if (EditorApplication.isPlaying) return "leave Play mode first";
             if (level != "L0" && level != "L1" && level != "L2") return "level " + level + ": L0, L1 or L2";
@@ -142,7 +142,7 @@ namespace EvoSim.Editor
             EditorSceneManager.OpenScene(ScenePath(scene), OpenSceneMode.Single);
             string args = string.Join(" ", "-scene", scene, "-seed", seed, "-ticks", ticks, "-speed", ticksPerSecond.ToString(System.Globalization.CultureInfo.InvariantCulture),
                                       "-wait", responsive ? "responsive" : "freeze", "-capture", captureSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                                      "-run", runName, LevelArgs(level)).Trim();
+                                      "-run", runName, LevelArgs(level), extra ?? "").Trim();
             SessionState.SetString(PlayArgsKey, args);
             return $"{scene} open, unchanged; on Play: {args}";
         }

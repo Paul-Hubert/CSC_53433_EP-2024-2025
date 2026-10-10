@@ -58,6 +58,17 @@ namespace EvoSim.Tests
             StringAssert.EndsWith(System.IO.Path.Combine("Temp", "EvoSimCacheTest"), w.GetComponentInChildren<AnswerCache>(true).Folder);
             StringAssert.Contains("seed 99", said);
 
+            var stagger = New(2).Lab1(prey: 12, predators: 4).BuildUninitialized();
+            var sp = PlayerArgs.Parse(new[] { "-stagger" });
+            Assert.IsTrue(sp.Stagger);
+            StringAssert.Contains("staggered", sp.ApplyTo(stagger));
+            Assert.IsTrue(stagger.Initialize(), stagger.LastReport.ToString());
+            stagger.Advance(1);                                                             // tick 0: every founder decides (no action yet, DEC-01)
+            int before = stagger.AllSpecies.Sum(s => s.Counters.Decisions);
+            stagger.Advance(1);
+            int animals = stagger.AllSpecies.Sum(s => s.Animals.Count), decided = stagger.AllSpecies.Sum(s => s.Counters.Decisions) - before;
+            Assert.That(decided, Is.GreaterThan(0).And.LessThan(animals), "DEC-04: on tick 1 the animals with (1 + id) % 4 == 0 decide; unstaggered, none");
+
             var unknown = PlayerArgs.Parse(new[] { "-brain", "nobody" });
             unknown.ApplyTo(w);
             Assert.AreEqual(1, unknown.Problems.Count);

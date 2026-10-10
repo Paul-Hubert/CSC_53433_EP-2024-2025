@@ -180,6 +180,7 @@ GameObject:
   - component: {fileID: 49072924}
   - component: {fileID: 49072923}
   - component: {fileID: 49072922}
+  - component: {fileID: 49072930}
   m_Layer: 0
   m_Name: Life
   m_TagString: Untagged
@@ -315,6 +316,20 @@ MonoBehaviour:
 
     breeds as soon as it reaches a ready partner, whatever the partner
     is doing.'
+--- !u!114 &49072930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 49072920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f30b5ebe26c0b4148b7f79da27ce35a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: EvoSim.Runtime::EvoSim.DecisionSchedule
+  period: 0
+  staggered: 1
 --- !u!1 &129196318
 GameObject:
   m_ObjectHideFlags: 0
@@ -4678,6 +4693,7 @@ GameObject:
   - component: {fileID: 1819429889}
   - component: {fileID: 1819429888}
   - component: {fileID: 1819429887}
+  - component: {fileID: 1819429895}
   m_Layer: 0
   m_Name: Life
   m_TagString: Untagged
@@ -4813,6 +4829,20 @@ MonoBehaviour:
 
     breeds as soon as it reaches a ready partner, whatever the partner
     is doing.'
+--- !u!114 &1819429895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1819429885}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f30b5ebe26c0b4148b7f79da27ce35a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: EvoSim.Runtime::EvoSim.DecisionSchedule
+  period: 0
+  staggered: 1
 --- !u!1 &1825900601
 GameObject:
   m_ObjectHideFlags: 0
@@ -5154,6 +5184,7 @@ MonoBehaviour:
   panSpeed: 0.8
   orbitSpeed: 90
   pickPixels: 24
+  followDistance: 15
 --- !u!1 &1904130657
 GameObject:
   m_ObjectHideFlags: 0
@@ -5344,6 +5375,7 @@ GameObject:
   - component: {fileID: 1949387253}
   - component: {fileID: 1949387252}
   - component: {fileID: 1949387251}
+  - component: {fileID: 1949387259}
   m_Layer: 0
   m_Name: Life
   m_TagString: Untagged
@@ -5479,6 +5511,20 @@ MonoBehaviour:
 
     breeds as soon as it reaches a ready partner, whatever the partner
     is doing.'
+--- !u!114 &1949387259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1949387249}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f30b5ebe26c0b4148b7f79da27ce35a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: EvoSim.Runtime::EvoSim.DecisionSchedule
+  period: 0
+  staggered: 1
 --- !u!1 &2063548745
 GameObject:
   m_ObjectHideFlags: 0

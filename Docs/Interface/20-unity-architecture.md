@@ -99,7 +99,7 @@ Lab1 World                                [World]  seed, wait mode, act order, d
 │   │   └── mate   (prefab Mate)          [MateAction] [TextGene]
 │   ├── Food                              [Diet] grass   [Edible] struck, 60 per kill, carcass 2 × 30, 100 ticks
 │   ├── Life                              [MatingRule] [Litter] [UniformCrossover] [Incubation 0]
-│   │                                     [Starvation] [OldAge] [CapRule] [FloorRule]
+│   │                                     [Starvation] [OldAge] [CapRule] [FloorRule] [DecisionSchedule staggered]
 │   └── Mutation                          [LlmMutation] deck mutate_v4
 └── Predator                              [Species] id and name "predator"
     ├── Locomotion                        [KinematicLocomotion] walk 1, run 2 m per tick

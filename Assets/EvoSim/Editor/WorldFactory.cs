@@ -27,7 +27,7 @@ namespace EvoSim.Editor
             return go;
         }
 
-        /// <summary>A species with a kinematic locomotion, energy, stamina, metabolism, diet, mating, litter, crossover, starvation, old age, cap and floor.</summary>
+        /// <summary>A species with a kinematic locomotion, energy, stamina, metabolism, diet, mating, litter, crossover, starvation, old age, cap, floor and staggered decisions.</summary>
         public static GameObject NewSpecies(GameObject world, string name = "grazer")
         {
             var go = new GameObject(name);
@@ -52,6 +52,7 @@ namespace EvoSim.Editor
             life.AddComponent<OldAge>();
             life.AddComponent<CapRule>();
             life.AddComponent<FloorRule>();
+            life.AddComponent<DecisionSchedule>().Configure(0, true);                 // staggered, like the reference species (DEC-04)
             go.AddComponent<Body>();
             return go;
         }
