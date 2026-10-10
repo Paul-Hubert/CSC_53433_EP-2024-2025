@@ -9,7 +9,9 @@ M13 waits at its checkpoint ⏸: the owner watches HideVsFlee (Play mode, or `Bu
 reads `Logs/EvoSim/Reports/RT-2026-10-10.md`. The owner's three M13 decisions are done (M13.4–M13.6): cache hits join the
 memo, the course's scripts build for a player, the reference scenes stagger decisions (R-01 re-pinned). The reference
 decision period was tried at 20 (M13.8) and 10 (M13.9, a 10-minute live L2 build run:
-`Logs/EvoSim/Reports/RT-2026-10-11-P10.md`), then set back to 4 (M13.10, owner). Still open from M12:
+`Logs/EvoSim/Reports/RT-2026-10-11-P10.md`), then set back to 4 (M13.10, owner). Long runs on five scenes are prepared,
+not started (owner): `Logs/EvoSim/long-runs/README.md` (runner, analysis, replay; build `Builds/EvoSim/2026-10-11-p4`;
+about 2 300–3 600 JEV calls per scene per 10 minutes, so the owner picks scenes and minutes). Still open from M12:
 40 §2 #1, #2 (golden texts), #13 (the B-10 bar), #15–#17 (wording, new codes and seams for the contract).
 EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh); long runs on the batch copy.
 
