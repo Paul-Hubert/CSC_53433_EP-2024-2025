@@ -1261,3 +1261,22 @@ the memo where it is read; it changes counters only. Left to the owner (the mean
 Packages, ProjectSettings) builds with 0 errors in about 3 min the first time (package import), seconds afterwards.
 That one in-project build attempt also made Unity rewrite `ProjectSettings/UnityConnectSettings.asset` (a format upgrade
 with `m_Enabled: 1`, 21:45); it was restored from git and nothing else in ProjectSettings changed.
+
+### M13.4–M13.6 (2026-10-11): the owner's three decisions
+- **Memo (M13.4, DEC-30).** `ChooseActionsPhase` stores a cached row in the memo in the same loop and order as a live
+  answer (storing it in AskBrainsPhase would turn later same-tick repeats into memo hits, which a live run counts as
+  brain queries). Test `HttpBrainTests.ReplayCountsLikeTheLiveRun` (failed before: prey brain queries 368 live, 493
+  replayed). HideVsFlee L2: the replay's stats.csv is byte-identical to the live run's (prey 3 730 / predator 386 queries,
+  memo rates 0.222 / 0.245); its cache hits (4 105) equal the live model calls.
+- **Player build (M13.5).** `MeshDeformer.cs`: the `AssetDatabase` count that names the deformed copy is editor-only; a
+  player uses `GetInstanceID()`. `FabricIK.cs`: `using UnityEditor` and `OnDrawGizmos` (Handles) inside
+  `#if UNITY_EDITOR`. Encodings kept (Windows-1252, UTF-8 with BOM), 8 lines added. `CompilePlayerScriptsLater`: 14
+  player assemblies, no error; a full build from the project into `Builds/EvoSim/2026-10-10-project` (0 errors) gives the
+  L0 hash `27c52857…`. Each in-project build makes Unity rewrite `ProjectSettings/UnityConnectSettings.asset`; restored.
+- **Staggering (M13.6, DEC-04).** Measured first: 100 live L2 ticks of HideVsFlee seed 1234 staggered (`-stagger`):
+  165 s, JEV mean 1.36 s / max 3.1 s per request, 99 waits of ~1.4 s; unstaggered (the M13 live run) ~190 s for the same
+  ticks, mean 2.54 s / max 11.6 s, a ~10 s stall every fourth tick; about the same queries (672 against ~680). JEV's
+  throughput (~4 queries/s) still bounds the pace. The owner chose staggering for every reference scene: a staggered
+  DecisionSchedule in each species' Life group (builder `Life()`, the menu's NewSpecies, the six scenes migrated: 11
+  species). Tests building worlds in code keep the all-together schedule. R-01 re-pinned: all 12 hashes changed; a second
+  run reproduced the file. `-stagger` (PlayerArgs, PreparePlay's `extra`) staggers any scene for one run.

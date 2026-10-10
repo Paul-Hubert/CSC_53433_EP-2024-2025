@@ -6,8 +6,8 @@ The single source of truth between implementation sessions of
 
 ## Next step
 M13 waits at its checkpoint ⏸: the owner watches HideVsFlee (Play mode, or `Builds/EvoSim/2026-10-10/EvoSim.exe`) and
-reads `Logs/EvoSim/Reports/RT-2026-10-10.md`. Open owner decisions from M13: memoise cache hits (problem 1 below), the
-course's scripts that block a player build (problem 8), staggered decisions for pace (problem 4). Still open from M12:
+reads `Logs/EvoSim/Reports/RT-2026-10-10.md`. The owner's three M13 decisions are done (M13.4–M13.6): cache hits join the
+memo, the course's scripts build for a player, the reference scenes stagger decisions (R-01 re-pinned). Still open from M12:
 40 §2 #1, #2 (golden texts), #13 (the B-10 bar), #15–#17 (wording, new codes and seams for the contract).
 EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh); long runs on the batch copy.
 
@@ -27,7 +27,7 @@ EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh
 | M10 Editor tooling | done | c61f043 | a world from the menus validates and runs; T-EDIT-01 for every catalogue code; windows not checked by eye |
 | M11 Samples, scenarios, verification, CI | done | e5f402d…cde9e9c, M11.5 | samples, conformance, CI, scenarios S00–S27, R-01…R-08, coverage test; EditMode 319 + T3, PlayMode 17/17; gates B-01…B-11 (Machine) |
 | M12 Teaching path and final audit | review | bb6b46a, 1eaa571, 66a81e5, 83019ce, M12.5 | 14 stubs, Exercises menu, README (no grading, hooks); P1 phases 1–2; EditMode 433/433 (with soak and pinned hashes), PlayMode 19/19 ⏸ |
-| M13 Real-time visual test | review | ed16db5, M13.2, M13.3 | scenes watchable (ground, food, cover, markers, overlay, camera, capture); L0 and L2 hashes equal headless = Play = build; EditMode 437/437, PlayMode 23/23; report RT-2026-10-10 ⏸ |
+| M13 Real-time visual test | review | ed16db5, d155e72, 29838b3, M13.4–M13.7 | scenes watchable (ground, food, cover, markers, overlay, camera, capture); L0 and L2 hashes equal headless = Play = build; then memo of cache hits, player build of the project, staggered reference; EditMode 438/438, PlayMode 23/23; report RT-2026-10-10 ⏸ |
 
 ## Machine
 - Unity **6000.3.9f1**: `C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Unity.exe`
@@ -80,11 +80,13 @@ unity command --result-only eval --code 'return EvoSim.Editor.RealTimeRuns.Headl
 unity command --result-only eval --code 'return EvoSim.Editor.RealTimeRuns.HeadlessStatus();'   # or Logs/EvoSim/realtime-headless.txt
 unity command --result-only eval --code 'return EvoSim.Editor.RealTimeRuns.Behaviour("HideVsFlee", 1234, 600, "L2");'
 ```
-The player can't be built in this project (the course's scripts, problem 8): build it from a copy holding Assets/EvoSim,
-Packages and ProjectSettings, on a short path (`subst W: <scratchpad>`; a long path breaks Unity's package cache):
-`Unity.exe -batchmode -projectPath W:/buildcopy -executeMethod EvoSim.Editor.VisualPlayerBuild.BuildFromCommandLine -out
-<repo>/Builds/EvoSim/<date> -logFile …` (Windows 64, Mono, six scenes, HideVsFlee first; no settings changed). Then
-`EvoSim.exe -scene HideVsFlee -seed 1234 -ticks 600 -speed 20 [-brain Random -noMutation] -capture 10 -run NAME
+Player build (Windows 64, Mono, six scenes, HideVsFlee first): EvoSim ▸ Build ▸ Visual Player, or from the CLI
+`eval 'return EvoSim.Editor.VisualPlayerBuild.BuildLater();'` (result in Logs/EvoSim/visual-player-build.txt); a build
+makes Unity rewrite `ProjectSettings/UnityConnectSettings.asset` (restore it, or commit Unity's version once). Batch, or
+a copy of Assets/EvoSim + Packages + ProjectSettings on a short path (`subst W:`): `-executeMethod
+EvoSim.Editor.VisualPlayerBuild.BuildFromCommandLine -out <repo>/Builds/EvoSim/<date>`. Scripts only:
+`VisualPlayerBuild.CompilePlayerScriptsLater()` (Logs/EvoSim/player-scripts.txt). Then
+`EvoSim.exe -scene HideVsFlee -seed 1234 -ticks 600 -speed 20 [-brain Random -noMutation] [-stagger] -capture 10 -run NAME
 -window 1920x1080 -quitAtEnd -logFile p.log` (`-screen-fullscreen 0` alone stays fullscreen). Run files, captures and the
 answer cache land next to the exe (`Logs/EvoSim/…`, `Library/EvoSim/AnswerCache`); copy the editor's cache there to replay.
 Ollama for L2: `OLLAMA_MAX_LOADED_MODELS=1 OLLAMA_KEEP_ALIVE=2h ollama serve`, gemma4:26b warmed with num_gpu 0 (9 GB RAM).
@@ -122,6 +124,14 @@ M0–M11: in [51](51-implementation-log.md). Since then:
 - M13 — Play settings from the CLI go in through `World.Configuring` (the player's `PlayerArgs`), never into the scene file.
 - M13 — L2 live calls happened in Play mode at 5 ticks/s (owner's choice); headless, 20 ticks/s, the build and the 10-minute
   run replayed the answer cache. 4 105 JEV calls for an estimate of 3 300 (owner agreed at tick 536).
+- DEC-30 (M13.4, owner) — a cached answer joins the memo where a live one would (ChooseActionsPhase, Due order), so a replay
+  counts exactly like the live run: HideVsFlee L2 replay stats.csv byte-identical to the live run's.
+- M13.5 (owner) — the course's two scripts guard their editor-only lines with `#if UNITY_EDITOR`; the project builds its
+  own player (the copy is no longer needed).
+- DEC-04 (M13.6, owner) — staggered decisions are the reference: a staggered DecisionSchedule in every species' Life group
+  (scene builder, the menu's New Species, the six scenes migrated by EvoSim ▸ Reference ▸ Stagger Decisions in Reference
+  Scenes). Worlds built in code still decide all together (the prototype's way). R-01 re-pinned (all 12 hashes; the
+  re-pinned file reproduced on a second run). The M13 report's HideVsFlee hashes predate staggering.
 
 ## Disagreements between the brief and Docs/Interface
 - 20 §3.9 names the operator method `MutationOperator.Start(gene, parent, rng)`; on a MonoBehaviour Unity takes
@@ -140,8 +150,6 @@ seven states (Idle, Running, Waiting, Blocked, Paused, Stepping, Stopped), now `
   owner's; the mutator runs on the CPU in Ollama (started for the checks).
 - Untracked files that aren't EvoSim's and were left alone: `Assets/MobileDependencyResolver/`, two `.cs.meta`
   in `Assets/02 - Scripts/`, `Docs/Interface/design.md`, `design.pdf`.
-- M13: a player build of this project fails on the course's scripts (`Assets/02 - Scripts/MeshDeformer.cs:27`
-  AssetDatabase, `…/FabricIK.cs:274-276` Handles, outside `#if UNITY_EDITOR`); built from a copy instead.
 - M13: in the editor a capture needs a drawn Game view (hidden, captures are given up after 5 s); Unity warns on Play that
   the Input Manager is deprecated (`activeInputHandler: 0`, the owner's setting).
 - M13: a `BuildPipeline.BuildPlayer` inside the project made Unity rewrite `ProjectSettings/UnityConnectSettings.asset`
@@ -162,14 +170,14 @@ portions, food regrown 2 424, hunters' nearest prey hidden 1 280 times and never
 
 | # | Rule | Problem | Sev. | State |
 |---|---|---|---|---|
-| 1 | DEC-30, 13 §4 | cache hits aren't memoised: a replay's `backend_queries`, `memo_hit_rate` differ from the live run's | risk | proposed (owner) |
+| 1 | DEC-30, 13 §4 | cache hits aren't memoised: a replay's `backend_queries`, `memo_hit_rate` differ from the live run's | risk | fixed M13.4 |
 | 2 | SPACE-12 | RealTime views didn't interpolate (jumps 5×/s) | bug (look) | fixed M13.1 |
 | 3 | SPACE-14 | RealTime catch-up bursts after a wait | risk | fixed M13.1 |
-| 4 | DEC-01 | L2 pace = JEV throughput: all animals decide on the same tick | risk | proposed: stagger (contract) |
+| 4 | DEC-01 | L2 pace = JEV throughput: all animals decide on the same tick | risk | M13.6: staggered reference (~13 % faster, no stall; JEV still bounds the pace) |
 | 5 | — | editor captures need a drawn Game view | risk | fixed M13.1 (give up after 5 s) |
 | 6 | ARCH-01 | `Batch.WithScene` ran on an open scene, changed and closed it (then saved by the test runner) | bug (tooling) | fixed M13.1 |
 | 7 | — | Input Manager deprecation warning on Play | look | owner's setting |
-| 8 | — | the course's scripts block any player build | risk | owner (`#if UNITY_EDITOR`) |
+| 8 | — | the course's scripts block any player build | risk | fixed M13.5 (`#if UNITY_EDITOR`) |
 | 9–11 | — | long copy path; `-screen-*` stays fullscreen; "waiting" shown while paused | look | 9, 10 worked around; 11 proposed |
 
 ## P1 audit (2026-10-10): phase 1 findings, phase 2 fixes
