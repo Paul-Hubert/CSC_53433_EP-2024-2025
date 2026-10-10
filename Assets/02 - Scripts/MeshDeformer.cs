@@ -24,7 +24,11 @@ public class MeshDeformer : MonoBehaviour
         {
             // Duplicate so we don’t overwrite the project asset
             Mesh newMesh = Instantiate(mesh);
+#if UNITY_EDITOR
             int id = AssetDatabase.GetAllAssetPaths().Length;
+#else
+            int id = GetInstanceID();      // AssetDatabase exists only in the editor; any unique number names the copy
+#endif
             newMesh.name = id + "_" + mesh.name + "_Deformed";
             meshName = newMesh.name;
             mf.sharedMesh = newMesh;

@@ -56,6 +56,34 @@ namespace EvoSim.Editor
             return "build scheduled; result in " + resultFile;
         }
 
+        /// <summary>
+        /// For the unity CLI: compiles every script of the project for the Windows player, without building, after the call
+        /// returns; the result goes to Logs/EvoSim/player-scripts.txt, the compiler's errors to the console.
+        /// </summary>
+        public static string CompilePlayerScriptsLater()
+        {
+            const string resultFile = "Logs/EvoSim/player-scripts.txt";
+            Directory.CreateDirectory(Path.GetDirectoryName(resultFile));
+            File.WriteAllText(resultFile, "compiling\n");
+            EditorApplication.delayCall += () =>
+            {
+                string result;
+                try
+                {
+                    var settings = new UnityEditor.Build.Player.ScriptCompilationSettings
+                    {
+                        target = BuildTarget.StandaloneWindows64, group = BuildTargetGroup.Standalone,
+                    };
+                    var compiled = UnityEditor.Build.Player.PlayerBuildInterface.CompilePlayerScripts(settings, "Temp/EvoSimPlayerScripts");
+                    IReadOnlyCollection<string> assemblies = compiled.assemblies;
+                    result = assemblies != null && assemblies.Count > 0 ? $"Succeeded: {assemblies.Count} assemblies: {string.Join(", ", assemblies)}" : "Failed: see the console";
+                }
+                catch (Exception e) { result = "Failed: " + e.Message; }
+                File.WriteAllText(resultFile, result + "\n");
+            };
+            return "scheduled; result in " + resultFile;
+        }
+
         /// <summary>Builds the player; returns "Succeeded: …" or "Failed: …".</summary>
         public static string Build(IEnumerable<string> sceneNames, string folder)
         {

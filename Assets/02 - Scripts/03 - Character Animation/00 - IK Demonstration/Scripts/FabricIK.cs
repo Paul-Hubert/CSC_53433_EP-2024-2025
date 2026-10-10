@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 public class FabricIK : MonoBehaviour
 {
@@ -259,6 +261,7 @@ public class FabricIK : MonoBehaviour
         }
     }
 
+#if UNITY_EDITOR    // Handles is an editor API: a player build has no gizmos
     /// <summary>
     /// Function to draw some rectangles ("Handles") between the joints, for better visualization.
     /// </summary>
@@ -278,4 +281,5 @@ public class FabricIK : MonoBehaviour
             current = current.parent;
         }
     }
+#endif
 }
