@@ -1,0 +1,28 @@
+{
+    "name": "EvoSim.Tests.EditMode",
+    "rootNamespace": "EvoSim.Tests",
+    "references": [
+        "EvoSim.Runtime",
+        "EvoSim.Http",
+        "EvoSim.Editor",
+        "EvoSim.Testing",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll",
+        "Newtonsoft.Json.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
