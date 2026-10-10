@@ -31,7 +31,8 @@ namespace EvoSim
             }
         }
 
-        internal Decision Add(Animal a)
+        /// <summary>Adds a deciding animal for this tick (a student's own sense phase calls it).</summary>
+        public Decision Add(Animal a)
         {
             Decision d;
             if (pool.Count > due.Count) d = pool[due.Count];
@@ -41,9 +42,11 @@ namespace EvoSim
             return d;
         }
 
-        internal void AddAnswer(BrainAnswer a) => answers.Add(a);
+        /// <summary>An answer this tick waits for (a student's own ask phase calls it).</summary>
+        public void AddAnswer(BrainAnswer a) => answers.Add(a);
 
-        internal void Clear(int tick)
+        /// <summary>Starts a tick's decisions.</summary>
+        public void Clear(int tick)
         {
             due.Clear();
             answers.Clear();

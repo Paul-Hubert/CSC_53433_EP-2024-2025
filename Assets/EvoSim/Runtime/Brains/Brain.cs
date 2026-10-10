@@ -38,6 +38,12 @@ namespace EvoSim
         public bool Strict { get => strict; set => strict = value; }
         public bool UsesCache { get => useCache; set => useCache = value; }
 
+        /// <summary>
+        /// True (reference): equal queries get equal rows, so they are memoised and shared within a tick (DEC-30, DEC-32).
+        /// A brain with memory, or one that learns, says false: every query then reaches it, with its animal's id.
+        /// </summary>
+        public virtual bool Memoizable => true;
+
         /// <summary>Answer a batch (DEC-11). Fast brains fill the answer at once; HTTP brains later.</summary>
         public abstract BrainAnswer Ask(IReadOnlyList<DecisionQuery> batch);
 

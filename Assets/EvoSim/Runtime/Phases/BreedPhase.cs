@@ -138,16 +138,28 @@ namespace EvoSim
             return n;
         }
 
+        /// <summary>A fix that adds a module on a new child of the species.</summary>
+        internal static ValidationFix AddModule<T>(Species s, string childName) where T : SpeciesModule => new ValidationFix($"Add {typeof(T).Name}", () =>
+        {
+            var go = new UnityEngine.GameObject(childName);
+            go.transform.SetParent(s.transform, false);
+            go.AddComponent<T>();
+        });
+
         public override void Validate(ValidationReport report)
         {
             foreach (var s in World.AllSpecies)
             {
                 if (s.Module<MatingRule>() == null) continue;
                 if (World.Service<EggSystem>() == null) report.Error("V-20", this, $"'{s.DisplayName}' breeds but the world has no EggSystem.");
-                if (s.Module<Litter>() == null) report.Warning("V-20", s, $"'{s.DisplayName}' breeds without a Litter: one baby, no energy cost.");
-                if (s.Module<Crossover>() == null && s.Module<MatingRule>().Sexual) report.Warning("V-20", s, $"'{s.DisplayName}' has no crossover: babies copy the first parent.");
+                if (s.Module<Litter>() == null)
+                    report.Warning("V-26", s, $"'{s.DisplayName}' breeds without a Litter: one baby, no energy cost.", AddModule<Litter>(s, "Litter"));
+                if (s.Module<Crossover>() == null && s.Module<MatingRule>().Sexual)
+                    report.Warning("V-26", s, $"'{s.DisplayName}' has no crossover: babies copy the first parent.", AddModule<UniformCrossover>(s, "Crossover"));
                 foreach (var g in s.Genes)
-                    if (OperatorFor(s, g) == null) report.Warning("V-48", g, $"No mutation operator accepts the gene '{g.Label}'.");
+                    if (OperatorFor(s, g) == null)
+                        report.Warning("V-48", g, $"No mutation operator accepts the gene '{g.Label}'.",
+                                       g.Kind == AlleleKind.Number ? AddModule<GaussianMutation>(s, "Mutation (gauss)") : null);
             }
         }
     }

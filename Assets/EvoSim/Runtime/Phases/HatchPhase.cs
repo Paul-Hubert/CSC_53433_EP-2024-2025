@@ -18,13 +18,20 @@ namespace EvoSim
             if (eggs == null) return null;
             eggs.Due(t.Tick, due);
             waiting.Clear();
+            pendings.Clear();
             foreach (var e in due)
                 foreach (var m in e.Mutations)
-                    if (!m.Job.IsDone) waiting.Add(m.Job);
-            if (waiting.Count == 0) return null;
+                {
+                    if (m.Job.IsDone) continue;
+                    if (m.Job.Pending != null) pendings.Add(m.Job.Pending);               // an operator's own asynchronous work (MUT-32)
+                    else waiting.Add(m.Job);                                              // the mutator service's
+                }
             var service = World.Service<MutatorService>();
-            return service != null ? service.PendingFor(waiting) : null;
+            if (waiting.Count > 0 && service != null) pendings.Add(service.PendingFor(waiting));
+            return Pending.All(pendings);
         }
+
+        readonly List<Pending> pendings = new List<Pending>();
 
         public override void Run(TickContext t)
         {
@@ -41,16 +48,34 @@ namespace EvoSim
             var mutations = new List<object>();
             foreach (var m in egg.Mutations)
             {
-                if (!m.Job.IsDone || !m.Job.Succeeded) { World.Mutations.Failures += m.Job.IsDone ? 1 : 0; continue; }   // MUT-04
+                if (!m.Job.IsDone || !m.Job.Succeeded)                                     // MUT-04: the inherited allele stays
+                {
+                    if (!m.Job.IsDone) World.Mutations.Reject("not finished");
+                    World.Mutations.Failures++;
+                    continue;
+                }
                 var gene = s.Genes[m.Locus];
+                if (gene.Check(m.Job.Result) != null)                                       // the gene's allowed values hold for every operator
+                {
+                    World.Mutations.Reject("not allowed");
+                    World.Mutations.Failures++;
+                    continue;
+                }
                 var allele = World.Alleles.Register(gene, m.Job.Result, "mutant", m.Parent.Id, m.Job.Operator, m.Job.Model, m.Job.Seed);
+                if (allele == m.Parent)                                                  // e.g. a clamp at the range's edge: unchanged is a failure (MUT-04)
+                {
+                    World.Mutations.Reject("unchanged");
+                    World.Mutations.Failures++;
+                    continue;
+                }
                 egg.Alleles[m.Locus] = allele;
                 World.Mutations.Successes++;
                 var entry = new SortedDictionary<string, object>(System.StringComparer.Ordinal)
                 {
                     { "locus", gene.LocusId }, { "parent", m.Parent.Id }, { "child", allele.Id },
                 };
-                if (m.Job.Operator != null && m.Job.Operator.StartsWith("llm#")) entry["prompt"] = int.Parse(m.Job.Operator.Substring(4));
+                if (m.Job.Operator != null && m.Job.Operator.StartsWith("llm#") && int.TryParse(m.Job.Operator.Substring(4), out int deckIndex))
+                    entry["prompt"] = deckIndex;
                 else entry["operator"] = m.Job.Operator;
                 if (allele.Kind == AlleleKind.Text) entry["text"] = allele.Text; else entry["value"] = allele.Number;
                 mutations.Add(entry);
@@ -85,7 +110,7 @@ namespace EvoSim
                 if (phases[i] == this) me = i;
                 if (phases[i] is BreedPhase) breed = i;
             }
-            if (breed > me) report.Error("V-08", this, "Hatch must come after Breed.");
+            if (breed > me) report.Error("V-08", this, "Hatch must come after Breed.", PlaceAfter(World.Phase<BreedPhase>()));
         }
     }
 }

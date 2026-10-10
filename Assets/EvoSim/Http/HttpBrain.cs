@@ -123,7 +123,7 @@ namespace EvoSim
         public override void Validate(ValidationReport report)
         {
             HttpChecks.Host(report, this, host);
-            HttpChecks.Secrets(report, this, host, apiKeyVariable);
+            Secrets.CheckFields(report, this);                                  // V-61 (also run by the World on every module)
         }
     }
 }

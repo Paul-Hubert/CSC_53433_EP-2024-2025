@@ -42,11 +42,12 @@ namespace EvoSim
         bool Graze(Animal a, ResourceItem item)
         {
             var layer = item.Layer;
-            var entry = layer != null ? a.Species.Module<Diet>()?.Grazing(layer) : null;
+            var diet = a.Species.Module<Diet>();
+            var entry = layer != null ? diet?.Grazing(layer) : null;
             if (entry == null) return false;
             if (!Within(world.Distance(a.Position, item.Position), GrazeReach)) return false;
             if (!layer.Consume(item)) return false;                         // eaten by someone earlier (ENV-02)
-            Eat(a, entry.Energy, digest: false);
+            Eat(a, diet.EnergyFrom(a, entry, entry.Energy), digest: false);
             return true;
         }
 
@@ -59,24 +60,25 @@ namespace EvoSim
             if (world.Queries.IsHiddenFrom(prey, hunter.Species)) return false;     // ENV-11: never struck in cover
             if (!Within(world.Distance(hunter.Position, prey.Position), StrikeReach)) return false;
             hunter.StruckThisTick = true;                                           // ACT-12
-            float killP = diet.KillChance.IsValid ? hunter.Trait(diet.KillChance) : 0f;
+            float killP = diet.KillChanceAgainst(hunter, prey);
             if (!world.Random.For(hunter.Species, "actions").Chance(killP)) return true;
             prey.Killed = true;                                                     // ANIM-41: marked now, removed in the death phase
             prey.KilledBy = hunter.Id;
             hunter.Species.Counters.Kills++;
             world.Service<CarcassSystem>()?.Create(prey, hunter.Id);
-            Eat(hunter, entry.Energy, digest: true);
+            Eat(hunter, diet.EnergyFrom(hunter, entry, entry.Energy), digest: true);
             return true;
         }
 
         bool Scavenge(Animal a, Carcass c)
         {
             if (c == null || c.UsedUp) return false;
-            var entry = a.Species.Module<Diet>()?.Scavenging(c.Of);
+            var diet = a.Species.Module<Diet>();
+            var entry = diet?.Scavenging(c.Of);
             var cs = world.Service<CarcassSystem>();
             if (entry == null || cs == null) return false;
             if (!Within(world.Distance(a.Position, c.Position), ScavengeReach)) return false;
-            float gain = c.EnergyPerPortion * entry.EnergyScale;
+            float gain = diet.EnergyFrom(a, entry, c.EnergyPerPortion * entry.EnergyScale);
             if (!cs.EatPortion(c, a)) return false;
             a.Species.Counters.Portions++;
             Eat(a, gain, digest: true);
@@ -86,16 +88,17 @@ namespace EvoSim
         bool EatEgg(Animal a, Egg egg)
         {
             if (egg == null || egg.UsedUp) return false;
-            var entry = a.Species.Module<Diet>()?.EatingEggs(egg.Species);
+            var diet = a.Species.Module<Diet>();
+            var entry = diet?.EatingEggs(egg.Species);
             var eggs = world.Service<EggSystem>();
             if (entry == null || eggs == null) return false;
             if (!Within(world.Distance(a.Position, egg.Position), GrazeReach)) return false;
             eggs.Lose(egg, "eaten");                                                // REPRO-23: never hatches, recorded
-            Eat(a, entry.Energy, digest: false);
+            Eat(a, diet.EnergyFrom(a, entry, entry.Energy), digest: false);
             return true;
         }
 
-        static void Eat(Animal a, float gain, bool digest)
+        internal static void Eat(Animal a, float gain, bool digest)
         {
             a.Species.Module<Energy>()?.Gain(a, gain);
             a.Meals++;

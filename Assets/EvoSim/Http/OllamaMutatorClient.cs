@@ -5,7 +5,7 @@ using UnityEngine;
 namespace EvoSim
 {
     /// <summary>
-    /// The reference mutator (10 §2): a small model in Ollama on the CPU (qwen3.5:0.8b, num_gpu 0, num_ctx 1 024),
+    /// The reference mutator (10 §2): a model in Ollama on the CPU (gemma4:26b, owner 2026-10-10; num_gpu 0, num_ctx 1 024),
     /// thinking off, so the GPU stays JEV's.
     /// </summary>
     public class OllamaMutatorClient : HttpMutatorClient
@@ -14,7 +14,7 @@ namespace EvoSim
         bool cpuOnly = true;
         [SerializeField, Min(256), Tooltip("Context length in tokens (reference 1 024).")]
         int contextLength = 1024;
-        [SerializeField, Tooltip("Let thinking models reason before answering (reference off: Qwen3.5 thinks by default).")]
+        [SerializeField, Tooltip("Let thinking models reason before answering (reference off: gemma4 and Qwen3.5 think by default).")]
         bool think;
 
         string digest;
@@ -24,9 +24,17 @@ namespace EvoSim
         public override void Begin()
         {
             var service = World.Service<MutatorService>();
-            if (service == null || digest != null || World.NoMutation || World.GetComponentInChildren<LlmMutation>(true) == null) return;
+            if (service == null || digest != null || World.NoMutation || !Used()) return;
             string model = service.Model;
             digest = Task.Run(() => OllamaTags.DigestAsync(new HttpCaller(host, apiKeyVariable, 5f, 1, 0f, 1, Wire), model)).GetAwaiter().GetResult();
+        }
+
+        /// <summary>Whether an operator sends work to the mutator service (LlmMutation, or a student's own).</summary>
+        bool Used()
+        {
+            foreach (var op in World.GetComponentsInChildren<MutationOperator>(true))
+                if (op.UsesMutatorService) return true;
+            return false;
         }
 
         protected override string ChatPath => "/api/chat";

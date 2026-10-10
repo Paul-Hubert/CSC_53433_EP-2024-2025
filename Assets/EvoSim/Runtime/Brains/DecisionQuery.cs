@@ -18,6 +18,8 @@ namespace EvoSim
         public IReadOnlyList<object> Attachments { get; }
         /// <summary>The brain-visible genome key (DEC-31).</summary>
         public string GenomeKey { get; }
+        /// <summary>The deciding animal's id (-1 when the query is built by a tool): for brains that aren't memoizable.</summary>
+        public int AnimalId { get; set; } = -1;
 
         public DecisionQuery(Species species, IReadOnlyList<KeyValuePair<string, string>> genes, Observation observation,
                              string situation, TextStyle style, string genomeKey, IReadOnlyList<object> attachments = null)

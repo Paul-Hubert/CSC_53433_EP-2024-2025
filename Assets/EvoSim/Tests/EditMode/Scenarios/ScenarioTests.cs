@@ -143,6 +143,9 @@ namespace EvoSim.Tests
                     Object.DestroyImmediate(m);
                     if (op == "ladder") go.AddComponent<IntensityLadder>().Rate = 0.5f;
                 }
+                if (op == "ladder")                                                  // a rest sentence the ladder can always move
+                    foreach (var g in b.Root.GetComponentsInChildren<TextGene>(true))
+                        if (g.gameObject.name == "rest") { g.SetPool(null); g.Configure(new[] { "Sometimes rest when tired." }); }
                 var w = b.Build();
                 w.Advance(400);
                 return w;
@@ -153,7 +156,9 @@ namespace EvoSim.Tests
 
             var ladder = Run("ladder");
             string[] words = { "never", "rarely", "sometimes", "often", "always" };
-            foreach (var allele in ladder.Alleles.All.Where(a => a.Origin == "mutation" && a.Kind == AlleleKind.Text))
+            var mutants = ladder.Alleles.All.Where(a => a.Origin == "mutant" && a.Kind == AlleleKind.Text).ToList();
+            Assert.IsNotEmpty(mutants, $"the ladder made mutants: {ladder.Mutations.Attempts} tries, {ladder.Mutations.Successes} ok, {ladder.Mutations.Failures} failed");
+            foreach (var allele in mutants)
             {
                 var parent = ladder.Alleles.ById(allele.ParentId);
                 var x = allele.Text.ToLowerInvariant().Split(' ');
@@ -164,7 +169,8 @@ namespace EvoSim.Tests
             }
 
             var none = Run("none");
-            Assert.IsFalse(none.Alleles.All.Any(a => a.Origin == "mutation"), "no operator: no new allele");
+            Assert.Greater(none.AllSpecies.Sum(s => s.Counters.Births), 0, "babies were born");
+            Assert.IsFalse(none.Alleles.All.Any(a => a.Origin == "mutant"), "no operator: no new allele");
         }
 
         // ---- S18 ----

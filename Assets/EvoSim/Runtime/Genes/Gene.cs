@@ -18,6 +18,9 @@ namespace EvoSim
         /// <summary>"&lt;species id&gt;.&lt;label&gt;", unique in the world (GENE-11).</summary>
         public string LocusId => Species.Id + "." + Label;
 
+        /// <summary>Sets the label from code (WorldBuilder, tests).</summary>
+        public void SetLabel(string newLabel) => label = newLabel;
+
         /// <summary>This gene's position in the species' locus order.</summary>
         public int Locus { get; internal set; } = -1;
 

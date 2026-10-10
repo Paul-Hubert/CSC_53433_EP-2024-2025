@@ -58,6 +58,9 @@ namespace EvoSim
         public ResourceItem? NearestResource(Animal a, string layerName, float radius) => World.Queries.NearestResource(a, layerName, radius);
         public EntityHit<Carcass>? NearestCarcass(Animal a, float radius) => World.Queries.NearestCarcass(a, radius);
         public EntityHit<Egg>? NearestEgg(Animal a, Species of, float radius) => World.Queries.NearestEgg(a, of, radius);
+        /// <summary>The nearest entity of a kind of your own within radius (see WorldQueries.NearestEntity).</summary>
+        public EntityHit<T>? NearestEntity<T>(Animal a, float radius, System.Func<T, Animal, bool> filter = null) where T : Entity =>
+            World.Queries.NearestEntity(a, radius, filter);
         public CoverHit? NearestCover(Animal a, float radius) => World.Queries.NearestCover(a, radius);
         public bool InCover(Animal a) => World.Queries.InCover(a);
 

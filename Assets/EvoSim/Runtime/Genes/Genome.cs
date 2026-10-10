@@ -41,7 +41,7 @@ namespace EvoSim
             for (int i = 0; i < alleles.Length; i++)
             {
                 if (brainOnly && !Species.Genes[i].ReadByBrain) continue;
-                sb.Append('\n').Append(Species.Genes[i].Label).Append('=').Append(alleles[i].Value.Canonical());
+                sb.Append('\n').Append(Species.Genes[i].Label).Append('=').Append(alleles[i].Value.Canonical(Species.Genes[i].Decimals));   // the registry's precision (GENE-10)
             }
             return Hashing.Sha256Hex(sb.ToString());
         }

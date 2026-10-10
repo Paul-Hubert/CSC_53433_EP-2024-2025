@@ -19,6 +19,15 @@ namespace EvoSim
         /// </summary>
         public virtual void Begin() { }
 
+        /// <summary>Called when a species is added during the run (SPEC-30), after it is set up and its event recorded.</summary>
+        public virtual void OnSpeciesAdded(Species species) { }
+
+        /// <summary>An animal of any species joined the living (a founder, a baby, an immigrant), after its species' modules heard it.</summary>
+        public virtual void OnBorn(Animal a) { }
+
+        /// <summary>An animal of any species died, after its species' modules heard it (ANIM-42).</summary>
+        public virtual void OnDied(Animal a, string cause) { }
+
         /// <summary>Called once when the run stops, whatever the reason (RAND-20).</summary>
         public virtual void OnRunStopped(string reason) { }
 

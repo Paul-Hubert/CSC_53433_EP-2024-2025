@@ -9,7 +9,8 @@ namespace EvoSim
         public Ground Ground => World.Ground;
         public int Tick => World.Tick;
 
-        internal MoveContext(World world) { World = world; }
+        /// <summary>A student's own act or movement phase builds one to call Locomotion.Move (22 §5).</summary>
+        public MoveContext(World world) { World = world; }
 
         /// <summary>The world distance (SPACE-02).</summary>
         public float Distance(Vector3 a, Vector3 b) => World.Distance(a, b);

@@ -8,7 +8,7 @@ namespace EvoSim.Samples
     /// </summary>
     public class ChasedSense : Sense
     {
-        static readonly List<string> tokens = new List<string> { "no", "yes" };
+        static readonly IReadOnlyList<string> tokens = System.Array.AsReadOnly(new[] { "no", "yes" });   // shared, so read-only (ARCH-07)
 
         public override IReadOnlyList<string> Tokens => tokens;
         protected override string DefaultLabel => "Chased";
@@ -18,7 +18,7 @@ namespace EvoSim.Samples
             var threat = s.NearestAnimal(a, AnimalSet.Threats, s.Vision(a));
             if (threat == null) return 0;
             var t = threat.Value.Animal;
-            bool hunting = t.CurrentAction is HuntAction;
+            bool hunting = t.CurrentAction != null && t.CurrentAction.Hunts;          // the reference hunt, or any action that hunts
             return hunting && s.CurrentTarget(t) == a ? 1 : 0;              // the hunter's target this tick
         }
 

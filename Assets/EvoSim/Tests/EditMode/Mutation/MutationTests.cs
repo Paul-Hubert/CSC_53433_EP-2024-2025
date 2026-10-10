@@ -102,7 +102,8 @@ namespace EvoSim.Tests
         [Test, Description("T-MUT-04 (MUT-04, MUT-05, MUT-13): a fake mutator whose every answer is rejected → after 5 tries the inherited allele stays; counters record the rejections by reason")]
         public void RejectedEverywhere()
         {
-            var w = New().Flat(20, 20).Food(0f, 0f).Service<EggSystem>("Eggs").FakeMutation(f => f.Answer = (sentence, seed, prompt) => sentence)
+            var tries = new List<(long seed, string prompt)>();
+            var w = New().Flat(20, 20).Food(0f, 0f).Service<EggSystem>("Eggs").FakeMutation(f => f.Answer = (sentence, seed, prompt) => { lock (tries) tries.Add((seed, prompt)); return sentence; })
                 .Phase<BreedPhase>().Phase<HatchPhase>()
                 .Species("prey", s => s.PreyBody().Action<MateAction>("mate", founders: new[] { "Mate often." }).LifeRules(100, 0).LlmMutation(1f))
                 .Build();
@@ -121,6 +122,18 @@ namespace EvoSim.Tests
             Assert.AreEqual(jobs, w.Mutations.Attempts);
             Assert.AreEqual(0, w.Mutations.Successes);
             Assert.AreEqual(jobs, w.Mutations.Failures);
+            Assert.AreEqual(jobs * 5, tries.Select(t => t.seed).Distinct().Count(), "a new seed for every try (MUT-13)");
+            Assert.Greater(tries.Select(t => t.prompt).Distinct().Count(), 1, "and a new instruction draw");
+        }
+
+        [Test, Description("MUT-14: a mutator answer is cached by model, prompt, seed and temperature: changing the model or the temperature misses the cache")]
+        public void CacheKeysHoldModelAndTemperature()
+        {
+            var a = new MutatorRequest("Make it shorter. \"Eat now.\"", 42, 1.2f, "gemma4:26b");
+            Assert.AreEqual(a.CacheKey, new MutatorRequest("Make it shorter. \"Eat now.\"", 42, 1.2f, "gemma4:26b").CacheKey);
+            Assert.AreNotEqual(a.CacheKey, new MutatorRequest("Make it shorter. \"Eat now.\"", 42, 1.0f, "gemma4:26b").CacheKey, "temperature");
+            Assert.AreNotEqual(a.CacheKey, new MutatorRequest("Make it shorter. \"Eat now.\"", 42, 1.2f, "qwen3.5:0.8b").CacheKey, "model");
+            Assert.AreNotEqual(a.CacheKey, new MutatorRequest("Make it shorter. \"Eat now.\"", 43, 1.2f, "gemma4:26b").CacheKey, "seed");
         }
 
         [Test, Description("T-MUT-05 (MUT-10): a deck with comments and blank lines → only instruction lines are drawn; adding a line adds an instruction")]

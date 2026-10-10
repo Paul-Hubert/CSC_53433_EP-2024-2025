@@ -282,7 +282,7 @@ namespace EvoSim.Tests
             Assert.AreEqual("V-20", Check("localhost:8000", ""));
         }
 
-        [Test, Description("SPACE-14, DEC-12, DEC-33 over HTTP: answers arriving late on other threads give the same events in Freeze and Responsive modes; a second run replays from the answer cache with no request")]
+        [Test, Description("SPACE-13, SPACE-14, DEC-12, DEC-33 over HTTP: answers arriving late on other threads give the same events in Freeze and Responsive modes; a second run replays from the answer cache with no request")]
         public void WaitModesAndReplay()
         {
             string Run(WaitMode mode, string cache, out int requests, int delay)

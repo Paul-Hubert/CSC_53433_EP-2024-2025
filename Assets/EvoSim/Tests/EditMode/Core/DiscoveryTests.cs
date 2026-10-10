@@ -46,14 +46,14 @@ namespace EvoSim.Tests
                 .Sense<ProbeSense>(name: "s1")).Build().AllSpecies[0];
 
             sp.transform.Find("Actions/two").gameObject.SetActive(false);                  // inactive GameObject
-            sp.transform.Find("Actions/three").GetComponent<ProbeAction>().enabled = false;  // disabled component
-            sp.transform.Find("Actions/three").GetComponent<TextGene>().enabled = false;
+            sp.transform.Find("Actions/three").GetComponent<ProbeAction>().enabled = false;  // disabled component: its gene goes with it
             sp.transform.Find("Senses/s2").GetComponent<ProbeSense>().enabled = false;
             b.Build();
 
             CollectionAssert.AreEqual(new[] { "one" }, sp.Actions.Select(a => a.Name).ToArray());
             Assert.AreEqual(1, sp.Senses.Count);
-            Assert.AreEqual(1, sp.Genes.Count, "the gene of the inactive action is absent too");
+            Assert.AreEqual(1, sp.Genes.Count, "the genes of the inactive and of the disabled action are absent too (GENE-05)");
+            StringAssert.DoesNotContain("three", sp.Prompt.Text, "nor in the prompt");
             Assert.AreEqual(reference.Signature, sp.Signature, "the signature equals a species built without them");
         }
 

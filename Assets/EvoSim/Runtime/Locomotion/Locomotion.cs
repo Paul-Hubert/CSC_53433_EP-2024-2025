@@ -57,7 +57,8 @@ namespace EvoSim
 
         public override void Validate(ValidationReport report)
         {
-            if (wanderTurnP < 0f || wanderTurnP > 1f) report.Error("V-35", this, "The wander turn probability must be in [0, 1].");
+            if (!(wanderTurnP >= 0f && wanderTurnP <= 1f))
+                report.Error("V-35", this, "The wander turn probability must be in [0, 1].", new ValidationFix("Clamp", () => SetWanderTurnP(float.IsNaN(wanderTurnP) ? 0.25f : wanderTurnP)));
         }
     }
 }

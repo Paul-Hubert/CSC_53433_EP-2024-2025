@@ -16,7 +16,7 @@ namespace EvoSim
         public const string Reason = "digesting";
 
         /// <summary>Makes the animal busy for a meal of this energy (ANIM-30, ANIM-31).</summary>
-        public void AfterMeal(Animal a, float gain)
+        public virtual void AfterMeal(Animal a, float gain)
         {
             int ticks = Mathf.RoundToInt(digestTicks * gain / referenceGain);
             if (ticks <= 0) return;

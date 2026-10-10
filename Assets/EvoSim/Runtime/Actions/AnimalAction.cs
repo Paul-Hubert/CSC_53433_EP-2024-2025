@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace EvoSim
@@ -19,11 +21,28 @@ namespace EvoSim
         /// <summary>The text gene bound to this action (GENE-05), or null (V-05).</summary>
         public TextGene Gene { get; internal set; }
 
+        /// <summary>True for an action that chases and strikes animals: senses such as the sample ChasedSense read it.</summary>
+        public virtual bool Hunts => false;
+
         /// <summary>This action's index in the species' action order.</summary>
         public int Index { get; internal set; } = -1;
 
         /// <summary>Every tick while this action is chosen: say where to go, and what to do on arrival (ACT-02, ACT-03).</summary>
         public abstract void Act(Animal a, ActContext c);
+
+        /// <summary>
+        /// The batch entry point (20 §10, ARCH-12): the act phase plans every animal of the group (all chose this action)
+        /// through it. The default calls Act for each; an override must give the plans Act would give.
+        /// </summary>
+        public virtual void ActAll(IReadOnlyList<Animal> group, ActContext c, Span<ActPlan> plans)
+        {
+            for (int i = 0; i < group.Count; i++)
+            {
+                c.Begin(group[i]);
+                Act(group[i], c);
+                plans[i] = c.Plan;
+            }
+        }
 
         /// <summary>Directed tests: is this observation relevant for this action (CTRL-10)?</summary>
         public virtual bool IsRelevant(ObservationView o) => true;

@@ -135,8 +135,12 @@ namespace EvoSim
 
         public override void Validate(ValidationReport report)
         {
-            if (initialFraction < 0 || initialFraction > 1 || regrowP < 0 || regrowP > 1)
-                report.Error("V-35", this, "Food fractions and probabilities must be in [0, 1].");
+            if (!(initialFraction >= 0 && initialFraction <= 1 && regrowP >= 0 && regrowP <= 1))
+                report.Error("V-35", this, "Food fractions and probabilities must be in [0, 1].", new ValidationFix("Clamp", () =>
+                {
+                    initialFraction = float.IsNaN(initialFraction) ? 0f : Mathf.Clamp01(initialFraction);
+                    regrowP = float.IsNaN(regrowP) ? 0f : Mathf.Clamp01(regrowP);
+                }));
         }
     }
 }

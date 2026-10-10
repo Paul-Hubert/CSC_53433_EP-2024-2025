@@ -6,7 +6,7 @@ namespace EvoSim
     /// A conceived baby waiting to hatch (REPRO-20): its parents, generation, genome after crossover, the mutations
     /// still running, and when it hatches. Not an animal: it doesn't sense, decide, move or count toward caps (REPRO-22).
     /// </summary>
-    public sealed class Egg : Entity
+    public class Egg : Entity
     {
         public override string Kind => "egg";
 

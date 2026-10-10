@@ -34,10 +34,24 @@ namespace EvoSim.Tests
         static IEnumerable<Type> Layers() => Kind<ResourceLayer>();
         static IEnumerable<Type> StatModules() => Kind<SpeciesModule>().Where(t => t.GetProperties().Any(p => p.PropertyType == typeof(StatId)));
 
-        /// <summary>Modules some kinds need beside them (a drink needs thirst): added to the species under test.</summary>
+        /// <summary>
+        /// The modules a kind names with [RequiresModule] (a drink needs thirst): a species module goes on the species under
+        /// test, a world module under its World, so a student's module that needs company is tested like the others.
+        /// </summary>
         static void Companions(Type t, GameObject species)
         {
-            if (t.Name == "DrinkAction" || t.Name == "DiesOfThirst") species.AddComponent(Type.GetType("EvoSim.Samples.Thirst, EvoSim.Samples"));
+            foreach (RequiresModuleAttribute need in t.GetCustomAttributes(typeof(RequiresModuleAttribute), true))
+            {
+                if (need.Module == null || need.Module.IsAbstract) continue;
+                if (typeof(SpeciesModule).IsAssignableFrom(need.Module))
+                {
+                    if (species.GetComponentInChildren(need.Module, true) == null) species.AddComponent(need.Module);
+                    continue;
+                }
+                var world = species.GetComponentInParent<World>(true);
+                if (world != null && typeof(WorldModule).IsAssignableFrom(need.Module) && world.GetComponentInChildren(need.Module, true) == null)
+                    Child(world.gameObject, need.Module.Name).AddComponent(need.Module);
+            }
         }
 
         static GameObject Child(GameObject parent, string name)
@@ -64,6 +78,7 @@ namespace EvoSim.Tests
             {
                 Companions(type, go);
                 sense = (Sense)Child(go, type.Name).AddComponent(type);
+                sense.SetLabel("Probe " + type.Name);                               // never the label of a reference sense (V-17)
             }).Build();
             Assert.Greater(sense.Tokens.Count, 0, "tokens declared");
             foreach (var t in sense.Tokens) Assert.IsFalse(string.IsNullOrWhiteSpace(t), "a token is empty");
@@ -93,7 +108,7 @@ namespace EvoSim.Tests
 
         // ---- T-ACT template ----
 
-        [Test, Description("T-ACT template (ACT-02, ACT-04, ACT-06): description present; bound gene; Act only sets intents (no animal moved or changed); searches when alone")]
+        [Test, Description("T-ACT template (ACT-04, ACT-06): description present; bound gene; Act only sets intents (no animal moved or changed); searches when alone")]
         public void ActionConformance([ValueSource(nameof(Actions))] Type type)
         {
             AnimalAction action = null;
@@ -259,7 +274,7 @@ namespace EvoSim.Tests
 
         // ---- T-MOVE locomotion template ----
 
-        [Test, Description("T-MOVE locomotion template (MOVE-02, MOVE-03, SPACE-05): never ends a tick on water or outside; reports the meters actually moved; stuck animals move again within 3 ticks; extra cost ≥ 0")]
+        [Test, Description("T-MOVE locomotion template (MOVE-02, MOVE-03, SPACE-04, SPACE-05): never ends a tick on water or outside; reports the meters actually moved; stuck animals move again within 3 ticks; extra cost ≥ 0")]
         public void LocomotionConformance([ValueSource(nameof(Locomotions))] Type type)
         {
             var w = New(21, name: "move " + type.Name).Ground<PondGround>(20, 20).Phase<SensePhase>().Phase<ActPhase>().DefaultBrain<RandomBrain>()

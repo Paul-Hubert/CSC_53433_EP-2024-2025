@@ -9,7 +9,13 @@ namespace EvoSim
     [DisallowMultipleComponent]
     public class AnimalView : MonoBehaviour
     {
-        /// <summary>The animal shown, or 0 while the view waits in its pool.</summary>
-        public int AnimalId { get; internal set; }
+        /// <summary>The animal shown, or -1 while the view waits in its pool (ids start at 0).</summary>
+        public int AnimalId { get; internal set; } = -1;
+
+        /// <summary>
+        /// Called each frame after the World placed the view: change colours or animations from the animal's state here.
+        /// Read the animal only; a view never writes to the run (SPACE-12).
+        /// </summary>
+        public virtual void OnShow(Animal a) { }
     }
 }

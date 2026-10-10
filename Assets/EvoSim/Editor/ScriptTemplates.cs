@@ -121,10 +121,10 @@ namespace EvoSim.Editor
             Directory.CreateDirectory(StudentFolder + "/Tests");
             if (!File.Exists(StudentFolder + "/Student.asmdef"))
                 File.WriteAllText(StudentFolder + "/Student.asmdef",
-                    "{\n    \"name\": \"Student\",\n    \"references\": [\"EvoSim.Runtime\"],\n    \"autoReferenced\": true\n}\n");
+                    "{\n    \"name\": \"Student\",\n    \"references\": [\"EvoSim.Runtime\", \"EvoSim.Http\", \"EvoSim.Samples\"],\n    \"autoReferenced\": true\n}\n");   // HTTP brains and clients, and the samples, to build on
             if (!File.Exists(StudentFolder + "/Tests/Student.Tests.asmdef"))
                 File.WriteAllText(StudentFolder + "/Tests/Student.Tests.asmdef",
-                    "{\n    \"name\": \"Student.Tests\",\n    \"references\": [\"Student\", \"EvoSim.Runtime\", \"EvoSim.Testing\", \"UnityEngine.TestRunner\", \"UnityEditor.TestRunner\"],\n" +
+                    "{\n    \"name\": \"Student.Tests\",\n    \"references\": [\"Student\", \"EvoSim.Runtime\", \"EvoSim.Http\", \"EvoSim.Samples\", \"EvoSim.Testing\", \"UnityEngine.TestRunner\", \"UnityEditor.TestRunner\"],\n" +
                     "    \"includePlatforms\": [\"Editor\"],\n    \"overrideReferences\": true,\n    \"precompiledReferences\": [\"nunit.framework.dll\"],\n" +
                     "    \"autoReferenced\": false,\n    \"defineConstraints\": [\"UNITY_INCLUDE_TESTS\"]\n}\n");
         }

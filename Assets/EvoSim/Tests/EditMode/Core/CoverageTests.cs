@@ -25,7 +25,7 @@ namespace EvoSim.Tests
             {
                 string name = Path.GetFileName(f);
                 if (!char.IsDigit(name[0]) || string.CompareOrdinal(name, "30") >= 0) continue;
-                foreach (Match m in Regex.Matches(File.ReadAllText(f), @"\*\*([A-Z]+-\d+) \(MUST\)\*\*")) rules.Add(m.Groups[1].Value);
+                foreach (Match m in Regex.Matches(File.ReadAllText(f), @"\*\*([A-Z]+-\d+) \(MUST\)")) rules.Add(m.Groups[1].Value);   // "(MUST)**" or "(MUST) Title.**"
             }
             return rules;
         }
@@ -42,17 +42,32 @@ namespace EvoSim.Tests
                 if (d == null) continue;
                 string text = (d.GetType().GetProperty("Description")?.GetValue(d) as string) ?? "";
                 foreach (var attr in m.GetCustomAttributes<DescriptionAttribute>()) text += " " + attr.Properties.Get(NUnit.Framework.Internal.PropertyNames.Description);
-                foreach (Match x in Regex.Matches(text, @"\b([A-Z]+)-(\d+)(?:…(\d+))?((?:/\d+)*)"))
-                {
-                    string prefix = x.Groups[1].Value;
-                    int lo = int.Parse(x.Groups[2].Value);
-                    int hi = x.Groups[3].Success ? int.Parse(x.Groups[3].Value) : lo;
-                    for (int n = lo; n <= hi; n++) cited.Add($"{prefix}-{n:00}");
-                    foreach (var more in x.Groups[4].Value.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries))
-                        cited.Add($"{prefix}-{int.Parse(more):00}");
-                }
+                Cite(text, cited);
             }
             return cited;
+        }
+
+        /// <summary>The rule ids a description cites: "SENSE-03", "SENSE-01…05", "ACT-10/11"; never a test id such as "T-DEC-02".</summary>
+        public static void Cite(string text, ISet<string> cited)
+        {
+            foreach (Match x in Regex.Matches(text, @"(?<![A-Z]-)\b([A-Z]+)-(\d+)(?:…(\d+))?((?:/\d+)*)"))
+            {
+                string prefix = x.Groups[1].Value;
+                int lo = int.Parse(x.Groups[2].Value);
+                int hi = x.Groups[3].Success ? int.Parse(x.Groups[3].Value) : lo;
+                for (int n = lo; n <= hi; n++) cited.Add($"{prefix}-{n:00}");
+                foreach (var more in x.Groups[4].Value.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries))
+                    cited.Add($"{prefix}-{int.Parse(more):00}");
+            }
+        }
+
+        [Test, Description("The coverage gate's own rules: a test id is no citation, ranges and lists are, and a rule written \"(MUST) Title.\" counts")]
+        public void CitationsAreReadCorrectly()
+        {
+            var cited = new SortedSet<string>(StringComparer.Ordinal);
+            Cite("T-DEC-02 (DEC-10): …; T-ANIM-02 (ANIM-10, SENSE-01…03, ACT-10/12)", cited);
+            CollectionAssert.AreEqual(new[] { "ACT-10", "ACT-12", "ANIM-10", "DEC-10", "SENSE-01", "SENSE-02", "SENSE-03" }, cited);
+            Assert.IsTrue(MustRules().Contains("TICK-04"), "\"**TICK-04 (MUST) The reference phase list.**\" is a MUST rule");
         }
 
         [Test, Description("M11 (rule 4 of the prompt): every MUST rule of Docs/Interface is cited by at least one test")]

@@ -26,17 +26,17 @@ namespace EvoSim
         public float MateEnergy => mateEnergy;
         public float Reach => reach;
         /// <summary>Sexual unless this rule or the world's asexual control (C7) says otherwise.</summary>
-        public bool Sexual => sexual && (World == null || !World.Asexual);
+        public virtual bool Sexual => sexual && (World == null || !World.Asexual);
 
         public override void Declare(SpeciesBuilder b) => Maturity = b.DeclareTrait("maturity", maturity, 0f, 100000f);
 
         public override void Initialize() => energy = Species.Module<Energy>();
 
         /// <summary>Adult (ANIM-36): age at least the maturity trait.</summary>
-        public bool IsAdult(Animal a) => a.Age >= a.Trait(Maturity);
+        public virtual bool IsAdult(Animal a) => a.Age >= a.Trait(Maturity);
 
         /// <summary>Ready to mate (REPRO-01): adult, alive, energy at least mateEnergy.</summary>
-        public bool IsReady(Animal a) => !a.Killed && !a.IsGone && IsAdult(a) && energy != null && a[energy.Value] >= mateEnergy;
+        public virtual bool IsReady(Animal a) => !a.Killed && !a.IsGone && IsAdult(a) && energy != null && a[energy.Value] >= mateEnergy;
 
         public override void WritePromptRules(PromptWriter w) => w.Rule(promptRule);
 
@@ -53,7 +53,7 @@ namespace EvoSim
         public override void Validate(ValidationReport report)
         {
             if (Species.Module<Energy>() == null)
-                report.Warning("V-20", this, "The mating rule needs an Energy module: without it no animal is ever ready.");
+                report.Warning("V-26", this, "The mating rule needs an Energy module: without it no animal is ever ready.", BreedPhase.AddModule<Energy>(Species, "Energy"));
         }
     }
 }

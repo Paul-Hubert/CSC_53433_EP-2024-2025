@@ -19,8 +19,9 @@ namespace EvoSim
         public string Source;
         /// <summary>The decision of this tick with the same key whose answer this one shares (DEC-32), or null.</summary>
         public Decision SameAs;
-        internal BrainAnswer Answer;
-        internal int AnswerIndex = -1;
+        /// <summary>The batch answer that holds this decision's row, and its index in it.</summary>
+        public BrainAnswer Answer;
+        public int AnswerIndex = -1;
 
         internal void Reset(Animal a)
         {

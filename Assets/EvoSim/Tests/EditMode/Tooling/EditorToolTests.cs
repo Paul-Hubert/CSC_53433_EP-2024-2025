@@ -43,6 +43,35 @@ namespace EvoSim.Tests
             foreach (var g in WorldFactory.Genes) Assert.IsNotNull(WorldFactory.AddModule(species, "Genes", g), g);
         }
 
+        static System.Collections.Generic.IEnumerable<string> ModulePrefabs() => UnityEditor.AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/EvoSim/Modules" })
+            .Select(UnityEditor.AssetDatabase.GUIDToAssetPath).Where(p => !p.Contains("/Bodies/")).OrderBy(p => p, System.StringComparer.Ordinal);
+
+        [Test, Description("T-EDIT-03 (EDIT-01): every module prefab validates without an error inside the reference prey or predator")]
+        public void EveryModulePrefabValidates([ValueSource(nameof(ModulePrefabs))] string path)
+        {
+            var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            Assert.IsNotNull(prefab, path);
+            var problems = new System.Collections.Generic.List<string>();
+            foreach (var who in new[] { "prey", "predator" })
+            {
+                var b = New(name: "prefab " + who).Lab1(prey: 2, predators: 1);
+                var species = b.Root.GetComponentsInChildren<Species>(true).First(s => s.gameObject.name == who);
+                var instance = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(prefab);
+                instance.name = "probe " + prefab.name.ToLowerInvariant();
+                instance.transform.SetParent(species.transform, false);
+                foreach (var a in instance.GetComponentsInChildren<AnimalAction>(true))
+                    if (species.GetComponentsInChildren<AnimalAction>(true).Any(x => x != a && x.Name == a.Name)) a.gameObject.name += " 2";
+                foreach (var s in instance.GetComponentsInChildren<Sense>(true)) s.SetLabel("Probe " + s.Label);
+                foreach (var g in instance.GetComponentsInChildren<Gene>(true)) g.SetLabel("probe." + g.Label);
+                var report = new ValidationReport();
+                UnityEngine.TestTools.LogAssert.ignoreFailingMessages = true;
+                b.BuildUninitialized().Prepare(report);
+                problems.AddRange(report.Messages.Where(m => m.Severity == Severity.Error).Select(m => $"{who}: {m}"));
+                if (problems.Count == 0) return;                                       // fits one of the two reference species
+            }
+            Assert.IsEmpty(problems, path);
+        }
+
         [Test, Description("T-PROMPT-05 (PROMPT-06): the species inspector's preview equals the text the brain receives for the same animal (a prompt brain and JEV)")]
         public void PreviewEqualsWhatTheBrainReceives()
         {

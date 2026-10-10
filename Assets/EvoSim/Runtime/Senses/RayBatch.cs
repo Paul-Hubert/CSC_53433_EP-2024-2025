@@ -52,6 +52,7 @@ namespace EvoSim
         /// <summary>Asks for a ray; returns its index among this animal's rays for this sense.</summary>
         public int Add(Vector3 origin, Vector3 direction, float distance, int layerMask = Physics.DefaultRaycastLayers)
         {
+            layerMask &= ~(1 << ViewPool.IgnoreRaycastLayer);                    // never the views: senses don't depend on rendering (RAND-11)
             requests.Add(new Request { Origin = origin, Direction = direction.normalized, Distance = distance, LayerMask = layerMask });
             if (Immediate)
             {

@@ -34,6 +34,8 @@ namespace EvoSim
                 var attachments = SensePhase.Attachments(a, sense, out string attachmentKey, out bool memoable);
                 d.Query = new DecisionQuery(species, DecisionQuery.BrainGenes(species, genome), d.Observation, d.Situation, World.TextStyle,
                                             genome != null ? genome.BrainKey : species.Id, attachments);
+                d.Query.AnimalId = a.Id;
+                if (d.Brain != null && !d.Brain.Memoizable) memoable = false;              // a brain with memory: no memo, no sharing, no cache
                 d.MemoKey = memoable ? DecisionMemo.Key(species, d.Brain, d.Query.GenomeKey, d.Observation) + (attachmentKey.Length > 0 ? "|" + attachmentKey : "") : null;
 
                 if (state.Memo.TryGet(d.MemoKey, out var row)) { d.Row = row; d.Source = "memo"; species.Counters.MemoHits++; continue; }
@@ -89,11 +91,17 @@ namespace EvoSim
         public override void Validate(ValidationReport report)
         {
             int me = IndexOf(this), sense = IndexOf(World.Phase<SensePhase>());
-            if (sense < 0 || sense > me) report.Error("V-08", this, "Ask brains must come after the Sense phase.");
+            if (sense < 0 || sense > me) report.Error("V-08", this, "Ask brains must come after the Sense phase.", PlaceAfter(World.Phase<SensePhase>()));
             foreach (var s in World.AllSpecies)
             {
                 var brain = s.Brain;
-                if (brain == null) { report.Error("V-10", s, $"Species '{s.DisplayName}' has no brain and the World has no default brain."); continue; }
+                if (brain == null) { report.Error("V-10", s, $"Species '{s.DisplayName}' has no brain and the World has no default brain.", PickBrain(s)); continue; }
+                if (!IsService(brain))
+                {
+                    report.Error("V-10", s, $"The brain '{brain.name}' of '{s.DisplayName}' is disabled, inactive, under a species or in another World: " +
+                                            "it would be used without being set up or checked (ARCH-06, DEC-13).", PickBrain(s));
+                    continue;
+                }
                 if (s.Actions.Count > brain.MaxActions)
                     report.Error("V-11", s, $"'{s.DisplayName}' has {s.Actions.Count} actions; {brain.Id} takes at most {brain.MaxActions} (DEC-14).");
                 if (brain.MaxPromptTokens > 0 && s.Prompt != null)
@@ -106,6 +114,22 @@ namespace EvoSim
                     if (sense2.HasAttachments && !brain.AcceptsAttachments)
                         report.Error("V-51", sense2, $"Sense '{sense2.Label}' gives attachments and {brain.Id} can't read them (SENSE-41).");
             }
+        }
+
+        bool IsService(Brain b)
+        {
+            foreach (var svc in World.Services) if (svc == b) return true;
+            return false;
+        }
+
+        /// <summary>V-10's fix: the World's first enabled brain for this species (or as the default), if there is one.</summary>
+        ValidationFix PickBrain(Species s)
+        {
+            var first = World.Service<Brain>();
+            if (first == null) return null;
+            var world = World;
+            return s.OwnBrain != null ? new ValidationFix($"Use {first.name}", () => s.SetBrain(first))
+                                      : new ValidationFix($"Use {first.name} as the default", () => world.DefaultBrain = first);
         }
 
         /// <summary>The longest founder genome with the longest situation (B-06, PROMPT-06).</summary>

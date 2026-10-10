@@ -1,6 +1,7 @@
 namespace EvoSim.Samples
 {
     /// <summary>Recipe 22 §3: walk to the nearest visible water's shore and drink there, which resets thirst.</summary>
+    [RequiresModule(typeof(Thirst))]
     public class DrinkAction : AnimalAction
     {
         Thirst thirst;

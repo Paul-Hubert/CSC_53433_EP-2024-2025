@@ -84,8 +84,9 @@ namespace EvoSim
 
         public override void Validate(ValidationReport report)
         {
-            if (fraction < 0f || fraction > 1f) report.Error("V-35", this, "Cover fraction must be in [0, 1].");
-            if (octaves == null || octaves.Length == 0) report.Error("V-35", this, "Cover needs at least one noise octave.");
+            if (!(fraction >= 0f && fraction <= 1f))
+                report.Error("V-35", this, "Cover fraction must be in [0, 1].", new ValidationFix("Clamp", () => SetFraction(float.IsNaN(fraction) ? 0f : fraction)));
+            if (octaves == null || octaves.Length == 0) report.Error("V-37", this, "Cover needs at least one noise octave.");
         }
     }
 }

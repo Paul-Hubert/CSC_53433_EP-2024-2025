@@ -74,7 +74,8 @@ namespace EvoSim
                 Brain b = null;
                 foreach (var candidate in world.GetComponentsInChildren<Brain>(true))
                     if (candidate.gameObject.name == brainName || candidate.Id == brainName) { b = candidate; break; }
-                if (b != null) { world.DefaultBrain = b; applied["brain"] = brainName; }
+                if (b != null && !Ownership.IsEnabled(b)) problems.Add($"the brain {brainName} is disabled (ARCH-06)");
+                else if (b != null) { world.DefaultBrain = b; applied["brain"] = brainName; }
                 else problems.Add($"no brain named {brainName}");
             }
             foreach (var o in Concat(set, v.set))

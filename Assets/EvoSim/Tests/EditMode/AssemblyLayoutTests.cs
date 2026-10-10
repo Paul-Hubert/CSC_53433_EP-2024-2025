@@ -13,12 +13,14 @@ namespace EvoSim.Tests
             Assert.AreEqual(0.001f, Units.Epsilon);
         }
 
-        [Test, Description("T-EDIT-02 (EDIT-03): the runtime assemblies have no reference to UnityEditor")]
+        [Test, Description("T-EDIT-02 (EDIT-03): the runtime assemblies (Runtime, Http, Samples) have no reference to UnityEditor")]
         public void RuntimeAssembliesDoNotReferenceUnityEditor()
         {
-            var runtime = typeof(Units).Assembly;
-            var names = runtime.GetReferencedAssemblies().Select(r => r.Name).ToList();
-            Assert.That(names, Has.None.StartsWith("UnityEditor"), string.Join(", ", names));
+            foreach (var runtime in new[] { typeof(Units).Assembly, typeof(HttpBrain).Assembly, typeof(EvoSim.Samples.Thirst).Assembly })
+            {
+                var names = runtime.GetReferencedAssemblies().Select(r => r.Name).ToList();
+                Assert.That(names, Has.None.StartsWith("UnityEditor"), runtime.GetName().Name + ": " + string.Join(", ", names));
+            }
         }
     }
 }

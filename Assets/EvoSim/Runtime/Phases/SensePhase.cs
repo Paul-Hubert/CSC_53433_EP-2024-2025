@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace EvoSim
@@ -34,16 +35,35 @@ namespace EvoSim
             }
             senses.CastRays(deciders);                                                      // SENSE-30
             var style = World.TextStyle;
-            foreach (var d in state.Due)
+            var due = state.Due;                                                            // species order, then id order
+            for (int start = 0, end; start < due.Count; start = end)
             {
-                var species = d.Animal.Species;
-                d.Observation = species.Observe(d.Animal, senses);
-                d.Situation = species.Describe(d.Observation, style);
+                var species = due[start].Animal.Species;
+                group.Clear();
+                for (end = start; end < due.Count && due[end].Animal.Species == species; end++) group.Add(due[end].Animal);
+                var list = species.Senses;
+                var observed = new int[group.Count][];
+                for (int i = 0; i < group.Count; i++) observed[i] = new int[list.Count];
+                if (tokens.Length < group.Count) tokens = new int[Math.Max(group.Count, tokens.Length * 2)];
+                for (int k = 0; k < list.Count; k++)
+                {
+                    list[k].ReadAll(group, senses, new Span<int>(tokens, 0, group.Count));   // the batch entry point (ARCH-12)
+                    for (int i = 0; i < group.Count; i++) observed[i][k] = tokens[i];
+                }
+                for (int i = 0; i < group.Count; i++)
+                {
+                    var d = due[start + i];
+                    d.Observation = new Observation(observed[i]);
+                    d.Situation = species.Describe(d.Observation, style);
+                }
             }
         }
 
+        readonly List<Animal> group = new List<Animal>();
+        int[] tokens = new int[64];
+
         /// <summary>The attachments of an animal's senses (SENSE-40), and a key for them or null (SENSE-41).</summary>
-        internal static List<object> Attachments(Animal a, SenseContext s, out string key, out bool memoable)
+        public static List<object> Attachments(Animal a, SenseContext s, out string key, out bool memoable)
         {
             List<object> list = null;
             key = "";
@@ -61,6 +81,7 @@ namespace EvoSim
             return list;
         }
 
-        internal SenseContext Context => senses;
+        /// <summary>This tick's sense context (rays cast), for the phases after it.</summary>
+        public SenseContext Context => senses;
     }
 }

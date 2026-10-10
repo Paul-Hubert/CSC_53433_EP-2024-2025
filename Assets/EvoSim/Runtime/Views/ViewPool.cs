@@ -4,12 +4,14 @@ using UnityEngine;
 namespace EvoSim
 {
     /// <summary>
-    /// Inactive views of one species, reused (20 §6): a new animal takes one, a dead one gives it back. Views sit on the
-    /// "Ignore Raycast" layer, so the senses' rays never hit them (SPACE-12).
+    /// Inactive views of one species, reused (20 §6): a new animal takes one, a dead one gives it back. Views have no
+    /// active collider and sit on the "Ignore Raycast" layer, which every sense ray leaves out, so what the animals sense
+    /// never depends on rendering (SPACE-12, RAND-11).
     /// </summary>
     public sealed class ViewPool
     {
-        const int IgnoreRaycastLayer = 2;
+        /// <summary>The views' layer ("Ignore Raycast"): RayBatch removes it from every mask.</summary>
+        public const int IgnoreRaycastLayer = 2;
         static readonly int ColorId = Shader.PropertyToID("_Color");
         static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
 
@@ -37,7 +39,7 @@ namespace EvoSim
 
         public void Return(AnimalView v)
         {
-            v.AnimalId = 0;
+            v.AnimalId = -1;
             v.gameObject.SetActive(false);
             free.Push(v);
         }
@@ -62,7 +64,8 @@ namespace EvoSim
             }
             go.name = body.Species != null ? body.Species.Id : "view";
             foreach (var t in go.GetComponentsInChildren<Transform>(true)) t.gameObject.layer = IgnoreRaycastLayer;
-            var view = go.GetComponent<AnimalView>() ?? go.AddComponent<AnimalView>();
+            foreach (var c in go.GetComponentsInChildren<Collider>(true)) c.enabled = false;   // views are never hit (SPACE-12)
+            if (!go.TryGetComponent<AnimalView>(out var view)) view = go.AddComponent<AnimalView>();
             go.SetActive(false);
             Created++;
             return view;

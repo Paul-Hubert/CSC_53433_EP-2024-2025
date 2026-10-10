@@ -202,6 +202,13 @@ namespace EvoSim
             if (IsInitialized) SyncViews();               // visuals only (SPACE-12)
         }
 
+        /// <summary>Leaving Play mode, or disabling the World, ends the run like any stop: its files are complete (RAND-20, OUT-03).</summary>
+        void OnDisable()
+        {
+            if (!IsInitialized || stopped) return;
+            Stop(nextPhase == 0 && !waiting ? "world disabled" : $"world disabled during {phases[nextPhase].PhaseName} of tick {Tick}");
+        }
+
         /// <summary>Advances according to the run controls; returns the ticks done.</summary>
         int Drive(int ticks)
         {
@@ -298,11 +305,17 @@ namespace EvoSim
             context = new TickContext(this);
             ResetSystems();
 
-            // 1. Species: a species inside a species is an error (SPEC-05, V-01).
+            // 0. A World inside a World: both would own and tick the same species (ARCH-05, V-16).
+            var outer = transform.parent != null ? transform.parent.GetComponentInParent<World>(true) : null;
+            if (outer != null) report.Error("V-16", this, $"The World '{name}' is inside the World '{outer.name}': each World owns everything below it (ARCH-05).");
+            foreach (var inner in GetComponentsInChildren<World>(true))
+                if (inner != this) report.Error("V-16", inner, $"The World '{inner.name}' is inside the World '{name}': each World owns everything below it (ARCH-05).");
+            if (report.HasErrors) return false;
+
+            // 1. Species: a species inside a species is an error, enabled or not (SPEC-05, V-01).
             species.Clear();
-            foreach (var s in GetComponentsInChildren<Species>(false))
+            foreach (var s in GetComponentsInChildren<Species>(true))
             {
-                if (!Ownership.IsEnabled(s)) continue;
                 var above = Ownership.SpeciesAbove(s);
                 if (above != null)
                 {
@@ -311,7 +324,7 @@ namespace EvoSim
                                  new ValidationFix("Move it up", () => nested.transform.SetParent(transform, true)));
                     continue;
                 }
-                species.Add(s);
+                if (Ownership.IsEnabled(s)) species.Add(s);
             }
 
             // 2. World modules: under the World but not under a species, in hierarchy order (TICK-01).
@@ -321,7 +334,7 @@ namespace EvoSim
                 if (!Ownership.IsEnabled(m)) continue;
                 if (Ownership.NearestSpecies(m) != null)
                 {
-                    report.Warning("V-02", m, $"{m.GetType().Name} is a world module under a species; it is ignored.");
+                    report.Warning("V-15", m, $"{m.GetType().Name} is a world module under a species; it is ignored.");
                     continue;
                 }
                 m.Bind(this);
@@ -341,7 +354,7 @@ namespace EvoSim
             ground = Service<Ground>();
             if (ground != null) ground.Initialize();
             foreach (var svc in services) if (svc != ground) svc.Initialize();
-            Queries.Bind(Service<Cover>());
+            Queries.Bind(ServicesOf<Cover>());                 // several covers combine: hidden by any (ENV-11)
 
             // 4–5. Species modules, ownership, gene binding, orders. Ids are unique (V-07).
             usedSpeciesIds.Clear();
@@ -349,10 +362,17 @@ namespace EvoSim
             foreach (var s in species)
             {
                 string sid = s.RequestedId;
+                var sp = s;
+                var rename = new ValidationFix("Rename", () => sp.SetNames("", sp.DisplayName + " 2"));
                 if (!usedSpeciesIds.Add(sid))
-                    report.Error("V-07", s, $"Two species have the id '{sid}'.");
+                    report.Error("V-07", s, $"Two species have the id '{sid}'.", rename);
                 if (!names.Add(s.DisplayName))
-                    report.Error("V-07", s, $"Two species have the display name '{s.DisplayName}'.");
+                    report.Error("V-07", s, $"Two species have the display name '{s.DisplayName}'.", rename);
+                if (sid.IndexOf('.') >= 0)
+                    report.Error("V-07", s, $"The species id '{sid}' contains '.', which separates species and gene in locus ids (GENE-01).");
+                foreach (var other in species)
+                    if (other != s && other.DisplayName == sid && other.RequestedId != sid)
+                        report.Error("V-07", s, $"'{sid}' is the id of '{s.DisplayName}' and the display name of another species: diets and senses naming it are ambiguous.", rename);
                 s.Discover(this, sid, report);
             }
             if (report.HasErrors) return false;
@@ -365,52 +385,135 @@ namespace EvoSim
 
             // 7. The food web and animal sets; then each species' prompt template (PROMPT-01).
             DeriveRelations();
-            foreach (var s in species) s.Prompt = PromptWriter.Build(s);
+            foreach (var s in species) { s.Sign(); s.Prompt = PromptWriter.Build(s); }
 
             // 8. Validation (EDIT-01).
             ValidateCore(report);
             foreach (var m in modules) m.Validate(report);
             foreach (var s in species)
                 foreach (var sm in s.Modules) sm.Validate(report);
+            foreach (var s in species) ValidateCompanions(s, report);
+            ValidateSecrets(report);
             return !report.HasErrors;
         }
 
         /// <summary>The checks that belong to no single module (21 §2).</summary>
         void ValidateCore(ValidationReport report)
         {
-            foreach (var s in species)
-            {
-                if (s.Actions.Count == 0)
-                    report.Error("V-04", s, $"Species '{s.DisplayName}' has no action (CORE-04).");
-                var seen = new HashSet<string>();
-                foreach (var a in s.Actions)
-                {
-                    if (!seen.Add(a.Name)) report.Error("V-03", a, $"Two actions of '{s.DisplayName}' are named '{a.Name}' (ACT-01).");
-                    if (a.Gene == null) report.Warning("V-05", a, $"Action '{a.Name}' has no text gene: the brain can't be steered for it.");
-                }
-                var labels = new HashSet<string>();
-                foreach (var g in s.Genes)
-                    if (!labels.Add(g.Label)) report.Error("V-14", g, $"Two genes of '{s.DisplayName}' have the label '{g.Label}': locus ids must be unique (GENE-01).");
-                foreach (var problem in s.Declarations.Problems) report.Warning("V-36", s, problem);
-                if (!string.IsNullOrEmpty(s.AcceptedSignature) && s.AcceptedSignature != s.Signature)
-                {
-                    var sp = s;
-                    report.Warning("V-12", s, $"The signature of '{s.DisplayName}' changed: results and cached answers change (SPEC-03).",
-                                   new ValidationFix("Accept", () => sp.AcceptSignature()));
-                }
-                double space = s.ObservationSpace;                       // SENSE-05
-                if (space > ObservationSpaceError)
-                    report.Error("V-50", s, $"'{s.DisplayName}' has {space:N0} possible observations: above {ObservationSpaceError:N0}.");
-                else if (space > ObservationSpaceWarning)
-                    report.Warning("V-50", s, $"'{s.DisplayName}' has {space:N0} possible observations: above {ObservationSpaceWarning:N0}, the memo and cache will rarely help.");
-                foreach (var problem in s.Prompt.Problems)
-                    report.Error("V-53", s, $"Prompt of '{s.DisplayName}': {problem}.");
-                if (species.Count > 0 && Phase<DeathPhase>() == null && s == species[0])
-                    report.Warning("V-09", this, "There is no Deaths phase: nobody dies.");
-                if (s.Id == RandomStreams.WorldStream)
-                    report.Error("V-07", s, "The species id 'world' is reserved for the map's random streams.");
-            }
+            ValidateSettings(report);
+            foreach (var s in species) ValidateSpecies(s, report);
+            ValidatePhaseSet(report);
+            ValidateServiceNames(report);
             ValidateAcrossSpecies(report);
+        }
+
+        /// <summary>V-35: run settings outside their range, e.g. set by a scenario override, which skips the inspector's limits.</summary>
+        void ValidateSettings(ValidationReport report)
+        {
+            void Check(bool bad, string what, Action clamp)
+            {
+                if (bad) report.Error("V-35", this, $"{what} (an override can bypass the inspector's limit).", new ValidationFix("Clamp", clamp));
+            }
+            Check(decisionPeriod < 1, $"The decision period is {decisionPeriod}: it must be at least 1 tick (DEC-01)", () => DecisionPeriod = decisionPeriod);
+            Check(!(samplingTemperature >= 0.01f), $"The sampling temperature is {samplingTemperature}: it must be at least 0.01 (DEC-20)", () => SamplingTemperature = float.IsNaN(samplingTemperature) ? 1f : samplingTemperature);
+            Check(ticksPerFixedUpdate < 1, $"Ticks per FixedUpdate is {ticksPerFixedUpdate}: it must be at least 1", () => TicksPerFixedUpdate = ticksPerFixedUpdate);
+            Check(memoCapacity < 0, $"The memo capacity is {memoCapacity}: it must be 0 (no limit) or more", () => MemoCapacity = memoCapacity);
+            Check(tickLimit < 0, $"The tick limit is {tickLimit}: it must be 0 (off) or more", () => TickLimit = tickLimit);
+            Check(!(wallClockMinutes >= 0f), $"The wall-clock limit is {wallClockMinutes}: it must be 0 (off) or more", () => WallClockMinutes = 0f);
+            Check(!(fastBudgetMs > 0f), $"The Fast speed budget is {fastBudgetMs} ms: it must be more than 0", () => fastBudgetMs = 10f);
+            Check(!(realTimeTicksPerSecond >= 0.1f), $"Real-time speed is {realTimeTicksPerSecond} ticks per second: it must be at least 0.1", () => realTimeTicksPerSecond = 0.1f);
+        }
+
+        /// <summary>The checks of one species (21 §2); also run on a species added during the run.</summary>
+        void ValidateSpecies(Species s, ValidationReport report)
+        {
+            var sp = s;
+            if (s.Actions.Count == 0)
+                report.Error("V-04", s, $"Species '{s.DisplayName}' has no action (CORE-04).", new ValidationFix("Add Rest", () =>
+                {
+                    var go = new GameObject(nameof(RestAction).Replace("Action", "").ToLowerInvariant());
+                    go.transform.SetParent(sp.transform, false);
+                    go.AddComponent<RestAction>();
+                }));
+            var seen = new HashSet<string>();
+            foreach (var a in s.Actions)
+            {
+                var action = a;
+                if (!seen.Add(a.Name))
+                    report.Error("V-03", a, $"Two actions of '{s.DisplayName}' are named '{a.Name}' (ACT-01).",
+                                 new ValidationFix("Rename", () => action.gameObject.name = action.Name + " 2"));
+                if (a.Gene == null)
+                    report.Warning("V-05", a, $"Action '{a.Name}' has no text gene: the brain can't be steered for it.",
+                                   new ValidationFix("Add a text gene", () => action.gameObject.AddComponent<TextGene>()));   // its pool: the neutral allele
+            }
+            var labels = new HashSet<string>();
+            foreach (var g in s.Genes)
+                if (!labels.Add(g.Label)) report.Error("V-14", g, $"Two genes of '{s.DisplayName}' have the label '{g.Label}': locus ids must be unique (GENE-01).");
+            var senseLabels = new HashSet<string>();
+            foreach (var sense in s.Senses)
+                if (!senseLabels.Add(sense.Label))
+                    report.Error("V-17", sense, $"Two senses of '{s.DisplayName}' have the label '{sense.Label}': the brain can't tell them apart (SENSE-10).");
+            foreach (var problem in s.Declarations.Problems) report.Add(problem.Code, problem.Severity, problem.Module != null ? (UnityEngine.Object)problem.Module : s, problem.Text);
+            if (!string.IsNullOrEmpty(s.AcceptedSignature) && s.AcceptedSignature != s.Signature)
+                report.Warning("V-12", s, $"The signature of '{s.DisplayName}' changed: results and cached answers change (SPEC-03).",
+                               new ValidationFix("Accept", () => sp.AcceptSignature()));
+            double space = s.ObservationSpace;                       // SENSE-05
+            if (space > ObservationSpaceError)
+                report.Error("V-50", s, $"'{s.DisplayName}' has {space:N0} possible observations: above {ObservationSpaceError:N0}.");
+            else if (space > ObservationSpaceWarning)
+                report.Warning("V-50", s, $"'{s.DisplayName}' has {space:N0} possible observations: above {ObservationSpaceWarning:N0}, the memo and cache will rarely help.");
+            foreach (var problem in s.Prompt.Problems)
+                report.Error("V-53", s, $"Prompt of '{s.DisplayName}': {problem}.");
+            if (s.Id == RandomStreams.WorldStream)
+                report.Error("V-07", s, "The species id 'world' is reserved for the map's random streams.");
+        }
+
+        /// <summary>V-09: a core phase missing, so part of the life cycle never happens.</summary>
+        void ValidatePhaseSet(ValidationReport report)
+        {
+            if (species.Count == 0) return;
+            if (Phase<DeathPhase>() == null)
+                report.Warning("V-09", this, "There is no Deaths phase: nobody dies.", AddPhaseFix<DeathPhase>("Deaths"));
+            if (Phase<BreedPhase>() != null && Phase<HatchPhase>() == null)
+                report.Warning("V-09", Phase<BreedPhase>(), "There is a Breed phase and no Hatch phase: eggs are laid and never hatch.", AddPhaseFix<HatchPhase>("Hatch"));
+            if (Service<RunRecorder>() != null && Phase<RecordPhase>() == null)
+                report.Warning("V-09", Service<RunRecorder>(), "There is a run recorder and no Record phase: no statistics rows, no periodic flush.", AddPhaseFix<RecordPhase>("Record"));
+        }
+
+        ValidationFix AddPhaseFix<T>(string phaseName) where T : TickPhase
+        {
+            var parent = phases.Count > 0 ? phases[phases.Count - 1].transform.parent : transform;
+            var world = this;
+            return new ValidationFix("Add it", () =>
+            {
+                var go = new GameObject(phaseName);
+                go.transform.SetParent(parent != null ? parent : world.transform, false);
+                go.AddComponent<T>();
+            });
+        }
+
+        /// <summary>V-18: services found by name must have unique names, and layer names must not be reserved stream names (ARCH-08, RAND-02).</summary>
+        void ValidateServiceNames(ValidationReport report)
+        {
+            for (int i = 0; i < services.Count; i++)
+            {
+                var a = services[i];
+                if (a is ResourceLayer layer)
+                {
+                    string n = layer.ServiceName;
+                    if (n == RandomStreams.WorldStream || n == RandomStreams.ActOrderStream || n.IndexOf('/') >= 0)
+                        report.Error("V-18", layer, $"The layer name '{n}' is reserved for random streams (RAND-02): rename it.");
+                }
+                for (int j = 0; j < i; j++)
+                {
+                    var b = services[j];
+                    bool byName = (a is ResourceLayer && b is ResourceLayer) || (a is Brain && b is Brain);      // the services found by name
+                    if (byName && a.ServiceName == b.ServiceName)
+                        report.Error("V-18", a, $"Two {(a is ResourceLayer ? "layers" : "brains")} are named '{a.ServiceName}': " +
+                                                "look-ups by name reach only the first, and they would share random streams (ARCH-08, RAND-02).",
+                                     new ValidationFix("Rename", () => a.gameObject.name = a.ServiceName + " 2"));
+                }
+            }
         }
 
         partial void ResetSystems();

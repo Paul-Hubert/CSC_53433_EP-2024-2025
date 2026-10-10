@@ -54,6 +54,8 @@ namespace EvoSim
         public IReadOnlyList<Animal> Animals => animals;
         /// <summary>The prompt template built from the modules (PROMPT-01), with its id (PROMPT-05).</summary>
         public PromptTemplate Prompt { get; internal set; }
+        /// <summary>Builds the prompt template again, e.g. after a phase changed a rule line during the run (PROMPT-01).</summary>
+        public void RebuildPrompt() => Prompt = PromptWriter.Build(this);
 
         /// <summary>The order and set of actions, genes and senses (SPEC-03).</summary>
         public string Signature { get; private set; }
@@ -134,7 +136,8 @@ namespace EvoSim
             animals.Clear();
             Counters = new SpeciesCounters();
             modules.Clear(); actions.Clear(); genes.Clear(); senses.Clear(); moduleOf.Clear();
-            modules.AddRange(Ownership.Owned<SpeciesModule>(this));
+            foreach (var m in Ownership.Owned<SpeciesModule>(this))
+                if (!(m is Gene g0) || !Ownership.OnDisabledAction(g0, this)) modules.Add(m);
             foreach (var m in modules)
             {
                 m.Bind(this);
@@ -179,13 +182,15 @@ namespace EvoSim
             Declarations.Current = null;
         }
 
-        /// <summary>Step 6b: every module looks up what it needs (ARCH-08); then the signature.</summary>
+        /// <summary>Step 6b: every module looks up what it needs (ARCH-08).</summary>
         internal void InitializeModules()
         {
             foreach (var m in modules) m.Initialize();
             Counters.Resize(actions.Count);
-            Signature = ComputeSignature();
         }
+
+        /// <summary>Step 7, after the food web: sense labels derived from it are final (SPEC-03, SPEC-20).</summary>
+        internal void Sign() => Signature = ComputeSignature();
 
         /// <summary>The signature: a hash of the action, gene and sense orders and tokens (SPEC-03).</summary>
         public string ComputeSignature()
@@ -209,10 +214,14 @@ namespace EvoSim
 
         /// <summary>
         /// Creates an animal: traits at their defaults, then the genome expressed into them (ANIM-15),
-        /// then stats at their start values. The caller records the event.
+        /// then stats at their start values. The caller records the event. <paramref name="atCreation"/> may still set
+        /// any trait (ANIM-17), before the stats start from them.
         /// </summary>
-        public Animal CreateAnimal(string origin, Vector3 position, float heading, Genome genome, int generation, int[] parents)
+        public Animal CreateAnimal(string origin, Vector3 position, float heading, Genome genome, int generation, int[] parents,
+                                   System.Action<Animal> atCreation = null)
         {
+            if (genome != null && genome.Species != this)
+                throw new System.ArgumentException($"A {genome.Species?.Id} genome can't make a {Id} animal (GENE-06).");
             var d = Declarations;
             var a = new Animal(World.NextAnimalId(), this, d.Stats.Count, d.Traits.Count)
             {
@@ -234,12 +243,14 @@ namespace EvoSim
                 var e = new Expression(a, d);
                 for (int i = 0; i < genes.Count; i++) genes[i].Express(expressed[i].Value, e);
             }
+            atCreation?.Invoke(a);
             var stats = a.RawStats;
             foreach (var s in d.Stats)
             {
                 float v = s.Start.Trait >= 0 ? traits[s.Start.Trait] : s.Start.Value;
                 stats[s.Id.Index] = s.Id.Clamp(v, traits);
             }
+            a.Created = true;                                       // traits are fixed from now on, unless changeable (ANIM-17)
             return a;
         }
 
@@ -249,10 +260,11 @@ namespace EvoSim
             animals.Add(a);
             World.OnAnimalAdded(a);
             OnBorn(a);
+            World.Born(a);
         }
 
-        /// <summary>Drops the animals marked gone, keeping creation order.</summary>
-        internal void RemoveGone()
+        /// <summary>Drops the animals marked gone, keeping creation order (a student's own death phase calls it too).</summary>
+        public void RemoveGone()
         {
             int w = 0;
             for (int r = 0; r < animals.Count; r++)

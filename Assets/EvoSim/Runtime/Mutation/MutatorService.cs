@@ -12,11 +12,11 @@ namespace EvoSim
     /// </summary>
     public class MutatorService : WorldService
     {
-        [SerializeField, Tooltip("The mutator model (reference qwen3.5:0.8b on the CPU).")]
-        string model = "qwen3.5:0.8b";
+        [SerializeField, Tooltip("The mutator model (reference gemma4:26b on the CPU, owner 2026-10-10; qwen3.5:0.8b is the small, faster choice).")]
+        string model = "gemma4:26b";
         [SerializeField, Min(0f), Tooltip("Sampling temperature of the mutator (reference 1.2).")]
         float temperature = 1.2f;
-        [SerializeField, Tooltip("Off (reference): an unavailable mutator leaves the gene unchanged (MUT-04). On: the run stops.")]
+        [SerializeField, Tooltip("Off (reference): an unavailable mutator leaves the gene unchanged (MUT-04). On: the run also stops, at the end of that tick.")]
         bool strict;
         [SerializeField, Tooltip("Store and reuse the mutator's answers (MUT-14).")]
         bool useCache = true;
@@ -125,7 +125,7 @@ namespace EvoSim
         {
             if (answer == null)
             {
-                if (strict) { World.Stop("mutator failure: " + error); }
+                if (strict) World.RequestStop("mutator failure: " + error);   // at the tick boundary: this tick ends with the gene unchanged (RAND-20)
                 Finish(j, "mutator unavailable: " + error);
                 return;
             }

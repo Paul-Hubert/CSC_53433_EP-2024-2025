@@ -18,7 +18,7 @@ namespace EvoSim
         readonly Func<Animal, Animal, bool> visibleAndReady;
         readonly Func<Carcass, Animal, bool> carcassForViewer;
         readonly Func<Egg, Animal, bool> eggForViewer;
-        Cover cover;
+        readonly List<Cover> covers = new List<Cover>();
         Species eggSpecies;
 
         public WorldQueries(World world)
@@ -30,9 +30,10 @@ namespace EvoSim
             eggForViewer = (e, viewer) => !e.UsedUp && (eggSpecies == null || e.Species == eggSpecies) && Diet(viewer)?.EatingEggs(e.Species) != null;
         }
 
-        internal void Bind(Cover coverService)
+        internal void Bind(IEnumerable<Cover> coverServices)
         {
-            cover = coverService;
+            covers.Clear();
+            covers.AddRange(coverServices);
             visionTraits.Clear();
         }
 
@@ -48,9 +49,17 @@ namespace EvoSim
         }
 
         /// <summary>Whether this animal stands in cover that hides it from that species (ENV-11).</summary>
-        public bool IsHiddenFrom(Animal target, Species viewer) => cover != null && cover.IsHiddenFrom(target, viewer);
+        public bool IsHiddenFrom(Animal target, Species viewer)
+        {
+            for (int i = 0; i < covers.Count; i++) if (covers[i].IsHiddenFrom(target, viewer)) return true;   // any cover hides
+            return false;
+        }
 
-        public bool InCover(Animal a) => cover != null && cover.InCover(a.Position);
+        public bool InCover(Animal a)
+        {
+            for (int i = 0; i < covers.Count; i++) if (covers[i].InCover(a.Position)) return true;
+            return false;
+        }
 
         /// <summary>Ready to mate (REPRO-01), by the species' mating rule; never without one.</summary>
         public bool IsReady(Animal a)
@@ -70,11 +79,25 @@ namespace EvoSim
         public AnimalHit? NearestAnimal(Animal a, AnimalSet set, IReadOnlyList<Species> listed = null) =>
             NearestAnimal(a, world.Resolve(a.Species, set, listed), Vision(a));
 
-        /// <summary>The nearest visible kin that is ready to mate, within vision (07 §4, mate).</summary>
+        /// <summary>
+        /// The nearest visible kin that is ready to mate (07 §4, mate), within vision and within the partner range of the
+        /// kin sense that reports readiness: the action never targets what the senses can't report (ACT-05).
+        /// </summary>
         public AnimalHit? NearestReadyKin(Animal a)
         {
             var kin = world.Resolve(a.Species, AnimalSet.Kin);
-            return world.Space.Nearest(a, a.Position, Vision(a), kin, visibleAndReady, out var hit) ? hit : (AnimalHit?)null;
+            float radius = Math.Min(Vision(a), PartnerRange(a.Species));
+            return world.Space.Nearest(a, a.Position, radius, kin, visibleAndReady, out var hit) ? hit : (AnimalHit?)null;
+        }
+
+        /// <summary>The partner range of the species' kin senses that report readiness (the widest), or no limit without one.</summary>
+        static float PartnerRange(Species s)
+        {
+            float range = -1f;
+            var senses = s.Senses;
+            for (int i = 0; i < senses.Count; i++)
+                if (senses[i] is NearestAnimalSense n && n.Targets == AnimalSet.Kin && n.ReportsReadiness) range = Math.Max(range, n.PartnerRange);
+            return range < 0f ? float.PositiveInfinity : range;
         }
 
         /// <summary>The nearest item of a layer the diet grazes (all of them for an empty name), within radius.</summary>
@@ -117,8 +140,27 @@ namespace EvoSim
         /// <summary>The nearest cover within radius; distance 0 when standing in it (ENV-10, ENV-12).</summary>
         public CoverHit? NearestCover(Animal a, float radius)
         {
-            if (cover == null) return null;
-            return cover.NearestCover(a.Position, radius, out var p, out float d) ? new CoverHit(p, d) : (CoverHit?)null;
+            CoverHit? best = null;
+            for (int i = 0; i < covers.Count; i++)                                       // the nearest of every cover; a tie keeps the first
+                if (covers[i].NearestCover(a.Position, radius, out var p, out float d) && (best == null || d < best.Value.Distance - 1e-6f))
+                    best = new CoverHit(p, d);
+            return best;
+        }
+
+        /// <summary>
+        /// The nearest entity of a kind of your own (fruit, nests…) within radius, across every entity system of that type,
+        /// passing the filter, which receives the viewer; ties by id (SPACE-07, SPACE-08).
+        /// </summary>
+        public EntityHit<T>? NearestEntity<T>(Animal a, float radius, Func<T, Animal, bool> filter = null) where T : Entity
+        {
+            EntityHit<T>? best = null;
+            foreach (var system in world.ServicesOf<EntitySystem<T>>())
+            {
+                if (!system.Nearest(a.Position, radius, a, filter, out var e, out float d)) continue;
+                if (best == null || d < best.Value.Distance - 1e-6f || (Math.Abs(d - best.Value.Distance) <= 1e-6f && e.Id < best.Value.Entity.Id))
+                    best = new EntityHit<T>(e, d);
+            }
+            return best;
         }
 
         static Diet Diet(Animal a) => a.Species.Module<Diet>();

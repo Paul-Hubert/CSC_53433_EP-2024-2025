@@ -17,7 +17,7 @@ namespace EvoSim
         public Ground Ground => World.Ground;
         public int Tick => World.Tick;
         /// <summary>Within this distance of a food item the animal grazes it (ACT-10).</summary>
-        public float GrazeReach { get; internal set; } = 0.5f;
+        public float GrazeReach { get; set; } = 0.5f;
 
         /// <summary>The intent planned so far for the current animal (stay by default).</summary>
         public Intent Intent { get; private set; }
@@ -38,6 +38,9 @@ namespace EvoSim
 
         /// <summary>The animal the intent is about (followed, fled, chased), or null; recorded for the inspector.</summary>
         public Animal TargetAnimal { get; private set; }
+
+        /// <summary>What was planned for the current animal: its intent, interaction and target animal.</summary>
+        public ActPlan Plan => new ActPlan(Intent, Interaction, TargetAnimal);
 
         // ---- Queries: only what the animal's senses could report (ACT-05) ----
 
@@ -60,6 +63,9 @@ namespace EvoSim
 
         /// <summary>The nearest egg (of a species, or any) the diet eats, within vision.</summary>
         public EntityHit<Egg>? NearestEgg(Animal a, Species of = null) => World.Queries.NearestEgg(a, of, Vision(a));
+        /// <summary>The nearest entity of a kind of your own within the animal's vision (see WorldQueries.NearestEntity).</summary>
+        public EntityHit<T>? NearestEntity<T>(Animal a, System.Func<T, Animal, bool> filter = null) where T : Entity =>
+            World.Queries.NearestEntity(a, Vision(a), filter);
 
         /// <summary>The nearest cover within vision (or a given radius); distance 0 when in cover.</summary>
         public CoverHit? NearestCover(Animal a, float radius = -1f) =>
@@ -145,5 +151,21 @@ namespace EvoSim
             degrees %= 360f;
             return degrees < 0f ? degrees + 360f : degrees;
         }
+    }
+
+    /// <summary>One animal's plan for a tick (ActContext.Plan): the batch entry point AnimalAction.ActAll writes these.</summary>
+    public readonly struct ActPlan
+    {
+        public readonly Intent Intent;
+        public readonly Interaction Interaction;
+        public readonly Animal TargetAnimal;
+
+        public ActPlan(Intent intent, Interaction interaction, Animal targetAnimal)
+        {
+            Intent = intent; Interaction = interaction; TargetAnimal = targetAnimal;
+        }
+
+        /// <summary>Stay where it is, no interaction (busy animals, animals without an action).</summary>
+        public static ActPlan Stay(Animal a) => new ActPlan(Intent.StayAt(a.Position), default, null);
     }
 }

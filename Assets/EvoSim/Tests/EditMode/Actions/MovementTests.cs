@@ -185,7 +185,7 @@ namespace EvoSim.Tests
             Assert.AreEqual(0, food.Count, "it still reaches the food, from the actual positions, without errors");
         }
 
-        [Test, Description("T-MOVE-07 (MOVE-07): a kinematic subclass that forbids steep slopes, for one species only → it never climbs past the limit, the other does")]
+        [Test, Description("T-MOVE-07 (MOVE-07, SPACE-06): a kinematic subclass that forbids steep slopes, for one species only → it never climbs past the limit, the other does")]
         public void LocomotionCanBeInherited()
         {
             var w = New().Ground<RampGround>(40, 40).Phase<ActPhase>()
@@ -202,6 +202,8 @@ namespace EvoSim.Tests
             w.Advance(15);
             Assert.Greater(climber.Position.x, 15f, "the kinematic species climbs the 45° ramp");
             Assert.Greater(climber.Position.y, 1f, "height follows the ground (SPACE-06)");
+            foreach (var a in new[] { climber, careful })
+                Assert.AreEqual(w.Ground.Height(a.Position), a.Position.y, 1e-4, "exactly the ground's height (SPACE-06)");
             Assert.LessOrEqual(careful.Position.x, 10.5f, "the careful species stops at the foot of the ramp");
         }
     }

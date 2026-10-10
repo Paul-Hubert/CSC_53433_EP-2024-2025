@@ -26,15 +26,18 @@ namespace EvoSim.Tests
             Assert.AreEqual("prey.level", number.LocusId);
             Assert.AreEqual(AlleleKind.Number, number.Kind);
 
-            var a = Place.Animal(sp, Place.At(1, 1));
             var lines = new List<KeyValuePair<string, string>>();
-            var e = new Expression(a, sp.Declarations, lines);
-            float before = a.Trait(sp.Module<TraitProbe>().Trait);
-            text.Express(AlleleValue.OfText("Never rest."), e);
-            Assert.AreEqual(1, lines.Count);
-            Assert.AreEqual(before, a.Trait(sp.Module<TraitProbe>().Trait), "a text gene changes no trait");
-            number.Express(AlleleValue.OfNumber(99f), e);
-            Assert.AreEqual(1, lines.Count, "a number gene adds no prompt line");
+            var a = Place.Animal(sp, Place.At(1, 1), atCreation: x =>                       // genes are expressed at creation (ANIM-15, ANIM-17)
+            {
+                var e = new Expression(x, sp.Declarations, lines);
+                float before = x.Trait(sp.Module<TraitProbe>().Trait);
+                text.Express(AlleleValue.OfText("Never rest."), e);
+                Assert.AreEqual(1, lines.Count);
+                Assert.AreEqual(new KeyValuePair<string, string>("rest", "Never rest."), lines[0], "the gene's label and sentence go to the genes block (GENE-03)");
+                Assert.AreEqual(before, x.Trait(sp.Module<TraitProbe>().Trait), "a text gene changes no trait");
+                number.Express(AlleleValue.OfNumber(99f), e);
+                Assert.AreEqual(1, lines.Count, "a number gene adds no prompt line");
+            });
             Assert.AreEqual(99f, a.Trait(sp.Module<TraitProbe>().Trait));
         }
 

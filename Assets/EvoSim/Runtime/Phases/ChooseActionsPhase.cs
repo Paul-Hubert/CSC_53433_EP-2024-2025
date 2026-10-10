@@ -20,6 +20,7 @@ namespace EvoSim
             {
                 if (d.Answer == null) continue;
                 state.ModelCalls += d.AnswerIndex == 0 ? d.Answer.ModelCalls : 0;
+                d.Animal.Species.Counters.BrainMilliseconds += d.Answer.Milliseconds / d.Answer.Count;   // each query's share (backend_s)
                 var row = d.Answer.Row(d.AnswerIndex);
                 string problem = d.Answer.Failed(d.AnswerIndex) ? d.Answer.Error(d.AnswerIndex)
                                : BrainAnswer.Check(row, d.Animal.Species.Actions.Count);
@@ -71,7 +72,7 @@ namespace EvoSim
                 if (phases[i] == this) me = i;
                 if (phases[i] is AskBrainsPhase) ask = i;
             }
-            if (ask < 0 || ask > me) report.Error("V-08", this, "Choose actions must come after Ask brains.");
+            if (ask < 0 || ask > me) report.Error("V-08", this, "Choose actions must come after Ask brains.", PlaceAfter(World.Phase<AskBrainsPhase>()));
         }
     }
 }

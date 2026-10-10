@@ -11,6 +11,7 @@ namespace EvoSim
         readonly float[][] rows;
         readonly string[] errors;
         readonly ManualPending pending;
+        readonly long started = System.Diagnostics.Stopwatch.GetTimestamp();
         volatile bool done;
 
         public int Count => rows.Length;
@@ -19,6 +20,8 @@ namespace EvoSim
         public Pending Pending { get; }
         /// <summary>Model calls this batch made (cached answers excluded), for the summary.</summary>
         public int ModelCalls { get; set; }
+        /// <summary>Wall-clock time from the batch's creation to its completion (the summary's backend_s, 13 §5).</summary>
+        public double Milliseconds { get; private set; }
 
         BrainAnswer(int count, Pending wait)
         {
@@ -54,6 +57,7 @@ namespace EvoSim
 
         public void Complete()
         {
+            Milliseconds = (System.Diagnostics.Stopwatch.GetTimestamp() - started) * 1000.0 / System.Diagnostics.Stopwatch.Frequency;
             done = true;
             pending?.SetDone();
         }

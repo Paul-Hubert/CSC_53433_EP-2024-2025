@@ -22,6 +22,15 @@ namespace EvoSim
             if (a.Killed && a.KilledBy >= 0) e.With("killer", a.KilledBy);
             Events.Record(e);
             s.OnDied(a, cause);
+            foreach (var m in s.Modules) m.OnDied(a, cause);
+            foreach (var m in modules) m.OnDied(a, cause);
+        }
+
+        /// <summary>Tells the species' modules, then the World's, that an animal joined the living (in hierarchy order).</summary>
+        internal void Born(Animal a)
+        {
+            foreach (var m in a.Species.Modules) m.OnBorn(a);
+            foreach (var m in modules) m.OnBorn(a);
         }
     }
 }

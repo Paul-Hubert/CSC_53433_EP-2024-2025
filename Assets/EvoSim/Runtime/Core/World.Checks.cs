@@ -12,6 +12,58 @@ namespace EvoSim
             ValidateSpeciesWords(report);
         }
 
+        /// <summary>V-61 (OUT-04): no key, token or password in a serialized string of the World's components, enabled or not.</summary>
+        void ValidateSecrets(ValidationReport report)
+        {
+            var reported = new HashSet<UnityEngine.Object>();                     // components that checked their own fields
+            foreach (var m in report.Messages) if (m.Id == "V-61" && m.Object != null) reported.Add(m.Object);
+            foreach (var c in GetComponentsInChildren<UnityEngine.MonoBehaviour>(true))
+                if ((c is World || c is WorldModule || c is SpeciesModule || c is Species || c is Edible) && !reported.Contains(c))
+                    Secrets.CheckFields(report, c);
+        }
+
+        /// <summary>V-26: a module whose [RequiresModule] names a module that isn't there, unless the module reported an error itself.</summary>
+        void ValidateCompanions(Species s, ValidationReport report)
+        {
+            foreach (var m in s.Modules)
+            {
+                var needs = (RequiresModuleAttribute[])m.GetType().GetCustomAttributes(typeof(RequiresModuleAttribute), true);
+                Array.Sort(needs, (x, y) => string.CompareOrdinal(x.Module?.FullName, y.Module?.FullName));   // the attributes' order isn't defined
+                foreach (var need in needs)
+                {
+                    if (need.Module == null || HasModule(s, need.Module) || ReportedError(report, m)) continue;
+                    bool onWorld = typeof(WorldModule).IsAssignableFrom(need.Module);
+                    report.Warning("V-26", m, $"{m.GetType().Name} needs a {need.Module.Name} {(onWorld ? "under the World" : $"on '{s.DisplayName}'")}.",
+                                   AddModuleFix(need.Module, onWorld ? transform : s.transform));
+                }
+            }
+        }
+
+        bool HasModule(Species s, Type t)
+        {
+            foreach (var m in s.Modules) if (t.IsInstanceOfType(m)) return true;
+            foreach (var m in modules) if (t.IsInstanceOfType(m)) return true;
+            return false;
+        }
+
+        static bool ReportedError(ValidationReport report, UnityEngine.Object o)
+        {
+            foreach (var m in report.Messages) if (m.Object == o && m.Severity == Severity.Error) return true;
+            return false;
+        }
+
+        /// <summary>A fix that adds a module of this type on a child named after it; none for an abstract type.</summary>
+        static ValidationFix AddModuleFix(Type t, UnityEngine.Transform parent)
+        {
+            if (t.IsAbstract || !typeof(UnityEngine.MonoBehaviour).IsAssignableFrom(t)) return null;
+            return new ValidationFix("Add " + t.Name, () =>
+            {
+                var go = new UnityEngine.GameObject(t.Name);
+                go.transform.SetParent(parent, false);
+                go.AddComponent(t);
+            });
+        }
+
         /// <summary>V-25 (info): an edible layer or species that no diet lists.</summary>
         void ValidateEdibles(ValidationReport report)
         {

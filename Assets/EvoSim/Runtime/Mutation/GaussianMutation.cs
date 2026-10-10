@@ -10,12 +10,12 @@ namespace EvoSim
 
         public float Sigma { get => sigma; set => sigma = Mathf.Max(0f, value); }
 
-        public override bool Accepts(Gene g) => g.Kind == AlleleKind.Number;
+        public override bool Accepts(Gene g) => g.Kind == AlleleKind.Number && g is INumberRange;
 
         public override MutationJob StartMutation(Gene g, Allele parent, RandomStream rng)
         {
-            var gene = (NumberGene)g;
-            float v = Mathf.Clamp(parent.Number + sigma * (float)rng.NextGaussian(), gene.Min, gene.Max);
+            var range = (INumberRange)g;
+            float v = Mathf.Clamp(parent.Number + sigma * (float)rng.NextGaussian(), range.Min, range.Max);
             return MutationJob.Done(v, "gauss");                    // MUT-20
         }
     }

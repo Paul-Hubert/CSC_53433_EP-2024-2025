@@ -33,7 +33,7 @@ namespace EvoSim
             var controls = new SortedDictionary<string, object>(StringComparer.Ordinal)
             {
                 ["no_mutation"] = w.NoMutation, ["shuffled"] = w.ShuffledGenes, ["random_founders"] = w.RandomFounders,
-                ["asexual"] = w.Asexual, ["null_brain"] = w.DefaultBrain is RandomBrain,
+                ["asexual"] = w.Asexual, ["null_brain"] = NullBrain(w),
             };
             info["controls"] = controls;                                                          // CTRL-01
             var brains = new SortedDictionary<string, object>(StringComparer.Ordinal);
@@ -57,24 +57,17 @@ namespace EvoSim
             return info;
         }
 
-        /// <summary>The command line, with the value after any argument naming a key, token or secret masked (OUT-04).</summary>
-        public static string MaskedCommandLine()
+        /// <summary>The command line, with keys and the values of options naming one masked (OUT-04).</summary>
+        /// <summary>The NULL control (15 §1): every species is decided by the random brain, whatever the default.</summary>
+        static bool NullBrain(World w)
         {
-            var args = Environment.GetCommandLineArgs();
-            var parts = new List<string>();
-            for (int i = 0; i < args.Length; i++)
-            {
-                bool secret = i > 0 && LooksSecret(args[i - 1]);
-                parts.Add(secret || LooksSecret(args[i]) && args[i].Contains("=") ? "***" : args[i]);
-            }
-            return string.Join(" ", parts);
+            if (w.AllSpecies.Count == 0) return w.DefaultBrain != null && w.DefaultBrain.Id == "random";
+            foreach (var s in w.AllSpecies)
+                if (s.Brain == null || s.Brain.Id != "random") return false;
+            return true;
         }
 
-        static bool LooksSecret(string arg)
-        {
-            string a = arg.ToLowerInvariant();
-            return a.Contains("key") || a.Contains("token") || a.Contains("secret") || a.Contains("password");
-        }
+        public static string MaskedCommandLine() => Secrets.Mask(Environment.GetCommandLineArgs());
 
         /// <summary>The commit checked out in the project's repository, read from .git (no process started).</summary>
         public static string GitCommit()

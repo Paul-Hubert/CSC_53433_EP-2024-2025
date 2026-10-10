@@ -22,7 +22,7 @@ namespace EvoSim
 
         readonly List<StatDeclaration> stats = new List<StatDeclaration>();
         readonly List<TraitDeclaration> traits = new List<TraitDeclaration>();
-        readonly List<string> problems = new List<string>();
+        readonly List<Problem> problems = new List<Problem>();
         readonly List<string> costs = new List<string>();
 
         public Species Species { get; }
@@ -31,17 +31,34 @@ namespace EvoSim
 
         public IReadOnlyList<StatDeclaration> Stats => stats;
         public IReadOnlyList<TraitDeclaration> Traits => traits;
-        /// <summary>Conflicting declarations (same name, different settings), reported by validation.</summary>
-        public IReadOnlyList<string> Problems => problems;
+        /// <summary>A declaration problem, reported by validation: V-36 (a default outside its range), V-38 (declared twice differently).</summary>
+        public readonly struct Problem
+        {
+            public readonly string Code;
+            public readonly Severity Severity;
+            public readonly SpeciesModule Module;
+            public readonly string Text;
+            public Problem(string code, Severity severity, SpeciesModule module, string text) { Code = code; Severity = severity; Module = module; Text = text; }
+            public override string ToString() => Code + " " + Text;
+        }
+
+        /// <summary>Declaration problems, reported by validation.</summary>
+        public IReadOnlyList<Problem> Problems => problems;
 
         public SpeciesBuilder(Species species) { Species = species; }
 
-        /// <summary>Declares a stat; declaring the same name again returns the first declaration.</summary>
+        /// <summary>Declares a stat; declaring the same name again returns the first declaration (V-38 if it differs).</summary>
         public StatId DeclareStat(string name, StatStart start, float min = float.MinValue, float max = float.MaxValue,
                                   TraitId capTrait = default)
         {
             foreach (var s in stats)
-                if (s.Id.Name == name) return s.Id;
+                if (s.Id.Name == name)
+                {
+                    if (!Same(s.Start.Value, start.Value) || s.Start.Trait != start.Trait || !Same(s.Id.Min, min) || !Same(s.Id.Max, max))
+                        problems.Add(new Problem("V-38", Severity.Warning, Current,
+                            $"Stat '{name}' declared twice with different start or range ({Who(s.DeclaredBy)} and {Who(Current)}); the first one counts."));
+                    return s.Id;
+                }
             var id = new StatId(stats.Count, name, min, max, capTrait.IsValid ? capTrait.Index : -1);
             stats.Add(new StatDeclaration { Id = id, Start = start, DeclaredBy = Current });
             return id;
@@ -54,10 +71,13 @@ namespace EvoSim
             foreach (var t in traits)
                 if (t.Id.Name == name)
                 {
-                    if (!Same(t.Id.Default, defaultValue))
-                        problems.Add($"Trait '{name}' declared twice with defaults {t.Id.Default} ({Who(t.DeclaredBy)}) and {defaultValue} ({Who(Current)}).");
+                    if (!Same(t.Id.Default, defaultValue) || !Same(t.Id.Min, min) || !Same(t.Id.Max, max))
+                        problems.Add(new Problem("V-38", Severity.Warning, Current,
+                            $"Trait '{name}' declared twice with defaults {t.Id.Default} ({Who(t.DeclaredBy)}) and {defaultValue} ({Who(Current)}), or different ranges; the first one counts."));
                     return t.Id;
                 }
+            if (defaultValue < min || defaultValue > max || float.IsNaN(defaultValue))
+                problems.Add(new Problem("V-36", Severity.Warning, Current, $"Trait '{name}' has the default {defaultValue}, outside its range [{min}, {max}] ({Who(Current)})."));
             var id = new TraitId(traits.Count, name, defaultValue, min, max, changeable);
             traits.Add(new TraitDeclaration { Id = id, DeclaredBy = Current });
             return id;
@@ -88,7 +108,7 @@ namespace EvoSim
             return default;
         }
 
-        static bool Same(float a, float b) => System.Math.Abs(a - b) <= 1e-6f * System.Math.Max(1f, System.Math.Abs(a));
+        static bool Same(float a, float b) => a == b || System.Math.Abs(a - b) <= 1e-6f * System.Math.Max(1f, System.Math.Abs(a));
         static string Who(SpeciesModule m) => m == null ? "?" : m.GetType().Name + " on " + m.gameObject.name;
     }
 }

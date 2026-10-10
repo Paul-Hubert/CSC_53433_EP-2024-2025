@@ -71,7 +71,7 @@ namespace EvoSim
         public override void Validate(ValidationReport report)
         {
             if (Species.Module<Energy>() == null)
-                report.Warning("V-20", this, "Metabolism without an Energy module charges nothing.");
+                report.Warning("V-26", this, "Metabolism without an Energy module charges nothing.", BreedPhase.AddModule<Energy>(Species, "Energy"));
             if (!string.IsNullOrEmpty(costTrait) && !Species.Declarations.FindTrait(costTrait).IsValid)
                 report.Error("V-45", this, $"Metabolism's cost grows with the trait '{costTrait}', which no module declares.");
         }

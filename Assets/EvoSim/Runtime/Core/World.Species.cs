@@ -13,25 +13,42 @@ namespace EvoSim
         public Species AddSpecies(Species template, string name, Species parent = null, int founders = 0)
         {
             if (!IsInitialized) throw new System.InvalidOperationException("Initialize the World before adding species.");
-            var go = Instantiate(template.gameObject, transform);
-            go.name = name;
-            var s = go.GetComponent<Species>();
-            string id = name;
-            for (int n = 2; usedSpeciesIds.Contains(id); n++) id = name + "-" + n;
+            string id = UnusedName(name);                       // a new id and a new name (SPEC-30, V-07), never reused (SPEC-32)
             usedSpeciesIds.Add(id);
-            s.SetNames(id, name);
+            var go = Instantiate(template.gameObject, transform);
+            go.name = id;
+            var s = go.GetComponent<Species>();
+            s.SetNames(id, id);
             s.Parent = parent != null ? parent : template;
             var report = new ValidationReport();
             s.Discover(this, id, report);
             s.DeclareAll();
             s.InitializeModules();
             species.Add(s);
+            RebuildFoodWeb();
+            s.Sign();
+            s.Prompt = PromptWriter.Build(s);
+
+            ValidateSpecies(s, report);                          // the checks of Prepare (EDIT-01), before anything is recorded
+            foreach (var sm in s.Modules) sm.Validate(report);
+            foreach (var m in modules) m.Validate(report);       // phases and services see the new species (V-10, V-11…)
+            ValidateCompanions(s, report);
+            foreach (var msg in report.Messages)
+                if (msg.Severity == Severity.Warning) Debug.LogWarning("EvoSim: " + msg, msg.Object);
+            if (report.HasErrors)
+            {
+                species.Remove(s);
+                RebuildFoodWeb();
+                if (Application.isPlaying) Destroy(go); else DestroyImmediate(go);
+                var errors = new System.Text.StringBuilder();
+                foreach (var msg in report.Messages) if (msg.Severity == Severity.Error) errors.Append("\n").Append(msg);
+                throw new System.InvalidOperationException($"The species '{id}' can't be added:{errors}");
+            }
+
             foreach (var g in s.Genes)
                 foreach (var f in g.FounderPool) Alleles.Register(g, f.Value, f.Origin);
-            RebuildFoodWeb();
-            s.Prompt = PromptWriter.Build(s);
-            Events.Record(new SimEvent("species_created", Tick, -1, id).With("name", name).With("parent_species", s.Parent.Id));
-            OnSpeciesAdded(s);
+            Events.Record(new SimEvent("species_created", Tick, -1, id).With("name", id).With("parent_species", s.Parent.Id));
+            foreach (var m in modules) m.OnSpeciesAdded(s);    // e.g. the recorder adds its columns
             var rng = Random.For(s, "founders");
             for (int i = 0; i < founders; i++)
             {
@@ -44,6 +61,18 @@ namespace EvoSim
             return s;
         }
 
-        partial void OnSpeciesAdded(Species s);
+        /// <summary>The name itself if no species uses it as an id or display name (and no species ever had that id), else name-2, name-3…</summary>
+        string UnusedName(string name)
+        {
+            bool Taken(string n)
+            {
+                if (usedSpeciesIds.Contains(n)) return true;
+                foreach (var other in species) if (other.Id == n || other.DisplayName == n) return true;
+                return false;
+            }
+            string id = name;
+            for (int n = 2; Taken(id); n++) id = name + "-" + n;
+            return id;
+        }
     }
 }

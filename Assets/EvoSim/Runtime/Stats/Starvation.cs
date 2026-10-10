@@ -13,7 +13,7 @@ namespace EvoSim
 
         public override void Validate(ValidationReport report)
         {
-            if (Species.Module<Energy>() == null) report.Warning("V-20", this, "Starvation needs an Energy module.");
+            if (Species.Module<Energy>() == null) report.Warning("V-26", this, "Starvation needs an Energy module.", BreedPhase.AddModule<Energy>(Species, "Energy"));
         }
     }
 }

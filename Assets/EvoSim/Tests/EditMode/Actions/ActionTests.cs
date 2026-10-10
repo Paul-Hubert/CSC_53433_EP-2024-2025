@@ -36,7 +36,8 @@ namespace EvoSim.Tests
                     go.transform.SetParent(s.GameObject.transform, false);
                     go.AddComponent(type);
                     go.AddComponent<TextGene>();
-                    if (type == typeof(EvoSim.Samples.DrinkAction)) s.GameObject.AddComponent<EvoSim.Samples.Thirst>();   // what it drinks away
+                    foreach (RequiresModuleAttribute need in type.GetCustomAttributes(typeof(RequiresModuleAttribute), true))
+                        if (typeof(SpeciesModule).IsAssignableFrom(need.Module)) s.GameObject.AddComponent(need.Module);   // what it needs beside it (V-26)
                 });
             var w = b.Build();
             var sp = w.FindSpecies("test");
@@ -61,7 +62,15 @@ namespace EvoSim.Tests
             }
             Assert.LessOrEqual(sp.Counters.Invalid, 1, "searching is counted once per decision");
             Assert.AreEqual(a.Searching ? 1 : 0, sp.Counters.Invalid);
+            if (Searchers.Contains(type))
+            {
+                Assert.IsTrue(a.Searching && c.Intent.Wandering, $"{type.Name} with nothing to act on in sight searches, it doesn't stay (ACT-04)");
+                Assert.AreEqual(1, sp.Counters.Invalid, "counted once");
+            }
         }
+
+        /// <summary>The reference actions that look for something (food, a threat, kin, prey, a partner): alone, they search (ACT-04).</summary>
+        static readonly Type[] Searchers = { typeof(EatAction), typeof(FleeAction), typeof(FollowAction), typeof(HuntAction), typeof(MateAction) };
 
         [Test, Description("T-ACT-02 (ACT-02): a chosen action over 4 ticks with a moving target looks the target up again each tick")]
         public void TargetsAreLookedUpEachTick()
@@ -202,8 +211,8 @@ namespace EvoSim.Tests
         {
             var w = Eco(killChance: 1f);
             var resolver = new InteractionResolver(w);
-            var hunter = Place.Animal(w.FindSpecies("predator"), Place.At(10, 10));
-            hunter.SetTrait(w.FindSpecies("predator").Module<Diet>().KillChance, 0f);
+            var killChance = w.FindSpecies("predator").Module<Diet>().KillChance;
+            var hunter = Place.Animal(w.FindSpecies("predator"), Place.At(10, 10), atCreation: a => a.SetTrait(killChance, 0f));   // traits: at creation (ANIM-17)
             var p1 = Place.Animal(w.FindSpecies("prey"), Place.At(10.5f, 10));
             var p2 = Place.Animal(w.FindSpecies("prey"), Place.At(9.5f, 10));
             Assert.IsTrue(resolver.Apply(hunter, Interaction.Strike(p1), p1.Position));
@@ -227,11 +236,14 @@ namespace EvoSim.Tests
             Assert.AreEqual(0, prey.Counters.Births);
         }
 
-        [Test, Description("T-ACT-09 (ACT-20): static check: no action class reads text gene values or allele texts")]
+        [Test, Description("T-ACT-09 (ACT-20, CORE-06): static check: no action, sense, locomotion or stat of EvoSim (samples included) reads genes, allele texts or the decision records (LastSituation…)")]
         public void ActionsDontReadGenes()
         {
-            var files = SourceScan.Files("Runtime/Actions").Where(f => !f.EndsWith("AnimalAction.cs"));
-            var hits = SourceScan.Find(files, @"\.Gene\b|Genome|Allele|FounderPool|Founders|\.Neutral\b|ContrastPro|ContrastAnti");
+            var modules = new System.Text.RegularExpressions.Regex(@"class\s+\w+\s*:\s*(\w*Action|\w*Sense|\w*Locomotion|DeathRule|Stamina|Energy|Metabolism|Digestion|Starvation|OldAge)\b");
+            var files = new[] { "Runtime/Actions", "Runtime/Senses", "Runtime/Locomotion", "Runtime/Stats" }.SelectMany(SourceScan.Files)
+                .Concat(SourceScan.Files("Samples").Where(f => modules.IsMatch(SourceScan.Code(f))))
+                .Where(f => !f.EndsWith("AnimalAction.cs"));
+            var hits = SourceScan.Find(files, @"\.Gene\b|Genome|Allele|FounderPool|Founders|\.Neutral\b|ContrastPro|ContrastAnti|LastSituation|LastProbabilities|LastObservation");
             Assert.IsEmpty(hits, string.Join("\n", hits));
         }
 

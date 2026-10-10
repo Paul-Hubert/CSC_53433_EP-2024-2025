@@ -1090,3 +1090,112 @@ Breed phase and no Hatch phase (eggs never hatch) or without a Record phase (no 
 gets no message. Fix: validate each module prefab inside a minimal world in CI; extend V-09 to Hatch-without-Breed
 pairs and Record.
 
+
+## M12.4–M12.5 (2026-10-10): the CPU mutator, P1 phase 2, the open system
+
+Owner, 2026-10-10: "Use a better mutator on the cpu. Fix all audit items, no grading rules for students, there is no
+criteria to attain, they can do whatever they want, and should be able to make anything with this system."
+
+### The mutator: gemma4:26b on the CPU
+- Ollama `gemma4:26b` (mixture of experts, about 19 GB of RAM, digest 001e5dafc3c7): num_gpu 0, num_ctx 1 024,
+  thinking off, temperature 1.2; about 2.5 s per call. Changed in the five scenes, the scene builder,
+  MutatorService's default and CI's `ollama pull`. `qwen3.5:0.8b` stays the small, faster choice (tooltip).
+- B-10 (32 §2), same judge (gemma4:12b on the CPU) and slot topics, 40 founders × 10 mutations, 400 mutator and 80
+  judge calls: guards pass 97.5 % of first answers; usable 72.5 % after one mutation, 62.5 % after ten (gate 80 %
+  after one; the prototype measured 50 % after ten). qwen3.5:0.8b on the same run: 90 % / 67.5 % / 17.5 %.
+- B-10 now also rates the founders (step 0, `usable_founders`), the baseline: 92.5 %. A first run was stopped by
+  the machine (low memory with both models and the editor loaded); the second ran with the editor closed and one
+  model loaded at a time (a watcher unloaded the idle one), 520 calls, same 72.5 % / 62.5 % (same seeds).
+
+### P1 phase 2: what each row of the audit table became
+1. AskBrainsPhase: V-10 when a species' brain isn't an enabled service of this World, fix "Use <the World's first
+   brain>". WorldIntegrityTests.BrainsMustBeServicesOfThisWorld (disabled, inactive, another World's).
+2. World.ValidateSettings: V-35 with a clamp fix for the decision period, sampling temperature, ticks per
+   FixedUpdate, memo capacity, tick limit, wall-clock limit, Fast budget and real-time speed. DecisionPeriodOverride.
+3. AddSpecies: a new id and display name (name-2…), the checks of Prepare (the species, its modules, the World's
+   modules); on an error nothing stays (species removed, food web rebuilt, the object destroyed) and an
+   InvalidOperationException lists the errors; alleles and `species_created` only after that; then every world
+   module's new `OnSpeciesAdded`. AddedSpeciesAreValidated.
+4. Strict mutator: `World.RequestStop("mutator failure: …")` stops at the end of the tick. StrictMutatorStopsAtTheBoundary.
+5. Hatch: an allele equal to its parent's is a failure ("unchanged"), like an unfinished job ("not finished") and a
+   value the gene doesn't allow ("not allowed"); `llm#n` parsed with TryParse. MutationsThatChangeNothingFail.
+6. BrainAnswer.Milliseconds (creation to Complete), shared among its queries into the species' BrainMilliseconds.
+   BrainTimeIsRecorded (a JEV fake that answers in 20 ms).
+7. Signatures after the food web (Prepare step 7, and AddSpecies); relations cleared on reset. SignaturesAreStable.
+8. The batch seams run: SensePhase reads each species group through `Sense.ReadAll`, ActPhase plans through
+   `AnimalAction.ActAll` and moves through `Locomotion.MoveAll` (sequential orders call them with one animal,
+   simultaneous with each group). BatchEntryPoints (both orders, probes counting batch calls).
+9. Genome keys hash numbers at each gene's precision (`Canonical(gene.Decimals)`). GenomeKeysUseTheGenesPrecision.
+10. stats.csv opened with its header in Begin; the compatibility merge keeps the run's own keys; V-36 checks a trait
+    default against its range (SpeciesBuilder), V-38 a stat or trait declared twice differently. ShortRunsHaveStats,
+    CompatibilityKeepsTheRunsFailures.
+11. CoverageTests: MUST rules matched by `\*\*([A-Z]+-\d+) \(MUST\)`; citations exclude test ids with `(?<![A-Z]-)`.
+    CitationsAreReadCorrectly.
+12. S13 filters origin "mutant", asserts the set non-empty and that births happened; the ladder's founders rest
+    "Sometimes … when tired" so mutants appear.
+13. T-OUT-03: an Ollama brain and mutator that read OLLAMA_API_KEY over fake transports; run files, logs, the editor
+    log and every asset scanned.
+14. EveryModulePrefabValidates: each module prefab prepared inside a species.
+15. BusyAnimalsNeverDecide (removing `|| a.IsBusy` now fails).
+16. World.OnDisable stops the run ("world disabled", or "… during <phase> of tick n" mid-tick); RunRecorder.OnDestroy
+    finishes a run that started. LeavingPlayWritesEverything (PlayMode).
+17. A gene whose nearest action is disabled is absent (Ownership.OnDisabledAction). T-CORE-03 asserts no gene line.
+18. V-63 (W): an LLM mutation with a rate above 0 and no MutatorService, or a service without a client.
+19. ActOrderTests: later actors see earlier moves (three act orders), eggs come from the Breed phase, babies age on
+    their birth tick; the Searchers assertion in ActionConformance (ACT-04); EggTests.FromConceptionToBirth
+    (REPRO-20/22/24, GENE-32).
+20. Strikes and scavenging resolve the struck species' own Edible, enabled. ClonesAreEatenThroughTheirOwnEdible.
+21. New errors: V-16 a World inside a World, V-17 duplicate sense labels, V-18 duplicate layer or brain names and
+    reserved layer names ("world", "act-order", "/"); V-07 also for an id that is another species' display name and
+    an id with "."; V-15 (W) a world module under a species; the nesting check is symmetric.
+22. Secrets: keys like sk-, sk_, hf_, gsk_, gh[pousr]_, github_pat_, xox, AIza, Bearer, Basic and `?key=`, and
+    credentials in URLs, in every serialized string of the World's components, enabled or not (V-61, "Clear it");
+    run_info masks arguments that name a key, token, secret, password, auth, bearer, credential, serial or cookie.
+23. Views: colliders off; ray masks drop the Ignore Raycast layer. SensesNeverSeeTheViews.
+24. T-ACT-09 scans every module folder and the samples; V-49 the LLM context line must be one line.
+25. Own codes and severities (V-15, V-26, V-37, V-38), fix buttons for 24 codes. ValidationCatalogueTests asserts
+    (code, severity) for every fixture, FixesRepairTheirProblem applies each fix and validates again.
+26. Weak tests strengthened: TraitsAreFixedAfterCreation (ANIM-17: SetTrait throws after creation unless the trait
+    is changeable), BabiesAgeOnTheirBirthTick (ANIM-35), DecidersSenseTheStartOfTheTick (SENSE-04),
+    GenomesMatchTheirSpecies (GENE-06), REPRO-03 (nearest partner, tie by id), MUT-13 (seeds and prompts),
+    CacheKeysHoldModelAndTemperature, UnreachableServers (V-60), NoIterationOverHashCollections (RAND-05),
+    ModulesKeepNoAnimalState.
+27. stats.csv rewritten with the new columns when a species is added (AddedSpeciesGetColumns); mate's radius
+    min(vision, partner range) (MateStaysWithinThePartnerRange); the samples' static lists read-only.
+28. Contract wording, not code: 40 §2 #15.
+29. Citations fixed in ConformanceTests, LongScenarioTests, RegressionTests R-04, HttpBrainTests, SenseTests.
+
+Decisions:
+- RAND-03 — one `act-order` stream for all species — kept: per-species streams would change every pinned hash for
+  no behaviour a student needs; the contract should state the exception (40 §2 #15).
+- V-20, V-36, V-62 — no fix button: the target, the value or the folder is a person's choice.
+- Not done (small): MUT-30 with answers arriving out of order (applied by index, untested with a reordering
+  transport); TICK-02 (no test of the phase set's minimum); PhaseConformance stays shallow.
+
+### The open system
+No grading (22 §0 stubs stay a way in); every reference module can be replaced or extended:
+- Lifecycle: `SpeciesModule.OnBorn/OnDied` and `WorldModule.OnBorn/OnDied` (founders, babies, immigrants; every
+  death after it is recorded), `WorldModule.OnSpeciesAdded`.
+- Statistics: `IStatsColumns` on a species module (prefixed columns) or a world module (columns at the end); a death
+  cause recorded by any code (`World.RecordDeath`) gets its `deaths_<cause>` column; a new column rewrites the header.
+- `[RequiresModule(typeof(T))]`: V-26 (W) with an "Add T" fix when T is missing (skipped when the module reported its
+  own error); the conformance suites and ActionConformance add T before testing. The samples Drink and DiesOfThirst use it.
+- Food: `Diet.KillChanceAgainst(hunter, prey)`, `Diet.EnergyFrom(eater, entry, energy)`; Grazing, Striking,
+  Scavenging, EatingEggs virtual; `InteractionContext.Feed(animal, energy, digest)` for custom interactions.
+- Brains: `Brain.Memoizable` (false: no memo, no sharing, no cache; every query reaches the brain) and
+  `DecisionQuery.AnimalId`.
+- Space: several Cover services combine (hidden by any, the nearest of all); `NearestEntity<T>` across every
+  EntitySystem of T (WorldQueries, SenseContext, ActContext).
+- Views: `AnimalView.OnShow(animal)` each frame after placing (read only).
+- Prompts: placeholders read fields, then properties; `{{` and `}}` write a brace.
+- Actions: `AnimalAction.Hunts` (HuntAction true); the sample ChasedSense reads it instead of the class.
+- Mutation: `MutationOperator.UsesMutatorService` (LlmMutation true): the Ollama mutator client reads the digest when
+  any operator uses the service.
+- run_info's `null_brain`: every species decided by the random brain, not only the default.
+- Public or virtual for students' own phases and modules: MoveContext's constructor; DecisionState Add, AddAnswer,
+  Clear; Decision.Answer, AnswerIndex; Species.RebuildPrompt, RemoveGone; SensePhase.Attachments, Context;
+  ActContext.GrazeReach; Energy.Gain/Pay, DecisionSchedule.IsDue, MatingRule.Sexual/IsAdult/IsReady,
+  Litter.ChildEnergy, Incubation.Ticks, Digestion.AfterMeal, Cover.Hides/IsHiddenFrom, CapRule.Cap,
+  CarcassSystem.Create; Carcass and Egg no longer sealed. The Student assemblies reference EvoSim.Http and
+  EvoSim.Samples.
+- Tests: OpenHooksTests (ten), ViewPlayTests.ViewsHearTheirAnimal.

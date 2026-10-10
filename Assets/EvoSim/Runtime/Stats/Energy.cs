@@ -18,10 +18,10 @@ namespace EvoSim
             Value = b.DeclareStat("energy", StatStart.Fixed(start), float.MinValue, max);   // may go below 0 (REPRO-10)
 
         /// <summary>Adds energy from a meal, clamped to the maximum (ANIM-22).</summary>
-        public void Gain(Animal a, float amount) => a[Value] += amount;
+        public virtual void Gain(Animal a, float amount) => a[Value] += amount;
 
         /// <summary>Removes energy (costs, paying for a litter); it may fall below zero.</summary>
-        public void Pay(Animal a, float amount) => a[Value] -= amount;
+        public virtual void Pay(Animal a, float amount) => a[Value] -= amount;
 
         public void Configure(float maximum, float startEnergy)
         {

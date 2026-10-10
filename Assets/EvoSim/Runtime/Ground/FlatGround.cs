@@ -23,7 +23,8 @@ namespace EvoSim
 
         public override void Validate(ValidationReport report)
         {
-            if (width < 1f || depth < 1f) report.Error("V-35", this, "The ground must be at least 1 × 1 m.");
+            if (!(width >= 1f && depth >= 1f))
+                report.Error("V-37", this, "The ground must be at least 1 × 1 m.", new ValidationFix("Clamp", () => { width = float.IsNaN(width) ? 1f : Mathf.Max(1f, width); depth = float.IsNaN(depth) ? 1f : Mathf.Max(1f, depth); }));
         }
     }
 }

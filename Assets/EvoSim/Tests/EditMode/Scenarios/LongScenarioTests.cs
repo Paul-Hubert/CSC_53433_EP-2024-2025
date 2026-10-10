@@ -32,7 +32,7 @@ namespace EvoSim.Tests
             return ScriptedBrain.Prefer(s, action, 0.05f);
         }
 
-        [Test, Description("S06 hide versus flee, mechanics (ACT-31, ENV-12): a scripted prey that hides when a threat is close and cover is near is killed less than a flee-only prey in >= 4/5 seeds")]
+        [Test, Description("S06 hide versus flee, mechanics (ACT-31): a scripted prey that hides when a threat is close and cover is near is killed less than a flee-only prey in >= 4/5 seeds")]
         public void HideVersusFlee()
         {
             int Kills(int seed, bool hide)
@@ -144,7 +144,7 @@ namespace EvoSim.Tests
 
         // ---- S17 ----
 
-        [Test, Description("S17 terrain and locomotion (MOVE-02, SPACE-05): on the terrain scene, no animal stands on water or unwalkable ground; a predator with the slope locomotion never climbs steeper than its limit")]
+        [Test, Description("S17 terrain and locomotion (MOVE-02, SPACE-04, SPACE-05): on the terrain scene, no animal stands on water or unwalkable ground; a predator with the slope locomotion never climbs steeper than its limit")]
         public void SlopesOnTerrain()
         {
             string result = Batch.WithScene("Assets/EvoSim/Scenes/Terrain_Locomotion.unity", w =>

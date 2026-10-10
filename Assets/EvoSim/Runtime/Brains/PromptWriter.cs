@@ -11,12 +11,12 @@ namespace EvoSim
     /// Collects the action lines and rule lines that modules contribute to a species' prompt (PROMPT-01). Numbers in
     /// rule lines come from placeholders filled from module settings (PROMPT-03): {field} on the writing module,
     /// {Module.field} on another module of the species, {species.Module.field} on a module of another species;
-    /// {name} and {species.name} are display names.
+    /// {name} and {species.name} are display names. A placeholder reads a field or a property; {{ and }} write a brace.
     /// A module is named by its class, a base class, or its GameObject.
     /// </summary>
     public sealed class PromptWriter
     {
-        static readonly Regex Placeholder = new Regex(@"\{([A-Za-z_][\w ]*(?:\.[A-Za-z_][\w ]*){0,2})\}");
+        static readonly Regex Placeholder = new Regex(@"\{\{|\}\}|\{([A-Za-z_][\w ]*(?:\.[A-Za-z_][\w ]*){0,2})\}");
 
         readonly List<string> actions = new List<string>();
         readonly List<string> rules = new List<string>();
@@ -44,9 +44,11 @@ namespace EvoSim
         /// <summary>Fills {placeholders} from module settings; unknown ones are kept and reported.</summary>
         public string Fill(string text)
         {
-            if (string.IsNullOrEmpty(text) || text.IndexOf('{') < 0) return text;
+            if (string.IsNullOrEmpty(text) || (text.IndexOf('{') < 0 && text.IndexOf('}') < 0)) return text;
             return Placeholder.Replace(text, m =>
             {
+                if (m.Value == "{{") return "{";
+                if (m.Value == "}}") return "}";
                 string path = m.Groups[1].Value;
                 if (path == "genes" || path == "situation" || path == "ask") return m.Value;
                 if (TryResolve(path, out var value)) return value;
@@ -94,15 +96,19 @@ namespace EvoSim
             return null;
         }
 
-        /// <summary>Reads a field (public or private, of the class or a base class) and formats it as the brain reads it.</summary>
+        /// <summary>Reads a field, else a property (public or private, of the class or a base class), formatted as the brain reads it.</summary>
         public static bool TryRead(object target, string field, out string value)
         {
             value = null;
+            const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
             for (var t = target.GetType(); t != null && t != typeof(object); t = t.BaseType)
             {
-                var f = t.GetField(field, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-                if (f == null) continue;
-                value = Format(f.GetValue(target));
+                var f = t.GetField(field, flags);
+                if (f != null) { value = Format(f.GetValue(target)); return true; }
+                var p = t.GetProperty(field, flags);
+                if (p == null || !p.CanRead || p.GetIndexParameters().Length > 0) continue;
+                try { value = Format(p.GetValue(target)); }
+                catch (TargetInvocationException) { return false; }                          // a getter that throws: reported as unknown (V-53)
                 return true;
             }
             return false;

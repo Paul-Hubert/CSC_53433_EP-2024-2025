@@ -15,7 +15,7 @@ namespace EvoSim
         [SerializeField, Tooltip("Migrate (reference) or Block.")]
         Mode mode = Mode.Migrate;
 
-        public int Cap => cap;
+        public virtual int Cap => cap;
         public Mode Rule => mode;
 
         public void Configure(int maximum, Mode rule = Mode.Migrate)

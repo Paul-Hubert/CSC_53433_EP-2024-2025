@@ -9,6 +9,9 @@ namespace EvoSim
 
         internal InteractionContext(World world) { World = world; }
 
+        /// <summary>Feeds an animal as a meal does: energy gained, the meal counted, digestion after it when <paramref name="digest"/>.</summary>
+        public void Feed(Animal a, float energy, bool digest = false) => InteractionResolver.Eat(a, energy, digest);
+
         /// <summary>A species' stream (RAND-03).</summary>
         public RandomStream Stream(Species s, string purpose) => World.Random.For(s, purpose);
     }

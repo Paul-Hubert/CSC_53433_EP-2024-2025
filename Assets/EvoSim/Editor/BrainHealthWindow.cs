@@ -57,7 +57,12 @@ namespace EvoSim.Editor
             {
                 tested[owner] = "testing…";
                 var task = test();
-                task.ContinueWith(t => tested[owner] = t.Result == null ? "reachable" : "V-60 " + t.Result);
+                task.ContinueWith(t =>
+                {
+                    var report = new ValidationReport();
+                    HttpChecks.Reachability(report, owner, t.Result);
+                    tested[owner] = report.Messages.Count == 0 ? "reachable" : report.Messages[0].ToString();
+                });
             }
             EditorGUILayout.EndHorizontal();
             if (tested.TryGetValue(owner, out var result)) EditorGUILayout.LabelField("", result, EditorStyles.wordWrappedMiniLabel);

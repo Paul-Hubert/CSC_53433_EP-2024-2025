@@ -32,7 +32,7 @@ namespace EvoSim
 
         StreamWriter events, stats;
         readonly List<string> statColumns = new List<string>();
-        readonly List<string> extraCauses = new List<string>();
+        readonly List<Dictionary<string, string>> statRows = new List<Dictionary<string, string>>();   // to rewrite the file when a species is added
         readonly System.Diagnostics.Stopwatch clock = new System.Diagnostics.Stopwatch();
         bool started, finished;
 
@@ -52,6 +52,7 @@ namespace EvoSim
             Close();
             started = finished = false;
             RunFolder = null;
+            statRows.Clear();
         }
 
         /// <summary>After everything is ready, before founders: open the folder and the files.</summary>
@@ -71,6 +72,8 @@ namespace EvoSim
             Directory.CreateDirectory(folder);
             RunFolder = folder;                                             // OUT-01
             events = new StreamWriter(Path.Combine(folder, "events.jsonl"), false, new UTF8Encoding(false)) { NewLine = "\n" };
+            BuildColumns();
+            OpenStats();                                                    // the header even if the run ends before the first row
             WriteRunInfo();
         }
 
@@ -120,21 +123,38 @@ namespace EvoSim
         /// <summary>One statistics row; the record phase calls it every statsEvery ticks.</summary>
         public void WriteStats(int tick)
         {
-            if (stats == null && writeFiles && RunFolder != null)
-            {
-                stats = new StreamWriter(Path.Combine(RunFolder, "stats.csv"), false, new UTF8Encoding(false)) { NewLine = "\n" };
-                BuildColumns();
-                stats.WriteLine(string.Join(",", statColumns));
-            }
             if (stats == null) return;
             var row = StatRow(tick);
+            var columns = Columns();
+            if (!SameAs(columns, statColumns))                              // a species added (SPEC-30), a new death cause or module column
+            {
+                statColumns.Clear();
+                statColumns.AddRange(columns);
+                OpenStats();
+            }
+            statRows.Add(row);
+            stats.WriteLine(StatLine(row));
+        }
+
+        /// <summary>(Re)writes stats.csv: the header, then the rows so far (empty cells for species that didn't exist yet).</summary>
+        void OpenStats()
+        {
+            if (!writeFiles || RunFolder == null) return;
+            stats?.Dispose();
+            stats = new StreamWriter(Path.Combine(RunFolder, "stats.csv"), false, new UTF8Encoding(false)) { NewLine = "\n" };
+            stats.WriteLine(string.Join(",", statColumns));
+            foreach (var row in statRows) stats.WriteLine(StatLine(row));
+        }
+
+        string StatLine(Dictionary<string, string> row)
+        {
             var sb = new StringBuilder();
             for (int i = 0; i < statColumns.Count; i++)
             {
                 if (i > 0) sb.Append(',');
                 sb.Append(row.TryGetValue(statColumns[i], out var v) ? v : "");
             }
-            stats.WriteLine(sb.ToString());
+            return sb.ToString();
         }
 
         string Prefix(Species s, int index) => compatibility ? (index == 0 ? "" : index == 1 ? PrototypeFormat.SecondSpeciesPrefix : s.Id + "_") : s.Id + "_";
@@ -142,26 +162,55 @@ namespace EvoSim
         void BuildColumns()
         {
             statColumns.Clear();
-            statColumns.Add("t");
+            statColumns.AddRange(Columns());
+        }
+
+        /// <summary>The columns now: t, then each species' block (its modules' columns last), then the World's modules' columns.</summary>
+        List<string> Columns()
+        {
+            var columns = new List<string> { "t" };
+            void Add(string c) { if (!columns.Contains(c)) columns.Add(c); }
             for (int i = 0; i < World.AllSpecies.Count; i++)
             {
                 var s = World.AllSpecies[i];
                 string p = Prefix(s, i);
                 foreach (var c in new[] { "pop", "mean_energy", "mean_stamina", "exhausted", "mean_gen", "max_gen", "births", "immigrants",
                                           "deaths_starve", "deaths_pred", "deaths_age", "deaths_migrated" })
-                    statColumns.Add(p + c);
-                foreach (var cause in OtherCauses(s)) statColumns.Add(p + "deaths_" + cause);
-                foreach (var c in new[] { "decisions", "backend_queries", "invalid", "portions" }) statColumns.Add(p + c);
-                foreach (var a in s.Actions) statColumns.Add(p + "act_" + a.Name);
-                if (i == 0) statColumns.Add("alleles");
+                    Add(p + c);
+                foreach (var cause in OtherCauses(s)) Add(p + "deaths_" + cause);
+                foreach (var c in new[] { "decisions", "backend_queries", "invalid", "portions" }) Add(p + c);
+                foreach (var a in s.Actions) Add(p + "act_" + a.Name);
+                foreach (var m in s.ModulesOf<IStatsColumns>())
+                    foreach (var c in m.StatColumns) Add(p + c);
+                if (i == 0) Add("alleles");
             }
+            foreach (var m in WorldColumns())
+                foreach (var c in m.StatColumns) Add(c);
+            return columns;
         }
 
+        static bool SameAs(List<string> a, List<string> b)
+        {
+            if (a.Count != b.Count) return false;
+            for (int i = 0; i < a.Count; i++) if (a[i] != b[i]) return false;
+            return true;
+        }
+
+        IEnumerable<IStatsColumns> WorldColumns()
+        {
+            foreach (var ph in World.Phases) if (ph is IStatsColumns c) yield return c;
+            foreach (var svc in World.Services) if (svc is IStatsColumns c) yield return c;
+        }
+
+        /// <summary>Causes beyond the four fixed columns: the death rules' (in rule order), then any other cause recorded so far (sorted).</summary>
         IEnumerable<string> OtherCauses(Species s)
         {
+            var seen = new List<string> { "starvation", "killed", "old_age", "migrated" };
             foreach (var rule in s.ModulesOf<DeathRule>())
                 foreach (var cause in rule.Causes)
-                    if (cause != "starvation" && cause != "old_age") yield return cause;
+                    if (!seen.Contains(cause)) { seen.Add(cause); yield return cause; }
+            foreach (var kv in s.Counters.Deaths)                           // World.RecordDeath from a student's own phase or module
+                if (!seen.Contains(kv.Key)) { seen.Add(kv.Key); yield return kv.Key; }
         }
 
         Dictionary<string, string> StatRow(int tick)
@@ -203,9 +252,17 @@ namespace EvoSim
                 row[p + "invalid"] = Num(c.Invalid);
                 row[p + "portions"] = Num(c.Portions);
                 for (int k = 0; k < s.Actions.Count; k++) row[p + "act_" + s.Actions[k].Name] = Num(k < c.ActionCounts.Length ? c.ActionCounts[k] : 0);
+                foreach (var m in s.ModulesOf<IStatsColumns>())
+                    foreach (var col in m.StatColumns)
+                        if (!row.ContainsKey(p + col)) row[p + col] = Value(m.StatValue(col));
             }
+            foreach (var m in WorldColumns())
+                foreach (var col in m.StatColumns)
+                    if (!row.ContainsKey(col)) row[col] = Value(m.StatValue(col));
             return row;
         }
+
+        static string Value(double v) => Math.Round(v, 4).ToString("0.####", CultureInfo.InvariantCulture);
 
         static string Num(double v, int decimals = 0) =>
             decimals == 0 ? Math.Round(v).ToString(CultureInfo.InvariantCulture) : Math.Round(v, decimals).ToString("0.##", CultureInfo.InvariantCulture);
@@ -237,8 +294,12 @@ namespace EvoSim
             World.Events.RemoveSink(this);
         }
 
-        /// <summary>Finishes the files of a world that is being destroyed without a stop (tests, editor).</summary>
-        void OnDestroy() => Close();
+        /// <summary>Finishes the files of a world that is being destroyed without a stop (tests, editor): RAND-20, OUT-03.</summary>
+        void OnDestroy()
+        {
+            if (started && !finished && World != null) OnRunStopped(World.StopReason ?? "world destroyed");
+            Close();
+        }
 
         void Close()
         {
@@ -339,7 +400,8 @@ namespace EvoSim
             };
             if (compatibility && World.AllSpecies.Count > 0)
             {
-                foreach (var kv in SpeciesSummary(World.AllSpecies[0])) d[kv.Key] = kv.Value;
+                foreach (var kv in SpeciesSummary(World.AllSpecies[0]))
+                    if (!d.ContainsKey(kv.Key)) d[kv.Key] = kv.Value;               // the run's own keys (failures) win
                 for (int i = 1; i < World.AllSpecies.Count; i++)
                     d[PrototypeFormat.SummaryKey(World.AllSpecies[i].Id)] = SpeciesSummary(World.AllSpecies[i]);
             }

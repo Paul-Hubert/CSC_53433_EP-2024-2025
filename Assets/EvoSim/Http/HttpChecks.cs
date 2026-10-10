@@ -1,22 +1,14 @@
-using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace EvoSim
 {
-    /// <summary>Checks shared by HTTP brains and mutator clients: no key in a serialized field (V-61, OUT-04).</summary>
+    /// <summary>Checks shared by HTTP brains and mutator clients (the key checks, V-61, are Secrets.CheckFields).</summary>
     public static class HttpChecks
     {
-        static readonly Regex VariableName = new Regex("^[A-Za-z_][A-Za-z0-9_]*$");
-        static readonly Regex KeyLike = new Regex("(sk-|hf_|Bearer\\s|api[_-]?key=|token=)", RegexOptions.IgnoreCase);
-
-        /// <summary>V-61: the key variable must be a variable name, and the address must not carry credentials.</summary>
-        public static void Secrets(ValidationReport report, Object owner, string host, string apiKeyVariable)
+        /// <summary>V-60 on demand: a connection test's result (null = reachable) as a warning naming the brain or client.</summary>
+        public static void Reachability(ValidationReport report, Object owner, string error)
         {
-            if (!string.IsNullOrEmpty(apiKeyVariable) && (!VariableName.IsMatch(apiKeyVariable) || KeyLike.IsMatch(apiKeyVariable)))
-                report.Error("V-61", owner, "The API key field holds something that isn't an environment variable name: put the key in an " +
-                                            "environment variable and write its name here (OUT-04).");
-            if (!string.IsNullOrEmpty(host) && (KeyLike.IsMatch(host) || Regex.IsMatch(host, "://[^/@]+:[^/@]+@")))
-                report.Error("V-61", owner, "The server address carries a key or a password: move it to an environment variable (OUT-04).");
+            if (error != null) report.Warning("V-60", owner, $"The server can't be reached: {error}");
         }
 
         /// <summary>V-20: the address must be an http(s) URL.</summary>

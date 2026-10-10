@@ -11,6 +11,6 @@ namespace EvoSim
         [SerializeField, Min(0), Tooltip("Ticks from conception to hatching (reference 0).")]
         int ticks;
 
-        public int Ticks { get => ticks; set => ticks = Mathf.Max(0, value); }
+        public virtual int Ticks { get => ticks; set => ticks = Mathf.Max(0, value); }
     }
 }

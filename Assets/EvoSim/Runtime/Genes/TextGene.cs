@@ -64,13 +64,21 @@ namespace EvoSim
             foreach (var f in Founders)
             {
                 if (string.IsNullOrWhiteSpace(f)) continue;
-                string problem = SentenceGuards.Check(AlleleValue.OfText(f).Text, maxWords);
+                string problem = Check(AlleleValue.OfText(f));                         // virtual: a gene kind may relax the guards
                 if (problem != null) report.Error("V-40", this, $"Founder \"{f}\" of gene '{Label}': {problem} (GENE-22).");
-                if (!seen.Add(AlleleValue.OfText(f).Text)) report.Warning("V-42", this, $"Gene '{Label}' lists \"{f}\" twice.");
+                if (!seen.Add(AlleleValue.OfText(f).Text))
+                    report.Warning("V-42", this, $"Gene '{Label}' lists \"{f}\" twice.", pool != null ? null : new ValidationFix("Remove the duplicates", () =>
+                    {
+                        var kept = new List<string>();
+                        var once = new HashSet<string>();
+                        foreach (var x in founders) if (once.Add(AlleleValue.OfText(x).Text)) kept.Add(x);
+                        founders = kept;
+                        poolCache = null;
+                    }));
             }
             if (hasNeutral)
             {
-                string problem = SentenceGuards.Check(neutral, maxWords);
+                string problem = Check(AlleleValue.OfText(neutral));
                 if (problem != null) report.Error("V-40", this, $"Neutral allele of gene '{Label}': {problem} (GENE-22).");
             }
             if (FounderPool.Count == 0)
@@ -94,7 +102,6 @@ namespace EvoSim
             poolCache = null;
         }
 
-        public void SetLabel(string newLabel) => label = newLabel;
         public void SetNeutralMutates(bool value) => neutralMutates = value;
         public void SetPool(AllelePool p) { pool = p; poolCache = null; }
     }

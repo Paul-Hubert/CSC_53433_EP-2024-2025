@@ -38,6 +38,25 @@ namespace EvoSim.Tests
             Assert.IsFalse(newcomer.BredThisPeriod, "flags cleared at the decision (DEC-03)");
         }
 
+        [Test, Description("DEC-02, ANIM-30: an animal busy across a decision tick doesn't decide on it; it decides at the start of the tick after its busy state ends")]
+        public void BusyAnimalsNeverDecide()
+        {
+            var w = Lab(prey: 3).DefaultBrain<RandomBrain>().Build();
+            var prey = w.FindSpecies("prey");
+            var busy = prey.Animals[0];
+            var decided = new List<(int tick, int id)>();
+            for (int t = 0; t < 9; t++)
+            {
+                if (t == 2) busy.BusyTicks = 4;                                      // busy during ticks 2, 3, 4 and 5
+                w.Advance(1);
+                foreach (var d in w.Decisions.Due) decided.Add((w.Decisions.Tick, d.Animal.Id));
+            }
+            int[] PerTick(int tick) => decided.Where(x => x.tick == tick).Select(x => x.id).ToArray();
+            Assert.AreEqual(2, PerTick(4).Length, "the others decide on tick 4");
+            CollectionAssert.DoesNotContain(PerTick(4), busy.Id, "busy on a decision tick: no decision");
+            CollectionAssert.AreEqual(new[] { busy.Id }, PerTick(6), "its busy state ended on tick 5: it decides at the start of tick 6");
+        }
+
         [Test, Description("T-DEC-02 (DEC-10): a query has the species, the brain-visible genes in locus order with labels, the observation and the situation text in the world's style")]
         public void QueriesCarryWhatTheBrainReads()
         {

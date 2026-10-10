@@ -9,7 +9,8 @@ namespace EvoSim.Testing
         public static Vector3 At(float x, float z) => new Vector3(x, 0f, z);
 
         /// <summary>An animal of a species at a point, with each gene's first founder allele (or a given genome).</summary>
-        public static Animal Animal(Species s, Vector3 p, Genome genome = null, float heading = 0f, string origin = "founder")
+        public static Animal Animal(Species s, Vector3 p, Genome genome = null, float heading = 0f, string origin = "founder",
+                                    System.Action<Animal> atCreation = null)
         {
             var w = s.World;
             if (genome == null)
@@ -23,7 +24,7 @@ namespace EvoSim.Testing
                 genome = new Genome(s, alleles);
             }
             if (w.Ground != null) p = w.Ground.OnGround(p);
-            var a = s.CreateAnimal(origin, p, heading, genome, 0, null);
+            var a = s.CreateAnimal(origin, p, heading, genome, 0, null, atCreation);
             s.Add(a);
             return a;
         }

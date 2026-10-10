@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace EvoSim
 {
     /// <summary>What a kill leaves: portions that other eaters may eat, one each, never the killer (03 §3).</summary>
-    public sealed class Carcass : Entity
+    public class Carcass : Entity
     {
         public override string Kind => "carcass";
         /// <summary>The species of the killed animal: diets name it "carcass:&lt;species&gt;".</summary>

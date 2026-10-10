@@ -96,21 +96,84 @@ namespace EvoSim.Tests
             }
         }
 
-        [Test, Description("T-OUT-03 (OUT-04, V-61): with a fake API key in the environment, the key appears in no output or log")]
+        [Test, Description("T-OUT-03 (OUT-04, V-61): an Ollama brain and mutator read their key from OLLAMA_API_KEY and send it; the key appears in no run file, no log line (HTTP failures included) and no asset")]
         public void NoSecrets()
         {
             const string secret = "sk-evosim-test-SECRET-1234567890";
+            var logs = new List<string>();
+            Application.LogCallback grab = (text, stack, type) => { lock (logs) logs.Add(text + " | " + stack); };
+            Application.logMessageReceivedThreaded += grab;
+            UnityEngine.TestTools.LogAssert.ignoreFailingMessages = true;
             Environment.SetEnvironmentVariable("OLLAMA_API_KEY", secret);
             try
             {
-                var w = Run("out03", 200);
+                int brainCalls = 0, mutatorCalls = 0;
+                var brainServer = FakeHttpTransport.OllamaPoints();
+                brainServer.FailWith = (path, body) => path == "/api/chat" && System.Threading.Interlocked.Increment(ref brainCalls) % 5 == 0 ? 500 : 0;
+                string[] mutants = { "Eat when the sun is high.", "Run from anything that moves.", "Stay near cover at night.", "Rest after every meal.", "Follow the oldest animal." };
+                var mutatorServer = new FakeHttpTransport
+                {
+                    Respond = (method, path, body) => path == "/api/tags"
+                        ? new JObject { ["models"] = new JArray(new JObject { ["name"] = "fake", ["digest"] = "feedfacecafe0002" }) }
+                        : FakeHttpTransport.Chat(mutants[Hashing.Sha256Hex(FakeHttpTransport.Prompt(body), 2)[0] % mutants.Length]),
+                    FailWith = (path, body) => path == "/api/chat" && System.Threading.Interlocked.Increment(ref mutatorCalls) % 4 == 0 ? 503 : 0,
+                };
+                var w = Run("out03", 600, b =>                                              // founders mature at 150: births, so mutations
+                {
+                    b.DefaultBrain<OllamaPointsBrain>(o =>
+                    {
+                        o.Transport = brainServer;
+                        o.ConfigureClient("http://ollama.test", 5f, 1, 0f, 2, "OLLAMA_API_KEY");
+                        o.Strict = false;                                               // a failed call falls back, the run goes on
+                    });
+                    var fake = b.Get<FakeMutator>();
+                    var go = fake.gameObject;
+                    UnityEngine.Object.DestroyImmediate(fake);
+                    var client = go.AddComponent<OllamaMutatorClient>();
+                    client.Transport = mutatorServer;
+                    client.ConfigureClient("http://mutator.test", 5f, 1, 0f, 2, "OLLAMA_API_KEY");
+                    foreach (var m in b.Root.GetComponentsInChildren<LlmMutation>(true)) m.Rate = 0.5f;
+                });
+                Assert.IsTrue(brainServer.Requests.Any(r => r.ApiKey == secret), "the brain read the key from the environment and sent it");
+                Assert.IsTrue(mutatorServer.Requests.Any(r => r.Path == "/api/chat" && r.ApiKey == secret), "so did the mutator");
+                Assert.Greater(w.AllSpecies.Sum(s => s.Counters.Failures), 0, "some brain calls failed, so failures were handled");
                 string folder = w.Service<RunRecorder>().RunFolder;
                 foreach (var f in Directory.GetFiles(folder))
                     Assert.IsFalse(File.ReadAllText(f).Contains(secret), Path.GetFileName(f));
+                lock (logs) foreach (var l in logs) Assert.IsFalse(l.Contains(secret), "log: " + l);
+                if (File.Exists(Application.consoleLogPath))
+                    using (var stream = new FileStream(Application.consoleLogPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    using (var reader = new StreamReader(stream))
+                        Assert.IsFalse(reader.ReadToEnd().Contains(secret), "the editor log");
                 foreach (var f in Directory.GetFiles(Path.Combine(Application.dataPath, "EvoSim"), "*", SearchOption.AllDirectories))
                     if (f.EndsWith(".asset") || f.EndsWith(".unity") || f.EndsWith(".prefab")) Assert.IsFalse(File.ReadAllText(f).Contains(secret), f);
             }
-            finally { Environment.SetEnvironmentVariable("OLLAMA_API_KEY", null); }
+            finally
+            {
+                Application.logMessageReceivedThreaded -= grab;
+                Environment.SetEnvironmentVariable("OLLAMA_API_KEY", null);
+            }
+        }
+
+        [Test, Description("RAND-20, OUT-03: destroying a running World (leaving Play mode) stops the run, so alleles.jsonl, final_population.json and summary.json are written")]
+        public void LeavingPlayWritesEverything()
+        {
+            const string name = "leave";
+            string root = Path.Combine(Root, name);
+            if (Directory.Exists(root)) Directory.Delete(root, true);
+            var b = New(17, name: name).Lab1(prey: 30, predators: 5).Recorder(true, "Logs/EvoSim/test-runs", name);
+            var w = b.Build();
+            w.Advance(120);
+            string folder = w.Service<RunRecorder>().RunFolder;
+            UnityEngine.Object.DestroyImmediate(b.Root);
+            foreach (var f in new[] { "events.jsonl", "stats.csv", "alleles.jsonl", "final_population.json", "summary.json", "run_info.json" })
+                Assert.IsTrue(File.Exists(Path.Combine(folder, f)), f);
+            var summary = JObject.Parse(File.ReadAllText(Path.Combine(folder, "summary.json")));
+            Assert.AreEqual("world disabled", (string)summary["stopped"]);
+            Assert.AreEqual(120, (int)summary["ticks"]);
+            var alleles = File.ReadAllLines(Path.Combine(folder, "alleles.jsonl")).Where(l => l.Length > 0).Select(l => (string)JObject.Parse(l)["id"]).ToList();
+            foreach (var line in File.ReadAllLines(Path.Combine(folder, "events.jsonl")).Where(l => l.Contains("\"genome\"")))
+                foreach (var id in JObject.Parse(line)["genome"]) CollectionAssert.Contains(alleles, (string)id, "every genome's alleles are listed (OUT-03)");
         }
 
         [Test, Description("OUT-05: the compatibility mode writes prey events without a species field, unprefixed prey loci, predator events with species, kills as \"predator\"")]

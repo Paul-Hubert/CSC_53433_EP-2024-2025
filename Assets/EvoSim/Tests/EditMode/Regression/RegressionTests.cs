@@ -176,7 +176,7 @@ namespace EvoSim.Tests
                 if (!Path.GetFileName(d).StartsWith("__pycache__")) CopyDirectory(d, Path.Combine(to, Path.GetFileName(d)));
         }
 
-        [Test, Category("T3"), Description("R-04 (SPACE-11, SPACE-14): Freeze = Responsive with a brain that answers late; 1 tick per call = 10 ticks per call")]
+        [Test, Category("T3"), Description("R-04 (SPACE-11, SPACE-13, SPACE-14): Freeze = Responsive with a brain that answers late; 1 tick per call = 10 ticks per call")]
         public void Equivalences()
         {
             string Run(WaitMode mode, int perCall, int delay)

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace EvoSim
 {
     /// <summary>A number expressed into one trait (GENE-04), e.g. a stamina gene setting stamina.max.</summary>
-    public class NumberGene : Gene
+    public class NumberGene : Gene, INumberRange
     {
         [SerializeField, Tooltip("The trait this gene sets (a name a module declares, V-45).")]
         string trait = "stamina.max";
@@ -25,6 +25,8 @@ namespace EvoSim
         public override AlleleKind Kind => AlleleKind.Number;
         public override bool ReadByBrain => showInPrompt;
         public override int Decimals => decimals;
+        /// <summary>Sets the decimals the registry compares (GENE-10), from code.</summary>
+        public void SetDecimals(int d) { decimals = Mathf.Clamp(d, 0, 8); poolCache = null; }
         public string Trait => trait;
         public bool MultiplyDefault => multiplyDefault;
         public float Min => min;
@@ -58,9 +60,13 @@ namespace EvoSim
             var t = Species.Declarations.FindTrait(trait);
             if (!t.IsValid) { report.Error("V-45", this, $"Number gene '{Label}' sets the trait '{trait}', which no module declares."); return; }
             foreach (var f in founders)
-                if (f < min || f > max) report.Warning("V-46", this, $"Founder value {f} of gene '{Label}' is outside its range [{min}, {max}].");
+                if (f < min || f > max)
+                    report.Warning("V-46", this, $"Founder value {f} of gene '{Label}' is outside its range [{min}, {max}].", new ValidationFix("Clamp", () =>
+                    {
+                        for (int i = 0; i < founders.Count; i++) founders[i] = Mathf.Clamp(founders[i], min, max);
+                        poolCache = null;
+                    }));
             if (founders.Count == 0) report.Error("V-41", this, $"Gene '{Label}' has an empty founder pool.");
-            if (t.Default < t.Min || t.Default > t.Max) report.Warning("V-36", this, $"The default of trait '{trait}' is outside its range.");
             if (!Species.Declarations.HasCost(trait))
                 report.Info("V-47", this, $"No cost depends on '{trait}': gene '{Label}' will drift to whichever end helps (09 §5). " +
                                           "Pair it with a cost, e.g. Metabolism's cost trait.");

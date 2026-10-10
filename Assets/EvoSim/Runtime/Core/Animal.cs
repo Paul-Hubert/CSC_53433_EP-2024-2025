@@ -60,7 +60,15 @@ namespace EvoSim
         public float Trait(TraitId t) => traits[t.Index];
 
         /// <summary>Sets a trait. Only at creation, or for traits declared changeable (ANIM-17).</summary>
-        public void SetTrait(TraitId t, float value) => traits[t.Index] = t.Clamp(value);
+        public void SetTrait(TraitId t, float value)
+        {
+            if (Created && !t.Changeable)
+                throw new System.InvalidOperationException($"Trait '{t.Name}' of {this} is set at creation only; declare it changeable to change it during life (ANIM-17).");
+            traits[t.Index] = t.Clamp(value);
+        }
+
+        /// <summary>False while the species creates it (traits from the genome); then non-changeable traits are fixed (ANIM-17).</summary>
+        public bool Created { get; internal set; }
 
         public bool IsBusy => BusyTicks > 0;
         public bool IsAlive => !IsGone && !Killed;

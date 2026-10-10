@@ -26,6 +26,27 @@ namespace EvoSim
         public static Species SpeciesAbove(Species s) =>
             s.transform.parent != null ? s.transform.parent.GetComponentInParent<Species>(true) : null;
 
+        /// <summary>
+        /// True when the nearest action on or above the gene is disabled: switching an action off takes its gene with it
+        /// (ARCH-06, GENE-05), out of the genome, the prompt and the signature.
+        /// </summary>
+        public static bool OnDisabledAction(Gene gene, Species owner)
+        {
+            for (var t = gene.transform; t != null; t = t.parent)
+            {
+                bool disabled = false;
+                foreach (var a in t.GetComponents<AnimalAction>())
+                {
+                    if (NearestSpecies(a) != owner) continue;
+                    if (IsEnabled(a)) return false;
+                    disabled = true;
+                }
+                if (disabled) return true;
+                if (t.GetComponent<Species>() != null) break;
+            }
+            return false;
+        }
+
         /// <summary>The nearest enabled action on the gene's GameObject or above it, within the same species (GENE-05).</summary>
         public static AnimalAction NearestAction(Gene gene, Species owner)
         {

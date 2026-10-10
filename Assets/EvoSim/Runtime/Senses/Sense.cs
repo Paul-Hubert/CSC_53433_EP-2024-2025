@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -23,6 +24,15 @@ namespace EvoSim
 
         /// <summary>Read one animal at a decision (SENSE-03).</summary>
         public abstract int Read(Animal a, SenseContext s);
+
+        /// <summary>
+        /// The batch entry point (20 §10, ARCH-12): the sense phase reads every deciding animal of the species through it.
+        /// The default calls Read for each; an override must give the tokens Read would give.
+        /// </summary>
+        public virtual void ReadAll(IReadOnlyList<Animal> group, SenseContext s, Span<int> tokens)
+        {
+            for (int i = 0; i < group.Count; i++) tokens[i] = Read(group[i], s);
+        }
 
         /// <summary>The text the brain reads for a token (SENSE-10).</summary>
         public virtual string Write(int token, TextStyle style) => $"{Label}: {Tokens[token]}.";

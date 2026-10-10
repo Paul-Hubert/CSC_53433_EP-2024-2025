@@ -17,7 +17,7 @@ namespace EvoSim
 
         public int Min => min;
         public int Max => max;
-        public float ChildEnergy => childEnergy;
+        public virtual float ChildEnergy => childEnergy;
 
         /// <summary>The litter size for these parents' energies (REPRO-10): drawn, then cut to what they can pay, never below min.</summary>
         public virtual int Size(RandomStream rng, float[] parentEnergies)

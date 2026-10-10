@@ -10,10 +10,12 @@ namespace EvoSim
         readonly Dictionary<Species, List<Species>> kinOf = new Dictionary<Species, List<Species>>();
         readonly List<Species> noSpecies = new List<Species>();
 
+        void ClearRelations() { preyOf.Clear(); threatsOf.Clear(); kinOf.Clear(); }
+
         /// <summary>Step 7 of 20 §4: who strikes whom, from the diets; threats are the reverse (SPEC-12).</summary>
         partial void DeriveRelations()
         {
-            preyOf.Clear(); threatsOf.Clear(); kinOf.Clear();
+            ClearRelations();
             foreach (var s in species)
             {
                 preyOf[s] = new List<Species>();

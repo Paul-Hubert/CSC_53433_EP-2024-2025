@@ -25,7 +25,7 @@ namespace EvoSim
         protected override void OnRemoved(Carcass c, string reason, TickContext t) => spare.Push(c);
 
         /// <summary>A carcass at the killed animal's position, if its species' Edible leaves one (ACT-11).</summary>
-        public Carcass Create(Animal killed, int killerId)
+        public virtual Carcass Create(Animal killed, int killerId)
         {
             var e = killed.Species.GetComponent<Edible>();
             if (e == null || !e.enabled || e.carcassPortions <= 0) return null;

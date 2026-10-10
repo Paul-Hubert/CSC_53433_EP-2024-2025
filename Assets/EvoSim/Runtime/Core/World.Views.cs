@@ -93,6 +93,7 @@ namespace EvoSim
             d.y = 0f;
             float yaw = d.sqrMagnitude > 1e-6f ? Mathf.Atan2(d.x, d.z) * Mathf.Rad2Deg : a.Heading;
             view.transform.SetPositionAndRotation(p, Quaternion.Euler(0f, yaw, 0f));
+            view.OnShow(a);
         }
 
         void DestroyViews()

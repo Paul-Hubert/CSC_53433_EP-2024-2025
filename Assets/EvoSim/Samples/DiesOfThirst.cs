@@ -3,9 +3,10 @@ using System.Collections.Generic;
 namespace EvoSim.Samples
 {
     /// <summary>Recipe 22 §1: thirst grows in the death phase, and an animal at the deadly level dies of "thirst".</summary>
+    [RequiresModule(typeof(Thirst))]
     public class DiesOfThirst : DeathRule
     {
-        static readonly string[] causes = { "thirst" };
+        static readonly IReadOnlyList<string> causes = System.Array.AsReadOnly(new[] { "thirst" });   // shared, so read-only (ARCH-07)
         Thirst thirst;
 
         public override IEnumerable<string> Causes => causes;

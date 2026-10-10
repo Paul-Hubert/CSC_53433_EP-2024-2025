@@ -205,7 +205,7 @@ namespace EvoSim.Tests
             Golden.Check("situations.tsv", sb.ToString());
         }
 
-        [Test, Description("06 §2 reference texts: the prey and predator examples of the table, word for word")]
+        [Test, Description("SENSE-10…13 (06 §2): the prey and predator reference texts of the table, word for word")]
         public void ReferenceTexts()
         {
             var w = Eco();

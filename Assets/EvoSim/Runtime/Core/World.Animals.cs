@@ -35,6 +35,7 @@ namespace EvoSim
         {
             Alleles = new AlleleRegistry();
             ground = null;
+            ClearRelations();                                    // labels derived before step 7 never see a stale food web
             ResetSpace();
             ResetDecisions();
         }
@@ -78,7 +79,7 @@ namespace EvoSim
 
         Allele RandomFounderAllele(Gene g, RandomStream rng)
         {
-            if (g is NumberGene n)
+            if (g is INumberRange n)                                     // any number gene kind with a range
                 return Alleles.Register(g, AlleleValue.OfNumber(rng.Range(n.Min, n.Max)), "control");
             if (controlSentences.Count == 0)
                 throw new System.InvalidOperationException("The random-founders control needs control sentences on the World.");

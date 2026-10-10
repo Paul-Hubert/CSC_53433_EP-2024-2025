@@ -83,6 +83,19 @@ namespace EvoSim.Tests
             string first = Pairing();
             Assert.AreEqual("True,True,False", first, "by id: a breeds with its nearest, b");
             for (int i = 0; i < 5; i++) Assert.AreEqual(first, Pairing());
+
+            string Nearest(float bx, float cx)
+            {
+                var w = Breeders();
+                var s = w.AllSpecies[0];
+                var a = Adult(s, Place.At(10, 10), action: "mate");
+                var b = Adult(s, Place.At(bx, 10), action: "mate");
+                var c = Adult(s, Place.At(cx, 10), action: "mate");
+                w.Phase<BreedPhase>().Run(w.Context);
+                return string.Join(",", new[] { a, b, c }.Select(x => x.Offspring > 0));
+            }
+            Assert.AreEqual("True,False,True", Nearest(10.9f, 10.4f), "a pairs with its nearest partner c, not with b, the first by id (REPRO-03)");
+            Assert.AreEqual("True,True,False", Nearest(10.5f, 9.5f), "equally near: the lower id, b");
         }
 
         [Test, Description("T-REPRO-04 (REPRO-04, GENE-31, T-GENE-09): asexual → one parent pays the whole cost; the baby copies its genome")]

@@ -20,6 +20,7 @@ namespace EvoSim
         int maxWords = SentenceGuards.ReferenceMaxWords;
 
         List<string> instructions = new List<string>();
+        static readonly char[] LineBreaks = { '\n', '\r' };
 
         public IReadOnlyList<string> Instructions => instructions;
         public string ContextLine => contextLine;
@@ -28,6 +29,7 @@ namespace EvoSim
         public override void Initialize() => instructions = MutationText.Instructions(deck != null ? deck.text : "");
 
         public override bool Accepts(Gene g) => g.Kind == AlleleKind.Text;
+        public override bool UsesMutatorService => true;
 
         public override MutationJob StartMutation(Gene gene, Allele parent, RandomStream rng)
         {
@@ -54,10 +56,20 @@ namespace EvoSim
 
         public override void Validate(ValidationReport report)
         {
+            base.Validate(report);
             if (deck == null || MutationText.Instructions(deck.text).Count == 0)
                 report.Error("V-20", this, "LLM mutation needs a deck with at least one instruction (MUT-10).");
-            if (World.Service<MutatorService>() == null)
-                report.Warning("V-60", this, "LLM mutation without a MutatorService: text genes never mutate.");
+            if (Rate > 0f && !World.NoMutation)
+            {
+                var service = World.Service<MutatorService>();
+                if (service == null)
+                    report.Warning("V-63", this, "LLM mutation without a MutatorService: text genes never mutate.");
+                else if (!service.HasClient)
+                    report.Warning("V-63", service, "The MutatorService has no mutator client: every LLM mutation fails (\"no mutator\").");
+            }
+            if (contextLine.IndexOfAny(LineBreaks) >= 0 || contextLine.IndexOf('{') >= 0)
+                report.Error("V-49", this, "The context line must be one fixed line without placeholders: the mutator sees nothing of the world (CORE-07, MUT-11).",
+                             new ValidationFix("Keep the first line", () => contextLine = contextLine.Split(LineBreaks)[0].Replace("{", "").Replace("}", "")));
         }
     }
 }

@@ -71,5 +71,36 @@ namespace EvoSim.Tests
             Assert.AreEqual(hashes[0], hashes[1], "interpolation off");
             Assert.AreEqual(hashes[0], hashes[2], "views hidden");
         }
+
+        [UnityTest, Description("20 §6, open: a view of one's own (an AnimalView subclass on the Body's prefab) hears OnShow with its own animal every frame it is shown")]
+        public IEnumerator ViewsHearTheirAnimal()
+        {
+            var prefab = new GameObject("probe view");
+            prefab.AddComponent<ShowProbeView>();
+            var b = New(11, WaitMode.Freeze, "views-probe").Lab1(prey: 20, predators: 4).Configure(x => x.TickLimit = 60);
+            b.Root.transform.Find("prey").gameObject.AddComponent<Body>().Configure(prefab, Color.green, 0.6f);
+            var w = b.Build();
+            w.Play();
+            var problems = new List<string>();
+            int frames = 0;
+            float until = Time.realtimeSinceStartup + 60f;
+            while (w.State != RunState.Stopped && Time.realtimeSinceStartup < until)
+            {
+                yield return null;
+                if (w.State == RunState.Stopped || w.ViewsTick != w.Tick) continue;
+                frames++;
+                foreach (var a in w.FindSpecies("prey").Animals)
+                {
+                    if (a.IsGone) continue;
+                    var v = w.ViewOf(a) as ShowProbeView;
+                    if (v == null) problems.Add($"no probe view for {a.Id}");
+                    else if (v.Shown == 0 || v.LastShownId != a.Id) problems.Add($"view of {a.Id}: shown {v.Shown} times, last for {v.LastShownId}");
+                }
+            }
+            Object.Destroy(prefab);
+            Assert.AreEqual(60, w.Tick);
+            Assert.Greater(frames, 5, "frames where the views were looked at");
+            Assert.IsEmpty(problems, string.Join("\n", problems.Take(10)));
+        }
     }
 }

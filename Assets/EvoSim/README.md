@@ -39,6 +39,22 @@ contract is in [`Docs/Interface`](../../Docs/Interface/) (start with
 - Every module you write is checked by the conformance suite of its kind
   ([30 §4](../../Docs/Interface/30-tests.md)): `Window ▸ General ▸ Test Runner`,
   EditMode.
+- Hooks to build on, beyond the recipes:
+  - species and world modules hear every birth and death (`OnBorn`, `OnDied`);
+  - a module adds its own columns to `stats.csv` (`IStatsColumns`), and any
+    death cause you record (`World.RecordDeath`) gets its column;
+  - `[RequiresModule(typeof(Thirst))]` names what a module needs: validation
+    offers to add it, and the conformance suite adds it before testing;
+  - a diet decides kills and meals (`KillChanceAgainst`, `EnergyFrom`); a custom
+    interaction feeds an animal with `InteractionContext.Feed`;
+  - a brain with memory says `Memoizable => false` and gets every animal's
+    query, with the animal's id;
+  - entity kinds of your own (`EntitySystem<T>`) are found with
+    `NearestEntity<T>`; several `Cover` services combine;
+  - an `AnimalView` subclass on a body's prefab hears `OnShow` every frame, to
+    colour or animate its animal;
+  - prompt placeholders read fields and properties; `{{` and `}}` write a brace;
+  - most reference methods are virtual: subclass a module and change one.
 
 ## 4. Rewrite a module, or invent one
 

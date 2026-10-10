@@ -18,6 +18,9 @@ namespace EvoSim
         /// <summary>The genes this operator is configured for (empty: the species' default for its kind).</summary>
         public IReadOnlyList<Gene> OnlyThese => onlyThese;
 
+        /// <summary>True for an operator that sends its work to the World's MutatorService (LlmMutation): the client then reads the model's digest (GENE-12).</summary>
+        public virtual bool UsesMutatorService => false;
+
         /// <summary>Whether this operator can change genes of this kind.</summary>
         public abstract bool Accepts(Gene g);
 
@@ -25,5 +28,11 @@ namespace EvoSim
         public abstract MutationJob StartMutation(Gene gene, Allele parent, RandomStream rng);
 
         public void SetOnlyThese(IEnumerable<Gene> genes) => onlyThese = new List<Gene>(genes);
+
+        public override void Validate(ValidationReport report)
+        {
+            if (!(rate >= 0f && rate <= 1f))
+                report.Error("V-35", this, $"The mutation rate {rate} is outside [0, 1] (MUT-01).", new ValidationFix("Clamp", () => Rate = float.IsNaN(rate) ? 0f : rate));
+        }
     }
 }

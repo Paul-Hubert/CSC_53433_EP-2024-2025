@@ -41,7 +41,7 @@ namespace EvoSim.Editor
             world = null;
             var go = Selection.activeGameObject;
             var view = go != null ? go.GetComponentInParent<AnimalView>() : null;
-            if (view == null || view.AnimalId == 0) return null;
+            if (view == null || view.AnimalId < 0) return null;
             world = view.GetComponentInParent<World>();
             return world != null ? Find(world, view.AnimalId) : null;
         }
