@@ -1,15 +1,10 @@
 {
-    "name": "EvoSim.Editor",
-    "rootNamespace": "EvoSim.Editor",
+    "name": "EvoSim.Samples",
+    "rootNamespace": "EvoSim.Samples",
     "references": [
-        "EvoSim.Runtime",
-        "EvoSim.Http",
-        "UnityEditor.TestRunner",
-        "UnityEngine.TestRunner"
+        "EvoSim.Runtime"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

@@ -40,6 +40,15 @@ deferred.
 | # | Question | Default until decided | Affects |
 |---|---|---|---|
 | 1 | **Founder pools** (H1), including the new draft hide sentences ("Hide when a predator is close.", "Stay in cover when danger is near.", "Hide only when you are tired.", "Leave cover to find food when hungry.") and the hide contrast pair | use them as they are | 09 |
+| 2 | Situation texts V1/V2 of both species (Tests/Golden/situations.tsv), pinned from the first Unity run | as pinned | 06, T-SENSE-08 |
+| 3 | JEV's question line: one per species, the prototype's ("Which action does this predator take now?" for predators) where 08 §6 shows one line | per species, as the prototype | 08 §6 |
+| 4 | JEV requests: one /v1/completions per batch and option count with the list of texts (64 per request at most), where the prototype sent one per text | batched | 08 §6, DEC-15 |
+| 5 | Client back-off (DEC-42): waits of 1 and 2 s between 3 tries, none after the last | as implemented | 08 §5 |
+| 6 | The kill cause is "killed" in Unity events; the compatibility mode writes the prototype's "predator" | "killed" | 05, 13 |
+| 7 | A new world from the menu (21 §6) has the random brain as default (JEV present, one click away), so it runs without a server | random | 21 §6 |
+| 8 | Scenario T2 variants (S03 default) run with C2 (no mutation) so they make no model call; mutation is covered by the fake-mutator tests and R-01 | C2 in T2 | 31 |
+| 9 | Integrity reports go to Logs/EvoSim/Reports (gitignored), where 32 §4 says Reports/ | Logs/EvoSim/Reports | 32 §4 |
+| 10 | Teaching-path stubs for Stamina and Litter: other modules look them up by their concrete type, so an "empty class of the same base class" isn't found; the stub must derive from the reference class or the look-ups must use the base | open | 22 §0 |
 
 ## 3. Deferred by the owner ("later")
 

@@ -4,6 +4,7 @@
     "references": [
         "EvoSim.Runtime",
         "EvoSim.Http",
+        "EvoSim.Samples",
         "EvoSim.Editor",
         "EvoSim.Testing",
         "UnityEngine.TestRunner",

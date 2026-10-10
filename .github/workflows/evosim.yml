@@ -1,0 +1,85 @@
+# EvoSim CI (Docs/Interface/32-integrity-prompts-and-ci.md §4). Every job runs on the owner's machine (self-hosted runner:
+# Windows 11, Unity 6000.3.9f1 installed and licensed, a 16 GB GPU, Docker for JEV, Ollama for the mutator).
+# Batch mode can't open the project while an editor has it open: close Unity on the runner machine before a run.
+name: EvoSim
+
+on:
+  push:
+  schedule:
+    - cron: "17 2 * * *"   # nightly: T3 regression + T4 models
+    - cron: "17 3 * * 1"   # weekly: T5 agent audit
+  workflow_dispatch:
+
+env:
+  UNITY: C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Unity.exe
+
+jobs:
+  editmode:                                   # T0 + T1: validation, static checks, EditMode tests (T3 tests excluded)
+    runs-on: [self-hosted, windows, unity]
+    steps:
+      - uses: actions/checkout@v4
+        with: { clean: false }                # keeps Library/ between runs
+      - shell: pwsh
+        run: '& $env:UNITY -batchmode -nographics -projectPath . -runTests -testPlatform EditMode -testCategory "!T3" -testResults results/editmode.xml -logFile results/editmode.log'
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with: { name: editmode, path: results/ }
+
+  playmode:                                   # T2: PlayMode tests, short worlds with random and scripted brains, fakes
+    needs: editmode
+    runs-on: [self-hosted, windows, unity]
+    steps:
+      - uses: actions/checkout@v4
+        with: { clean: false }
+      - shell: pwsh
+        run: '& $env:UNITY -batchmode -nographics -projectPath . -runTests -testPlatform PlayMode -testResults results/playmode.xml -logFile results/playmode.log'
+      - shell: pwsh
+        run: '& $env:UNITY -batchmode -nographics -projectPath . -executeMethod EvoSim.Batch.RunScenarios -tier T2 -logFile results/scenarios-T2.log'
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with: { name: playmode, path: results/ }
+
+  regression:                                 # T3: pinned hashes, equivalences, scene checks, soak and performance
+    if: github.event_name != 'push'
+    runs-on: [self-hosted, windows, unity]
+    steps:
+      - uses: actions/checkout@v4
+        with: { clean: false }
+      - shell: pwsh
+        run: '& $env:UNITY -batchmode -nographics -projectPath . -executeMethod EvoSim.Batch.RunRegression -logFile results/regression.log'
+      - shell: pwsh
+        run: '& $env:UNITY -batchmode -nographics -projectPath . -executeMethod EvoSim.Batch.RunScenarios -tier T3 -logFile results/scenarios-T3.log'
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with: { name: regression, path: "results/\nLogs/EvoSim/Reports/" }
+
+  llm-integrity:                              # T4: JEV (the default brain) and the mutator on this machine
+    if: github.event_name != 'push'
+    needs: regression                         # the GPU belongs to JEV while this runs
+    runs-on: [self-hosted, windows, unity, gpu]
+    steps:
+      - uses: actions/checkout@v4
+        with: { clean: false }
+      - shell: pwsh
+        run: |
+          docker compose -f prototype/docker/compose.yaml up -d
+          for ($i = 0; $i -lt 80; $i++) { try { Invoke-RestMethod http://localhost:8000/health -TimeoutSec 5; break } catch { Start-Sleep 15 } }
+      - shell: pwsh
+        run: ollama pull qwen3.5:0.8b; ollama pull gemma4:12b
+      - shell: pwsh
+        run: '& $env:UNITY -batchmode -nographics -projectPath . -executeMethod EvoSim.Batch.RunIntegrity -checks B-01,B-11 -logFile results/integrity.log'
+      - shell: pwsh
+        run: '& $env:UNITY -batchmode -nographics -projectPath . -executeMethod EvoSim.Batch.RunScenarios -tier T4 -logFile results/scenarios-T4.log'
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with: { name: integrity-reports, path: "results/\nLogs/EvoSim/Reports/" }
+
+  agent-audit:                                # T5, weekly: prompt P1 (Docs/prompts/07-p1-audit.md), read-only phase 1
+    if: github.event.schedule == '17 3 * * 1'
+    runs-on: [self-hosted, windows, unity]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt_file: Docs/prompts/07-p1-audit.md

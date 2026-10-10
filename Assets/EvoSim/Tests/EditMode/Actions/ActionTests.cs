@@ -36,6 +36,7 @@ namespace EvoSim.Tests
                     go.transform.SetParent(s.GameObject.transform, false);
                     go.AddComponent(type);
                     go.AddComponent<TextGene>();
+                    if (type == typeof(EvoSim.Samples.DrinkAction)) s.GameObject.AddComponent<EvoSim.Samples.Thirst>();   // what it drinks away
                 });
             var w = b.Build();
             var sp = w.FindSpecies("test");
