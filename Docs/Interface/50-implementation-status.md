@@ -5,8 +5,10 @@ The single source of truth between implementation sessions of
 [`Docs/prompts/06-implement-unity-system.md`](../prompts/06-implement-unity-system.md).
 
 ## Next step
-M4.1: senses (Sense, BatchedSense, Bands, LevelSense, AgeSense, NearestResourceSense, NearestAnimalSense with
-readiness, NearestCoverSense), V1/V2 texts in meters, observations and their space size; tests T-SENSE-01…10.
+M7.1: outputs (RunRecorder: events.jsonl, stats.csv, alleles.jsonl, final_population.json, summary.json,
+run_info.json, compatibility mode), RecordPhase, LiveStatistics, ScenarioAsset with path overrides, EvoSim.Batch
+entry points, stop file, resume by replay, the per-tick invariant checker; tests T-OUT-01…03, T-CFG-01…03,
+T-RAND-06, R-01, R-04, R-05; T-TICK-01 with the full reference order.
 
 ## Milestones
 | M | State | Commit | Notes |
@@ -15,10 +17,10 @@ readiness, NearestCoverSense), V1/V2 texts in meters, observations and their spa
 | M1 Core and the tick loop | done | 2bacd0c | S00 1 000 ticks, same hash in both wait modes; T-TICK-03, T-RAND-04, T-CORE-06/07/10 finish later |
 | M2 Space, ground, environment | done | 1aed10e | EggSystem/Egg/MutationJob built here (needed by diets) |
 | M3 Animals, metabolism, locomotion, actions, food web | done | 7a6688a | EditMode 83/83; T-ANIM-01/09 (migration), T-MOVE-05, T-SPEC-01/02 come with M5–M6 |
-| M4 Senses and observations | next | | |
-| M5 Genes, decisions, prompts | | | |
-| M6 Reproduction, population, non-LLM mutation, controls | | | |
-| M7 Outputs, configuration, batch runs | | | ⏸ |
+| M4 Senses and observations | done | 143de9a | situation texts pinned from the first run: Tests/Golden/situations.tsv (owner to review) |
+| M5 Genes, decisions, prompts | done | 95d47df | prompts pinned: Tests/Golden/prompts.txt; the 08 §7 example matches word for word |
+| M6 Reproduction, population, non-LLM mutation, controls | done | de83e06 | EditMode 154/154, PlayMode 11/11; LLM mutation logic done with a fake client (HTTP client in M8) |
+| M7 Outputs, configuration, batch runs | next | | ⏸ (no stop, owner's instruction) |
 | M8 LLM services | | | ⏸; model calls allowed from here |
 | M9 Reference content and views | | | ⏸ |
 | M10 Editor tooling | | | ⏸ |
@@ -97,6 +99,28 @@ LLM servers: not checked yet (not needed before M8).
 - 20 §3.4 — the inspector's "current target" — Animal.TargetId/TargetPoint, set by the act phase (also used by
   the "chased" sense recipe, 22 §13).
 
+- SENSE-22 — per-animal vision in texts — each text states the trait's default vision (one text per token, so
+  equal observations give equal texts, SENSE-10); per-animal vision changes the band, not the wording.
+- SPEC-20 — threat/prey sense labels — empty label = the species' display name when the set has one species
+  ("Predator" for `predator`), so renaming a species changes what the brain reads; else "Predator"/"Prey".
+- 15 §2 — the 48 situations — the prototype's own set (prototype/data/observations_v2.jsonl, copied to
+  Data/Observations), mapped onto the Unity prey (stamina high, cover none where it had none); the predator's
+  48 are energy × prey band × carcass × kin.
+- PROMPT-01 — line breaks — the reference texts keep the prototype prompts' hard wraps (JEV was trained on
+  them); the 08 §7 example is reproduced word for word (T-PROMPT-01).
+- PROMPT-01 — rule order — modules in hierarchy order; the search rule sits on the species' own GameObject (first);
+  the carcass line is written by the diet that scavenges, so it comes before the breeding line as in predator_v3.
+- T-SENSE-08 — golden file name — Tests/Golden/situations.tsv (tab-separated, easier to review) instead of .json.
+- DEC-04 — staggering and per-species periods — an optional DecisionSchedule module.
+- MUT-31 — batching rounds — one mutator batch in flight at a time; queued tries (new first tries and redraws)
+  go out together when it returns. Results don't depend on batching (tries are drawn at conception).
+- MUT-12 — guard order — as the prototype: "invalid" (empty, > maxWords, same as parent ignoring case, forbidden
+  characters) before "unchanged" (punctuation only). T-MUT-07 checks against the prototype's own clean().
+- REPRO-10 — block cap — the litter is cut to cap − living animals (eggs don't count, REPRO-22).
+- 22 — Samples — reference module defaults may name species in tooltips; T-CORE-08 checks Core, Phases, Recording.
+- Answer cache folder — Library/EvoSim/AnswerCache (gitignored; deleting Library loses it); the file is
+  .jsonl per brain ("mutator-<model>" for the mutator), rows stored with round-trip precision.
+
 ## Disagreements between the brief and Docs/Interface
 None found so far. Chapter B of the brief (the Claude Doc, tabs A–G) matches 20; it adds the run loop's
 seven states (Idle, Running, Waiting, Blocked, Paused, Stepping, Stopped), now `RunState`.
@@ -112,4 +136,7 @@ Covered by passing tests so far: EDIT-03; CORE-02/03/05/09 (part); SPEC-02/03/04
 ARCH-05/06; GENE-05; TICK-01/02/03/07; RAND-01/02/03/04/05/10/11/13/20; SPACE-01…04/06/07/08/10/11/13/14;
 ENV-01…04/10/11/12/20/22/23; ANIM-10/11/15/16/17/20/21/22/30/31/35/36/40/41/42/43; ACT-01…06/10…13/20/30/31/32;
 MOVE-01…07; REPRO-23 (part).
-Still without a test: everything from M4 on, and the parts listed in the milestone notes.
+M4–M6 added: SENSE-01…06/10…13/20/21/30/31/41; DEC-01…03/10…15/20/21/30…34/40; PROMPT-01…05/07; GENE-01…06/10…13/20…24/30…32;
+MUT-01…05/10…14/20/22/30…33; REPRO-01…05/10…13/20…24; POP-01…04; SPEC-01/06/30…32; CTRL-01/02; CORE-04/06/07/09.
+Still without a test: OUT-*, CFG-*, RAND-06/20…22 (replay), DEC-41 (points repair, M8), PROMPT-06 (editor, M10),
+EDIT-01/02 (M10), SPACE-12 (views, M9), ENV-21 (moving entities, S18 sample), SENSE-40 camera (S24 sample).
