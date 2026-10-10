@@ -56,6 +56,10 @@ cover is its own behaviour.
 | 32 | [Integrity prompts and CI](32-integrity-prompts-and-ci.md) | brain integrity checks, prompts for coding agents, the CI tiers (with real LLMs) |
 | 40 | [Open questions](40-open-questions.md) | blind spots and decisions still to take |
 
+A prompt for Claude Design turns this folder into an illustrated architecture
+brief (UML, design patterns, worked custom setups):
+[`Docs/prompts/05-claude-design-architecture-brief.md`](../prompts/05-claude-design-architecture-brief.md).
+
 ## How to read the rules
 
 Each contract document lists numbered rules:
