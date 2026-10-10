@@ -1,0 +1,22 @@
+using System;
+using System.Collections.Generic;
+using EvoSim;
+using UnityEngine;
+
+// A teaching-path exercise (Docs/Interface/22 §0), written by EvoSim > Exercises > Replace with stub.
+// Fill in every method that throws; the reference module's tests and the conformance suite of its kind grade it.
+#pragma warning disable CS0414 // settings your code will read
+
+/// <summary>
+/// Exercise 8: stamina, paid per meter and recovered at rest (ANIM-21). Reference: Stamina. The stub derives from the
+/// reference, which declares the stat and the traits, because other modules look stamina up by its type.
+/// </summary>
+[ExerciseOf(typeof(Stamina))]
+public class MyStamina : Stamina
+{
+    /// <summary>How far the animal may move this tick: its stamina, never below 0.</summary>
+    public override float Budget(Animal a) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyStamina", "Budget"));
+
+    /// <summary>After the animal acted: pay the meters moved, or recover stamina.regen (up to stamina.max) for RegenEnergyCost energy.</summary>
+    public override void Settle(Animal a, float metersMoved, Energy energy) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyStamina", "Settle"));
+}

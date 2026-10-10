@@ -31,10 +31,10 @@ namespace EvoSim
         }
 
         /// <summary>How far the animal may move this tick (ANIM-21).</summary>
-        public float Budget(Animal a) => Mathf.Max(0f, a[Value]);
+        public virtual float Budget(Animal a) => Mathf.Max(0f, a[Value]);
 
         /// <summary>Called by the metabolism after the animal acted: pay the meters, or recover (ANIM-21).</summary>
-        public void Settle(Animal a, float metersMoved, Energy energy)
+        public virtual void Settle(Animal a, float metersMoved, Energy energy)
         {
             if (metersMoved > Units.Epsilon) { a[Value] -= metersMoved; return; }
             if (a[Value] < a.Trait(Max))

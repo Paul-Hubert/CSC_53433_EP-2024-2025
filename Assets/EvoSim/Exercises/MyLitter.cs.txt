@@ -1,0 +1,19 @@
+using System;
+using System.Collections.Generic;
+using EvoSim;
+using UnityEngine;
+
+// A teaching-path exercise (Docs/Interface/22 §0), written by EvoSim > Exercises > Replace with stub.
+// Fill in every method that throws; the reference module's tests and the conformance suite of its kind grade it.
+#pragma warning disable CS0414 // settings your code will read
+
+/// <summary>
+/// Exercise 9: the litter size (REPRO-10, REPRO-11). Reference: Litter. The stub derives from the reference (its
+/// settings Min, Max, ChildEnergy) because the breed and hatch phases look the litter up by its type.
+/// </summary>
+[ExerciseOf(typeof(Litter))]
+public class MyLitter : Litter
+{
+    /// <summary>k uniform in [Min, Max] from rng, cut to what every parent can pay (ChildEnergy shared equally), never below Min.</summary>
+    public override int Size(RandomStream rng, float[] parentEnergies) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyLitter", "Size"));
+}

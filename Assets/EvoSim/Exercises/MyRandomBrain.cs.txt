@@ -1,0 +1,18 @@
+using System;
+using System.Collections.Generic;
+using EvoSim;
+using UnityEngine;
+
+// A teaching-path exercise (Docs/Interface/22 §0), written by EvoSim > Exercises > Replace with stub.
+// Fill in every method that throws; the reference module's tests and the conformance suite of its kind grade it.
+#pragma warning disable CS0414 // settings your code will read
+
+/// <summary>Exercise 13: uniform probabilities over the species' actions (DEC-11, 08 §6). Reference: RandomBrain.</summary>
+[ExerciseOf(typeof(RandomBrain))]
+public class MyRandomBrain : Brain
+{
+    public override string Id => "random";
+
+    /// <summary>One uniform row per query, in query order, answered now (BrainAnswer).</summary>
+    public override BrainAnswer Ask(IReadOnlyList<DecisionQuery> batch) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyRandomBrain", "Ask"));
+}

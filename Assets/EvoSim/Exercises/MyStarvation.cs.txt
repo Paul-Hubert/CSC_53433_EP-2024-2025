@@ -1,0 +1,19 @@
+using System;
+using System.Collections.Generic;
+using EvoSim;
+using UnityEngine;
+
+// A teaching-path exercise (Docs/Interface/22 §0), written by EvoSim > Exercises > Replace with stub.
+// Fill in every method that throws; the reference module's tests and the conformance suite of its kind grade it.
+#pragma warning disable CS0414 // settings your code will read
+
+/// <summary>Exercise 3: death when energy runs out (ANIM-40). Reference: Starvation.</summary>
+[ExerciseOf(typeof(Starvation))]
+public class MyStarvation : DeathRule
+{
+    static readonly string[] causes = { "starvation" };
+    public override IEnumerable<string> Causes => causes;
+
+    /// <summary>"starvation" when the animal's energy is at or below 0, else null (find Energy once, in Initialize).</summary>
+    public override string CauseOfDeath(Animal a) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyStarvation", "CauseOfDeath"));
+}

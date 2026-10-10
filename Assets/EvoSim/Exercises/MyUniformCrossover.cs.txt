@@ -1,0 +1,16 @@
+using System;
+using System.Collections.Generic;
+using EvoSim;
+using UnityEngine;
+
+// A teaching-path exercise (Docs/Interface/22 §0), written by EvoSim > Exercises > Replace with stub.
+// Fill in every method that throws; the reference module's tests and the conformance suite of its kind grade it.
+#pragma warning disable CS0414 // settings your code will read
+
+/// <summary>Exercise 10: each locus from either parent with probability one half (REPRO-03). Reference: UniformCrossover.</summary>
+[ExerciseOf(typeof(UniformCrossover))]
+public class MyUniformCrossover : Crossover
+{
+    /// <summary>One allele per locus, drawn from the given stream only (RAND-03).</summary>
+    public override Allele[] Cross(Genome a, Genome b, RandomStream rng) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyUniformCrossover", "Cross"));
+}

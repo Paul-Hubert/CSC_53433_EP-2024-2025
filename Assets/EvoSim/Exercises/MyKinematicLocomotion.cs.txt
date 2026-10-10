@@ -1,0 +1,16 @@
+using System;
+using System.Collections.Generic;
+using EvoSim;
+using UnityEngine;
+
+// A teaching-path exercise (Docs/Interface/22 §0), written by EvoSim > Exercises > Replace with stub.
+// Fill in every method that throws; the reference module's tests and the conformance suite of its kind grade it.
+#pragma warning disable CS0414 // settings your code will read
+
+/// <summary>Exercise 11: straight lines, limited by speed, stamina and the intent (MOVE-01…04). Reference: KinematicLocomotion.</summary>
+[ExerciseOf(typeof(KinematicLocomotion))]
+public class MyKinematicLocomotion : Locomotion
+{
+    /// <summary>Move toward the intent; return the meters actually moved; never end on non-walkable ground (MOVE-02).</summary>
+    public override float Move(Animal a, Intent intent, float staminaBudget, MoveContext c) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyKinematicLocomotion", "Move"));
+}

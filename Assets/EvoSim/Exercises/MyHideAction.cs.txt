@@ -1,0 +1,29 @@
+using System;
+using System.Collections.Generic;
+using EvoSim;
+using UnityEngine;
+
+// A teaching-path exercise (Docs/Interface/22 §0), written by EvoSim > Exercises > Replace with stub.
+// Fill in every method that throws; the reference module's tests and the conformance suite of its kind grade it.
+#pragma warning disable CS0414 // settings your code will read
+
+/// <summary>Exercise 7: go to the nearest cover and stay in it (ENV-12). Reference: HideAction.</summary>
+[ExerciseOf(typeof(HideAction))]
+public class MyHideAction : AnimalAction
+{
+    [SerializeField, Tooltip("Run into cover instead of walking.")]
+    bool run;
+    [SerializeField, Tooltip("The sense whose token says whether cover is in sight (CTRL-10).")]
+    string relevantSense = "Cover";
+
+    protected override string DefaultDescription => "go to the nearest cover and stay in it; predators can't see or catch an animal in cover";
+
+    /// <summary>In cover: stay. Else walk (or run) to the nearest cover in sight (ActContext); none: search.</summary>
+    public override void Act(Animal a, ActContext c) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyHideAction", "Act"));
+
+        public override bool IsRelevant(ObservationView o)
+        {
+            var token = o.Token(relevantSense);
+            return token != null && token != "none";
+        }
+}

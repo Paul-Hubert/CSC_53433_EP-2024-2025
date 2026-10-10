@@ -1,0 +1,35 @@
+using System;
+using System.Collections.Generic;
+using EvoSim;
+using UnityEngine;
+
+// A teaching-path exercise (Docs/Interface/22 §0), written by EvoSim > Exercises > Replace with stub.
+// Fill in every method that throws; the reference module's tests and the conformance suite of its kind grade it.
+#pragma warning disable CS0414 // settings your code will read
+
+/// <summary>Exercise 6: run away from the nearest threat (ACT-04, SPEC-12). Reference: FleeAction.</summary>
+[ExerciseOf(typeof(FleeAction))]
+public class MyFleeAction : AnimalAction
+{
+    [SerializeField, Tooltip("Whom to flee: the species' threats (reference), or listed species (SPEC-12).")]
+    AnimalSet from = AnimalSet.Threats;
+    [SerializeField, Tooltip("Species ids or names, when 'from' is Listed (ARCH-08: by name).")]
+    List<string> listed = new List<string>();
+    [SerializeField, Tooltip("The prototype's behaviour (S06): stay in cover, or run into cover within coverSeek. Off in the reference.")]
+    bool fleeIntoCover;
+    [SerializeField, Min(0f), Tooltip("Cover within this distance is run into, in meters (reference 6).")]
+    float coverSeek = 6f;
+    [SerializeField, Tooltip("The sense whose token says whether a threat is in sight (CTRL-10).")]
+    string relevantSense = "Predator";
+
+    protected override string DefaultDescription => "run away from the nearest predator";
+
+    /// <summary>Find the nearest threat in sight (ActContext) and run away from it; none in sight: search.</summary>
+    public override void Act(Animal a, ActContext c) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyFleeAction", "Act"));
+
+        public override bool IsRelevant(ObservationView o)
+        {
+            var token = o.Token(relevantSense);
+            return token != null && token != "none";
+        }
+}

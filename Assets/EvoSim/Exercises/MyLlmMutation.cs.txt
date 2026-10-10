@@ -1,0 +1,27 @@
+using System;
+using System.Collections.Generic;
+using EvoSim;
+using UnityEngine;
+
+// A teaching-path exercise (Docs/Interface/22 §0), written by EvoSim > Exercises > Replace with stub.
+// Fill in every method that throws; the reference module's tests and the conformance suite of its kind grade it.
+#pragma warning disable CS0414 // settings your code will read
+
+/// <summary>Exercise 14: a gene rewritten by the mutator model (MUT-10…14, MUT-30). Reference: LlmMutation.</summary>
+[ExerciseOf(typeof(LlmMutation))]
+public class MyLlmMutation : MutationOperator
+{
+    [SerializeField, Tooltip("One instruction per line; lines starting with # are ignored (MUT-10). Reference: mutate_v4.")]
+    TextAsset deck;
+    [SerializeField, Tooltip("The one fixed line before the instruction (empty = none).")]
+    string contextLine = "The sentence below is a rule that a wild animal follows.";
+    [SerializeField, Range(1, 20), Tooltip("Tries before the gene stays unchanged (reference 5).")]
+    int tries = 5;
+    [SerializeField, Range(1, 64), Tooltip("Longest mutant, in words (reference 12).")]
+    int maxWords = 12;
+
+    public override bool Accepts(Gene g) => g.Kind == AlleleKind.Text;
+
+    /// <summary>Draw every try's instruction and seed now, from rng (MUT-30), then submit them to the world's MutatorService.</summary>
+    public override MutationJob StartMutation(Gene gene, Allele parent, RandomStream rng) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyLlmMutation", "StartMutation"));
+}

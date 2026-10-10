@@ -1,0 +1,29 @@
+using System;
+using System.Collections.Generic;
+using EvoSim;
+using UnityEngine;
+
+// A teaching-path exercise (Docs/Interface/22 §0), written by EvoSim > Exercises > Replace with stub.
+// Fill in every method that throws; the reference module's tests and the conformance suite of its kind grade it.
+#pragma warning disable CS0414 // settings your code will read
+
+/// <summary>Exercise 4: go to the nearest visible food and eat it (ACT-04, ACT-10). Reference: EatAction.</summary>
+[ExerciseOf(typeof(EatAction))]
+public class MyEatAction : AnimalAction
+{
+    [SerializeField, Tooltip("A layer name; empty = every layer the diet grazes; \"egg:<species>\" = eggs (22 §15).")]
+    string target = "";
+    [SerializeField, Tooltip("The sense whose token says whether food is in sight (CTRL-10).")]
+    string relevantSense = "Food";
+
+    protected override string DefaultDescription => "go to the nearest visible food and eat it";
+
+    /// <summary>Find the nearest food in sight (ActContext), walk to it, graze on arrival; nothing in sight: search.</summary>
+    public override void Act(Animal a, ActContext c) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyEatAction", "Act"));
+
+        public override bool IsRelevant(ObservationView o)
+        {
+            var token = o.Token(relevantSense);
+            return token != null && token != "none";
+        }
+}

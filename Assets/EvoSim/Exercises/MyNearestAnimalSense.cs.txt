@@ -1,0 +1,30 @@
+using System;
+using System.Collections.Generic;
+using EvoSim;
+using UnityEngine;
+
+// A teaching-path exercise (Docs/Interface/22 §0), written by EvoSim > Exercises > Replace with stub.
+// Fill in every method that throws; the reference module's tests and the conformance suite of its kind grade it.
+#pragma warning disable CS0414 // settings your code will read
+
+/// <summary>Exercise 5: how far the nearest animal of a set is, with readiness (SENSE-20…22, SPEC-12). Reference: NearestAnimalSense.</summary>
+[ExerciseOf(typeof(NearestAnimalSense))]
+public class MyNearestAnimalSense : BandedSense
+{
+    [SerializeField, Tooltip("Threats (\"Predator\"), Prey, Kin (\"Animal\") or Listed species (SPEC-12).")]
+    AnimalSet targets = AnimalSet.Threats;
+    [SerializeField, Tooltip("Species ids or names, when targets is Listed (ARCH-08: by name).")]
+    List<string> listed = new List<string>();
+    [SerializeField, Tooltip("Add \", ready to mate\" or \", not ready to mate\" within the partner range (06 §4).")]
+    bool reportReadiness;
+    [SerializeField, Min(0f), Tooltip("Readiness is seen within this distance, in meters (reference 20 = the vision).")]
+    float partnerRange = 20f;
+
+    protected override string DefaultLabel => targets == AnimalSet.Kin ? "Animal" : targets == AnimalSet.Prey ? "Prey" : "Predator";
+
+    /// <summary>none, then per band: "close, ready" and "close, not ready" within the partner range when readiness is on.</summary>
+    protected override void BuildTokens() => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyNearestAnimalSense", "BuildTokens"));
+
+    /// <summary>The token of the nearest visible animal of the set (SenseContext), or none.</summary>
+    public override int Read(Animal a, SenseContext s) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyNearestAnimalSense", "Read"));
+}

@@ -20,7 +20,7 @@ namespace EvoSim
         public float ChildEnergy => childEnergy;
 
         /// <summary>The litter size for these parents' energies (REPRO-10): drawn, then cut to what they can pay, never below min.</summary>
-        public int Size(RandomStream rng, float[] parentEnergies)
+        public virtual int Size(RandomStream rng, float[] parentEnergies)
         {
             int k = rng.Range(min, max + 1);
             float share = childEnergy / parentEnergies.Length;

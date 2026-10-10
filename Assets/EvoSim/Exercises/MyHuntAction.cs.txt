@@ -1,0 +1,29 @@
+using System;
+using System.Collections.Generic;
+using EvoSim;
+using UnityEngine;
+
+// A teaching-path exercise (Docs/Interface/22 §0), written by EvoSim > Exercises > Replace with stub.
+// Fill in every method that throws; the reference module's tests and the conformance suite of its kind grade it.
+#pragma warning disable CS0414 // settings your code will read
+
+/// <summary>Exercise 12: chase the nearest prey or carcass, strike or scavenge on arrival (ACT-11). Reference: HuntAction.</summary>
+[ExerciseOf(typeof(HuntAction))]
+public class MyHuntAction : AnimalAction
+{
+    [SerializeField, Min(0f), Tooltip("Stop this far from the target, in meters (reference 1).")]
+    float stopAt = 1f;
+    [SerializeField, Tooltip("The sense whose token says whether prey is in sight (CTRL-10).")]
+    string relevantSense = "Prey";
+
+    protected override string DefaultDescription => "chase the nearest visible prey animal or carcass; next to a prey animal,\n  try to kill and eat it; next to a carcass, eat from it";
+
+    /// <summary>The nearer of prey and carcass: run to it; strike the prey or eat from the carcass on arrival; none: search.</summary>
+    public override void Act(Animal a, ActContext c) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyHuntAction", "Act"));
+
+        public override bool IsRelevant(ObservationView o)
+        {
+            var token = o.Token(relevantSense);
+            return token != null && token != "none";
+        }
+}

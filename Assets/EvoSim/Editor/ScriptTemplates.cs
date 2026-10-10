@@ -115,10 +115,9 @@ namespace EvoSim.Editor
             "/// <summary>Tests of #NAME# (30 §2: worlds built in code with WorldBuilder).</summary>\n" +
             "public class #NAME#Tests : WorldFixture\n{\n    [Test]\n    public void Works()\n    {\n" + body + "    }\n}\n";
 
-        /// <summary>Writes a script and its test under Assets/Student, making the two assemblies the first time.</summary>
-        public static string Create(string kind, string name)
+        /// <summary>Makes Assets/Student with its assembly and its test assembly, the first time.</summary>
+        public static void EnsureStudentAssemblies()
         {
-            var (script, test) = Render(kind, name);
             Directory.CreateDirectory(StudentFolder + "/Tests");
             if (!File.Exists(StudentFolder + "/Student.asmdef"))
                 File.WriteAllText(StudentFolder + "/Student.asmdef",
@@ -128,6 +127,13 @@ namespace EvoSim.Editor
                     "{\n    \"name\": \"Student.Tests\",\n    \"references\": [\"Student\", \"EvoSim.Runtime\", \"EvoSim.Testing\", \"UnityEngine.TestRunner\", \"UnityEditor.TestRunner\"],\n" +
                     "    \"includePlatforms\": [\"Editor\"],\n    \"overrideReferences\": true,\n    \"precompiledReferences\": [\"nunit.framework.dll\"],\n" +
                     "    \"autoReferenced\": false,\n    \"defineConstraints\": [\"UNITY_INCLUDE_TESTS\"]\n}\n");
+        }
+
+        /// <summary>Writes a script and its test under Assets/Student, making the two assemblies the first time.</summary>
+        public static string Create(string kind, string name)
+        {
+            var (script, test) = Render(kind, name);
+            EnsureStudentAssemblies();
             string path = $"{StudentFolder}/{name}.cs";
             File.WriteAllText(path, script);
             File.WriteAllText($"{StudentFolder}/Tests/{name}Tests.cs", test);

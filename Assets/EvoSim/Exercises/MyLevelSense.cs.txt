@@ -1,0 +1,33 @@
+using System;
+using System.Collections.Generic;
+using EvoSim;
+using UnityEngine;
+
+// A teaching-path exercise (Docs/Interface/22 §0), written by EvoSim > Exercises > Replace with stub.
+// Fill in every method that throws; the reference module's tests and the conformance suite of its kind grade it.
+#pragma warning disable CS0414 // settings your code will read
+
+/// <summary>Exercise 2: a stat as low, medium or high (SENSE-10…13). Reference: LevelSense.</summary>
+[ExerciseOf(typeof(LevelSense))]
+public class MyLevelSense : Sense
+{
+    [SerializeField, Tooltip("The stat to sense, by name (\"energy\", \"stamina\"…).")]
+    string stat = "energy";
+    [SerializeField, Tooltip("Below this the level is low (reference energy 30).")]
+    float low = 30f;
+    [SerializeField, Tooltip("Above this the level is high (reference energy 70).")]
+    float high = 70f;
+    [SerializeField, Tooltip("V2 sentences for low, medium and high (SENSE-11).")]
+    string[] words = { "I am hungry and weak.", "I have some energy.", "I am well fed and strong." };
+
+    readonly List<string> tokens = new List<string> { "low", "medium", "high" };
+
+    public override IReadOnlyList<string> Tokens => tokens;
+    protected override string DefaultLabel => stat.Length == 0 ? "Level" : char.ToUpperInvariant(stat[0]) + stat.Substring(1);
+
+    /// <summary>The token index of the animal's stat now (find the stat once, in Initialize: Species.Declarations.FindStat).</summary>
+    public override int Read(Animal a, SenseContext s) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyLevelSense", "Read"));
+
+    /// <summary>V1 "Energy: low." (the base class does it) or V2 the sentence of the token.</summary>
+    public override string Write(int token, TextStyle style) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyLevelSense", "Write"));
+}

@@ -1,0 +1,19 @@
+using System;
+using System.Collections.Generic;
+using EvoSim;
+using UnityEngine;
+
+// A teaching-path exercise (Docs/Interface/22 §0), written by EvoSim > Exercises > Replace with stub.
+// Fill in every method that throws; the reference module's tests and the conformance suite of its kind grade it.
+#pragma warning disable CS0414 // settings your code will read
+
+/// <summary>Exercise 1: stay still to rest (ACT-02, ANIM-21). Reference: RestAction.</summary>
+[ExerciseOf(typeof(RestAction))]
+public class MyRestAction : AnimalAction
+{
+    protected override string DefaultDescription => "stay still to catch your breath and save energy";
+    public override bool Rests => true;
+
+    /// <summary>Give the intent of staying (ActContext); never move the animal yourself (ACT-02).</summary>
+    public override void Act(Animal a, ActContext c) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyRestAction", "Act"));
+}
