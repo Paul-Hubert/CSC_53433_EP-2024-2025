@@ -4,7 +4,8 @@ using EvoSim;
 using UnityEngine;
 
 // A teaching-path exercise (Docs/Interface/22 §0), written by EvoSim > Exercises > Replace with stub.
-// Fill in every method that throws; the reference module's tests and the conformance suite of its kind grade it.
+// Write it your own way: nothing has to match the reference, and nothing grades it. The conformance suite of
+// its kind (Test Runner, EditMode) only checks that it fits the system, for example that a seed repeats a run.
 #pragma warning disable CS0414 // settings your code will read
 
 /// <summary>Exercise 1: stay still to rest (ACT-02, ANIM-21). Reference: RestAction.</summary>

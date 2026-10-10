@@ -14,6 +14,6 @@ namespace EvoSim
 
         /// <summary>The message a stub throws until the student writes it.</summary>
         public static string Todo(string module, string method) =>
-            $"Exercise: write {module}.{method} (Docs/Interface/22 §0; the reference module's tests grade it).";
+            $"Exercise: write {module}.{method} your own way (Docs/Interface/22 §0; nothing has to match the reference).";
     }
 }

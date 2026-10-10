@@ -6,7 +6,7 @@ The single source of truth between implementation sessions of
 
 ## Next step
 M12 waits for the owner (final review ⏸): the P1 audit table below; phase 2 fixes only the rows the owner approves.
-Open owner decisions: 40 §2 #1, #2 (golden texts), #13 (B-10 with the qwen mutator), #14 (grading).
+Open owner decisions: 40 §2 #1, #2 (golden texts), #13 (B-10). Owner 2026-10-10: no grading (40 §2 #14), a better mutator on the CPU, fix every audit row.
 EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh); long runs on the batch copy.
 
 ## Milestones
@@ -24,7 +24,7 @@ EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh
 | M9 Reference content and views | done | a021fc2 | six scenes, module prefabs, bodies, T-SPACE-06; Play-mode look not checked by eye (editor frozen) |
 | M10 Editor tooling | done | c61f043 | a world from the menus validates and runs; T-EDIT-01 for every catalogue code; windows not checked by eye |
 | M11 Samples, scenarios, verification, CI | done | e5f402d…cde9e9c, M11.5 | samples, conformance, CI, scenarios S00–S27, R-01…R-08, coverage test; EditMode 319 + T3, PlayMode 17/17; gates B-01…B-11 (Machine) |
-| M12 Teaching path and final audit | review | bb6b46a, M12.2 | 14 stubs, Exercises menu, grading suite, README; P1 phase 1 below; EditMode 336/336 (non-T3), PlayMode 17/17 ⏸ |
+| M12 Teaching path and final audit | review | bb6b46a, M12.2 | 14 stubs, Exercises menu, README (no grading); P1 phase 1 below; EditMode 336/336 (non-T3), PlayMode 17/17 ⏸ |
 
 ## Machine
 - Unity **6000.3.9f1**: `C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Unity.exe`
@@ -82,7 +82,7 @@ M0–M11: in [51](51-implementation-log.md). Since then:
 - 32 §2 B-10 — the judge's {topic} per slot: the prototype's table (gene_timeline.TOPIC), "hide" = "when to hide in cover".
 - 22 §0 — stubs are templates (`Exercises/My*.cs.txt`), not compiled in the package (the conformance suites would
   run them and fail); the menu writes them to Assets/Student. Stamina/Litter stubs derive from the reference (40 §2 #10);
-  grading by the events hash (40 §2 #14).
+  no grading: there is no criterion to reach (owner 2026-10-10, 40 §2 #14); TeachingPathGradingTests removed.
 
 ## Disagreements between the brief and Docs/Interface
 - 20 §3.9 names the operator method `MutationOperator.Start(gene, parent, rng)`; on a MonoBehaviour Unity takes

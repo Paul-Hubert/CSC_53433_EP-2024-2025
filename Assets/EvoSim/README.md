@@ -40,9 +40,13 @@ contract is in [`Docs/Interface`](../../Docs/Interface/) (start with
   ([30 §4](../../Docs/Interface/30-tests.md)): `Window ▸ General ▸ Test Runner`,
   EditMode.
 
-## 4. The teaching path
+## 4. Rewrite a module, or invent one
 
-First reimplement what exists, smallest first
+There is nothing to reach and nothing grades you: change anything, replace any
+module, invent senses, actions, genes, stats, phases, brains or mutation
+operators, and see what evolves.
+
+A good way in is to rewrite a module that exists, from the smallest
 ([22 §0](../../Docs/Interface/22-extending-recipes.md#0-the-teaching-path)):
 `RestAction`, `LevelSense`, `Starvation`, `EatAction`, `NearestAnimalSense`,
 `FleeAction`, `HideAction`, `Stamina`, `Litter`, `UniformCrossover`,
@@ -51,21 +55,19 @@ First reimplement what exists, smallest first
 1. Open a scene, then `EvoSim ▸ Exercises ▸ Replace with stub ▸ <module>`. It
    writes `Assets/Student/Exercises/My<Module>.cs` and swaps the module for it
    in the open scenes, keeping its settings.
-2. Fill in every method that throws. The doc comments say what each must do
-   and cite the rules.
-3. Run the EditMode tests: `TeachingPathGradingTests` runs the Lab scene with
-   your class instead of the reference. A deterministic module must give the
-   same run as the reference (the same events with the same seed); crossover,
-   litter and mutation are checked by their properties. The conformance suite
-   of the module's kind runs on your class too.
+2. Write the methods that throw, your own way. The doc comments say what the
+   reference does; yours can do something else.
+3. Press Play and watch. The conformance suite of the module's kind (Test
+   Runner, EditMode) checks only that your class fits the system, for example
+   that the same seed gives the same run.
 4. `EvoSim ▸ Exercises ▸ Restore reference` puts the reference modules back;
    your files stay.
 
-Then invent: new senses, actions, genes, phases or brains, each with its tests.
+## Worth knowing
 
-## Rules worth knowing
-
-- Never use `UnityEngine.Random` or the clock: draw from the stream you are
-  given (`RandomStream`), so a run repeats exactly with its seed.
-- Senses read, actions ask for an intent; only the phases change the world.
-- API keys only from environment variables, never in scenes or code.
+- A run repeats exactly with its seed only if every draw comes from the stream
+  you are given (`RandomStream`), not `UnityEngine.Random` or the clock.
+- The reference modules split the work this way: senses read, actions ask for
+  an intent, phases change the world. Your modules may split it differently.
+- Keep API keys in environment variables, never in scenes or code: scenes and
+  run files get shared.
