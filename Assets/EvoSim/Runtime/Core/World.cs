@@ -68,6 +68,9 @@ namespace EvoSim
         float realTimeCarry;
         readonly Stopwatch wallClock = new Stopwatch();
 
+        /// <summary>Observation spaces above these are a warning and an error (SENSE-05, V-50).</summary>
+        public const double ObservationSpaceWarning = 100000, ObservationSpaceError = 10000000;
+
         // ---- Public state ----
 
         public int Tick { get; private set; }
@@ -389,14 +392,19 @@ namespace EvoSim
                     report.Warning("V-12", s, $"The signature of '{s.DisplayName}' changed: results and cached answers change (SPEC-03).",
                                    new ValidationFix("Accept", () => sp.AcceptSignature()));
                 }
-                ValidateSpecies(s, report);
+                double space = s.ObservationSpace;                       // SENSE-05
+                if (space > ObservationSpaceError)
+                    report.Error("V-50", s, $"'{s.DisplayName}' has {space:N0} possible observations: above {ObservationSpaceError:N0}.");
+                else if (space > ObservationSpaceWarning)
+                    report.Warning("V-50", s, $"'{s.DisplayName}' has {space:N0} possible observations: above {ObservationSpaceWarning:N0}, the memo and cache will rarely help.");
+                if (s.Id == RandomStreams.WorldStream)
+                    report.Error("V-07", s, "The species id 'world' is reserved for the map's random streams.");
             }
         }
 
         partial void ResetSystems();
         partial void RegisterFounderPools();
         partial void DeriveRelations();
-        partial void ValidateSpecies(Species s, ValidationReport report);
         partial void CreateViews();
         partial void SyncViews();
         partial void SpawnFoundersCore();

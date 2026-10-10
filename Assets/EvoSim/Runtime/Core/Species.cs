@@ -253,6 +253,26 @@ namespace EvoSim
             if (w < animals.Count) animals.RemoveRange(w, animals.Count - w);
         }
 
+        /// <summary>Reads every sense of this species for one animal, in sense order (SENSE-02, SENSE-03).</summary>
+        public Observation Observe(Animal a, SenseContext s)
+        {
+            var tokens = new int[senses.Count];
+            for (int i = 0; i < senses.Count; i++) tokens[i] = senses[i].Read(a, s);
+            return new Observation(tokens);
+        }
+
+        /// <summary>The situation text: each sense's fragment, in sense order, joined by spaces (SENSE-10).</summary>
+        public string Describe(Observation o, TextStyle style)
+        {
+            var sb = new StringBuilder();
+            for (int i = 0; i < senses.Count; i++)
+            {
+                if (i > 0) sb.Append(' ');
+                sb.Append(senses[i].Write(o[i], style));
+            }
+            return sb.ToString();
+        }
+
         /// <summary>The number of possible observations: the product of the senses' token counts (SENSE-05).</summary>
         public double ObservationSpace
         {

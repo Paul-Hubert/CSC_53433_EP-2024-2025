@@ -75,6 +75,14 @@ namespace EvoSim.Testing
         /// <summary>The first module of this type built so far (to wire references in tests).</summary>
         public T Get<T>() where T : Component => root.GetComponentInChildren<T>(true);
 
+        /// <summary>The module of this type on the child GameObject with this name.</summary>
+        public T Find<T>(string gameObjectName) where T : Component
+        {
+            foreach (var c in root.GetComponentsInChildren<T>(true))
+                if (c.gameObject.name == gameObjectName) return c;
+            return null;
+        }
+
         static string DefaultName(string typeName, string suffix)
         {
             string n = typeName.EndsWith(suffix) ? typeName.Substring(0, typeName.Length - suffix.Length) : typeName;

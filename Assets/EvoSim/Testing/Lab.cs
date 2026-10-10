@@ -48,6 +48,27 @@ namespace EvoSim.Testing
         public static SpeciesSetup PredatorActionSet(this SpeciesSetup s) => s
             .Action<HuntAction>("hunt").Action<FollowAction>("follow").Action<RestAction>("rest").Action<MateAction>("mate");
 
+        /// <summary>The prey's seven senses, in situation-text order (04 §5).</summary>
+        public static SpeciesSetup PreySenses(this SpeciesSetup s) => s
+            .Sense<LevelSense>(l => l.Configure("energy", 30f, 70f), "Energy")
+            .Sense<LevelSense>(l => l.Configure("stamina", 20f, 40f, StaminaWords), "Stamina")
+            .Sense<NearestResourceSense>(name: "Food")
+            .Sense<NearestAnimalSense>(n => n.Configure(AnimalSet.Threats), "Predator")
+            .Sense<NearestCoverSense>(name: "Cover")
+            .Sense<NearestAnimalSense>(n => n.Configure(AnimalSet.Kin, readiness: true), "Animal")
+            .Sense<AgeSense>(name: "Age");
+
+        /// <summary>The predator's six senses (04 §5).</summary>
+        public static SpeciesSetup PredatorSenses(this SpeciesSetup s) => s
+            .Sense<LevelSense>(l => l.Configure("energy", 30f, 70f), "Energy")
+            .Sense<LevelSense>(l => l.Configure("stamina", 10f, 20f, StaminaWords), "Stamina")
+            .Sense<NearestAnimalSense>(n => n.Configure(AnimalSet.Prey), "Prey")
+            .Sense<NearestEntitySense>(name: "Carcass")
+            .Sense<NearestAnimalSense>(n => { n.Configure(AnimalSet.Kin, readiness: true); n.SetLabel("Other predator"); }, "OtherPredator")
+            .Sense<AgeSense>(name: "Age");
+
+        public static readonly string[] StaminaWords = { "I am out of breath.", "I am getting tired.", "I am rested." };
+
         /// <summary>A world with flat ground, food, cover, carcasses, eggs, the given phases, prey and predators.</summary>
         public static WorldBuilder Ecology(this WorldBuilder b, float size = 48f, float cover = 0.2f, float food = 0.1f,
                                            Action<SpeciesSetup> prey = null, Action<SpeciesSetup> predator = null, float regrow = 0.0015f)
@@ -55,8 +76,8 @@ namespace EvoSim.Testing
             b.Flat(size, size).Food(food, regrow);
             if (cover > 0f) b.Cover(cover);
             b.Carcasses().Service<EggSystem>("Eggs");
-            b.Species("prey", s => { s.PreyBody().PreyActionSet(); prey?.Invoke(s); });
-            b.Species("predator", s => { s.PredatorBody().PredatorActionSet(); predator?.Invoke(s); });
+            b.Species("prey", s => { s.PreyBody().PreySenses().PreyActionSet(); prey?.Invoke(s); });
+            b.Species("predator", s => { s.PredatorBody().PredatorSenses().PredatorActionSet(); predator?.Invoke(s); });
             return b;
         }
 
