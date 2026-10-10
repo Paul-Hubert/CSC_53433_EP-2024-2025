@@ -1,0 +1,43 @@
+using System.Collections.Generic;
+
+namespace EvoSim
+{
+    /// <summary>The named random streams of one world (RAND-02…04). Asking twice for a name returns the same stream.</summary>
+    public sealed class RandomStreams
+    {
+        readonly Dictionary<string, RandomStream> streams = new Dictionary<string, RandomStream>();
+
+        /// <summary>The run seed: every stream but <c>world</c> derives from it.</summary>
+        public long Seed { get; }
+        /// <summary>The seed of the <c>world</c> stream (terrain, cover, initial food); may differ from the run seed (RAND-04).</summary>
+        public long WorldSeed { get; }
+
+        public RandomStreams(long seed, long worldSeed)
+        {
+            Seed = seed;
+            WorldSeed = worldSeed;
+        }
+
+        public RandomStreams(long seed) : this(seed, seed) { }
+
+        /// <summary>The stream with this name (RAND-02). "world" uses the world seed.</summary>
+        public RandomStream Get(string name)
+        {
+            if (!streams.TryGetValue(name, out var s))
+            {
+                s = new RandomStream(name == WorldStream ? WorldSeed : Seed, name);
+                streams.Add(name, s);
+            }
+            return s;
+        }
+
+        /// <summary>A species' own stream, "&lt;species id&gt;/&lt;purpose&gt;" (RAND-03).</summary>
+        public RandomStream For(Species species, string purpose) => Get(species.Id + "/" + purpose);
+
+        /// <summary>The stream for terrain, cover and initial food.</summary>
+        public RandomStream World => Get(WorldStream);
+
+        public const string WorldStream = "world";
+        public const string ActOrderStream = "act-order";
+    }
+}
