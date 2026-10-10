@@ -37,6 +37,33 @@ namespace EvoSim.Testing
             return this;
         }
 
+        /// <summary>A flat ground of a given subclass (e.g. one that replaces the distance function).</summary>
+        public WorldBuilder Ground<T>(float width, float depth) where T : FlatGround
+        {
+            var g = Child(Root.transform, "Ground").gameObject.AddComponent<T>();
+            g.SetSize(width, depth);
+            g.transform.SetSiblingIndex(0);
+            return this;
+        }
+
+        /// <summary>A food layer with an Edible (grazed, <paramref name="energy"/> per item).</summary>
+        public WorldBuilder Food(float initialFraction = 0.1f, float regrowP = 0.0015f, string name = "Grass", float energy = 25f,
+                                 bool hungryCover = true)
+        {
+            return Service<FoodGrid>(name, g =>
+            {
+                g.Configure(initialFraction, regrowP, hungryCover);
+                g.gameObject.AddComponent<Edible>().Configure(EatMethod.Graze, energy);
+            });
+        }
+
+        /// <summary>A cover layer covering this share of walkable ground.</summary>
+        public WorldBuilder Cover(float fraction = 0.2f, string name = "Thickets") =>
+            Service<CoverLayer>(name, c => c.SetFraction(fraction));
+
+        /// <summary>The carcass system.</summary>
+        public WorldBuilder Carcasses(string name = "Carcasses") => Service<CarcassSystem>(name);
+
         /// <summary>Changes the World's settings.</summary>
         public WorldBuilder Configure(Action<World> configure)
         {

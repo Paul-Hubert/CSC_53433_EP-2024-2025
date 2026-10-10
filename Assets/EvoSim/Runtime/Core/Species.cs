@@ -57,6 +57,14 @@ namespace EvoSim
         public SpeciesBuilder Declarations { get; private set; }
         /// <summary>The species this one was cloned from at run time (SPEC-31), or null.</summary>
         public Species Parent { get; internal set; }
+        /// <summary>True for this species and every species cloned from it during the run (SPEC-31).</summary>
+        public bool DescendsFrom(Species ancestor)
+        {
+            for (var s = this; s != null; s = s.Parent)
+                if (s == ancestor) return true;
+            return false;
+        }
+
         /// <summary>Counters for the statistics and the summary.</summary>
         public SpeciesCounters Counters { get; private set; }
 
@@ -232,6 +240,7 @@ namespace EvoSim
         public void Add(Animal a)
         {
             animals.Add(a);
+            World.OnAnimalAdded(a);
             OnBorn(a);
         }
 

@@ -2,7 +2,10 @@ using System.Collections.Generic;
 
 namespace EvoSim
 {
-    /// <summary>The named random streams of one world (RAND-02…04). Asking twice for a name returns the same stream.</summary>
+    /// <summary>
+    /// The named random streams of one world (RAND-02…04). Asking twice for a name returns the same stream.
+    /// Map layers use "world/&lt;layer name&gt;", so adding a layer never changes another layer's map.
+    /// </summary>
     public sealed class RandomStreams
     {
         readonly Dictionary<string, RandomStream> streams = new Dictionary<string, RandomStream>();
@@ -25,7 +28,7 @@ namespace EvoSim
         {
             if (!streams.TryGetValue(name, out var s))
             {
-                s = new RandomStream(name == WorldStream ? WorldSeed : Seed, name);
+                s = new RandomStream(IsWorldStream(name) ? WorldSeed : Seed, name);
                 streams.Add(name, s);
             }
             return s;
@@ -33,6 +36,9 @@ namespace EvoSim
 
         /// <summary>A species' own stream, "&lt;species id&gt;/&lt;purpose&gt;" (RAND-03).</summary>
         public RandomStream For(Species species, string purpose) => Get(species.Id + "/" + purpose);
+
+        /// <summary>"world" and "world/&lt;layer&gt;" streams make the map: they use the world seed (RAND-04).</summary>
+        public static bool IsWorldStream(string name) => name == WorldStream || name.StartsWith(WorldStream + "/", System.StringComparison.Ordinal);
 
         /// <summary>The stream for terrain, cover and initial food.</summary>
         public RandomStream World => Get(WorldStream);

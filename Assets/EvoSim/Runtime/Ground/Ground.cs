@@ -35,6 +35,12 @@ namespace EvoSim
             return Mathf.Atan2(Mathf.Abs(Height(to) - Height(from)), run) * Mathf.Rad2Deg;
         }
 
+        /// <summary>Whether a point is water (terrain grounds; never on flat ground).</summary>
+        public virtual bool IsWater(Vector3 p) => false;
+
+        /// <summary>The nearest water within radius, with a walkable shore point next to it (22 §2); null if none.</summary>
+        public virtual WaterHit? NearestWater(Vector3 p, float radius) => null;
+
         public bool Inside(Vector3 p)
         {
             var r = Bounds;

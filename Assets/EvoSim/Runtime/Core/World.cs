@@ -73,6 +73,8 @@ namespace EvoSim
         public int Tick { get; private set; }
         public int Seed { get => seed; set => seed = value; }
         public int WorldSeed => separateWorldSeed ? worldSeed : seed;
+        /// <summary>Gives the map its own seed (RAND-04).</summary>
+        public void SetWorldSeed(int value) { separateWorldSeed = true; worldSeed = value; }
         public WaitMode WaitMode { get => waitMode; set => waitMode = value; }
         public RunSpeed RunSpeed { get => runSpeed; set => runSpeed = value; }
         public int TicksPerFixedUpdate { get => ticksPerFixedUpdate; set => ticksPerFixedUpdate = Mathf.Max(1, value); }
@@ -327,8 +329,10 @@ namespace EvoSim
             markers = new ProfilerMarker[phases.Count];
             for (int i = 0; i < phases.Count; i++) markers[i] = new ProfilerMarker("EvoSim." + phases[i].PhaseName);
 
-            // 3. Services, in hierarchy order.
-            foreach (var svc in services) svc.Initialize();
+            // 3. Services, in hierarchy order; the ground first, since layers are laid on it.
+            ground = Service<Ground>();
+            if (ground != null) ground.Initialize();
+            foreach (var svc in services) if (svc != ground) svc.Initialize();
 
             // 4–5. Species modules, ownership, gene binding, orders. Ids are unique (V-07).
             usedSpeciesIds.Clear();

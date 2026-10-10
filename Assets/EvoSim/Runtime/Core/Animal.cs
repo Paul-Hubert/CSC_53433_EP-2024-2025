@@ -35,6 +35,8 @@ namespace EvoSim
         public bool StruckThisTick;
 
         readonly float[] stats, traits;
+        /// <summary>The spatial index cell (core bookkeeping, not animal state).</summary>
+        internal int SpatialCell = -1;
 
         internal Animal(int id, Species species, int statCount, int traitCount)
         {

@@ -47,7 +47,6 @@ namespace EvoSim
         /// <summary>Founder pools are registered first and in pool order, so founders get the same ids in every run (GENE-21).</summary>
         partial void RegisterFounderPools()
         {
-            ground = Service<Ground>();
             foreach (var s in species)
                 foreach (var g in s.Genes)
                     foreach (var f in g.FounderPool)
