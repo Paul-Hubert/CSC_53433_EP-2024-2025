@@ -59,6 +59,9 @@ cover is its own behaviour.
 A prompt for Claude Design turns this folder into an illustrated architecture
 brief (UML, design patterns, worked custom setups):
 [`Docs/prompts/05-claude-design-architecture-brief.md`](../prompts/05-claude-design-architecture-brief.md).
+A prompt for Claude Code implements the whole system in Unity from this folder,
+milestone by milestone:
+[`Docs/prompts/06-implement-unity-system.md`](../prompts/06-implement-unity-system.md).
 
 ## How to read the rules
 

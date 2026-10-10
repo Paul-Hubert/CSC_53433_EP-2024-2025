@@ -749,7 +749,7 @@ Assets/EvoSim/
   Tests/PlayMode/   EvoSim.Tests.PlayMode.asmdef
   Modules/          prefabs: Eat, Flee, Hide, Follow, Rest, Mate, Hunt, Scavenge, StaminaGene, ...
   Data/             AllelePools, mutation decks (TextAssets), frozen prompts, control sentences
-  Scenes/           Lab1_Full, Lab1_Small, HideVsFlee, ThreeSpecies, Terrain_NavMesh, Sandbox
+  Scenes/           Lab1_Full, Lab1_Small, HideVsFlee, ThreeSpecies, Terrain_Locomotion, Sandbox
   Scenarios/        ScenarioAssets (overrides, CFG-02)
 ```
 
