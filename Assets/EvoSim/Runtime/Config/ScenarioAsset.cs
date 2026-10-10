@@ -26,6 +26,10 @@ namespace EvoSim
         public class Variant
         {
             public string name = "default";
+            [Tooltip("This variant's brain (GameObject name or brain id); empty = the scenario's.")]
+            public string brain = "";
+            [Tooltip("The tier this variant runs in (T2 fast … T4 real models); empty = the scenario's.")]
+            public string tier = "";
             public List<Override> set = new List<Override>();
             [Tooltip("GameObject paths under the World to switch off, e.g. prey/Actions/hide.")]
             public List<string> remove = new List<string>();
@@ -64,13 +68,14 @@ namespace EvoSim
             var v = FindVariant(variantName);
             world.Seed = seed;
             world.TickLimit = ticks;
-            if (!string.IsNullOrEmpty(brain))
+            string brainName = !string.IsNullOrEmpty(v.brain) ? v.brain : brain;
+            if (!string.IsNullOrEmpty(brainName))
             {
                 Brain b = null;
                 foreach (var candidate in world.GetComponentsInChildren<Brain>(true))
-                    if (candidate.gameObject.name == brain || candidate.Id == brain) { b = candidate; break; }
-                if (b != null) world.DefaultBrain = b;
-                else problems.Add($"no brain named {brain}");
+                    if (candidate.gameObject.name == brainName || candidate.Id == brainName) { b = candidate; break; }
+                if (b != null) { world.DefaultBrain = b; applied["brain"] = brainName; }
+                else problems.Add($"no brain named {brainName}");
             }
             foreach (var o in Concat(set, v.set))
             {

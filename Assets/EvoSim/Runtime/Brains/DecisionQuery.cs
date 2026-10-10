@@ -46,6 +46,17 @@ namespace EvoSim
             }
         }
 
+        /// <summary>The genes a brain reads from a genome, in locus order, with their labels (DEC-10, GENE-03).</summary>
+        public static List<KeyValuePair<string, string>> BrainGenes(Species s, Genome g)
+        {
+            var genes = new List<KeyValuePair<string, string>>();
+            if (g == null) return genes;
+            var e = new Expression(null, s.Declarations, genes);
+            for (int i = 0; i < s.Genes.Count; i++)
+                if (s.Genes[i].ReadByBrain) s.Genes[i].Express(g[i].Value, e);
+            return genes;
+        }
+
         /// <summary>The full prompt for a brain: the species' template with genes, situation and the brain's answer instruction.</summary>
         public string Prompt(Brain brain) => Species.Prompt.Fill(GenesBlock, Situation, brain != null ? brain.AnswerInstruction : "");
     }

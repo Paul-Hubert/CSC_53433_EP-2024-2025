@@ -27,6 +27,16 @@ namespace EvoSim.Tests
             return ScriptedBrain.Prefer(q.Species, action, 0.02f);
         }
 
+        /// <summary>The scene's mutator client replaced by the fake one: pinned runs never call a model (30 §2).</summary>
+        static void OfflineMutator(World w)
+        {
+            var client = w.GetComponentInChildren<MutatorClient>(true);
+            var service = w.GetComponentInChildren<MutatorService>(true);
+            var go = client != null ? client.gameObject : service != null ? service.gameObject : null;
+            if (client != null) Object.DestroyImmediate(client);
+            if (go != null) go.AddComponent<FakeMutator>();
+        }
+
         [Test, Category("T3"), Description("R-01 (RAND-11): events hash after 2 000 ticks for each reference scene and seeds 1234, 7, 42, random brain and a scripted prey policy → equal to Tests/Golden/hashes.json")]
         public void PinnedHashes()
         {
@@ -35,9 +45,10 @@ namespace EvoSim.Tests
             foreach (var scene in Scenes)
                 foreach (int seed in Seeds)
                 {
-                    string random = Batch.HashOf(scene, seed, 2000);
+                    string random = Batch.HashOf(scene, seed, 2000, OfflineMutator);
                     string scripted = Batch.HashOf(scene, seed, 2000, w =>
                     {
+                        OfflineMutator(w);
                         var brain = new GameObject("Scripted prey").AddComponent<ScriptedBrain>();
                         brain.transform.SetParent(w.transform.Find("Brains"), false);
                         brain.Policy = PreyPolicy;
@@ -121,6 +132,8 @@ namespace EvoSim.Tests
                     trace.Log = log;
                 }
                 w.WaitMode = WaitMode.Freeze;
+                w.DefaultBrain = w.GetComponentInChildren<RandomBrain>(true);
+                w.NoMutation = true;
                 foreach (var r in w.GetComponentsInChildren<RunRecorder>(true)) r.WriteFiles = false;
                 Assert.IsTrue(w.Initialize(), w.LastReport.ToString());
                 w.Advance(1);

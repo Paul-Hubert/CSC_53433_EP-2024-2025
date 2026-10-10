@@ -17,11 +17,20 @@ MonoBehaviour:
   set: []
   variants:
   - name: default
+    brain: Random
+    tier: T2
+    set:
+    - path: World/noMutation
+      value: true
+    remove: []
+  - name: jev
+    brain: JEV
+    tier: T4
     set: []
     remove: []
   seeds: d2040000070000002a000000
   ticks: 1000
-  brain: Random
+  brain: 
   expect:
   - invariants
   - deterministic

@@ -12,7 +12,6 @@ namespace EvoSim
         readonly Dictionary<string, Decision> firstWithKey = new Dictionary<string, Decision>();
         readonly List<Brain> brains = new List<Brain>();
         readonly List<List<Decision>> batches = new List<List<Decision>>();
-        readonly List<KeyValuePair<string, string>> geneBuffer = new List<KeyValuePair<string, string>>();
         AnswerCache cache;
 
         public override void Initialize() => cache = World.Service<AnswerCache>();
@@ -33,7 +32,7 @@ namespace EvoSim
                 species.Counters.Decisions++;
                 var genome = QueryGenome(a, t);
                 var attachments = SensePhase.Attachments(a, sense, out string attachmentKey, out bool memoable);
-                d.Query = new DecisionQuery(species, BrainGenes(species, genome), d.Observation, d.Situation, World.TextStyle,
+                d.Query = new DecisionQuery(species, DecisionQuery.BrainGenes(species, genome), d.Observation, d.Situation, World.TextStyle,
                                             genome != null ? genome.BrainKey : species.Id, attachments);
                 d.MemoKey = memoable ? DecisionMemo.Key(species, d.Brain, d.Query.GenomeKey, d.Observation) + (attachmentKey.Length > 0 ? "|" + attachmentKey : "") : null;
 
@@ -72,19 +71,6 @@ namespace EvoSim
             int i = rng.Range(0, living.Count - 1);
             var other = living[i] == a ? living[living.Count - 1] : living[i];          // another animal, uniformly
             return other.Genome;
-        }
-
-        /// <summary>The genes the brain reads, in locus order, with their labels (DEC-10, GENE-03).</summary>
-        List<KeyValuePair<string, string>> BrainGenes(Species s, Genome g)
-        {
-            var genes = new List<KeyValuePair<string, string>>();
-            if (g == null) return genes;
-            geneBuffer.Clear();
-            var e = new Expression(null, s.Declarations, geneBuffer);
-            for (int i = 0; i < s.Genes.Count; i++)
-                if (s.Genes[i].ReadByBrain) s.Genes[i].Express(g[i].Value, e);
-            genes.AddRange(geneBuffer);
-            return genes;
         }
 
         List<Decision> BatchFor(Brain b, Species s)
