@@ -15,7 +15,7 @@ namespace EvoSim.Tests
         {
             var p = PlayerArgs.Parse(new[] { "EvoSim.exe", "-scene", "HideVsFlee", "-seed", "1234", "-ticks", "600", "-speed", "20", "-wait", "freeze",
                                              "-brain", "JEV", "-capture", "10", "-cache", "cache", "-noMutation", "-quitAtEnd", "-logFile", "p.log",
-                                             "-window", "1920x1080", "-run", "r1" });
+                                             "-window", "1920x1080", "-run", "r1", "-minutes", "10" });
             Assert.AreEqual("HideVsFlee", p.Scene);
             Assert.AreEqual(1234, p.Seed);
             Assert.AreEqual(600, p.Ticks);
@@ -28,13 +28,14 @@ namespace EvoSim.Tests
             Assert.IsTrue(p.NoMutation && p.QuitAtEnd);
             Assert.AreEqual((1920, 1080), (p.WindowWidth, p.WindowHeight));
             Assert.AreEqual("r1", p.Run);
+            Assert.AreEqual(10f, p.Minutes);
             Assert.IsEmpty(p.Problems);
 
             Assert.AreEqual(RunSpeed.Fast, PlayerArgs.Parse(new[] { "-speed", "fast" }).Speed);
             Assert.AreEqual(RunSpeed.PerFixedUpdate, PlayerArgs.Parse(new[] { "-speed", "FIXED" }).Speed);
             Assert.AreEqual(-1f, PlayerArgs.Parse(new[] { "-capture", "off" }).Capture);
-            var bad = PlayerArgs.Parse(new[] { "-seed", "x", "-speed", "0", "-wait", "maybe", "-capture", "-3", "-window", "big" });
-            Assert.AreEqual(5, bad.Problems.Count, string.Join("; ", bad.Problems));
+            var bad = PlayerArgs.Parse(new[] { "-seed", "x", "-speed", "0", "-wait", "maybe", "-capture", "-3", "-window", "big", "-minutes", "0" });
+            Assert.AreEqual(6, bad.Problems.Count, string.Join("; ", bad.Problems));
             Assert.IsNull(bad.Seed);
         }
 
@@ -44,12 +45,13 @@ namespace EvoSim.Tests
             var b = New(1).Lab1(prey: 4, predators: 1).Service<AnswerCache>("Answer cache");
             var w = b.BuildUninitialized();
             var random = w.GetComponentInChildren<RandomBrain>(true);
-            var p = PlayerArgs.Parse(new[] { "-seed", "99", "-ticks", "30", "-speed", "12.5", "-wait", "responsive", "-brain", random.gameObject.name.ToUpperInvariant(),
+            var p = PlayerArgs.Parse(new[] { "-seed", "99", "-ticks", "30", "-minutes", "2.5", "-speed", "12.5", "-wait", "responsive", "-brain", random.gameObject.name.ToUpperInvariant(),
                                              "-noMutation", "-cache", "Temp/EvoSimCacheTest" });
             string said = p.ApplyTo(w);
             Assert.IsEmpty(p.Problems, string.Join("; ", p.Problems));
             Assert.AreEqual(99, w.Seed);
             Assert.AreEqual(30, w.TickLimit);
+            Assert.AreEqual(2.5f, w.WallClockMinutes);
             Assert.AreEqual(RunSpeed.RealTime, w.RunSpeed);
             Assert.AreEqual(12.5f, w.RealTimeTicksPerSecond);
             Assert.AreEqual(WaitMode.Responsive, w.WaitMode);

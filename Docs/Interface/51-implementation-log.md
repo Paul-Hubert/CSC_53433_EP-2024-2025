@@ -1300,3 +1300,27 @@ limits breeding to once per decision period, so prey births fall about 3 × unde
 brain); the prey sit at their floor, sustained by newcomers. If that isn't wanted, the breeding limit could become a
 cooldown of its own (4 ticks, as before) instead of the decision period — a contract change of REPRO-03, not made.
 R-01 re-pinned (12 hashes), reproduced by a second run.
+
+### M13.9 (2026-10-11): decision period 10 and the 10-minute L2 build test
+Owner: try 10 instead of 20; run a 10-minute HideVsFlee L2 test in the build and report mutations and animal numbers. The
+editor had been closed meanwhile, so everything ran in batch mode on the project (scratchpad proj.sh): Update Reference
+Scenes (20 → 10), R-01 re-pinned twice (reproduced; deleting hashes.json with no editor running made Unity give its .meta a
+new GUID, restored from git), the player built from the project, `RealTimeRuns.FromCommandLine` for headless runs.
+New player argument `-minutes` (the World's wall-clock stop).
+
+L0, HideVsFlee seed 1234: brain queries at tick 600 — period 4 3 033, 10 1 016, 20 541; prey births at 600 — 69, 19, 3; the
+random brain puts the prey on their floor from tick ~300 at period 10. Under JEV (the build run, live): 1 368 ticks in 600 s
+(2.28 ticks/s for a target of 5; 107 FPS mean, 47 lowest after the watcher went fullscreen 4K), 3 631 JEV calls (+249 cached),
+10 gemma4:26b calls (+27 cached), 37 mutations tried, 37 ok. Prey 29 → 37 → 40 (t 400) → 32 (t 600) → 18 (t 700) → 10 (t 1 300);
+predators 6 → 11 by t 400, then 7–12. Births: prey 167, predators 56; prey deaths 118 killed, 81 starved; generation 8 for both.
+At tick 600 prey births 99 (period 4: 87; period 20: 29). Mutations: 26 of 37 append "quickly"/"slowly", 7 change the meaning
+(three of them turn "run from" into "approach any predator"), 3 shorten, 1 returns to a founder sentence; at the end 7 of 11
+prey carry a mutant allele (3 of them "Approach any predator you see quickly."), no predator does. vLLM: 3 631 prompts of 457
+tokens, 0.18 s each, no prefix-cache hit. Memory: +52 MB of private bytes in 480 s, then +500 MB when the window went 4K.
+The headless replay of 1 368 ticks gives the build's hash with 0 model calls; behaviour probe: 2 849 of 9 858 hunting
+predator-ticks had their nearest prey hidden, no hunter targeted a hidden prey, 223 babies near a parent, 0 animals off the ground.
+
+Test fallout, batch mode: R-06 failed (managed memory 28.5 → 33.5 MB) because the memo still fills between ticks 10 000 and
+100 000 at period 10 (probe: 13 829 → 102 249 keys, 14.8 → 19.8 MB; at period 4 full, 262 144 keys, before tick 10 000, flat
+27.1–27.5 MB). The soak now caps the memo at 8 192 keys: 20.8 → 21.0 MB. ExerciseTests.StubsCompile failed once in the full
+batch run (`AssemblyBuilder.Build()` returned false, the compiler busy) and passed alone in batch and in the editor: flaky.

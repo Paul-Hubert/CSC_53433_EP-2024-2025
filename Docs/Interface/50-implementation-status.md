@@ -7,9 +7,10 @@ The single source of truth between implementation sessions of
 ## Next step
 M13 waits at its checkpoint ⏸: the owner watches HideVsFlee (Play mode, or `Builds/EvoSim/2026-10-10/EvoSim.exe`) and
 reads `Logs/EvoSim/Reports/RT-2026-10-10.md`. The owner's three M13 decisions are done (M13.4–M13.6): cache hits join the
-memo, the course's scripts build for a player, the reference scenes stagger decisions (R-01 re-pinned). Then (M13.8) the
-reference decision period went from 4 to 20 (owner): ~6 × fewer brain calls, but fewer prey births (REPRO-03 allows one per
-period): the owner to judge the ecology (below, and 51). Still open from M12:
+memo, the course's scripts build for a player, the reference scenes stagger decisions (R-01 re-pinned). Then the
+reference decision period went from 4 to 20 (M13.8) and, at the owner's request, to 10 (M13.9), checked by a 10-minute
+live L2 build run: `Logs/EvoSim/Reports/RT-2026-10-11-P10.md` (prey births kept over 600 ticks, 2.28 ticks/s, 37
+mutations, prey at their floor by tick ~1 300). Still open from M12:
 40 §2 #1, #2 (golden texts), #13 (the B-10 bar), #15–#17 (wording, new codes and seams for the contract).
 EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh); long runs on the batch copy.
 
@@ -29,7 +30,7 @@ EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh
 | M10 Editor tooling | done | c61f043 | a world from the menus validates and runs; T-EDIT-01 for every catalogue code; windows not checked by eye |
 | M11 Samples, scenarios, verification, CI | done | e5f402d…cde9e9c, M11.5 | samples, conformance, CI, scenarios S00–S27, R-01…R-08, coverage test; EditMode 319 + T3, PlayMode 17/17; gates B-01…B-11 (Machine) |
 | M12 Teaching path and final audit | review | bb6b46a, 1eaa571, 66a81e5, 83019ce, M12.5 | 14 stubs, Exercises menu, README (no grading, hooks); P1 phases 1–2; EditMode 433/433 (with soak and pinned hashes), PlayMode 19/19 ⏸ |
-| M13 Real-time visual test | review | ed16db5, d155e72, 29838b3, 9140625, c9d9e0a, e735804, 5efefe4, M13.8 | scenes watchable (ground, food, cover, markers, overlay, camera, capture); L0 and L2 hashes equal headless = Play = build; then memo of cache hits, player build of the project, staggered reference; EditMode 438/438, PlayMode 23/23; report RT-2026-10-10 ⏸ |
+| M13 Real-time visual test | review | ed16db5, d155e72, 29838b3, 9140625, c9d9e0a, e735804, 5efefe4, 6f3b302, M13.9 | scenes watchable (ground, food, cover, markers, overlay, camera, capture); L0 and L2 hashes equal headless = Play = build; then memo of cache hits, player build of the project, staggered reference; EditMode 438/438, PlayMode 23/23; report RT-2026-10-10 ⏸ |
 
 ## Machine
 - Unity **6000.3.9f1**: `C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Unity.exe`
@@ -81,6 +82,8 @@ unity command --result-only editor_stop
 unity command --result-only eval --code 'return EvoSim.Editor.RealTimeRuns.HeadlessStart("HideVsFlee", 1234, 600, "L2", "RUN-headless");'
 unity command --result-only eval --code 'return EvoSim.Editor.RealTimeRuns.HeadlessStatus();'   # or Logs/EvoSim/realtime-headless.txt
 unity command --result-only eval --code 'return EvoSim.Editor.RealTimeRuns.Behaviour("HideVsFlee", 1234, 600, "L2");'
+# editor closed: Unity.exe -batchmode -nographics -projectPath . -executeMethod EvoSim.Editor.RealTimeRuns.FromCommandLine
+#   -do headless|behaviour -scene HideVsFlee -seed 1234 -ticks 1368 -level L2 [-run NAME] -quit  (→ Logs/EvoSim/realtime-batch.txt)
 ```
 Player build (Windows 64, Mono, six scenes, HideVsFlee first): EvoSim ▸ Build ▸ Visual Player, or from the CLI
 `eval 'return EvoSim.Editor.VisualPlayerBuild.BuildLater();'` (result in Logs/EvoSim/visual-player-build.txt); a build
@@ -88,7 +91,7 @@ makes Unity rewrite `ProjectSettings/UnityConnectSettings.asset` (restore it, or
 a copy of Assets/EvoSim + Packages + ProjectSettings on a short path (`subst W:`): `-executeMethod
 EvoSim.Editor.VisualPlayerBuild.BuildFromCommandLine -out <repo>/Builds/EvoSim/<date>`. Scripts only:
 `VisualPlayerBuild.CompilePlayerScriptsLater()` (Logs/EvoSim/player-scripts.txt). Then
-`EvoSim.exe -scene HideVsFlee -seed 1234 -ticks 600 -speed 20 [-brain Random -noMutation] [-stagger] -capture 10 -run NAME
+`EvoSim.exe -scene HideVsFlee -seed 1234 -ticks 600 [-minutes 10] -speed 20 [-brain Random -noMutation] [-stagger] -capture 10 -run NAME
 -window 1920x1080 -quitAtEnd -logFile p.log` (`-screen-fullscreen 0` alone stays fullscreen). Run files, captures and the
 answer cache land next to the exe (`Logs/EvoSim/…`, `Library/EvoSim/AnswerCache`); copy the editor's cache there to replay.
 Ollama for L2: `OLLAMA_MAX_LOADED_MODELS=1 OLLAMA_KEEP_ALIVE=2h ollama serve`, gemma4:26b warmed with num_gpu 0 (9 GB RAM).
@@ -140,6 +143,14 @@ M0–M11: in [51](51-implementation-log.md). Since then:
   R-01 re-pinned again (reproduced). HideVsFlee seed 1234: L0 600 ticks 541 brain queries instead of 3 033, prey births 3
   instead of 69, the prey at their floor (10) from tick 200; L2 (JEV) 600 ticks: 680 JEV calls instead of 4 105, 119 s
   headless, prey 30 → 10 (their floor) by tick 500 with 29 births instead of 87, predators 6 → 11.
+- DEC-01 (M13.9, owner 2026-10-11) — the reference decision period is 10 (20 cost too many prey births). Same mechanism
+  (`ReferenceDecisionPeriod`, Update Reference Scenes); R-01 re-pinned. 10-minute live L2 build run of HideVsFlee seed 1234:
+  1 368 ticks, 2.28 ticks/s, 3 631 JEV + 10 gemma calls, 37 mutations ok of 37; at tick 600 prey 32 and 99 births (period 4:
+  23 and 87), then a decline to the prey floor by tick ~1 300 with the predators near their cap; the headless replay gives
+  the build's hash. Report `Logs/EvoSim/Reports/RT-2026-10-11-P10.md`.
+- R-06 (M13.9) — the soak caps the memo at 8 192 keys: at period 10 the reference memo (262 144 keys) is still filling
+  between ticks 10 000 and 100 000 (13 829 → 102 249 keys, 14.8 → 19.8 MB), which the "5 % after tick 10 000" bound
+  read as a leak; at period 4 it was full before tick 10 000. Capped: 20.8 → 21.0 MB.
 
 ## Disagreements between the brief and Docs/Interface
 - 20 §3.9 names the operator method `MutationOperator.Start(gene, parent, rng)`; on a MonoBehaviour Unity takes

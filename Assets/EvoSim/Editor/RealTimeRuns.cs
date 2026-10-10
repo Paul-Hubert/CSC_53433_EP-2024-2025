@@ -265,6 +265,32 @@ namespace EvoSim.Editor
             });
         }
 
+        /// <summary>
+        /// Batch entry point (the editor closed): -do headless|behaviour -scene S -seed n -ticks n -level L0|L1|L2 [-run name];
+        /// the result line goes to the log and to Logs/EvoSim/realtime-batch.txt (appended).
+        /// </summary>
+        public static void FromCommandLine()
+        {
+            string Arg(string name, string fallback)
+            {
+                var args = System.Environment.GetCommandLineArgs();
+                for (int i = 0; i < args.Length - 1; i++) if (args[i] == name) return args[i + 1];
+                return fallback;
+            }
+            string what = Arg("-do", "headless"), scene = Arg("-scene", "HideVsFlee"), level = Arg("-level", "L0");
+            int seed = int.Parse(Arg("-seed", "1234")), ticks = int.Parse(Arg("-ticks", "600"));
+            string result;
+            try
+            {
+                result = what == "behaviour" ? Behaviour(scene, seed, ticks, level)
+                       : Headless(scene, seed, ticks, level, Arg("-run", $"{scene}-{level}-s{seed}-{ticks}"));
+            }
+            catch (System.Exception e) { result = "FAILED: " + e; }
+            Debug.Log("EvoSim real-time batch: " + result);
+            Directory.CreateDirectory("Logs/EvoSim");
+            File.AppendAllText("Logs/EvoSim/realtime-batch.txt", $"{System.DateTime.Now:yyyy-MM-dd HH:mm:ss} {what}: {result}\n");
+        }
+
         /// <summary>The events hash recorded in a run folder's summary.json.</summary>
         public static string HashIn(string runFolder)
         {

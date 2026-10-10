@@ -72,13 +72,14 @@ namespace EvoSim.Tests
             return null;
         }
 
-        [Test, Category("T3"), Timeout(1800000), Description("R-06 soak: 100 000 ticks of the full world with the random brain → no exception, invariants hold (checked every 50 ticks), managed memory grows less than 5 % after tick 10 000")]
+        [Test, Category("T3"), Timeout(1800000), Description("R-06 soak: 100 000 ticks of the full world with the random brain → no exception, invariants hold (checked every 50 ticks), managed memory grows less than 5 % after tick 10 000 (the memo capped at 8 192 keys, so every bounded cache is full by then)")]
         public void Soak()
         {
             string result = Batch.WithScene(Scenes[1], w =>
             {
                 Offline(w);
                 w.TickLimit = 0;
+                w.MemoCapacity = 8192;          // full before tick 10 000 at any decision period (at 10 the reference memo fills until ~250 000 ticks)
                 Assert.IsTrue(w.Initialize(), w.LastReport.ToString());
                 long at10k = 0;
                 for (int t = 0; t < 100000 && w.State != RunState.Stopped; t += 50)

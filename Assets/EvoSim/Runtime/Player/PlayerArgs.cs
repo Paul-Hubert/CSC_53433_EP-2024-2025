@@ -5,7 +5,7 @@ using System.Globalization;
 namespace EvoSim
 {
     /// <summary>
-    /// A watched run's settings from a command line (the Windows player): -scene name, -seed n, -ticks n,
+    /// A watched run's settings from a command line (the Windows player): -scene name, -seed n, -ticks n, -minutes m (wall clock),
     /// -speed (ticks per second | fast | fixed), -wait (responsive | freeze), -brain (a brain's GameObject name or id),
     /// -capture seconds (0 = start and end only, off = none), -cache folder, -run folder name, -noMutation, -quitAtEnd,
     /// -window WIDTHxHEIGHT (a window of that many pixels), -stagger (every species decides staggered, DEC-04).
@@ -16,6 +16,8 @@ namespace EvoSim
         public string Scene, Brain, Cache, Run;
         public int? Seed, Ticks;
         public float? TicksPerSecond;
+        /// <summary>Stop after this many minutes of wall-clock time (the World's WallClockMinutes).</summary>
+        public float? Minutes;
         public RunSpeed? Speed;
         public WaitMode? Wait;
         /// <summary>Seconds between captures; null = the scene's setting; negative = no capture.</summary>
@@ -36,6 +38,11 @@ namespace EvoSim
                     case "-scene": p.Scene = v; i++; break;
                     case "-seed": p.Seed = Int(p, a, v); i++; break;
                     case "-ticks": p.Ticks = Int(p, a, v); i++; break;
+                    case "-minutes":
+                        i++;
+                        if (float.TryParse(v, NumberStyles.Float, CultureInfo.InvariantCulture, out float m) && m > 0f) p.Minutes = m;
+                        else p.Problems.Add($"-minutes {v}: minutes of wall-clock time, more than 0");
+                        break;
                     case "-brain": p.Brain = v; i++; break;
                     case "-cache": p.Cache = v; i++; break;
                     case "-run": p.Run = v; i++; break;
@@ -93,6 +100,7 @@ namespace EvoSim
             var said = new List<string>();
             if (Seed.HasValue) { w.Seed = Seed.Value; said.Add("seed " + Seed.Value); }
             if (Ticks.HasValue) { w.TickLimit = Ticks.Value; said.Add("ticks " + Ticks.Value); }
+            if (Minutes.HasValue) { w.WallClockMinutes = Minutes.Value; said.Add("minutes " + Minutes.Value.ToString(CultureInfo.InvariantCulture)); }
             if (Speed.HasValue)
             {
                 w.RunSpeed = Speed.Value;
