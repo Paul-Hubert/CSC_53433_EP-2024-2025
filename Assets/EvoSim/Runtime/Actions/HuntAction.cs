@@ -8,7 +8,7 @@ namespace EvoSim
     /// </summary>
     public class HuntAction : AnimalAction
     {
-        protected override string DefaultDescription => "chase the nearest visible prey animal or carcass; next to a prey animal, try to kill and eat it; next to a carcass, eat from it";
+        protected override string DefaultDescription => "chase the nearest visible prey animal or carcass; next to a prey animal,\n  try to kill and eat it; next to a carcass, eat from it";
 
         [SerializeField, Min(0f), Tooltip("Stop this far from the target, in meters (reference 1).")]
         float stopAt = 1f;

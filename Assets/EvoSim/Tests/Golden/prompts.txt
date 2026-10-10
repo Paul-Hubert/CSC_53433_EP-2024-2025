@@ -1,0 +1,157 @@
+=== prey
+You decide what a wild animal does next in a simple world.
+
+Actions:
+- eat: go to the nearest visible food and eat it
+- flee: run away from the nearest predator
+- hide: go to the nearest cover and stay in it; predators can't see or catch an animal in cover
+- follow: move toward the nearest other animal
+- rest: stay still to catch your breath and save energy
+- mate: walk to the nearest ready partner in sight and breed with it
+If the chosen action has nothing to act on in sight (no food, predator, cover,
+animal or ready partner), the animal searches the surroundings instead.
+Animals move 1 meter per step. Predators run 2 meters per step when they hunt,
+but they have 30 stamina against an animal's 60, so a long chase tires them first.
+Every meter moved costs stamina. Standing still brings it back, which costs some
+energy until stamina is full. Without stamina an animal cannot move.
+Breeding needs only one of the two to choose mate: an adult that chooses mate
+breeds as soon as it reaches a ready partner, whatever the partner is doing.
+
+This animal's instincts (its genes). They define its personality: follow them
+even when they seem unwise. Instincts that are meaningless have no effect.
+- eat: "Eat whenever food is close."
+- flee: "Run from any predator you see."
+- hide: "Hide when a predator is close."
+- follow: "Stay close to other animals."
+- rest: "Rest when you are tired."
+- mate: "Look for a partner when energy is high."
+
+Situation: Energy: low. Stamina: high. Food: none within 20 meters. Predator: 1-4 meters away. Cover: none within 20 meters. Animal: none within 20 meters. Age: adult.
+
+Distribute 100 points across the actions according to how likely this animal is to choose each.
+
+=== prey
+You decide what a wild animal does next in a simple world.
+
+Actions:
+- eat: go to the nearest visible food and eat it
+- flee: run away from the nearest predator
+- hide: go to the nearest cover and stay in it; predators can't see or catch an animal in cover
+- follow: move toward the nearest other animal
+- rest: stay still to catch your breath and save energy
+- mate: walk to the nearest ready partner in sight and breed with it
+If the chosen action has nothing to act on in sight (no food, predator, cover,
+animal or ready partner), the animal searches the surroundings instead.
+Animals move 1 meter per step. Predators run 2 meters per step when they hunt,
+but they have 30 stamina against an animal's 60, so a long chase tires them first.
+Every meter moved costs stamina. Standing still brings it back, which costs some
+energy until stamina is full. Without stamina an animal cannot move.
+Breeding needs only one of the two to choose mate: an adult that chooses mate
+breeds as soon as it reaches a ready partner, whatever the partner is doing.
+
+This animal's instincts (its genes). They define its personality: follow them
+even when they seem unwise. Instincts that are meaningless have no effect.
+- eat: "Eat whenever food is close."
+- flee: "Run from any predator you see."
+- hide: "Hide when a predator is close."
+- follow: "Stay close to other animals."
+- rest: "Rest when you are tired."
+- mate: "Look for a partner when energy is high."
+
+Situation: Energy: low. Stamina: high. Food: none within 20 meters. Predator: 1-4 meters away. Cover: none within 20 meters. Animal: within 1 meter, ready to mate. Age: adult.
+
+Distribute 100 points across the actions according to how likely this animal is to choose each.
+
+=== prey
+You decide what a wild animal does next in a simple world.
+
+Actions:
+- eat: go to the nearest visible food and eat it
+- flee: run away from the nearest predator
+- hide: go to the nearest cover and stay in it; predators can't see or catch an animal in cover
+- follow: move toward the nearest other animal
+- rest: stay still to catch your breath and save energy
+- mate: walk to the nearest ready partner in sight and breed with it
+If the chosen action has nothing to act on in sight (no food, predator, cover,
+animal or ready partner), the animal searches the surroundings instead.
+Animals move 1 meter per step. Predators run 2 meters per step when they hunt,
+but they have 30 stamina against an animal's 60, so a long chase tires them first.
+Every meter moved costs stamina. Standing still brings it back, which costs some
+energy until stamina is full. Without stamina an animal cannot move.
+Breeding needs only one of the two to choose mate: an adult that chooses mate
+breeds as soon as it reaches a ready partner, whatever the partner is doing.
+
+This animal's instincts (its genes). They define its personality: follow them
+even when they seem unwise. Instincts that are meaningless have no effect.
+- eat: "Eat whenever food is close."
+- flee: "Run from any predator you see."
+- hide: "Hide when a predator is close."
+- follow: "Stay close to other animals."
+- rest: "Rest when you are tired."
+- mate: "Look for a partner when energy is high."
+
+Situation: Energy: low. Stamina: high. Food: 10-20 meters away. Predator: none within 20 meters. Cover: none within 20 meters. Animal: within 1 meter, ready to mate. Age: adult.
+
+Distribute 100 points across the actions according to how likely this animal is to choose each.
+
+=== predator
+You decide what a predator does next in a simple world.
+
+Actions:
+- hunt: chase the nearest visible prey animal or carcass; next to a prey animal,
+  try to kill and eat it; next to a carcass, eat from it
+- follow: move toward the nearest other predator
+- rest: stay still to catch your breath and save energy
+- mate: walk to the nearest ready partner (another predator) in sight and breed with it
+If the chosen action has nothing to act on in sight (no prey, carcass, other
+predator or ready partner), the predator searches the surroundings instead.
+Predators run 2 meters per step when they hunt and walk 1 meter otherwise.
+Prey animals move 1 meter per step but have 60 stamina against a predator's 30.
+Every meter moved costs stamina. Standing still brings it back, which costs some
+energy until stamina is full. Without stamina a predator cannot move.
+A kill leaves a carcass that up to 2 other predators can eat from.
+Breeding needs only one of the two to choose mate: an adult that chooses mate
+breeds as soon as it reaches a ready partner, whatever the partner is doing.
+
+This predator's instincts (its genes). They define its personality: follow them
+even when they seem unwise. Instincts that are meaningless have no effect.
+- hunt: "Chase any prey you see."
+- follow: "Stay close to other predators."
+- rest: "Rest when your belly is full."
+- mate: "Look for a mate when well fed."
+
+Situation: Energy: low. Stamina: high. Prey: 1-4 meters away. Carcass: none within 20 meters. Other predator: none within 20 meters. Age: adult.
+
+Distribute 100 points across the actions according to how likely this animal is to choose each.
+
+=== example 08 §7
+You decide what a wild animal does next in a simple world.
+
+Actions:
+- eat: go to the nearest visible food and eat it
+- flee: run away from the nearest predator
+- hide: go to the nearest cover and stay in it; predators can't see or catch an animal in cover
+- follow: move toward the nearest other animal
+- rest: stay still to catch your breath and save energy
+- mate: walk to the nearest ready partner in sight and breed with it
+If the chosen action has nothing to act on in sight (no food, predator, cover,
+animal or ready partner), the animal searches the surroundings instead.
+Animals move 1 meter per step. Predators run 2 meters per step when they hunt,
+but they have 30 stamina against an animal's 60, so a long chase tires them first.
+Every meter moved costs stamina. Standing still brings it back, which costs some
+energy until stamina is full. Without stamina an animal cannot move.
+Breeding needs only one of the two to choose mate: an adult that chooses mate
+breeds as soon as it reaches a ready partner, whatever the partner is doing.
+
+This animal's instincts (its genes). They define its personality: follow them
+even when they seem unwise. Instincts that are meaningless have no effect.
+- eat: "Eat whenever food is close."
+- flee: "Run from any predator you see."
+- hide: "Hide when a predator is close."
+- follow: "Stay close to other animals."
+- rest: "Rest when you are tired."
+- mate: "Look for a partner when energy is high."
+
+Situation: Energy: low. Stamina: high. Food: 1-4 meters away. Predator: 4-10 meters away. Cover: 1-4 meters away. Animal: none within 20 meters. Age: adult.
+
+Distribute 100 points across the actions according to how likely this animal is to choose each.

@@ -40,19 +40,15 @@ namespace EvoSim
             return true;
         }
 
-        /// <summary>The carcass line in the prompt of species whose diet scavenges carcasses (PROMPT-01, 08 §7).</summary>
-        public override void WritePromptRules(Species species, PromptWriter w)
+        /// <summary>
+        /// The carcass line of a species that scavenges carcasses (08 §7): the diet writes it where it stands among the
+        /// species' rules; {portions} is the portions of the carcasses it eats.
+        /// </summary>
+        public string PromptRuleFor(EdibleTarget carcasses)
         {
-            var diet = species.Module<Diet>();
-            if (diet == null) return;
-            foreach (var entry in diet.Resolved)
-                if (entry.Kind == EdibleTargetKind.Carcass && entry.Species != null)
-                {
-                    var e = entry.Species.GetComponent<Edible>();
-                    int portions = e != null ? e.carcassPortions : 0;
-                    w.Rule(promptRule.Replace("{portions}", portions.ToString(CultureInfo.InvariantCulture)));
-                    return;
-                }
+            var e = carcasses.Species != null ? carcasses.Species.GetComponent<Edible>() : null;
+            int portions = e != null ? e.carcassPortions : 0;
+            return promptRule.Replace("{portions}", portions.ToString(CultureInfo.InvariantCulture));
         }
 
         public void SetPromptRule(string text) => promptRule = text;

@@ -136,6 +136,15 @@ namespace EvoSim
             return null;
         }
 
+        /// <summary>The carcass system's line for a diet that scavenges carcasses (08 §7).</summary>
+        public override void WritePromptRules(PromptWriter w)
+        {
+            var carcasses = World != null ? World.Service<CarcassSystem>() : null;
+            if (carcasses == null) return;
+            foreach (var t in resolved)
+                if (t.Kind == EdibleTargetKind.Carcass && t.Edible != null) { w.Rule(carcasses.PromptRuleFor(t)); return; }
+        }
+
         /// <summary>Whether the diet has an edible entry of this kind.</summary>
         public bool Has(EdibleTargetKind kind)
         {

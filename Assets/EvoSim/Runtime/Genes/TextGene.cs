@@ -53,6 +53,29 @@ namespace EvoSim
 
         public override void Initialize() => poolCache = null;
 
+        public override void Validate(ValidationReport report)
+        {
+            var seen = new HashSet<string>();
+            foreach (var f in Founders)
+            {
+                if (string.IsNullOrWhiteSpace(f)) continue;
+                string problem = SentenceGuards.Check(AlleleValue.OfText(f).Text, maxWords);
+                if (problem != null) report.Error("V-40", this, $"Founder \"{f}\" of gene '{Label}': {problem} (GENE-22).");
+                if (!seen.Add(AlleleValue.OfText(f).Text)) report.Warning("V-42", this, $"Gene '{Label}' lists \"{f}\" twice.");
+            }
+            if (hasNeutral)
+            {
+                string problem = SentenceGuards.Check(neutral, maxWords);
+                if (problem != null) report.Error("V-40", this, $"Neutral allele of gene '{Label}': {problem} (GENE-22).");
+            }
+            if (FounderPool.Count == 0)
+                report.Error("V-41", this, $"Gene '{Label}' has an empty founder pool.", new ValidationFix("Add the neutral allele", () => { hasNeutral = true; poolCache = null; }));
+            else if (!hasNeutral)
+                report.Warning("V-43", this, $"Gene '{Label}' has no neutral allele.", new ValidationFix("Add \"No preference.\"", () => { hasNeutral = true; neutral = "No preference."; poolCache = null; }));
+            if (string.IsNullOrWhiteSpace(ContrastPro) || string.IsNullOrWhiteSpace(ContrastAnti))
+                report.Info("V-44", this, $"Gene '{Label}' has no contrast pair: brain tests skip it.");
+        }
+
         /// <summary>Sets the founder settings from code (WorldBuilder, tests).</summary>
         public void Configure(IEnumerable<string> founderSentences, bool withNeutral = true, string neutralText = "No preference.",
                               bool isFree = false, string pro = "", string anti = "")

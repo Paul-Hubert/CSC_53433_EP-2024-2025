@@ -27,8 +27,22 @@ namespace EvoSim
         public bool ReportsReadiness => reportReadiness;
         public float PartnerRange => partnerRange;
 
-        protected override string DefaultLabel =>
-            targets == AnimalSet.Threats ? "Predator" : targets == AnimalSet.Prey ? "Prey" : targets == AnimalSet.Kin ? "Animal" : "Animal";
+        /// <summary>
+        /// Kin: "Animal". Threats and prey: the species' display name when the set holds one species (so renaming a
+        /// species changes what the brain reads, SPEC-20), else "Predator" or "Prey".
+        /// </summary>
+        protected override string DefaultLabel
+        {
+            get
+            {
+                if (targets == AnimalSet.Kin) return "Animal";
+                var set = World != null && Species != null ? World.Resolve(Species, targets, listedSpecies) : null;
+                if (set != null && set.Count == 1) return Capitalize(set[0].DisplayName);
+                return targets == AnimalSet.Prey ? "Prey" : "Predator";
+            }
+        }
+
+        static string Capitalize(string s) => string.IsNullOrEmpty(s) ? s : char.ToUpperInvariant(s[0]) + s.Substring(1);
 
         public override void Initialize()
         {

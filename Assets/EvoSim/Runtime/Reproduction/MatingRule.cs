@@ -17,8 +17,8 @@ namespace EvoSim
         [SerializeField, Tooltip("Two parents (reference). Off: asexual, one parent pays all (REPRO-04, control C7).")]
         bool sexual = true;
         [SerializeField, TextArea(2, 4), Tooltip("Rule line in the prompt (PROMPT-01).")]
-        string promptRule = "Breeding needs only one of the two to choose mate: an adult that chooses mate breeds as soon as " +
-                            "it reaches a ready partner, whatever the partner is doing.";
+        string promptRule = "Breeding needs only one of the two to choose mate: an adult that chooses mate\n" +
+                            "breeds as soon as it reaches a ready partner, whatever the partner is doing.";
 
         Energy energy;
 

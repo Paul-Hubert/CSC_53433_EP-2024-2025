@@ -19,7 +19,7 @@ namespace EvoSim
         [SerializeField, TextArea(2, 6), Tooltip("First part of the prompt (PROMPT-01).")]
         string promptHeader = "You decide what a wild animal does next in a simple world.";
         [SerializeField, TextArea(2, 6), Tooltip("The line before the genes block (PROMPT-01).")]
-        string genesIntro = "This animal's instincts (its genes). They define its personality: follow them " +
+        string genesIntro = "This animal's instincts (its genes). They define its personality: follow them\n" +
                             "even when they seem unwise. Instincts that are meaningless have no effect.";
         [SerializeField, Tooltip("Optional frozen prompt with {genes}, {situation} and {ask} (PROMPT-04).")]
         TextAsset frozenPrompt;
@@ -51,6 +51,9 @@ namespace EvoSim
         public IReadOnlyList<SpeciesModule> Modules => modules;
         /// <summary>Living animals, in creation (id) order.</summary>
         public IReadOnlyList<Animal> Animals => animals;
+        /// <summary>The prompt template built from the modules (PROMPT-01), with its id (PROMPT-05).</summary>
+        public PromptTemplate Prompt { get; internal set; }
+
         /// <summary>The order and set of actions, genes and senses (SPEC-03).</summary>
         public string Signature { get; private set; }
         /// <summary>The declared stats and traits (after Declare).</summary>

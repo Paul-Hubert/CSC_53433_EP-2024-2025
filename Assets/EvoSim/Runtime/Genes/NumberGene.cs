@@ -52,6 +52,16 @@ namespace EvoSim
 
         public override void Initialize() => poolCache = null;
 
+        public override void Validate(ValidationReport report)
+        {
+            var t = Species.Declarations.FindTrait(trait);
+            if (!t.IsValid) { report.Error("V-45", this, $"Number gene '{Label}' sets the trait '{trait}', which no module declares."); return; }
+            foreach (var f in founders)
+                if (f < min || f > max) report.Warning("V-46", this, $"Founder value {f} of gene '{Label}' is outside its range [{min}, {max}].");
+            if (founders.Count == 0) report.Error("V-41", this, $"Gene '{Label}' has an empty founder pool.");
+            if (t.Default < t.Min || t.Default > t.Max) report.Warning("V-36", this, $"The default of trait '{trait}' is outside its range.");
+        }
+
         /// <summary>Sets the gene from code (WorldBuilder, tests).</summary>
         public void Configure(string traitName, float rangeMin, float rangeMax, IEnumerable<float> founderValues,
                               bool multiply = false, string geneLabel = null)

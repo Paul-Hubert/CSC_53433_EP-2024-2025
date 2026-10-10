@@ -358,8 +358,9 @@ namespace EvoSim
             foreach (var p in phases) p.Initialize();
             RegisterFounderPools();                              // frozen pools: same ids in every run (GENE-21)
 
-            // 7. The food web and animal sets.
+            // 7. The food web and animal sets; then each species' prompt template (PROMPT-01).
             DeriveRelations();
+            foreach (var s in species) s.Prompt = PromptWriter.Build(s);
 
             // 8. Validation (EDIT-01).
             ValidateCore(report);
@@ -397,6 +398,10 @@ namespace EvoSim
                     report.Error("V-50", s, $"'{s.DisplayName}' has {space:N0} possible observations: above {ObservationSpaceError:N0}.");
                 else if (space > ObservationSpaceWarning)
                     report.Warning("V-50", s, $"'{s.DisplayName}' has {space:N0} possible observations: above {ObservationSpaceWarning:N0}, the memo and cache will rarely help.");
+                foreach (var problem in s.Prompt.Problems)
+                    report.Error("V-53", s, $"Prompt of '{s.DisplayName}': {problem}.");
+                if (species.Count > 0 && Phase<DeathPhase>() == null && s == species[0])
+                    report.Warning("V-09", this, "There is no Deaths phase: nobody dies.");
                 if (s.Id == RandomStreams.WorldStream)
                     report.Error("V-07", s, "The species id 'world' is reserved for the map's random streams.");
             }

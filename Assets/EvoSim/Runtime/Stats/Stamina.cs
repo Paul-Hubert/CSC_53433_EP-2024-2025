@@ -15,7 +15,7 @@ namespace EvoSim
         [SerializeField, Min(0f), Tooltip("Energy per tick while stamina recovers (reference 0.3).")]
         float regenEnergyCost = 0.3f;
         [SerializeField, TextArea(2, 4), Tooltip("Rule line in the prompt (PROMPT-03).")]
-        string promptRule = "Every meter moved costs stamina. Standing still brings it back, which costs some " +
+        string promptRule = "Every meter moved costs stamina. Standing still brings it back, which costs some\n" +
                             "energy until stamina is full. Without stamina an animal cannot move.";
 
         public StatId Value { get; private set; }

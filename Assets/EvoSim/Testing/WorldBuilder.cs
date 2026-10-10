@@ -81,6 +81,19 @@ namespace EvoSim.Testing
             return this;
         }
 
+        /// <summary>A brain under Brains, made the World's default brain.</summary>
+        public WorldBuilder DefaultBrain<T>(Action<T> configure = null, string name = null) where T : Brain
+        {
+            return Service<T>(name ?? typeof(T).Name, b =>
+            {
+                configure?.Invoke(b);
+                World.DefaultBrain = b;
+            });
+        }
+
+        /// <summary>The brain of this name (under Brains), or the first of its type.</summary>
+        public T Get<T>() where T : Component => Root.GetComponentInChildren<T>(true);
+
         /// <summary>A phase, appended after the existing ones (TICK-01).</summary>
         public WorldBuilder Phase<T>(Action<T> configure = null) where T : TickPhase
         {

@@ -33,6 +33,11 @@ namespace EvoSim
             Queries = new WorldQueries(this);
         }
 
+        /// <summary>The decisions of the current tick and the run's memo (08).</summary>
+        public DecisionState Decisions { get; } = new DecisionState();
+
+        partial void ResetDecisions() => Decisions.Reset();
+
         /// <summary>A new animal enters the spatial index.</summary>
         internal void OnAnimalAdded(Animal a) => space?.Added(a);
     }
