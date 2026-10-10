@@ -5,10 +5,11 @@ The single source of truth between implementation sessions of
 [`Docs/prompts/06-implement-unity-system.md`](../prompts/06-implement-unity-system.md).
 
 ## Next step
-M7.1: outputs (RunRecorder: events.jsonl, stats.csv, alleles.jsonl, final_population.json, summary.json,
-run_info.json, compatibility mode), RecordPhase, LiveStatistics, ScenarioAsset with path overrides, EvoSim.Batch
-entry points, stop file, resume by replay, the per-tick invariant checker; tests T-OUT-01…03, T-CFG-01…03,
-T-RAND-06, R-01, R-04, R-05; T-TICK-01 with the full reference order.
+M8.1: EvoSim.Http with fake transports first: HttpBrain (HttpClient, ConfigureAwait(false), retries with back-off,
+time-outs, parallel cap, strict mode, answer cache), JevBrain (one /v1/completions per batch, max_tokens 1, allowed
+option tokens, log-probabilities, head bias and calibrated temperature from decision_head.json / calibration.json
+stored as assets), OllamaPointsBrain (JSON schema, temperature 0, seed, context length, thinking off),
+OllamaMutatorClient; tests T-DEC-09/10, T-MUT-06…08; then B-01, B-11 against the local servers.
 
 ## Milestones
 | M | State | Commit | Notes |
@@ -20,8 +21,8 @@ T-RAND-06, R-01, R-04, R-05; T-TICK-01 with the full reference order.
 | M4 Senses and observations | done | 143de9a | situation texts pinned from the first run: Tests/Golden/situations.tsv (owner to review) |
 | M5 Genes, decisions, prompts | done | 95d47df | prompts pinned: Tests/Golden/prompts.txt; the 08 §7 example matches word for word |
 | M6 Reproduction, population, non-LLM mutation, controls | done | de83e06 | EditMode 154/154, PlayMode 11/11; LLM mutation logic done with a fake client (HTTP client in M8) |
-| M7 Outputs, configuration, batch runs | next | | ⏸ (no stop, owner's instruction) |
-| M8 LLM services | | | ⏸; model calls allowed from here |
+| M7 Outputs, configuration, batch runs | done | c5bf389, 75d0f81 | EditMode 162/162, PlayMode 16/16; S03 headless from the open editor; R-01 hashes pinned (owner to review situations.tsv) |
+| M8 LLM services | next | | ⏸ (no stop); model calls allowed from here |
 | M9 Reference content and views | | | ⏸ |
 | M10 Editor tooling | | | ⏸ |
 | M11 Samples, scenarios, verification, CI | | | ⏸ |
@@ -61,6 +62,10 @@ course's lab scripts (`Assets/02 - Scripts`), not ours.
 Batch mode (editor closed, CI): the commands of the prompt with
 `$U = "C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Unity.exe"`.
 **Not run yet on this machine** (the editor was open the whole session).
+Scenario runs in the open editor (same code as `-executeMethod EvoSim.Batch.RunScenario -scenario S03`):
+`unity command --timeout 900 --result-only eval --code 'return EvoSim.Batch.RunScenarioNamed("S03");'`
+(optional variant, seed, ticks); files go to `Logs/EvoSim/runs/<scenario>-<variant>-s<seed>-<time>/`.
+Rebuild the reference scenes and pools: `unity command --result-only menu --path "EvoSim/Build Reference Scenes"`.
 
 LLM servers: not checked yet (not needed before M8).
 
@@ -118,6 +123,13 @@ LLM servers: not checked yet (not needed before M8).
   characters) before "unchanged" (punctuation only). T-MUT-07 checks against the prototype's own clean().
 - REPRO-10 — block cap — the litter is cut to cap − living animals (eggs don't count, REPRO-22).
 - 22 — Samples — reference module defaults may name species in tooltips; T-CORE-08 checks Core, Phases, Recording.
+- OUT-05 — the prototype's names ("predator" kill cause, "pred_" columns, "<id>s" summary key) — kept in
+  Runtime/Compatibility/PrototypeFormat, outside the core folders (T-CORE-08).
+- CFG-01 — "range or unit" for numbers — T-CFG-01 accepts Range/Min or a reference value in the tooltip.
+- 20 §2 — building scenes while the editor holds an unsaved untitled scene — the builder writes an empty scene file
+  and opens it additively (NewScene additive is refused then); the owner's open scene is never touched.
+- R-01 — the scripted prey policy — flee a close threat, else eat food in sight, else mate with a ready kin, else
+  rest (2 % on the others); hashes pinned from the first run.
 - Answer cache folder — Library/EvoSim/AnswerCache (gitignored; deleting Library loses it); the file is
   .jsonl per brain ("mutator-<model>" for the mutator), rows stored with round-trip precision.
 
@@ -138,5 +150,6 @@ ENV-01…04/10/11/12/20/22/23; ANIM-10/11/15/16/17/20/21/22/30/31/35/36/40/41/42
 MOVE-01…07; REPRO-23 (part).
 M4–M6 added: SENSE-01…06/10…13/20/21/30/31/41; DEC-01…03/10…15/20/21/30…34/40; PROMPT-01…05/07; GENE-01…06/10…13/20…24/30…32;
 MUT-01…05/10…14/20/22/30…33; REPRO-01…05/10…13/20…24; POP-01…04; SPEC-01/06/30…32; CTRL-01/02; CORE-04/06/07/09.
-Still without a test: OUT-*, CFG-*, RAND-06/20…22 (replay), DEC-41 (points repair, M8), PROMPT-06 (editor, M10),
+M7 added: OUT-01…05, CFG-01…04, RAND-06/20/21, EDIT-01 (part: every scene validates).
+Still without a test: RAND-22, DEC-41 (points repair, M8), PROMPT-06 (editor, M10),
 EDIT-01/02 (M10), SPACE-12 (views, M9), ENV-21 (moving entities, S18 sample), SENSE-40 camera (S24 sample).
