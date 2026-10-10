@@ -8,7 +8,8 @@ The single source of truth between implementation sessions of
 M12 waits for the owner's final review ⏸. Owner 2026-10-10: no grading (40 §2 #14), a better mutator on the CPU, fix every
 audit row, an open system. Done: gemma4:26b on the CPU (M12.4); every P1 row fixed and the open system's seams (M12.5;
 table below, details in 51). Open owner decisions: 40 §2 #1, #2 (golden texts), #13 (the B-10 bar), #15–#17 (wording,
-new codes and seams for the contract).
+new codes and seams for the contract). Next, when the owner wants it: the real-time visual test,
+`Docs/prompts/07-real-time-visual-test.md` (Play mode and a Windows build; flat scenes draw no ground, food or cover yet).
 EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh); long runs on the batch copy.
 
 ## Milestones
