@@ -26,7 +26,8 @@ namespace EvoSim
             int code = 0;
             try
             {
-                var reports = Run(Arg("-checks") ?? "B-01,B-11", Arg("-scene") ?? DefaultScene, Arg("-brain") ?? "JEV", false);
+                var reports = Run(Arg("-checks") ?? "B-01,B-02,B-03,B-04,B-05,B-06,B-08,B-09,B-11", Arg("-scene") ?? DefaultScene, Arg("-brain") ?? "JEV",
+                                  Environment.GetCommandLineArgs().Contains("-cpu"));
                 foreach (var r in reports)
                 {
                     Debug.Log("EvoSim integrity: " + r.Line);
@@ -52,6 +53,15 @@ namespace EvoSim
             {
                 string id = raw.Trim();
                 if (id == "B-01") reports.Add(Smoke(scene, brain, cpuOnly));
+                else if (id == "B-02") reports.Add(IntegrityGates.Directed(scene, brain));
+                else if (id == "B-03") reports.Add(IntegrityGates.Information(scene, brain));
+                else if (id == "B-04") reports.Add(IntegrityGates.Locality(scene, brain));
+                else if (id == "B-05") reports.Add(IntegrityGates.OptionOrder(scene, brain));
+                else if (id == "B-06") reports.Add(IntegrityGates.PromptLength(scene, brain));
+                else if (id == "B-07") reports.Add(IntegrityGates.PointsSanity(scene, "Ollama points", cpuOnly));
+                else if (id == "B-08") reports.Add(IntegrityGates.Names(scene, brain));
+                else if (id == "B-09") reports.Add(IntegrityGates.Repeatability(scene, brain));
+                else if (id == "B-10") reports.Add(IntegrityGates.MutatorQuality(scene, Arg("-judge") ?? "gemma4:12b"));
                 else if (id == "B-11") reports.Add(Blindness(scene));
                 else
                 {

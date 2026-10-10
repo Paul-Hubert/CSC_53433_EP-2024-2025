@@ -5,11 +5,10 @@ The single source of truth between implementation sessions of
 [`Docs/prompts/06-implement-unity-system.md`](../prompts/06-implement-unity-system.md).
 
 ## Next step
-M11.2: scenario assets S00–S28 with their checks (exact facts through Batch.RunScenarios; directional ones as T3/T4
-tests), regressions R-02…R-08, integrity checks B-02…B-10, the coverage EditMode test (every MUST rule of
-30-tests.md cited by a passing test). Then M12 (teaching-path stubs and the Exercises menu, README, P1 audit).
-The editor is still frozen (Known problems): tests run in batch mode on a copy (scratchpad copyrun.sh: sync,
-build, edit, play, method); generated assets and new .meta files are copied back before committing.
+M12.1: teaching-path stubs (Assets/EvoSim/Exercises/My*.cs.txt), the Exercises menu, the grading suite and the
+students' README; then M12.2: the P1 audit, phase 1 (table below), and the owner's final review.
+The editor answers again (16:05): EditMode runs go through it with `--async_tests true` (scratchpad evo.sh);
+long and model runs still use the batch copy (copyrun.sh).
 
 ## Milestones
 | M | State | Commit | Notes |
@@ -25,7 +24,7 @@ build, edit, play, method); generated assets and new .meta files are copied back
 | M8 LLM services | done | ade561f, 8784ba7 | B-01 PASS (JEV, 0.29 s), B-11 PASS (23 prompts blind); S03 jev 50 ticks: Responsive 245 calls, longest Advance 22 ms; Freeze replay same hash, 0 calls |
 | M9 Reference content and views | done | a021fc2 | six scenes, module prefabs, bodies, T-SPACE-06; Play-mode look not checked by eye (editor frozen) |
 | M10 Editor tooling | done | c61f043 | a world from the menus validates and runs; T-EDIT-01 for every catalogue code; windows not checked by eye |
-| M11 Samples, scenarios, verification, CI | in progress | e5f402d | samples, conformance suites, CI entry points, workflow, prompts; EditMode 275/275, PlayMode 17/17 |
+| M11 Samples, scenarios, verification, CI | done | e5f402d…cde9e9c, M11.5 | samples, conformance, CI, scenarios S00–S27, R-01…R-08, coverage test; EditMode 319 + T3, PlayMode 17/17; gates B-01…B-11 (Machine) |
 | M12 Teaching path and final audit | | | ⏸ |
 
 ## Machine
@@ -61,13 +60,20 @@ course's lab scripts (`Assets/02 - Scripts`), not ours.
 
 Batch mode (editor closed, CI): the commands of the prompt with
 `$U = "C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Unity.exe"`.
-**Not run yet on this machine** (the editor was open the whole session).
+Works on a copy of the project while the editor holds the lock (scratchpad copyrun.sh: sync, build, edit, play, method).
 Scenario runs in the open editor (same code as `-executeMethod EvoSim.Batch.RunScenario -scenario S03`):
 `unity command --timeout 900 --result-only eval --code 'return EvoSim.Batch.RunScenarioNamed("S03");'`
 (optional variant, seed, ticks); files go to `Logs/EvoSim/runs/<scenario>-<variant>-s<seed>-<time>/`.
 Rebuild the reference scenes and pools: `unity command --result-only menu --path "EvoSim/Build Reference Scenes"`.
 
-LLM servers: not checked yet (not needed before M8).
+Servers (2026-10-10): JEV (vLLM container promptevo-jev, localhost:8000, model jev-decision) and Ollama 0.35.1
+(localhost:11434: qwen3.5:0.8b de63045f2975, gemma4:12b 6114515d63c1). Gates, on the copy:
+`-executeMethod EvoSim.Integrity.RunIntegrity -checks B-02,B-03 -brain JEV [-cpu] [-judge gemma4:12b]`.
+Results (reference scene, reports in Logs/EvoSim/Reports): B-01 pass (JEV 0.29 s); B-02 pass (sign 1.00, mean ΔP
+0.281); B-03 pass (MI_G founders/random: prey 0.057/0.006, predator 0.062/0.004); B-04 pass (locality 0.135,
+ρ 0.69, 33 edits); B-05 7 % of top answers change with reversed options; B-06 pass (463 of 1 024 tokens); B-07
+pass (gemma4:12b on CPU, every sum 100); B-08 pass (P(flee) wolf 0.42, shadow 0.035); B-09 JEV rows differ by up
+to 0.04 (reported); B-10 FAIL, 68 % usable after one mutation < 80 % (40 §2 #13); B-11 pass. About 4 500 calls.
 
 ## Decisions taken while implementing
 - M0 — tests from the command line — the editor is open, so batch mode can't
@@ -147,24 +153,13 @@ seven states (Idle, Running, Waiting, Blocked, Paused, Stepping, Stopped), now `
 `Docs/Interface/design.md` (chapter A) and `design.pdf` stay untracked (the owner's).
 
 ## Known problems
-- 2026-10-10 13:54 — the Unity editor froze (main thread at 100 %, no log output) after the pipeline's own
-  5-minute test timer cancelled a synchronous EditMode run that was still going; every CLI command times out.
-  It needs a restart by the owner (never kill Unity). Meanwhile everything runs in batch mode on a copy of the
-  project in the scratchpad. Lesson: in the editor, run EditMode with `--async_tests true` and poll.
+- 2026-10-10 13:54–16:05 — the editor froze after the pipeline's 5-minute timer cancelled a synchronous EditMode run;
+  it recovered by itself (same process). Lesson kept: in the editor, run EditMode with `--async_tests true` and poll.
 - GPU shared: the JEV container (restarted by Docker Desktop's restart policy) and another Python process of the
   owner's; the mutator runs on the CPU in Ollama (started for the checks).
 - Untracked files that aren't EvoSim's and were left alone: `Assets/MobileDependencyResolver/`, two `.cs.meta`
   in `Assets/02 - Scripts/`, `Docs/Interface/design.md`, `design.pdf`.
 
 ## Rule coverage
-Covered by passing tests so far: EDIT-03; CORE-02/03/05/09 (part); SPEC-02/03/04/05/10/11/12/13/15;
-ARCH-05/06; GENE-05; TICK-01/02/03/07; RAND-01/02/03/04/05/10/11/13/20; SPACE-01…04/06/07/08/10/11/13/14;
-ENV-01…04/10/11/12/20/22/23; ANIM-10/11/15/16/17/20/21/22/30/31/35/36/40/41/42/43; ACT-01…06/10…13/20/30/31/32;
-MOVE-01…07; REPRO-23 (part).
-M4–M6 added: SENSE-01…06/10…13/20/21/30/31/41; DEC-01…03/10…15/20/21/30…34/40; PROMPT-01…05/07; GENE-01…06/10…13/20…24/30…32;
-MUT-01…05/10…14/20/22/30…33; REPRO-01…05/10…13/20…24; POP-01…04; SPEC-01/06/30…32; CTRL-01/02; CORE-04/06/07/09.
-M7 added: OUT-01…05, CFG-01…04, RAND-06/20/21, EDIT-01 (part: every scene validates).
-M8–M11.1 added: DEC-41, DEC-42 (client), PROMPT-06, EDIT-01/02 (catalogue, play-mode gate), SPACE-12 (views),
-MUT-21 (ladder sample), OUT-04 (keys only from the environment, V-61).
-Still without a test: RAND-22, ENV-21 (moving entities, S18 sample), SENSE-40 camera (S24 sample); the full list
-comes from the coverage test (M11.2).
+Every MUST rule of 01–22 is cited by a passing test (CoverageTests.EveryMustRuleIsCited, from M11.3). Whether each
+citing test really checks its rule is item 1 of the P1 audit (M12.2).

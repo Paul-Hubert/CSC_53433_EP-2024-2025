@@ -52,6 +52,28 @@ namespace EvoSim
             return set;
         }
 
+        /// <summary>
+        /// The predator's 48 reference situations (15 §2): energy × prey band × carcass × another predator, with the tags
+        /// the brain checks use (prey_present, animal_present, animal_near, any).
+        /// </summary>
+        public static ObservationSet PredatorReference()
+        {
+            var set = new ObservationSet();
+            foreach (var e in new[] { "low", "medium", "high" })
+                foreach (var p in new[] { "none", "adjacent", "close", "far" })
+                    foreach (var c in new[] { "none", "close" })
+                        foreach (var k in new[] { "none", "close, ready" })
+                        {
+                            set.Add(new Dictionary<string, string> { { "energy", e }, { "prey", p }, { "carcass", c }, { "other predator", k }, { "stamina", "medium" } }, "reference");
+                            var row = set.rows[set.rows.Count - 1];
+                            row.Tags.Add("any");
+                            if (p != "none") row.Tags.Add("prey_present");
+                            if (c != "none") row.Tags.Add("carcass_present");
+                            if (k != "none") { row.Tags.Add("animal_present"); row.Tags.Add("animal_near"); }
+                        }
+            return set;
+        }
+
         /// <summary>Adds a row from label/token pairs.</summary>
         public void Add(Dictionary<string, string> tokens, string source = "custom")
         {

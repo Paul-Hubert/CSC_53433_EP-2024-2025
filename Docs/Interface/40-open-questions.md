@@ -50,7 +50,9 @@ deferred.
 | 9 | Integrity reports go to Logs/EvoSim/Reports (gitignored), where 32 §4 says Reports/ | Logs/EvoSim/Reports | 32 §4 |
 | 11 | The decision memo keeps at most 262 144 keys (World.memoCapacity, about 10 MB); beyond, queries go to the brain again (and to its answer cache), with the same answers (DEC-12) — so R-06's memory bound holds in long runs | capacity 262 144 | 08 DEC-30, 30 R-06 |
 | 12 | gene_timeline (prototype) draws its action chart from a fixed colour table without "hide": a Unity run with the hide action fails at the HTML step; R-08 uses a prototype-shaped world | prototype-shaped | 13 OUT-05, 30 R-08 |
-| 10 | Teaching-path stubs for Stamina and Litter: other modules look them up by their concrete type, so an "empty class of the same base class" isn't found; the stub must derive from the reference class or the look-ups must use the base | open | 22 §0 |
+| 10 | Teaching-path stubs for Stamina and Litter: other modules look them up by their concrete type, so an "empty class of the same base class" isn't found | the stubs derive from the reference (MyStamina : Stamina, MyLitter : Litter) and override its now-virtual methods (Budget, Settle, Size) | 22 §0 |
+| 13 | B-10 with the mutator qwen3.5:0.8b (T 1.2) and the 32 §2 judge prompt (gemma4:12b, the prototype's slot topics, "hide" added): 90 % of first answers pass the guards, 68 % usable after one mutation (gate 80 %), 18 % after ten (prototype 50 %, measured with the earlier gemma4:12b mutator); the prototype never judged qwen | B-10 reported, not blocking; keep qwen (small, random mutator) or lower the gate for it | 32 §2 B-10, 10 |
+| 14 | Teaching-path grading (22 §0): a deterministic exercise must give the reference's events hash on Lab1_Small (300 ticks, seed 7); crossover, litter and LLM mutation are checked by properties, since their draws may differ | TeachingPathGradingTests | 22 §0, 30 §4 |
 
 ## 3. Deferred by the owner ("later")
 

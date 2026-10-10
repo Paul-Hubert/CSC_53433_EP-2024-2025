@@ -23,6 +23,7 @@ namespace EvoSim
 
         public IReadOnlyList<string> Instructions => instructions;
         public string ContextLine => contextLine;
+        public int MaxWords => maxWords;
 
         public override void Initialize() => instructions = MutationText.Instructions(deck != null ? deck.text : "");
 
