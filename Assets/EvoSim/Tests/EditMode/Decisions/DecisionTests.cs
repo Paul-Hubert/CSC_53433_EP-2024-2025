@@ -68,6 +68,15 @@ namespace EvoSim.Tests
             var go = new GameObject(type.Name);
             go.transform.SetParent(b.Root.transform.Find("Brains"), false);
             var brain = (Brain)go.AddComponent(type);
+            if (brain is HttpBrain http)                                     // against fake servers: tests never call models
+            {
+                if (http is JevBrain jev)
+                    jev.SetModelFiles(UnityEditor.AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/EvoSim/Data/Models/JEV-9B/decision_head.json"),
+                                      UnityEditor.AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/EvoSim/Data/Models/JEV-9B/calibration.json"));
+                http.Transport = FakeHttpTransport.For(http);
+                if (http.Transport == null) Assert.Ignore($"{type.Name} needs a server; test it against a fake transport of its own.");
+                http.ConfigureClient("http://fake.test", 5f, 1, 0f, 4);
+            }
             b.World.DefaultBrain = brain;
             var w = b.Build();
             var prey = w.FindSpecies("prey");

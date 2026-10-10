@@ -49,6 +49,27 @@ namespace EvoSim
             return row;
         }
 
+        /// <summary>A probability row from non-negative weights, as floats summing to 1 within 1e-6 (DEC-11); all zero = uniform.</summary>
+        public static float[] Normalize(double[] weights)
+        {
+            int n = weights.Length;
+            double sum = 0;
+            foreach (var w in weights) sum += w > 0 ? w : 0;
+            if (!(sum > 0) || double.IsInfinity(sum)) return Uniform(n);
+            var row = new float[n];
+            double total = 0;
+            int largest = 0;
+            for (int i = 0; i < n; i++)
+            {
+                row[i] = (float)((weights[i] > 0 ? weights[i] : 0) / sum);
+                total += row[i];
+                if (row[i] > row[largest]) largest = i;
+            }
+            row[largest] = (float)(row[largest] + (1.0 - total));        // float rounding goes to the largest entry
+            if (row[largest] < 0f) row[largest] = 0f;
+            return row;
+        }
+
         /// <summary>The prompt's estimated token count: one token per 4 characters (PROMPT-06).</summary>
         public static int EstimateTokens(string prompt) => string.IsNullOrEmpty(prompt) ? 0 : (prompt.Length + 3) / 4;
     }
