@@ -65,7 +65,7 @@ jobs:
           docker compose -f prototype/docker/compose.yaml up -d
           for ($i = 0; $i -lt 80; $i++) { try { Invoke-RestMethod http://localhost:8000/health -TimeoutSec 5; break } catch { Start-Sleep 15 } }
       - shell: pwsh
-        run: ollama pull qwen3.5:0.8b; ollama pull gemma4:12b
+        run: ollama pull gemma4:26b; ollama pull gemma4:12b
       - shell: pwsh
         run: '& $env:UNITY -batchmode -nographics -projectPath . -executeMethod EvoSim.Batch.RunIntegrity -checks B-01,B-11 -logFile results/integrity.log'
       - shell: pwsh

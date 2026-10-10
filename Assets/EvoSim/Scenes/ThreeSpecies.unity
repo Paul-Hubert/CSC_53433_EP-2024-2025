@@ -2600,7 +2600,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec52ec633f0521040b9fd85d0dd7289e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: EvoSim.Runtime::EvoSim.MutatorService
-  model: qwen3.5:0.8b
+  model: gemma4:26b
   temperature: 1.2
   strict: 0
   useCache: 1

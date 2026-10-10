@@ -217,7 +217,7 @@ namespace EvoSim.Editor
             Child(brains, "Answer cache").AddComponent<AnswerCache>();
             if (full)
             {
-                Child(brains, "Mutator").AddComponent<MutatorService>().Configure("qwen3.5:0.8b", 1.2f);
+                Child(brains, "Mutator").AddComponent<MutatorService>().Configure("gemma4:26b", 1.2f);
                 Child(brains, "Mutator client").AddComponent<OllamaMutatorClient>();
             }
             world.DefaultBrain = defaultBrain;

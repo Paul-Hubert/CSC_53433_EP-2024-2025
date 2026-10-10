@@ -555,7 +555,8 @@ namespace EvoSim
 
         /// <summary>
         /// B-10 mutator: every founder sentence through the deck once (guards pass ≥ 70 %), then 10 mutations in a row
-        /// without selection; a judge model says whether each gene is still a usable rule (≥ 80 % after one mutation).
+        /// without selection; a judge model says whether each gene is still a usable rule (≥ 80 % after one mutation),
+        /// and rates the founders first, as the baseline.
         /// </summary>
         public static IntegrityReport MutatorQuality(string scene, string judgeModel, int chain = 10) => Run("B-10", "Mutator", false, scene, "Random", (w, brain, r) =>
         {
@@ -573,7 +574,13 @@ namespace EvoSim
                 foreach (var g in TextGenes(s)) foreach (var f in g.Founders) current.Add((s.Id, g, op, f));
             }
             var usableAfter = new Dictionary<int, double>();
-            for (int step = 1; step <= chain; step++)
+            for (int step = 0; step <= chain; step++)                                 // step 0: the founders themselves, the judge's baseline
+            {
+                if (step > 0) Mutate(step);
+                if ((step <= 1 || step == chain) && judge != null && !string.IsNullOrEmpty(judgeModel)) usableAfter[step] = Judge();
+            }
+
+            void Mutate(int step)
             {
                 var requests = current.Select(c => new MutatorRequest(MutationText.Prompt(c.op.ContextLine, c.op.Instructions[rng.Range(0, c.op.Instructions.Count)], c.text),
                                                                       rng.NextUInt() & 0x7FFFFFFF, service.Temperature, service.Model)).ToList();
@@ -588,7 +595,10 @@ namespace EvoSim
                     if (step == 1) { firstTotal++; if (ok) firstOk++; }
                     if (ok) current[i] = (current[i].species, current[i].gene, current[i].op, cleaned);
                 }
-                if ((step == 1 || step == chain) && judge != null && !string.IsNullOrEmpty(judgeModel))
+            }
+
+            double Judge()
+            {
                 {
                     int usable = 0;
                     foreach (var c in current)
@@ -610,7 +620,7 @@ namespace EvoSim
                         }
                         catch (Exception) { }
                     }
-                    usableAfter[step] = (double)usable / Math.Max(1, current.Count);
+                    return (double)usable / Math.Max(1, current.Count);
                 }
             }
             double first = (double)firstOk / Math.Max(1, firstTotal);
@@ -618,7 +628,7 @@ namespace EvoSim
             r.Facts["mutator"] = client is OllamaMutatorClient ollama
                 ? service.Model + "@" + (System.Threading.Tasks.Task.Run(() => OllamaTags.DigestAsync(ollama.Caller, service.Model)).GetAwaiter().GetResult() ?? "unknown")
                 : client.ModelIdentity; r.Facts["mutator_calls"] = mutatorCalls; r.Facts["judge"] = judgeModel; r.Facts["judge_calls"] = judgeCalls;
-            foreach (var kv in usableAfter) r.Facts[$"usable_after_{kv.Key}"] = Math.Round(kv.Value, 3);
+            foreach (var kv in usableAfter) r.Facts[kv.Key == 0 ? "usable_founders" : $"usable_after_{kv.Key}"] = Math.Round(kv.Value, 3);
             foreach (var c in current.Take(12)) { var row = r.Row(); row["species"] = c.species; row["slot"] = c.gene.Label; row["after_chain"] = c.text; }
             if (first < 0.7) r.Fail($"guards pass {first:P0} of first answers < 70 %");
             if (usableAfter.TryGetValue(1, out var u1) && u1 < 0.8) r.Fail($"usable after one mutation {u1:P0} < 80 %");
