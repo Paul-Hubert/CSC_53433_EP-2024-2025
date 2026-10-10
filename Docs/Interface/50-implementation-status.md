@@ -5,11 +5,11 @@ The single source of truth between implementation sessions of
 [`Docs/prompts/06-implement-unity-system.md`](../prompts/06-implement-unity-system.md).
 
 ## Next step
-M8.1: EvoSim.Http with fake transports first: HttpBrain (HttpClient, ConfigureAwait(false), retries with back-off,
-time-outs, parallel cap, strict mode, answer cache), JevBrain (one /v1/completions per batch, max_tokens 1, allowed
-option tokens, log-probabilities, head bias and calibrated temperature from decision_head.json / calibration.json
-stored as assets), OllamaPointsBrain (JSON schema, temperature 0, seed, context length, thinking off),
-OllamaMutatorClient; tests T-DEC-09/10, T-MUT-06…08; then B-01, B-11 against the local servers.
+M11.2: scenario assets S00–S28 with their checks (exact facts through Batch.RunScenarios; directional ones as T3/T4
+tests), regressions R-02…R-08, integrity checks B-02…B-10, the coverage EditMode test (every MUST rule of
+30-tests.md cited by a passing test). Then M12 (teaching-path stubs and the Exercises menu, README, P1 audit).
+The editor is still frozen (Known problems): tests run in batch mode on a copy (scratchpad copyrun.sh: sync,
+build, edit, play, method); generated assets and new .meta files are copied back before committing.
 
 ## Milestones
 | M | State | Commit | Notes |
@@ -22,10 +22,10 @@ OllamaMutatorClient; tests T-DEC-09/10, T-MUT-06…08; then B-01, B-11 against t
 | M5 Genes, decisions, prompts | done | 95d47df | prompts pinned: Tests/Golden/prompts.txt; the 08 §7 example matches word for word |
 | M6 Reproduction, population, non-LLM mutation, controls | done | de83e06 | EditMode 154/154, PlayMode 11/11; LLM mutation logic done with a fake client (HTTP client in M8) |
 | M7 Outputs, configuration, batch runs | done | c5bf389, 75d0f81 | EditMode 162/162, PlayMode 16/16; S03 headless from the open editor; R-01 hashes pinned (owner to review situations.tsv) |
-| M8 LLM services | next | | ⏸ (no stop); model calls allowed from here |
-| M9 Reference content and views | | | ⏸ |
-| M10 Editor tooling | | | ⏸ |
-| M11 Samples, scenarios, verification, CI | | | ⏸ |
+| M8 LLM services | done | ade561f, 8784ba7 | B-01 PASS (JEV, 0.29 s), B-11 PASS (23 prompts blind); S03 jev 50 ticks: Responsive 245 calls, longest Advance 22 ms; Freeze replay same hash, 0 calls |
+| M9 Reference content and views | done | a021fc2 | six scenes, module prefabs, bodies, T-SPACE-06; Play-mode look not checked by eye (editor frozen) |
+| M10 Editor tooling | done | c61f043 | a world from the menus validates and runs; T-EDIT-01 for every catalogue code; windows not checked by eye |
+| M11 Samples, scenarios, verification, CI | in progress | e5f402d | samples, conformance suites, CI entry points, workflow, prompts; EditMode 275/275, PlayMode 17/17 |
 | M12 Teaching path and final audit | | | ⏸ |
 
 ## Machine
@@ -139,9 +139,14 @@ seven states (Idle, Running, Waiting, Blocked, Paused, Stepping, Stopped), now `
 `Docs/Interface/design.md` (chapter A) and `design.pdf` stay untracked (the owner's).
 
 ## Known problems
-- Untracked files that aren't EvoSim's and were left alone:
-  `Assets/MobileDependencyResolver/` (+ `.meta`), two `.cs.meta` files in
-  `Assets/02 - Scripts/`, `Docs/Interface/design.md`, `design.pdf`.
+- 2026-10-10 13:54 — the Unity editor froze (main thread at 100 %, no log output) after the pipeline's own
+  5-minute test timer cancelled a synchronous EditMode run that was still going; every CLI command times out.
+  It needs a restart by the owner (never kill Unity). Meanwhile everything runs in batch mode on a copy of the
+  project in the scratchpad. Lesson: in the editor, run EditMode with `--async_tests true` and poll.
+- GPU shared: the JEV container (restarted by Docker Desktop's restart policy) and another Python process of the
+  owner's; the mutator runs on the CPU in Ollama (started for the checks).
+- Untracked files that aren't EvoSim's and were left alone: `Assets/MobileDependencyResolver/`, two `.cs.meta`
+  in `Assets/02 - Scripts/`, `Docs/Interface/design.md`, `design.pdf`.
 
 ## Rule coverage
 Covered by passing tests so far: EDIT-03; CORE-02/03/05/09 (part); SPEC-02/03/04/05/10/11/12/13/15;
@@ -151,5 +156,7 @@ MOVE-01…07; REPRO-23 (part).
 M4–M6 added: SENSE-01…06/10…13/20/21/30/31/41; DEC-01…03/10…15/20/21/30…34/40; PROMPT-01…05/07; GENE-01…06/10…13/20…24/30…32;
 MUT-01…05/10…14/20/22/30…33; REPRO-01…05/10…13/20…24; POP-01…04; SPEC-01/06/30…32; CTRL-01/02; CORE-04/06/07/09.
 M7 added: OUT-01…05, CFG-01…04, RAND-06/20/21, EDIT-01 (part: every scene validates).
-Still without a test: RAND-22, DEC-41 (points repair, M8), PROMPT-06 (editor, M10),
-EDIT-01/02 (M10), SPACE-12 (views, M9), ENV-21 (moving entities, S18 sample), SENSE-40 camera (S24 sample).
+M8–M11.1 added: DEC-41, DEC-42 (client), PROMPT-06, EDIT-01/02 (catalogue, play-mode gate), SPACE-12 (views),
+MUT-21 (ladder sample), OUT-04 (keys only from the environment, V-61).
+Still without a test: RAND-22, ENV-21 (moving entities, S18 sample), SENSE-40 camera (S24 sample); the full list
+comes from the coverage test (M11.2).
