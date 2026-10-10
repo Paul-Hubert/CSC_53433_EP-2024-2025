@@ -67,7 +67,7 @@ namespace EvoSim
             name = Sanitize(name);
             string root = Path.GetFullPath(Path.Combine(ProjectRoot, outputRoot));
             string folder = Path.Combine(root, name);
-            for (int n = 2; Directory.Exists(folder) && string.IsNullOrEmpty(runName); n++) folder = Path.Combine(root, name + "-" + n);
+            for (int n = 2; Directory.Exists(folder); n++) folder = Path.Combine(root, name + "-" + n);      // OUT-01: always its own folder
             Directory.CreateDirectory(folder);
             RunFolder = folder;                                             // OUT-01
             events = new StreamWriter(Path.Combine(folder, "events.jsonl"), false, new UTF8Encoding(false)) { NewLine = "\n" };
