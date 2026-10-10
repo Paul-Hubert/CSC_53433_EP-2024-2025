@@ -100,6 +100,8 @@ namespace EvoSim
         /// <summary>Opens a scene additively (or uses the open one), runs the action on its World, then closes it unsaved.</summary>
         public static string WithScene(string scenePath, Func<World, string> action)
         {
+            if (SceneManager.GetSceneByPath(scenePath).isLoaded)                       // it would run on the open scene, change it and close it
+                return "FAILED: " + scenePath + " is open in the editor: open another scene first";
             var scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
             try
             {
@@ -119,7 +121,7 @@ namespace EvoSim
         public static string HashOf(string scenePath, int seed, int ticks, Action<World> configure = null)
         {
             string hash = null;
-            WithScene(scenePath, world =>
+            string result = WithScene(scenePath, world =>
             {
                 world.Seed = seed;
                 world.TickLimit = ticks;
@@ -134,7 +136,7 @@ namespace EvoSim
                 hash = world.Events.Hash;
                 return hash;
             });
-            return hash;
+            return hash ?? throw new InvalidOperationException(result);
         }
 
         /// <summary>A scenario asset by asset name or by the start of its title ("S03").</summary>

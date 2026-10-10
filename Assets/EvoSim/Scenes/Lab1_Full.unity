@@ -1494,6 +1494,7 @@ MonoBehaviour:
   startOnPlay: 1
   decisionPeriod: 4
   samplingTemperature: 1
+  memoCapacity: 262144
   textStyle: 0
   defaultBrain: {fileID: 728091397}
   tickLimit: 0
@@ -1582,6 +1583,7 @@ GameObject:
   m_Component:
   - component: {fileID: 856438309}
   - component: {fileID: 856438308}
+  - component: {fileID: 856438310}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1655,6 +1657,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &856438310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 856438307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf405cde996d19d499357dcffcb2fd30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: EvoSim.Runtime::EvoSim.WorldCamera
+  world: {fileID: 0}
+  pitch: 55
+  yaw: 0
+  panSpeed: 0.8
+  orbitSpeed: 90
+  pickPixels: 24
 --- !u!1001 &869469284
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2103,6 +2123,107 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e029a45b0c50dc44da1d322a1ccca575, type: 3}
   m_Name: 
   m_EditorClassIdentifier: EvoSim.Runtime::EvoSim.ChooseActionsPhase
+--- !u!1 &1018909490
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1018909495}
+  - component: {fileID: 1018909494}
+  - component: {fileID: 1018909493}
+  - component: {fileID: 1018909492}
+  - component: {fileID: 1018909491}
+  m_Layer: 0
+  m_Name: Run views
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1018909491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018909490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14137dc587f6042468db11faa8574ec1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: EvoSim.Runtime::EvoSim.RunCapture
+  world: {fileID: 0}
+  everySeconds: 10
+  folder: Logs/EvoSim/captures
+  contactSheet: 1
+--- !u!114 &1018909492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018909490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6170fdb0c0d8f844ebb053ba0585446b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: EvoSim.Runtime::EvoSim.RunOverlay
+  world: {fileID: 0}
+  worldCamera: {fileID: 0}
+  fontSize: 16
+  visible: 1
+--- !u!114 &1018909493
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018909490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea9dd8e28d1dcdb42a3d4fdff9b7c7db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: EvoSim.Runtime::EvoSim.EntityMarkers
+  world: {fileID: 0}
+  carcass: {r: 0.45, g: 0.05, b: 0.05, a: 1}
+  egg: {r: 0.95, g: 0.92, b: 0.78, a: 1}
+  other: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+--- !u!114 &1018909494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018909490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e04c6dbaaeed724da4829457b37e8c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: EvoSim.Runtime::EvoSim.GroundView
+  world: {fileID: 0}
+  soil: {r: 0.62, g: 0.55, b: 0.4, a: 1}
+  cover: {r: 0.1, g: 0.32, b: 0.12, a: 1}
+  food: {r: 0.55, g: 0.95, b: 0.3, a: 1}
+  showCover: 1
+  showFood: 1
+--- !u!4 &1018909495
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018909490}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1078413213
 GameObject:
   m_ObjectHideFlags: 0
@@ -4290,3 +4411,4 @@ SceneRoots:
   - {fileID: 856438309}
   - {fileID: 1904130659}
   - {fileID: 789510256}
+  - {fileID: 1018909495}

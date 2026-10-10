@@ -28,10 +28,20 @@ namespace EvoSim
         public int ViewCount => viewed.Count;
         public AnimalView ViewOf(Animal a) => a != null && viewOf.TryGetValue(a, out var v) ? v : null;
 
-        /// <summary>The fraction of the next tick already elapsed (0 just after a tick, 1 when the next is due).</summary>
-        public float InterpolationFactor =>
-            !interpolateViews || waiting || runSpeed != RunSpeed.PerFixedUpdate || Time.fixedDeltaTime <= 0f ? 1f
-            : Mathf.Clamp01((Time.time - Time.fixedTime) / Time.fixedDeltaTime);
+        /// <summary>
+        /// The fraction of the next tick already elapsed (0 just after a tick, 1 when the next is due): the FixedUpdate
+        /// clock, or the RealTime carry. 1 while waiting or paused: the views rest where the last tick left them.
+        /// </summary>
+        public float InterpolationFactor
+        {
+            get
+            {
+                if (!interpolateViews || waiting || blocked) return 1f;
+                if (runSpeed == RunSpeed.RealTime) return runMode == RunState.Running ? Mathf.Clamp01(realTimeCarry) : 1f;
+                if (runSpeed != RunSpeed.PerFixedUpdate || Time.fixedDeltaTime <= 0f) return 1f;
+                return Mathf.Clamp01((Time.time - Time.fixedTime) / Time.fixedDeltaTime);
+            }
+        }
 
         partial void CreateViews()
         {

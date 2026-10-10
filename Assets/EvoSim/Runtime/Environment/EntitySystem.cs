@@ -12,6 +12,7 @@ namespace EvoSim
         /// <summary>Living entities, in creation (id) order.</summary>
         public IReadOnlyList<T> Entities => entities;
         public override int EntityCount => entities.Count;
+        public override Entity EntityAt(int i) => entities[i];
 
         public override void Initialize() => entities.Clear();
 

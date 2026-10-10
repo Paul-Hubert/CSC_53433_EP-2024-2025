@@ -18,6 +18,9 @@ namespace EvoSim
 
         public abstract int EntityCount { get; }
 
+        /// <summary>The i-th living entity, in creation order (views read them; 0 ≤ i &lt; EntityCount), or null if the kind keeps none.</summary>
+        public virtual Entity EntityAt(int i) => null;
+
         /// <summary>The environment phase: entities move, rot, and the used-up ones are removed (ENV-21, ENV-22).</summary>
         public abstract void UpdateEntities(TickContext t);
     }

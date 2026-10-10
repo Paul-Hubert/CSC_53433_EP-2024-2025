@@ -93,6 +93,7 @@ namespace EvoSim.Editor
         static void End(Scene scene, string path, Scene previous)
         {
             foreach (var root in scene.GetRootGameObjects()) root.SetActive(true);
+            RunViews.AddTo(scene);                                                     // ground, markers, overlay, capture, camera
             EditorSceneManager.SaveScene(scene, path);
             if (previous.IsValid()) SceneManager.SetActiveScene(previous);
             EditorSceneManager.CloseScene(scene, true);
@@ -437,18 +438,8 @@ namespace EvoSim.Editor
             return prefab;
         }
 
-        /// <summary>A placeholder body: a capsule as tall as it is wide (the Body scales it to its size).</summary>
-        static GameObject BodyPrefab(string file, Color color)
-        {
-            var go = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            go.name = file;
-            go.transform.localScale = new Vector3(1f, 0.5f, 1f);
-            go.GetComponent<Renderer>().sharedMaterial = BodyMaterial(file, color);
-            go.AddComponent<AnimalView>();
-            var prefab = PrefabUtility.SaveAsPrefabAsset(go, BodiesFolder + "/" + file + ".prefab");
-            Object.DestroyImmediate(go);
-            return prefab;
-        }
+        /// <summary>A placeholder body: a capsule as tall as it is wide standing on the ground, with a nose and an action marker (RunViews).</summary>
+        static GameObject BodyPrefab(string file, Color color) => RunViews.BodyPrefab(file, BodyMaterial(file, color));
 
         static Material BodyMaterial(string name, Color color)
         {

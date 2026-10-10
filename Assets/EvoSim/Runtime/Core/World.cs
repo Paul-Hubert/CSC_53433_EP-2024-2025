@@ -85,6 +85,7 @@ namespace EvoSim
         public WaitMode WaitMode { get => waitMode; set => waitMode = value; }
         public RunSpeed RunSpeed { get => runSpeed; set => runSpeed = value; }
         public int TicksPerFixedUpdate { get => ticksPerFixedUpdate; set => ticksPerFixedUpdate = Mathf.Max(1, value); }
+        public float RealTimeTicksPerSecond { get => realTimeTicksPerSecond; set => realTimeTicksPerSecond = Mathf.Max(0.1f, value); }
         public int DecisionPeriod { get => decisionPeriod; set => decisionPeriod = Mathf.Max(1, value); }
         public int MemoCapacity { get => memoCapacity; set => memoCapacity = Mathf.Max(0, value); }
         public float SamplingTemperature { get => samplingTemperature; set => samplingTemperature = Mathf.Max(0.01f, value); }
@@ -166,8 +167,18 @@ namespace EvoSim
 
         // ---- Unity entry points: they only drive (ARCH-04) ----
 
+        /// <summary>
+        /// Heard by every World in Awake, before it starts on Play: a launcher (a player's command line, a test) sets the
+        /// seed, speed or brain here, or turns StartOnPlay off. It runs before anything of the run exists.
+        /// </summary>
+        public static event Action<World> Configuring;
+
+        /// <summary>Most ticks a RealTime run may owe (it falls behind while waiting): catching up more would make the views jump.</summary>
+        const float MaxRealTimeDebtSeconds = 0.1f;
+
         void Awake()
         {
+            if (Application.isPlaying) Configuring?.Invoke(this);
             if (startOnPlay && Application.isPlaying && !IsInitialized)
             {
                 if (Initialize()) runMode = RunState.Running;
@@ -192,6 +203,7 @@ namespace EvoSim
             else if (runSpeed == RunSpeed.RealTime && (runMode == RunState.Running || runMode == RunState.Stepping))
             {
                 realTimeCarry += realTimeTicksPerSecond * Time.unscaledDeltaTime;
+                realTimeCarry = Mathf.Min(realTimeCarry, Mathf.Max(1f, realTimeTicksPerSecond * MaxRealTimeDebtSeconds));
                 int n = Mathf.FloorToInt(realTimeCarry);
                 if (n > 0) { realTimeCarry -= Drive(n); realTimeCarry = Mathf.Max(0, realTimeCarry); }
             }
