@@ -1,0 +1,23 @@
+{
+ "note": "Directed tests only (plan §A9). Never used as founders.",
+ "eat": {
+  "pro": "Always eat, whatever happens.",
+  "anti": "Never eat unless starving."
+ },
+ "flee": {
+  "pro": "Always run away, whatever happens.",
+  "anti": "Never run away from anything."
+ },
+ "follow": {
+  "pro": "Always follow other animals.",
+  "anti": "Never go near other animals."
+ },
+ "rest": {
+  "pro": "Always rest and stay still.",
+  "anti": "Never rest, keep moving."
+ },
+ "mate": {
+  "pro": "Always try to mate.",
+  "anti": "Never mate."
+ }
+}

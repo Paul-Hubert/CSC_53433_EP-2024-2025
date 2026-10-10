@@ -13,7 +13,8 @@ namespace EvoSim
         bool multiplyDefault;
         [SerializeField, Tooltip("The gene's own range; mutations are clamped to it (MUT-20).")]
         float min = 20f, max = 120f;
-        [SerializeField] List<float> founders = new List<float> { 45f, 60f, 75f };
+        [SerializeField, Tooltip("Founder values, drawn uniformly (GENE-20); within the gene's range.")]
+        List<float> founders = new List<float> { 45f, 60f, 75f };
         [SerializeField, Tooltip("Write the value into the prompt (GENE-04 MAY); off in the reference.")]
         bool showInPrompt;
         [SerializeField, Range(0, 8), Tooltip("Decimals compared when registering alleles (GENE-10).")]

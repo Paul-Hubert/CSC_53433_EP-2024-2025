@@ -11,9 +11,9 @@ namespace EvoSim
     {
         [SerializeField, Tooltip("The stat to sense, by name (\"energy\", \"stamina\", \"thirst\"…).")]
         string stat = "energy";
-        [SerializeField, Tooltip("Below this the level is low.")]
+        [SerializeField, Tooltip("Below this the level is low (reference energy 30, stamina 20 prey / 10 predators).")]
         float low = 30f;
-        [SerializeField, Tooltip("Above this the level is high.")]
+        [SerializeField, Tooltip("Above this the level is high (reference energy 70, stamina 40 prey / 20 predators).")]
         float high = 70f;
         [SerializeField, Tooltip("V2 sentences for low, medium and high (SENSE-11).")]
         string[] words = { "I am hungry and weak.", "I have some energy.", "I am well fed and strong." };

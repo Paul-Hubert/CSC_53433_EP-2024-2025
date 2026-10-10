@@ -114,7 +114,8 @@ namespace EvoSim.Tests
                             "\"id\": 7, \"kind\": \"death\", \"species\": \"prey\", \"t\": 12}", e.ToJson());
             Assert.AreEqual("40.0", CanonicalJson.Number(40.0));
             Assert.AreEqual("0", CanonicalJson.Number(-0.0));
-            Assert.AreEqual("\"caf\\u00e9\"", CanonicalJson.Write("café"));
+            Assert.AreEqual("\"café\"", CanonicalJson.Write("café"), "UTF-8, like the prototype (ensure_ascii=False)");
+            Assert.AreEqual("\"a\\nb\"", CanonicalJson.Write("a\nb"));
 
             var a = new EventLog(1, 1);
             var b = new EventLog(1, 1);

@@ -22,7 +22,8 @@ namespace EvoSim
             public Entry(string target, float energyScale = 1f) { this.target = target; this.energyScale = energyScale; }
         }
 
-        [SerializeField] List<Entry> eats = new List<Entry>();
+        [SerializeField, Tooltip("What the species eats: layers, species, carcass:<species>, egg:<species>, with energy scales.")]
+        List<Entry> eats = new List<Entry>();
         [SerializeField, Range(0f, 1f), Tooltip("Chance that a strike kills (a trait of the hunter, reference 0.5; ACT-11).")]
         float killChance = 0.5f;
 

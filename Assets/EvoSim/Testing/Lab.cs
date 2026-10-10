@@ -121,7 +121,16 @@ namespace EvoSim.Testing
             .Phase<SensePhase>().Phase<AskBrainsPhase>().Phase<ChooseActionsPhase>()
             .Phase<ActPhase>(p => p.Order = order)
             .Phase<BreedPhase>().Phase<HatchPhase>()
-            .Phase<DeathPhase>().Phase<MigrationPhase>().Phase<EnvironmentPhase>().Phase<FloorPhase>();
+            .Phase<DeathPhase>().Phase<MigrationPhase>().Phase<EnvironmentPhase>().Phase<FloorPhase>().Phase<RecordPhase>();
+
+        /// <summary>A run recorder (files off unless asked, so tests leave no folders) and live statistics.</summary>
+        public static WorldBuilder Recorder(this WorldBuilder b, bool files = false, string root = "Logs/EvoSim/test-runs", string name = "",
+                                            bool compatibility = false) => b
+            .Service<RunRecorder>("Recording", r => r.Configure(root, name, compatibility, files))
+            .Service<LiveStatistics>("Live statistics");
+
+        /// <summary>The invariants of 30 §5, checked after every tick.</summary>
+        public static WorldBuilder CheckInvariants(this WorldBuilder b) => b.Phase<InvariantPhase>();
 
         /// <summary>Litters, crossover, incubation, cap and floor (11, reference values).</summary>
         public static SpeciesSetup LifeRules(this SpeciesSetup s, int cap, int floor, int incubation = 0) => s

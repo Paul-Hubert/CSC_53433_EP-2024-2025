@@ -75,7 +75,7 @@ namespace EvoSim
             sb.Append(']');
         }
 
-        /// <summary>A JSON string with Python's escaping (non-ASCII as \uXXXX, like json.dumps' default).</summary>
+        /// <summary>A JSON string as the prototype writes it (json.dumps with ensure_ascii=False): UTF-8, control characters escaped.</summary>
         public static void AppendString(StringBuilder sb, string s)
         {
             sb.Append('"');
@@ -91,7 +91,7 @@ namespace EvoSim
                     case '\b': sb.Append("\\b"); break;
                     case '\f': sb.Append("\\f"); break;
                     default:
-                        if (c < 0x20 || c > 0x7f) sb.Append("\\u").Append(((int)c).ToString("x4"));
+                        if (c < 0x20) sb.Append("\\u").Append(((int)c).ToString("x4"));
                         else sb.Append(c);
                         break;
                 }

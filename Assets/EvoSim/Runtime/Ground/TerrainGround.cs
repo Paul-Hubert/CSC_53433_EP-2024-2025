@@ -12,7 +12,7 @@ namespace EvoSim
     {
         [SerializeField, Tooltip("The terrain, on this GameObject or below it (ARCH-08). Empty = the first one found there.")]
         Terrain terrain;
-        [SerializeField, Tooltip("World height of the water surface: lower ground is water.")]
+        [SerializeField, Tooltip("World height of the water surface, in meters: lower ground is water (terrain preview: the lowest 15 %).")]
         float waterLevel = 0f;
         [SerializeField, Range(0f, 90f), Tooltip("Steeper ground is not walkable, in degrees.")]
         float maxSteepness = 35f;

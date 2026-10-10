@@ -10,6 +10,8 @@ namespace EvoSim
 
         public int MaxAge => maxAge;
 
+        public override System.Collections.Generic.IEnumerable<string> Causes => new[] { "old_age" };
+
         public override string CauseOfDeath(Animal a) => a.Age > maxAge ? "old_age" : null;
 
         public void SetMaxAge(int ticks) => maxAge = Mathf.Max(1, ticks);

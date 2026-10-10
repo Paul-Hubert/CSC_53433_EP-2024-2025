@@ -7,6 +7,8 @@ namespace EvoSim
 
         public override void Initialize() => energy = Species.Module<Energy>();
 
+        public override System.Collections.Generic.IEnumerable<string> Causes => new[] { "starvation" };
+
         public override string CauseOfDeath(Animal a) => energy != null && a[energy.Value] <= 0f ? "starvation" : null;
 
         public override void Validate(ValidationReport report)

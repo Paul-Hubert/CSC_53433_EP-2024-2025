@@ -18,10 +18,12 @@ namespace EvoSim
         int seed = 1234;
         [SerializeField, Tooltip("Use a separate seed for the map: terrain, cover, initial food (RAND-04).")]
         bool separateWorldSeed;
-        [SerializeField] int worldSeed = 1234;
+        [SerializeField, Tooltip("The map's own seed, when separateWorldSeed is on (RAND-04).")]
+        int worldSeed = 1234;
         [SerializeField, Tooltip("Freeze blocks the main thread while waiting; Responsive keeps the editor drawing (SPACE-14).")]
         WaitMode waitMode = WaitMode.Responsive;
-        [SerializeField] RunSpeed runSpeed = RunSpeed.PerFixedUpdate;
+        [SerializeField, Tooltip("Ticks per FixedUpdate, as many as fit in a frame budget, or a fixed number per second.")]
+        RunSpeed runSpeed = RunSpeed.PerFixedUpdate;
         [SerializeField, Min(1), Tooltip("Ticks per FixedUpdate (PerFixedUpdate speed).")]
         int ticksPerFixedUpdate = 1;
         [SerializeField, Min(1), Tooltip("Milliseconds of ticks per frame (Fast speed).")]

@@ -1,0 +1,51 @@
+{
+ "version": "v2",
+ "note": "Draft for owner review (H1). 2026-10-07: one gene per action; the temperament genes (risk, social, place) and the attack and wander genes were removed. At most 12 words, imperative, plain words, no numbers.",
+ "loci": {
+  "eat": {
+   "neutral": "No preference.",
+   "alleles": [
+    "Eat whenever food is close.",
+    "Only look for food when energy is low.",
+    "Always finish eating before doing anything else.",
+    "Eat quickly, then move on."
+   ]
+  },
+  "flee": {
+   "neutral": "No preference.",
+   "alleles": [
+    "Run from any predator you see.",
+    "Flee only when a predator is very close.",
+    "Stay calm unless danger is right next to you.",
+    "Run away from anything that attacks you."
+   ]
+  },
+  "follow": {
+   "neutral": "No preference.",
+   "alleles": [
+    "Stay close to other animals.",
+    "Follow others when you are lost or hungry.",
+    "Keep your distance from other animals.",
+    "Follow the strongest animal nearby."
+   ]
+  },
+  "rest": {
+   "neutral": "No preference.",
+   "alleles": [
+    "Rest when you are tired.",
+    "Never stop moving.",
+    "Rest only when you feel safe.",
+    "Save energy by resting when food is far."
+   ]
+  },
+  "mate": {
+   "neutral": "No preference.",
+   "alleles": [
+    "Look for a partner when energy is high.",
+    "Mate with any nearby adult.",
+    "Mate only when food is plentiful.",
+    "Seek a partner before growing old."
+   ]
+  }
+ }
+}
