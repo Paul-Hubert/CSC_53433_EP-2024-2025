@@ -407,6 +407,7 @@ namespace EvoSim
                 if (s.Id == RandomStreams.WorldStream)
                     report.Error("V-07", s, "The species id 'world' is reserved for the map's random streams.");
             }
+            ValidateAcrossSpecies(report);
         }
 
         partial void ResetSystems();

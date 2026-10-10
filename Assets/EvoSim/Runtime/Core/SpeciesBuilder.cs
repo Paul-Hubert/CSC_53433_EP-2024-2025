@@ -23,6 +23,7 @@ namespace EvoSim
         readonly List<StatDeclaration> stats = new List<StatDeclaration>();
         readonly List<TraitDeclaration> traits = new List<TraitDeclaration>();
         readonly List<string> problems = new List<string>();
+        readonly List<string> costs = new List<string>();
 
         public Species Species { get; }
         /// <summary>The module currently declaring (set by the species while it calls Declare).</summary>
@@ -61,6 +62,17 @@ namespace EvoSim
             traits.Add(new TraitDeclaration { Id = id, DeclaredBy = Current });
             return id;
         }
+
+        /// <summary>Traits some cost depends on (09 §5): a number gene on any other trait drifts to one end (V-47).</summary>
+        public IReadOnlyList<string> Costs => costs;
+
+        /// <summary>Declares that a cost depends on this trait (for example a metabolism that grows with stamina.max).</summary>
+        public void DeclareCost(string trait)
+        {
+            if (!string.IsNullOrEmpty(trait) && !costs.Contains(trait)) costs.Add(trait);
+        }
+
+        public bool HasCost(string trait) => costs.Contains(trait);
 
         /// <summary>A declared stat by name, or an invalid id.</summary>
         public StatId FindStat(string name)

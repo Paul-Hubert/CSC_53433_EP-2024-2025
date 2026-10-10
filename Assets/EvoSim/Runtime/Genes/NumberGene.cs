@@ -61,6 +61,9 @@ namespace EvoSim
                 if (f < min || f > max) report.Warning("V-46", this, $"Founder value {f} of gene '{Label}' is outside its range [{min}, {max}].");
             if (founders.Count == 0) report.Error("V-41", this, $"Gene '{Label}' has an empty founder pool.");
             if (t.Default < t.Min || t.Default > t.Max) report.Warning("V-36", this, $"The default of trait '{trait}' is outside its range.");
+            if (!Species.Declarations.HasCost(trait))
+                report.Info("V-47", this, $"No cost depends on '{trait}': gene '{Label}' will drift to whichever end helps (09 §5). " +
+                                          "Pair it with a cost, e.g. Metabolism's cost trait.");
         }
 
         /// <summary>Sets the gene from code (WorldBuilder, tests).</summary>
