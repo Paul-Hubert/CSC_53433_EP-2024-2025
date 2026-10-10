@@ -83,8 +83,10 @@ namespace EvoSim
             var diet = Diet(a);
             if (diet == null) return null;
             ResourceItem? best = null;
-            foreach (var t in diet.Resolved)
+            var targets = diet.Resolved;
+            for (int i = 0; i < targets.Count; i++)
             {
+                var t = targets[i];
                 if (t.Kind != EdibleTargetKind.Layer || t.Edible == null) continue;
                 if (!string.IsNullOrEmpty(layerName) && t.Layer.LayerName != layerName) continue;
                 if (t.Layer.Nearest(a.Position, radius, out var item) && (best == null || item.Distance < best.Value.Distance - 1e-6f))

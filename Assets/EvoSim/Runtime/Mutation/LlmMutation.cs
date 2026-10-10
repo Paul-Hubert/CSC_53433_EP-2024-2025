@@ -28,7 +28,7 @@ namespace EvoSim
 
         public override bool Accepts(Gene g) => g.Kind == AlleleKind.Text;
 
-        public override MutationJob Start(Gene gene, Allele parent, RandomStream rng)
+        public override MutationJob StartMutation(Gene gene, Allele parent, RandomStream rng)
         {
             var plan = new int[tries];
             var seeds = new long[tries];

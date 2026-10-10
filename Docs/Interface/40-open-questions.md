@@ -48,6 +48,8 @@ deferred.
 | 7 | A new world from the menu (21 §6) has the random brain as default (JEV present, one click away), so it runs without a server | random | 21 §6 |
 | 8 | Scenario T2 variants (S03 default) run with C2 (no mutation) so they make no model call; mutation is covered by the fake-mutator tests and R-01 | C2 in T2 | 31 |
 | 9 | Integrity reports go to Logs/EvoSim/Reports (gitignored), where 32 §4 says Reports/ | Logs/EvoSim/Reports | 32 §4 |
+| 11 | The decision memo keeps at most 262 144 keys (World.memoCapacity, about 10 MB); beyond, queries go to the brain again (and to its answer cache), with the same answers (DEC-12) — so R-06's memory bound holds in long runs | capacity 262 144 | 08 DEC-30, 30 R-06 |
+| 12 | gene_timeline (prototype) draws its action chart from a fixed colour table without "hide": a Unity run with the hide action fails at the HTML step; R-08 uses a prototype-shaped world | prototype-shaped | 13 OUT-05, 30 R-08 |
 | 10 | Teaching-path stubs for Stamina and Litter: other modules look them up by their concrete type, so an "empty class of the same base class" isn't found; the stub must derive from the reference class or the look-ups must use the base | open | 22 §0 |
 
 ## 3. Deferred by the owner ("later")

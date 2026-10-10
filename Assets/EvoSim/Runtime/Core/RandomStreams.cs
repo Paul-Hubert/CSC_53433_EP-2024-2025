@@ -9,6 +9,8 @@ namespace EvoSim
     public sealed class RandomStreams
     {
         readonly Dictionary<string, RandomStream> streams = new Dictionary<string, RandomStream>();
+        // species id → purpose → stream: asking every tick builds no name string (R-07)
+        readonly Dictionary<string, Dictionary<string, RandomStream>> bySpecies = new Dictionary<string, Dictionary<string, RandomStream>>();
 
         /// <summary>The run seed: every stream but <c>world</c> derives from it.</summary>
         public long Seed { get; }
@@ -35,7 +37,12 @@ namespace EvoSim
         }
 
         /// <summary>A species' own stream, "&lt;species id&gt;/&lt;purpose&gt;" (RAND-03).</summary>
-        public RandomStream For(Species species, string purpose) => Get(species.Id + "/" + purpose);
+        public RandomStream For(Species species, string purpose)
+        {
+            if (!bySpecies.TryGetValue(species.Id, out var mine)) bySpecies.Add(species.Id, mine = new Dictionary<string, RandomStream>());
+            if (!mine.TryGetValue(purpose, out var stream)) mine.Add(purpose, stream = Get(species.Id + "/" + purpose));
+            return stream;
+        }
 
         /// <summary>"world" and "world/&lt;layer&gt;" streams make the map: they use the world seed (RAND-04).</summary>
         public static bool IsWorldStream(string name) => name == WorldStream || name.StartsWith(WorldStream + "/", System.StringComparison.Ordinal);

@@ -26,8 +26,10 @@ namespace EvoSim
         /// <summary>Every living animal of every species, placed again (once per sense and act phase).</summary>
         public void Rebuild()
         {
-            foreach (var s in world.AllSpecies)
+            var all = world.AllSpecies;
+            for (int si = 0; si < all.Count; si++)
             {
+                var s = all[si];
                 var cells = CellsOf(s);
                 for (int c = 0; c < cells.Length; c++) cells[c]?.Clear();
                 var animals = s.Animals;
@@ -112,9 +114,12 @@ namespace EvoSim
         public void Within(Vector3 p, float radius, IReadOnlyList<Species> among, List<Animal> result)
         {
             result.Clear();
-            foreach (var s in among)
-                foreach (var a in s.Animals)
-                    if (!a.IsGone && world.Distance(p, a.Position) <= radius) result.Add(a);
+            for (int si = 0; si < among.Count; si++)
+            {
+                var animals = among[si].Animals;
+                for (int i = 0; i < animals.Count; i++)
+                    if (!animals[i].IsGone && world.Distance(p, animals[i].Position) <= radius) result.Add(animals[i]);
+            }
         }
 
         int Cell(Vector3 p)
@@ -127,7 +132,7 @@ namespace EvoSim
         void Put(List<Animal>[] cells, Animal a)
         {
             int c = Cell(a.Position);
-            (cells[c] ??= new List<Animal>()).Add(a);
+            cells[c].Add(a);
             a.SpatialCell = c;
         }
 
@@ -136,6 +141,7 @@ namespace EvoSim
             if (!cellsOf.TryGetValue(s, out var cells))
             {
                 cells = new List<Animal>[grid.Count];
+                for (int c = 0; c < cells.Length; c++) cells[c] = new List<Animal>(16);   // made once and roomy: moving never allocates (R-07)
                 cellsOf.Add(s, cells);
             }
             return cells;

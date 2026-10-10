@@ -114,7 +114,7 @@ namespace EvoSim
                 if (!rng.Chance(rate)) continue;
                 if (!gene.MayMutate(egg.Alleles[i])) continue;                           // MUT-22
                 world.Mutations.Attempts++;
-                egg.Mutations.Add(new EggMutation { Locus = i, Parent = egg.Alleles[i], Operator = op, Job = op.Start(gene, egg.Alleles[i], rng) });
+                egg.Mutations.Add(new EggMutation { Locus = i, Parent = egg.Alleles[i], Operator = op, Job = op.StartMutation(gene, egg.Alleles[i], rng) });
             }
         }
 

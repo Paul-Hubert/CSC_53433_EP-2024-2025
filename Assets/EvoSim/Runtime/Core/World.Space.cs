@@ -42,6 +42,7 @@ namespace EvoSim
         partial void ResetDecisions()
         {
             Decisions.Reset();
+            Decisions.Memo.Capacity = memoCapacity;
             Mutations.Clear();
         }
 

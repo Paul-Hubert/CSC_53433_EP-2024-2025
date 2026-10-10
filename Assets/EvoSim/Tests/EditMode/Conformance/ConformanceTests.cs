@@ -218,8 +218,8 @@ namespace EvoSim.Tests
                 if (!op.Accepts(gene)) continue;
                 accepted++;
                 var parent = w.Alleles.Register(gene, gene.FounderPool[0].Value, "founder");
-                var a = op.Start(gene, parent, new RandomStream(11, "mutation"));
-                var b = op.Start(gene, parent, new RandomStream(11, "mutation"));
+                var a = op.StartMutation(gene, parent, new RandomStream(11, "mutation"));
+                var b = op.StartMutation(gene, parent, new RandomStream(11, "mutation"));
                 for (int i = 0; i < 50 && !(a.IsDone && b.IsDone); i++) w.Advance(1);   // asynchronous operators finish through the world
                 Assert.IsTrue(a.IsDone && b.IsDone, "finished");
                 Assert.AreEqual(a.Succeeded, b.Succeeded, "same seed, same outcome");

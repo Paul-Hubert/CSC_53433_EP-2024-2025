@@ -41,34 +41,46 @@ namespace EvoSim
             act = new ActContext(World) { GrazeReach = grazeReach };
             move = new MoveContext(World);
             resolver = new InteractionResolver(World) { GrazeReach = grazeReach, StrikeReach = strikeReach, ScavengeReach = scavengeReach };
+            int most = 0;                                                            // room for every animal the caps allow (R-07)
+            foreach (var s in World.AllSpecies)
+            {
+                var cap = s.Module<CapRule>();
+                most += cap != null ? cap.Cap : 2 * s.InitialPopulation;
+            }
+            if (actors.Capacity < most) actors.Capacity = most;
+            if (order != ActOrder.SpeciesInTurn) Ensure(most);
         }
 
         public override void Run(TickContext t)
         {
             World.Space.Rebuild();
             var rng = t.Stream(RandomStreams.ActOrderStream);                  // ACT-32
-            foreach (var s in World.AllSpecies)
-                foreach (var a in s.Animals) { a.StruckThisTick = false; a.MetersMoved = 0f; }
+            var all = World.AllSpecies;                                          // index loops: no enumerator per tick (R-07)
+            for (int si = 0; si < all.Count; si++)
+            {
+                var animals = all[si].Animals;
+                for (int i = 0; i < animals.Count; i++) { animals[i].StruckThisTick = false; animals[i].MetersMoved = 0f; }
+            }
 
             switch (order)
             {
                 case ActOrder.SpeciesInTurn:
-                    foreach (var s in World.AllSpecies)
+                    for (int si = 0; si < all.Count; si++)
                     {
-                        Living(s, actors);
+                        Living(all[si], actors);
                         rng.Shuffle(actors);
                         ActInTurn();
                     }
                     break;
                 case ActOrder.AllMixed:
                     actors.Clear();
-                    foreach (var s in World.AllSpecies) Append(s, actors);
+                    for (int si = 0; si < all.Count; si++) Append(all[si], actors);
                     rng.Shuffle(actors);
                     ActInTurn();
                     break;
                 default:
                     actors.Clear();
-                    foreach (var s in World.AllSpecies) Append(s, actors);
+                    for (int si = 0; si < all.Count; si++) Append(all[si], actors);
                     ActTogether(rng);
                     break;
             }

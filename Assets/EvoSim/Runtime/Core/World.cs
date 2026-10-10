@@ -38,6 +38,8 @@ namespace EvoSim
         int decisionPeriod = 4;
         [SerializeField, Min(0.01f), Tooltip("τ: probabilities p^(1/τ), renormalised, before drawing (DEC-20).")]
         float samplingTemperature = 1f;
+        [SerializeField, Min(0), Tooltip("Most keys the decision memo keeps (DEC-30); beyond, queries go to the brain (and its cache) again. 0 = no limit. Reference 262 144 (about 10 MB).")]
+        int memoCapacity = 262144;
         [SerializeField, Tooltip("Situation text style for every species (SENSE-11).")]
         TextStyle textStyle = TextStyle.V1;
         [SerializeField, Tooltip("The brain of species that don't name one (DEC-13).")]
@@ -84,6 +86,7 @@ namespace EvoSim
         public RunSpeed RunSpeed { get => runSpeed; set => runSpeed = value; }
         public int TicksPerFixedUpdate { get => ticksPerFixedUpdate; set => ticksPerFixedUpdate = Mathf.Max(1, value); }
         public int DecisionPeriod { get => decisionPeriod; set => decisionPeriod = Mathf.Max(1, value); }
+        public int MemoCapacity { get => memoCapacity; set => memoCapacity = Mathf.Max(0, value); }
         public float SamplingTemperature { get => samplingTemperature; set => samplingTemperature = Mathf.Max(0.01f, value); }
         public TextStyle TextStyle { get => textStyle; set => textStyle = value; }
         public Brain DefaultBrain { get => defaultBrain; set => defaultBrain = value; }

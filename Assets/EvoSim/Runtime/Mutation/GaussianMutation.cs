@@ -12,7 +12,7 @@ namespace EvoSim
 
         public override bool Accepts(Gene g) => g.Kind == AlleleKind.Number;
 
-        public override MutationJob Start(Gene g, Allele parent, RandomStream rng)
+        public override MutationJob StartMutation(Gene g, Allele parent, RandomStream rng)
         {
             var gene = (NumberGene)g;
             float v = Mathf.Clamp(parent.Number + sigma * (float)rng.NextGaussian(), gene.Min, gene.Max);

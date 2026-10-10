@@ -28,6 +28,7 @@ namespace EvoSim
 
         readonly List<Animal> animals = new List<Animal>();
         readonly List<SpeciesModule> modules = new List<SpeciesModule>();
+        readonly Dictionary<System.Type, object> moduleOf = new Dictionary<System.Type, object>();   // Module<T> look-ups, per type
         readonly List<AnimalAction> actions = new List<AnimalAction>();
         readonly List<Gene> genes = new List<Gene>();
         readonly List<Sense> senses = new List<Sense>();
@@ -74,8 +75,11 @@ namespace EvoSim
         /// <summary>The one module of this type (a Diet, a Litter, a CapRule…), or null.</summary>
         public T Module<T>() where T : class
         {
-            foreach (var m in modules) if (m is T t) return t;
-            return null;
+            if (moduleOf.TryGetValue(typeof(T), out var known)) return (T)known;
+            T found = null;
+            foreach (var m in modules) if (m is T t) { found = t; break; }
+            moduleOf[typeof(T)] = found;                                           // the act phase asks several times per animal
+            return found;
         }
 
         /// <summary>Every module of this type, in hierarchy order.</summary>
@@ -129,7 +133,7 @@ namespace EvoSim
             Id = assignedId;
             animals.Clear();
             Counters = new SpeciesCounters();
-            modules.Clear(); actions.Clear(); genes.Clear(); senses.Clear();
+            modules.Clear(); actions.Clear(); genes.Clear(); senses.Clear(); moduleOf.Clear();
             modules.AddRange(Ownership.Owned<SpeciesModule>(this));
             foreach (var m in modules)
             {

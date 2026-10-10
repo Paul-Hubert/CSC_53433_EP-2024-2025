@@ -210,10 +210,10 @@ namespace EvoSim.Tests
             var rng = new RandomStream(1, "gauss");
             for (int i = 0; i < 1000; i++)
             {
-                float v = op.Start(gene, nearTop, rng).Result.Number;
+                float v = op.StartMutation(gene, nearTop, rng).Result.Number;
                 Assert.That(v, Is.InRange(20f, 120f));
             }
-            Assert.AreEqual(op.Start(gene, nearTop, new RandomStream(9, "g")).Result.Number, op.Start(gene, nearTop, new RandomStream(9, "g")).Result.Number);
+            Assert.AreEqual(op.StartMutation(gene, nearTop, new RandomStream(9, "g")).Result.Number, op.StartMutation(gene, nearTop, new RandomStream(9, "g")).Result.Number);
         }
 
         [Test, Description("T-MUT-11 (MUT-31): 12 babies conceived in one tick, 3 answers rejected → one first batch of all requests, then one redraw batch")]

@@ -22,7 +22,7 @@ namespace EvoSim
         public abstract bool Accepts(Gene g);
 
         /// <summary>Draw every random choice now (MUT-30), then start the work; the job may finish later.</summary>
-        public abstract MutationJob Start(Gene gene, Allele parent, RandomStream rng);
+        public abstract MutationJob StartMutation(Gene gene, Allele parent, RandomStream rng);
 
         public void SetOnlyThese(IEnumerable<Gene> genes) => onlyThese = new List<Gene>(genes);
     }

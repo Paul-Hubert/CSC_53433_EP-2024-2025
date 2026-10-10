@@ -81,7 +81,7 @@ namespace EvoSim.Editor
 "/// <summary>#NAME#: a mutation operator (10; recipe 22 §9); draw only from the given stream (MUT-30).</summary>\n" +
 "public class #NAME# : MutationOperator\n{\n" +
 "    public override bool Accepts(Gene g) => g.Kind == AlleleKind.Number;\n\n" +
-"    public override MutationJob Start(Gene gene, Allele parent, RandomStream rng) =>\n" +
+"    public override MutationJob StartMutation(Gene gene, Allele parent, RandomStream rng) =>\n" +
 "        MutationJob.Done(parent.Number + (rng.Chance(0.5f) ? 1f : -1f), \"#LOWER#\");\n}\n";
             }
         }

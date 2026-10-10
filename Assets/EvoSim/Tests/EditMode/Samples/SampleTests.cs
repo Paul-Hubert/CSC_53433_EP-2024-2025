@@ -64,14 +64,14 @@ namespace EvoSim.Tests
                 var seen = new System.Collections.Generic.HashSet<string>();
                 for (int seed = 0; seed < 20; seed++)
                 {
-                    var job = op.Start(null, new Allele("prey.rest", 0, AlleleValue.OfText("Rest often when tired."), "founder"), new RandomStream(seed, "mutation"));
+                    var job = op.StartMutation(null, new Allele("prey.rest", 0, AlleleValue.OfText("Rest often when tired."), "founder"), new RandomStream(seed, "mutation"));
                     Assert.IsTrue(job.Succeeded);
                     seen.Add(job.Result.Text);
                 }
                 CollectionAssert.AreEquivalent(new[] { "Rest always when tired.", "Rest sometimes when tired." }, seen);
-                var top = op.Start(null, new Allele("prey.rest", 1, AlleleValue.OfText("Always rest."), "founder"), new RandomStream(1, "mutation"));
+                var top = op.StartMutation(null, new Allele("prey.rest", 1, AlleleValue.OfText("Always rest."), "founder"), new RandomStream(1, "mutation"));
                 Assert.IsTrue(top.Result.Text == "Always rest." || top.Result.Text == "Often rest.", top.Result.Text);
-                Assert.IsFalse(op.Start(null, new Allele("prey.rest", 2, AlleleValue.OfText("Rest when tired."), "founder"), new RandomStream(1, "m")).Succeeded);
+                Assert.IsFalse(op.StartMutation(null, new Allele("prey.rest", 2, AlleleValue.OfText("Rest when tired."), "founder"), new RandomStream(1, "m")).Succeeded);
             }
             finally { Object.DestroyImmediate(op.gameObject); }
         }

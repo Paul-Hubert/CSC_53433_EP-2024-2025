@@ -130,11 +130,19 @@ LLM servers: not checked yet (not needed before M8).
   and opens it additively (NewScene additive is refused then); the owner's open scene is never touched.
 - R-01 — the scripted prey policy — flee a close threat, else eat food in sight, else mate with a ready kin, else
   rest (2 % on the others); hashes pinned from the first run.
+- DEC-30 / R-06 — memo memory in long runs — keys stored as 128-bit hashes, identical rows shared, at most
+  World.memoCapacity keys (262 144); beyond, queries go to the brain (and its cache) again (40 §2 #11).
+- R-07 — per-tick allocations — module look-ups cached per species, species streams cached without building names,
+  carcasses pooled, index loops on the act path, spatial cells made once: full world 1.5 ms per tick, no allocation
+  in the act phase (Unity's Mono counts no per-thread allocations: R-07 reads the managed heap between two probes).
 - Answer cache folder — Library/EvoSim/AnswerCache (gitignored; deleting Library loses it); the file is
   .jsonl per brain ("mutator-<model>" for the mutator), rows stored with round-trip precision.
 
 ## Disagreements between the brief and Docs/Interface
-None found so far. Chapter B of the brief (the Claude Doc, tabs A–G) matches 20; it adds the run loop's
+- 20 §3.9 names the operator method `MutationOperator.Start(gene, parent, rng)`; on a MonoBehaviour Unity takes
+  `Start` for its message and logs "Script error: Start() can not take parameters" for every operator. Renamed
+  `StartMutation` (templates, samples, tests). The contract's text should follow.
+Brief vs Interface: none found so far. Chapter B of the brief (the Claude Doc, tabs A–G) matches 20; it adds the run loop's
 seven states (Idle, Running, Waiting, Blocked, Paused, Stepping, Stopped), now `RunState`.
 `Docs/Interface/design.md` (chapter A) and `design.pdf` stay untracked (the owner's).
 
