@@ -84,7 +84,7 @@ namespace EvoSim
                 for (int i = 0; i < requests.Count; i++)
                 {
                     results.Add(output[i]);
-                    hits.Add(output[i].colliderInstanceID != 0);
+                    hits.Add(output[i].collider != null);                        // no hit: no collider
                 }
             }
             finally

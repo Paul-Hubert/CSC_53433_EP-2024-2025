@@ -701,7 +701,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: EvoSim.Runtime::EvoSim.CoverLayer
   hidingSpecies: []
-  fraction: 0.2
+  fraction: 0.3
   octaves:
   - 8
   - 4
@@ -841,7 +841,7 @@ MonoBehaviour:
   id: predator
   displayName: predator
   brain: {fileID: 0}
-  initialPopulation: 28
+  initialPopulation: 6
   promptHeader: You decide what a predator does next in a simple world.
   genesIntro: 'This predator''s instincts (its genes). They define its personality:
     follow them
@@ -1196,7 +1196,7 @@ MonoBehaviour:
   id: prey
   displayName: prey
   brain: {fileID: 0}
-  initialPopulation: 136
+  initialPopulation: 40
   promptHeader: You decide what a wild animal does next in a simple world.
   genesIntro: 'This animal''s instincts (its genes). They define its personality:
     follow them
@@ -1321,7 +1321,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c55bb6030744b7748b7c75d0307c6e33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: EvoSim.Runtime::EvoSim.CapRule
-  cap: 68
+  cap: 12
   mode: 0
 --- !u!114 &787262811
 MonoBehaviour:
@@ -1649,7 +1649,7 @@ Transform:
   m_GameObject: {fileID: 856438307}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5, y: 0, z: 0, w: 0.8660254}
-  m_LocalPosition: {x: 96, y: 172.79999, z: -19.2}
+  m_LocalPosition: {x: 32, y: 57.6, z: -6.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2630,8 +2630,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d3886c54b27cf140a62c0c56e8d4b4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: EvoSim.Runtime::EvoSim.FlatGround
-  width: 192
-  depth: 192
+  width: 64
+  depth: 64
 --- !u!1 &1337962386
 GameObject:
   m_ObjectHideFlags: 0
@@ -3294,7 +3294,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c55bb6030744b7748b7c75d0307c6e33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: EvoSim.Runtime::EvoSim.CapRule
-  cap: 270
+  cap: 70
   mode: 0
 --- !u!114 &1720153036
 MonoBehaviour:
