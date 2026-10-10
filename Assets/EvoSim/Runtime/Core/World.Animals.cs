@@ -11,6 +11,10 @@ namespace EvoSim
         bool shuffledGenes;
         [SerializeField, Tooltip("C4 RANDOM-FOUNDERS: founders get control sentences and random numbers in range (CTRL-01).")]
         bool randomFounders;
+        [SerializeField, Tooltip("C2 NO-MUT: mutation rate 0 for every species (CTRL-01).")]
+        bool noMutation;
+        [SerializeField, Tooltip("C7 ASEXUAL: one parent per birth, copy and mutation (CTRL-01, REPRO-04).")]
+        bool asexual;
         [SerializeField, Tooltip("Control sentences for C4 and the brain tests (GENE-23).")]
         List<string> controlSentences = new List<string>();
 
@@ -22,6 +26,8 @@ namespace EvoSim
         public Ground Ground => ground;
         public bool ShuffledGenes { get => shuffledGenes; set => shuffledGenes = value; }
         public bool RandomFounders { get => randomFounders; set => randomFounders = value; }
+        public bool NoMutation { get => noMutation; set => noMutation = value; }
+        public bool Asexual { get => asexual; set => asexual = value; }
         public IReadOnlyList<string> ControlSentences => controlSentences;
         public void SetControlSentences(IEnumerable<string> sentences) => controlSentences = new List<string>(sentences);
 

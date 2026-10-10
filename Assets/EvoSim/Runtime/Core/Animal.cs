@@ -33,6 +33,10 @@ namespace EvoSim
         public float MetersMoved;
         /// <summary>Struck once already this tick as a hunter (ACT-12).</summary>
         public bool StruckThisTick;
+        /// <summary>The animal its action was about last time it acted (followed, fled, chased), or -1 (inspector, 22 §13).</summary>
+        public int TargetId = -1;
+        /// <summary>Where its last intent was heading.</summary>
+        public Vector3 TargetPoint;
 
         readonly float[] stats, traits;
         /// <summary>The spatial index cell (core bookkeeping, not animal state).</summary>

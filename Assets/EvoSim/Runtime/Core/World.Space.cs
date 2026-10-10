@@ -9,7 +9,19 @@ namespace EvoSim
         int nextEntityId;
 
         /// <summary>The spatial index of animals (SENSE-32), built on the ground's rectangle.</summary>
-        public SpatialIndex Space => space ??= new SpatialIndex(this, ground != null ? ground.Bounds : new Rect(-0.5f, -0.5f, 1f, 1f));
+        public SpatialIndex Space
+        {
+            get
+            {
+                if (space != null) return space;
+                space = new SpatialIndex(this, ground != null ? ground.Bounds : new Rect(-0.5f, -0.5f, 1f, 1f));
+                space.Rebuild();
+                return space;
+            }
+        }
+
+        /// <summary>The queries senses and actions share (ACT-05, SENSE-06).</summary>
+        public WorldQueries Queries { get; private set; }
 
         /// <summary>The next entity id (carcasses, eggs): unique in the run, never reused.</summary>
         public int NextEntityId() => nextEntityId++;
@@ -18,6 +30,7 @@ namespace EvoSim
         {
             space = null;
             nextEntityId = 0;
+            Queries = new WorldQueries(this);
         }
 
         /// <summary>A new animal enters the spatial index.</summary>

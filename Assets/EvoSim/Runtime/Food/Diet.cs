@@ -136,6 +136,13 @@ namespace EvoSim
             return null;
         }
 
+        /// <summary>Whether the diet has an edible entry of this kind.</summary>
+        public bool Has(EdibleTargetKind kind)
+        {
+            foreach (var t in resolved) if (t.Kind == kind && t.Edible != null) return true;
+            return false;
+        }
+
         /// <summary>Sets the entries from code (WorldBuilder, scenarios).</summary>
         public Diet Set(params Entry[] entries)
         {

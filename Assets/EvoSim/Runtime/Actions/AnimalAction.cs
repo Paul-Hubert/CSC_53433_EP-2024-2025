@@ -10,7 +10,11 @@ namespace EvoSim
 
         /// <summary>The action's name, unique in its species (ACT-01): its GameObject's name.</summary>
         public string Name => gameObject.name;
-        public string Description => description;
+        /// <summary>The prompt line: the inspector's text, or the action's default when empty.</summary>
+        public string Description => string.IsNullOrEmpty(description) ? DefaultDescription : description;
+
+        /// <summary>The reference prompt line of this action (08 §7), used when the inspector field is empty.</summary>
+        protected virtual string DefaultDescription => "";
 
         /// <summary>The text gene bound to this action (GENE-05), or null (V-05).</summary>
         public TextGene Gene { get; internal set; }
@@ -27,7 +31,7 @@ namespace EvoSim
         /// <summary>True for actions that rest: the metabolism charges its rest cost when the animal stays still.</summary>
         public virtual bool Rests => false;
 
-        public override void WritePromptRules(PromptWriter w) => w.Action(Name, description);
+        public override void WritePromptRules(PromptWriter w) => w.Action(Name, Description);
 
         /// <summary>Sets the prompt line from code (WorldBuilder, tests).</summary>
         public void SetDescription(string text) => description = text;

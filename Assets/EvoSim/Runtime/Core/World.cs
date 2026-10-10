@@ -333,6 +333,7 @@ namespace EvoSim
             ground = Service<Ground>();
             if (ground != null) ground.Initialize();
             foreach (var svc in services) if (svc != ground) svc.Initialize();
+            Queries.Bind(Service<Cover>());
 
             // 4–5. Species modules, ownership, gene binding, orders. Ids are unique (V-07).
             usedSpeciesIds.Clear();
