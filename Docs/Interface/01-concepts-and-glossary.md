@@ -106,7 +106,7 @@
 | **Locomotion** | The species' module that turns an intent into movement over the ground: kinematic straight lines in the reference; terrain, NavMesh or physics subclasses later. |
 | **Interaction** | A contact effect: graze, strike, eat a carcass portion, enter cover. |
 | **Act order** | The order in which animals act within a tick (species in turn, all mixed, or simultaneous). |
-| **Decision period** | Ticks between two decisions (4 in the reference). |
+| **Decision period** | Ticks between two decisions (20 in the reference; 4 until 2026-10-11). |
 | **Brain** | A module that maps a batch of queries to probability rows over actions. |
 | **Query** | What the brain receives for one animal: species, brain-visible genes, observation, situation text. |
 | **Sampling temperature** | τ applied to the brain's probabilities before drawing: p^(1/τ), renormalised. |

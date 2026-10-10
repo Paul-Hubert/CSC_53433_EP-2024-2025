@@ -24,7 +24,7 @@ meter, kept exactly (owner decision). "small" is the profile for tests and quick
 |---|---|---|
 | seed | 1234 | — |
 | size | 192 × 192 (small 48 × 48) | m |
-| decision period | 4 | ticks |
+| decision period | 20 (4 until 2026-10-11) | ticks |
 | sampling temperature | 1.0 | — |
 | stats interval | 100 | ticks |
 | act order | species in turn (simultaneous: random winner for contested items) | — |

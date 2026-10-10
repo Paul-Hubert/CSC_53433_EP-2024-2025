@@ -1280,3 +1280,23 @@ with `m_Enabled: 1`, 21:45); it was restored from git and nothing else in Projec
   DecisionSchedule in each species' Life group (builder `Life()`, the menu's NewSpecies, the six scenes migrated: 11
   species). Tests building worlds in code keep the all-together schedule. R-01 re-pinned: all 12 hashes changed; a second
   run reproduced the file. `-stagger` (PlayerArgs, PreparePlay's `extra`) staggers any scene for one run.
+
+### M13.8 (2026-10-11): the reference decision period × 5 (4 → 20)
+Owner's request. `ReferenceScenes.ReferenceDecisionPeriod = 20`, set on every reference World by the builder; the six saved
+scenes changed by `UpdateReferenceScenes` (the former stagger migration, now both settings; one line per scene). Prompts
+don't mention the period, so prompt ids and cache keys are unchanged. Measured on HideVsFlee seed 1234 (staggered both ways):
+
+| Run | Period 4 | Period 20 |
+|---|---|---|
+| L0 600 ticks: brain queries | 3 033 | 541 |
+| L0 600 ticks: prey births / deaths | 69 / 79 | 3 / 72 |
+| L0 2 000 ticks: prey births, prey alive | 342, 16–46 | 9, 10 (the floor) throughout |
+| L2 600 ticks: JEV calls | 4 105 (unstaggered live run) | 680 (+132 cache hits), 119 s headless |
+| L2 600 ticks: prey at t = 100…600 | 30 41 31 27 30 23 | 30 33 17 13 10 10 |
+| L2 600 ticks: prey births / kills / starved | 87 / 53 / 51 | 29 / 54 / 20 |
+
+The pace gain is real (about a sixth of the calls). The ecology changes: an animal keeps an action 20 ticks, and REPRO-03
+limits breeding to once per decision period, so prey births fall about 3 × under JEV (and collapse under the random
+brain); the prey sit at their floor, sustained by newcomers. If that isn't wanted, the breeding limit could become a
+cooldown of its own (4 ticks, as before) instead of the decision period — a contract change of REPRO-03, not made.
+R-01 re-pinned (12 hashes), reproduced by a second run.

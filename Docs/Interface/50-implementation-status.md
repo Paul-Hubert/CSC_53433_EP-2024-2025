@@ -7,7 +7,9 @@ The single source of truth between implementation sessions of
 ## Next step
 M13 waits at its checkpoint ⏸: the owner watches HideVsFlee (Play mode, or `Builds/EvoSim/2026-10-10/EvoSim.exe`) and
 reads `Logs/EvoSim/Reports/RT-2026-10-10.md`. The owner's three M13 decisions are done (M13.4–M13.6): cache hits join the
-memo, the course's scripts build for a player, the reference scenes stagger decisions (R-01 re-pinned). Still open from M12:
+memo, the course's scripts build for a player, the reference scenes stagger decisions (R-01 re-pinned). Then (M13.8) the
+reference decision period went from 4 to 20 (owner): ~6 × fewer brain calls, but fewer prey births (REPRO-03 allows one per
+period): the owner to judge the ecology (below, and 51). Still open from M12:
 40 §2 #1, #2 (golden texts), #13 (the B-10 bar), #15–#17 (wording, new codes and seams for the contract).
 EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh); long runs on the batch copy.
 
@@ -27,7 +29,7 @@ EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh
 | M10 Editor tooling | done | c61f043 | a world from the menus validates and runs; T-EDIT-01 for every catalogue code; windows not checked by eye |
 | M11 Samples, scenarios, verification, CI | done | e5f402d…cde9e9c, M11.5 | samples, conformance, CI, scenarios S00–S27, R-01…R-08, coverage test; EditMode 319 + T3, PlayMode 17/17; gates B-01…B-11 (Machine) |
 | M12 Teaching path and final audit | review | bb6b46a, 1eaa571, 66a81e5, 83019ce, M12.5 | 14 stubs, Exercises menu, README (no grading, hooks); P1 phases 1–2; EditMode 433/433 (with soak and pinned hashes), PlayMode 19/19 ⏸ |
-| M13 Real-time visual test | review | ed16db5, d155e72, 29838b3, M13.4–M13.7 | scenes watchable (ground, food, cover, markers, overlay, camera, capture); L0 and L2 hashes equal headless = Play = build; then memo of cache hits, player build of the project, staggered reference; EditMode 438/438, PlayMode 23/23; report RT-2026-10-10 ⏸ |
+| M13 Real-time visual test | review | ed16db5, d155e72, 29838b3, 9140625, c9d9e0a, e735804, 5efefe4, M13.8 | scenes watchable (ground, food, cover, markers, overlay, camera, capture); L0 and L2 hashes equal headless = Play = build; then memo of cache hits, player build of the project, staggered reference; EditMode 438/438, PlayMode 23/23; report RT-2026-10-10 ⏸ |
 
 ## Machine
 - Unity **6000.3.9f1**: `C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Unity.exe`
@@ -132,6 +134,12 @@ M0–M11: in [51](51-implementation-log.md). Since then:
   (scene builder, the menu's New Species, the six scenes migrated by EvoSim ▸ Reference ▸ Stagger Decisions in Reference
   Scenes). Worlds built in code still decide all together (the prototype's way). R-01 re-pinned (all 12 hashes; the
   re-pinned file reproduced on a second run). The M13 report's HideVsFlee hashes predate staggering.
+- DEC-01 (M13.8, owner 2026-10-11) — the reference decision period is 20 (5 × 4): `ReferenceScenes.ReferenceDecisionPeriod`,
+  set by the scene builder (and so the menu's new World); the six scenes updated by EvoSim ▸ Reference ▸ Update Reference
+  Scenes (one line each). A World component added by hand still starts at 4, and worlds built in code (tests) keep 4.
+  R-01 re-pinned again (reproduced). HideVsFlee seed 1234: L0 600 ticks 541 brain queries instead of 3 033, prey births 3
+  instead of 69, the prey at their floor (10) from tick 200; L2 (JEV) 600 ticks: 680 JEV calls instead of 4 105, 119 s
+  headless, prey 30 → 10 (their floor) by tick 500 with 29 births instead of 87, predators 6 → 11.
 
 ## Disagreements between the brief and Docs/Interface
 - 20 §3.9 names the operator method `MutationOperator.Start(gene, parent, rng)`; on a MonoBehaviour Unity takes

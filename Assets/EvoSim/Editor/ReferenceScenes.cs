@@ -27,6 +27,8 @@ namespace EvoSim.Editor
         const string ModelsFolder = Root + "/Data/Models/JEV-9B";
         const string EmptyScene = "%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n";
         const string ContextLine = "The sentence below is a rule that a wild animal follows.";
+        /// <summary>Ticks between two decisions in the reference worlds (DEC-01; owner 2026-10-11, 5 × the former 4).</summary>
+        public const int ReferenceDecisionPeriod = 20;
         static readonly string[] StaminaWords = { "I am out of breath.", "I am getting tired.", "I am rested." };
 
         // 08 §7 prompt texts (line breaks as in the prototype's prompts, which JEV was trained on).
@@ -193,6 +195,7 @@ namespace EvoSim.Editor
         {
             var world = worldGo.AddComponent<World>();
             world.SetControlSentences(ControlSentences());
+            world.DecisionPeriod = ReferenceDecisionPeriod;
 
             var env = Child(worldGo, "Environment");
             var grass = Child(env, "Grass");
@@ -375,11 +378,12 @@ namespace EvoSim.Editor
         }
 
         /// <summary>
-        /// Gives every species of the reference scenes a staggered DecisionSchedule in its Life group, as the builder now does
-        /// (DEC-04, owner 2026-10-10), without rebuilding the scenes. Species that have a schedule are left alone.
+        /// Brings the saved reference scenes to the builder's reference without rebuilding them: the reference decision period
+        /// (DEC-01, owner 2026-10-11) and a staggered DecisionSchedule in every species' Life group (DEC-04, owner 2026-10-10);
+        /// a species that has a schedule keeps it.
         /// </summary>
-        [MenuItem("EvoSim/Reference/Stagger Decisions in Reference Scenes")]
-        public static string StaggerReferenceScenes()
+        [MenuItem("EvoSim/Reference/Update Reference Scenes")]
+        public static string UpdateReferenceScenes()
         {
             var lines = new List<string>();
             foreach (var file in Directory.GetFiles(ScenesFolder, "*.unity"))
@@ -391,13 +395,21 @@ namespace EvoSim.Editor
                 {
                     var added = new List<string>();
                     foreach (var root in scene.GetRootGameObjects())
+                        foreach (var w in root.GetComponentsInChildren<World>(true))
+                            if (w.DecisionPeriod != ReferenceDecisionPeriod)
+                            {
+                                added.Add($"period {w.DecisionPeriod} → {ReferenceDecisionPeriod}");
+                                w.DecisionPeriod = ReferenceDecisionPeriod;
+                                EditorUtility.SetDirty(w);
+                            }
+                    foreach (var root in scene.GetRootGameObjects())
                         foreach (var s in root.GetComponentsInChildren<Species>(true))
                         {
                             if (s.GetComponentInChildren<DecisionSchedule>(true) != null) continue;
                             var life = s.transform.Find("Life");
                             var go = life != null ? life.gameObject : s.gameObject;
                             go.AddComponent<DecisionSchedule>().Configure(0, true);
-                            added.Add(s.name);
+                            added.Add(s.name + " staggered");
                         }
                     if (added.Count > 0) EditorSceneManager.SaveScene(scene);
                     lines.Add($"{Path.GetFileNameWithoutExtension(path)}: {(added.Count > 0 ? string.Join(", ", added) : "nothing")}");
@@ -405,7 +417,7 @@ namespace EvoSim.Editor
                 finally { EditorSceneManager.CloseScene(scene, true); }
             }
             string result = string.Join("\n", lines);
-            Debug.Log("EvoSim staggered decisions:\n" + result);
+            Debug.Log("EvoSim reference scenes updated:\n" + result);
             return result;
         }
 

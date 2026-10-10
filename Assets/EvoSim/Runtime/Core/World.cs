@@ -34,7 +34,7 @@ namespace EvoSim
         bool startOnPlay = true;
 
         [Header("Decisions")]
-        [SerializeField, Min(1), Tooltip("Ticks between two decisions (DEC-01), in ticks.")]
+        [SerializeField, Min(1), Tooltip("Ticks between two decisions (DEC-01). The reference worlds use 20; a new component starts at 4.")]
         int decisionPeriod = 4;
         [SerializeField, Min(0.01f), Tooltip("τ: probabilities p^(1/τ), renormalised, before drawing (DEC-20).")]
         float samplingTemperature = 1f;

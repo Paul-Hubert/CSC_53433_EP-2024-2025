@@ -398,7 +398,7 @@ MonoBehaviour:
   fastBudgetMs: 10
   realTimeTicksPerSecond: 5
   startOnPlay: 1
-  decisionPeriod: 4
+  decisionPeriod: 20
   samplingTemperature: 1
   memoCapacity: 262144
   textStyle: 0
