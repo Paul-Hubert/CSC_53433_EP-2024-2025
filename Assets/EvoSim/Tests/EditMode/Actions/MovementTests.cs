@@ -5,9 +5,26 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Locomotion and movement (07 §2, SPACE-01…04).</summary>
+    /// <summary>
+    /// Checks locomotion and movement (07 §2; SPACE-01…06, MOVE-01…07): continuous positions, staying inside, walk and run
+    /// speeds, stop distances, fleeing out of corners, the wandering walk, the meters charged, and locomotions that a test
+    /// replaces or subclasses (T-SPACE-01, -03, T-MOVE-01…04, -06, -07).
+    /// </summary>
+    /// <remarks>
+    /// Most tests steer animals with <see cref="GoToAction"/>, a test probe whose target, direction and run flag the test sets
+    /// directly, and run only the act phase. <see cref="TurningLocomotion"/>, <see cref="SlopeLimitLocomotion"/> and
+    /// <see cref="RampGround"/> are probes of <c>EvoSim.Testing</c> that stand in for a student's locomotion or ground.
+    /// </remarks>
     public class MovementTests : WorldFixture
     {
+        /// <summary>
+        /// A flat square world with an empty food layer, a carcass service and only the act phase, holding the reference prey
+        /// and predator with their action sets plus a <c>goto</c> action (<see cref="GoToAction"/>).
+        /// </summary>
+        /// <param name="size">The side of the square, in meters.</param>
+        /// <param name="more">Extra set-up on the builder before it builds, or null.</param>
+        /// <param name="preyStamina">The prey's maximum stamina, in points: high values let it run for the whole test.</param>
+        /// <returns>The built, initialised world.</returns>
         World Build(float size = 40f, System.Action<WorldBuilder> more = null, float preyStamina = 60f)
         {
             var b = New().Flat(size, size).Food(0f, 0f).Carcasses().Phase<ActPhase>()
@@ -50,7 +67,7 @@ namespace EvoSim.Tests
                 foreach (var a in animals)
                 {
                     Assert.IsTrue(w.Ground.IsWalkable(a.Position), $"tick {t}: {a} at {a.Position}");
-                    a.SetStat("stamina", 1000f);
+                    a.SetStat("stamina", 1000f);                            // never too tired to move
                 }
             }
         }
@@ -132,7 +149,7 @@ namespace EvoSim.Tests
                     Assert.IsTrue(Mathf.Abs(m - 45f) < 1e-3f || Mathf.Abs(m - 90f) < 1e-3f, $"turned by {delta}");
                 }
                 Assert.IsTrue(c.Intent.Wandering && !c.Intent.Run, "wandering walks");
-                a.Position += c.Intent.Direction;
+                a.Position += c.Intent.Direction;                           // the world is wide enough never to block it
             }
             Stat.Binomial(turns, n, 0.25, 4, "turn rate");
 

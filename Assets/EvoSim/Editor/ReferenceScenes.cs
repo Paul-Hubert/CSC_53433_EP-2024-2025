@@ -15,37 +15,69 @@ namespace EvoSim.Editor
     /// unless the reference itself changes. Scenes are opened additively from an empty file, so the editor's own open
     /// scene is never touched.
     /// </summary>
+    /// <remarks>
+    /// <para>Menus: <c>EvoSim ▸ Build Reference Scenes</c> (<see cref="BuildAll"/>) rebuilds everything and overwrites the
+    /// six scenes, the pools, the module prefabs and the scenario assets; <c>EvoSim ▸ Reference ▸ Update Reference
+    /// Scenes</c> (<see cref="UpdateReferenceScenes"/>) only brings the saved scenes to the current reference settings.</para>
+    /// <para>The same builder makes the World of <c>GameObject ▸ EvoSim ▸ New World</c> (<see cref="WorldFactory.NewWorld"/>),
+    /// so a new world and the reference worlds have the same tree.</para>
+    /// </remarks>
     public static class ReferenceScenes
     {
+        /// <summary>The EvoSim package folder, relative to the project.</summary>
         public const string Root = "Assets/EvoSim";
+        /// <summary>The reference scenes' folder: <c>Assets/EvoSim/Scenes</c>.</summary>
         public const string ScenesFolder = Root + "/Scenes";
+        /// <summary>The allele pool assets' folder, one asset per locus: <c>Assets/EvoSim/Data/AllelePools</c>.</summary>
         public const string PoolsFolder = Root + "/Data/AllelePools";
+        /// <summary>The module prefabs' folder: actions at its root, senses in <c>Senses/</c>, genes in <c>Genes/</c>.</summary>
         public const string ModulesFolder = Root + "/Modules";
+        /// <summary>The placeholder bodies' folder (prefabs and materials): <c>Assets/EvoSim/Modules/Bodies</c>.</summary>
         public const string BodiesFolder = ModulesFolder + "/Bodies";
+        /// <summary>The scenario assets' folder: <c>Assets/EvoSim/Scenarios</c>.</summary>
         public const string ScenariosFolder = Root + "/Scenarios";
+        /// <summary>The mutation deck of the reference LLM mutation.</summary>
         const string Deck = Root + "/Data/Decks/mutate_v4.txt";
+        /// <summary>The folder of JEV's decision head and calibration files.</summary>
         const string ModelsFolder = Root + "/Data/Models/JEV-9B";
+        /// <summary>The text of an empty scene file, written before the scene is opened and filled.</summary>
         const string EmptyScene = "%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n";
+        /// <summary>The line the mutator reads before a sentence to mutate.</summary>
         const string ContextLine = "The sentence below is a rule that a wild animal follows.";
         /// <summary>Ticks between two decisions in the reference worlds (DEC-01; owner 2026-10-11: back to 4 after trying 20 and 10).</summary>
         public const int ReferenceDecisionPeriod = 4;
+        /// <summary>The V2 sentences of the stamina sense, low to high.</summary>
         static readonly string[] StaminaWords = { "I am out of breath.", "I am getting tired.", "I am rested." };
 
         // 08 §7 prompt texts (line breaks as in the prototype's prompts, which JEV was trained on).
+        /// <summary>The prey's locomotion rule line (08 §7); the placeholders are filled from the modules' fields.</summary>
         const string PreyLocomotionRule = "Animals move {walkSpeed} meter per step. Predators run {predator.Locomotion.runSpeed} meters per step when they hunt,\n" +
                                           "but they have {predator.Stamina.max} stamina against an animal's {Stamina.max}, so a long chase tires them first.";
+        /// <summary>The predator's locomotion rule line (08 §7); the placeholders are filled from the modules' fields.</summary>
         const string PredatorLocomotionRule = "Predators run {runSpeed} meters per step when they hunt and walk {walkSpeed} meter otherwise.\n" +
                                               "Prey animals move {prey.Locomotion.walkSpeed} meter per step but have {prey.Stamina.max} stamina against a predator's {Stamina.max}.";
 
         /// <summary>The module prefabs and bodies made by BuildModules, by name.</summary>
         sealed class Kit
         {
+            /// <summary>The allele pools by <c>species.locus</c> (<c>prey.eat</c>, <c>predator.hunt</c>…).</summary>
             public Dictionary<string, AllelePool> Pools;
+            /// <summary>The action prefabs by name (<c>Eat</c>, <c>Flee</c>…).</summary>
             public Dictionary<string, GameObject> Modules = new Dictionary<string, GameObject>();
+            /// <summary>The placeholder body prefabs of the prey and the predator.</summary>
             public GameObject PreyBody, PredatorBody;
+            /// <summary>The mutation deck of the LLM mutation.</summary>
             public TextAsset Deck;
         }
 
+        /// <summary>
+        /// <c>EvoSim ▸ Build Reference Scenes</c>: rebuilds the allele pools, the module prefabs and bodies, the six reference
+        /// scenes and the scenario assets, overwriting them, then saves the assets.
+        /// </summary>
+        /// <remarks>
+        /// Course staff only, when the reference itself changes: the scenes are the configuration (ARCH-01), and a rebuild
+        /// erases any edit made in them. Scenes open in the editor should be closed first.
+        /// </remarks>
         [MenuItem("EvoSim/Build Reference Scenes")]
         public static void BuildAll()
         {
@@ -66,6 +98,7 @@ namespace EvoSim.Editor
 
         // ---- Scenes ----
 
+        /// <summary>Builds one scene: an empty scene with camera and light, the content, then the run views; saved and closed.</summary>
         static void Build(string name, float size, System.Action content)
         {
             var scene = Begin(name, size, out string path, out var previous);
@@ -73,6 +106,10 @@ namespace EvoSim.Editor
             End(scene, path, previous);
         }
 
+        /// <summary>
+        /// Writes an empty scene file, opens it additively as the active scene, and adds a camera above a world of
+        /// <paramref name="size"/> meters and a directional light.
+        /// </summary>
         static Scene Begin(string name, float size, out string path, out Scene previous)
         {
             Directory.CreateDirectory(ScenesFolder);
@@ -92,6 +129,7 @@ namespace EvoSim.Editor
             return scene;
         }
 
+        /// <summary>Activates the scene's roots, adds the run views, saves and closes the scene, and restores the active scene.</summary>
         static void End(Scene scene, string path, Scene previous)
         {
             foreach (var root in scene.GetRootGameObjects()) root.SetActive(true);
@@ -167,6 +205,7 @@ namespace EvoSim.Editor
             grazer.AddComponent<Body>().Configure(kit.PreyBody, Color.white, 0.6f);
         }
 
+        /// <summary>An inactive <c>World</c> object with a flat square ground of <paramref name="size"/> meters.</summary>
         static GameObject Flat(float size)
         {
             var worldGo = new GameObject("World");
@@ -175,6 +214,7 @@ namespace EvoSim.Editor
             return worldGo;
         }
 
+        /// <summary>Names the world object, then adds the world-level modules (see the overload without a name).</summary>
         static GameObject World(string name, GameObject worldGo, float cover, bool full)
         {
             worldGo.name = name;
@@ -190,7 +230,10 @@ namespace EvoSim.Editor
             return go;
         }
 
-        /// <summary>The world-level modules of 20 §2: environment, brains, recording, phases. Full = JEV and the mutator too.</summary>
+        /// <summary>
+        /// The world-level modules of 20 §2: environment, brains, recording, phases. Full = JEV and the mutator too.
+        /// <paramref name="cover"/> is the fraction of the ground under thickets (0 = no cover layer).
+        /// </summary>
         static GameObject World(GameObject worldGo, float cover, bool full)
         {
             var world = worldGo.AddComponent<World>();
@@ -360,9 +403,14 @@ namespace EvoSim.Editor
             return go;
         }
 
+        /// <summary>The genes block's introduction for a species named <paramref name="noun"/> (08 §7).</summary>
         static string Intro(string noun) =>
             $"This {noun}'s instincts (its genes). They define its personality: follow them\neven when they seem unwise. Instincts that are meaningless have no effect.";
 
+        /// <summary>
+        /// The <c>Life</c> group of a reference species: mating, litter, crossover, no incubation, starvation, old age
+        /// (1 500 ticks), the cap and floor, and staggered decisions.
+        /// </summary>
         static void Life(GameObject species, int cap, int floor)
         {
             var life = Child(species, "Life");
@@ -382,6 +430,11 @@ namespace EvoSim.Editor
         /// (DEC-01, owner 2026-10-11) and a staggered DecisionSchedule in every species' Life group (DEC-04, owner 2026-10-10);
         /// a species that has a schedule keeps it.
         /// </summary>
+        /// <remarks>
+        /// <c>EvoSim ▸ Reference ▸ Update Reference Scenes</c>. A scene open in the editor is skipped; the others are opened
+        /// additively, changed, saved when something changed, and closed. The result is logged.
+        /// </remarks>
+        /// <returns>One line per scene: what changed, <c>nothing</c>, or <c>open in the editor, skipped</c>.</returns>
         [MenuItem("EvoSim/Reference/Update Reference Scenes")]
         public static string UpdateReferenceScenes()
         {
@@ -467,6 +520,8 @@ namespace EvoSim.Editor
             Object.DestroyImmediate(gene);
         }
 
+        /// <summary>Saves a sense prefab <c>Modules/Senses/&lt;name&gt;.prefab</c>: one sense component, configured, on an object
+        /// whose name is the sense's label.</summary>
         static void SensePrefab<T>(string name, System.Action<T> configure) where T : Sense
         {
             var go = new GameObject(name);                                         // the GameObject's name is the sense's label
@@ -476,6 +531,7 @@ namespace EvoSim.Editor
             Object.DestroyImmediate(go);
         }
 
+        /// <summary>Saves an action prefab <c>Modules/&lt;file&gt;.prefab</c>: the action and its text gene with a founder pool.</summary>
         static GameObject ActionPrefab<T>(string file, string actionName, AllelePool pool) where T : AnimalAction
         {
             var go = new GameObject(actionName);                                  // the GameObject's name is the action's name
@@ -489,6 +545,9 @@ namespace EvoSim.Editor
         /// <summary>A placeholder body: a capsule as tall as it is wide standing on the ground, with a nose and an action marker (RunViews).</summary>
         static GameObject BodyPrefab(string file, Color color) => RunViews.BodyPrefab(file, BodyMaterial(file, color));
 
+        /// <summary>
+        /// The material <c>Modules/Bodies/&lt;name&gt;.mat</c>, created with the Standard shader if missing, set to a colour.
+        /// </summary>
         static Material BodyMaterial(string name, Color color)
         {
             Directory.CreateDirectory(BodiesFolder);
@@ -550,10 +609,14 @@ namespace EvoSim.Editor
         // ---- Pools, controls, scenarios ----
 
         /// <summary>The allele pools of 09 §3, one asset per locus, from Data/Pools (the prototype's v2 pools) plus the Unity hide draft.</summary>
+        /// <remarks>Each pool is written to <see cref="PoolsFolder"/> as <c>&lt;species&gt;_&lt;locus&gt;.asset</c>, its founders and
+        /// contrast pair (pro, anti) overwritten.</remarks>
+        /// <returns>The pools by <c>species.locus</c>, such as <c>prey.eat</c> or <c>predator.hunt</c>.</returns>
         public static Dictionary<string, AllelePool> BuildPools()
         {
             Directory.CreateDirectory(PoolsFolder);
             var pools = new Dictionary<string, AllelePool>();
+            // One pool per locus of the founder file, with the contrast pair of the same locus when the contrast file has one.
             void FromFiles(string species, string founderFile, string contrastFile)
             {
                 var founders = JObject.Parse(File.ReadAllText(Root + "/Data/Pools/" + founderFile))["loci"];
@@ -575,6 +638,8 @@ namespace EvoSim.Editor
             return pools;
         }
 
+        /// <summary>The pool asset <c>&lt;name&gt;.asset</c> of <see cref="PoolsFolder"/>, created if missing, with these founders
+        /// and contrast pair.</summary>
         static AllelePool Pool(string name, List<string> founders, string pro, string anti)
         {
             string path = PoolsFolder + "/" + name + ".asset";
@@ -592,6 +657,7 @@ namespace EvoSim.Editor
         }
 
         /// <summary>The control sentences of GENE-23: 20 shuffled-word and 20 irrelevant ones (Data/Pools/control_alleles_v1.json).</summary>
+        /// <returns>The shuffled-word sentences, then the irrelevant ones.</returns>
         public static List<string> ControlSentences()
         {
             var o = JObject.Parse(File.ReadAllText(Root + "/Data/Pools/control_alleles_v1.json"));
@@ -602,6 +668,8 @@ namespace EvoSim.Editor
         }
 
         /// <summary>The scenario assets whose scenes exist (31 §2); more come with the samples (M11).</summary>
+        /// <remarks>Each asset of <see cref="ScenariosFolder"/> is created if missing, and its title, scene, length, brain, tier,
+        /// seeds (1234, 7, 42 unless set after), expected facts and variants overwritten.</remarks>
         public static void BuildScenarios()
         {
             Directory.CreateDirectory(ScenariosFolder);
@@ -678,6 +746,9 @@ namespace EvoSim.Editor
                 .variants = new List<ScenarioAsset.Variant> { Online("jev", "JEV"), Online("gemma", "Ollama points") };
         }
 
+        /// <summary>
+        /// A variant with a brain, a tier and field overrides (<c>&lt;object path&gt;/&lt;Component&gt;/&lt;field&gt;</c>, value).
+        /// </summary>
         static ScenarioAsset.Variant Variant(string name, string brain, string tier, params (string path, string value)[] set)
         {
             var v = new ScenarioAsset.Variant { name = name, brain = brain, tier = tier };
@@ -685,6 +756,7 @@ namespace EvoSim.Editor
             return v;
         }
 
+        /// <summary>The same variant with more field overrides.</summary>
         static ScenarioAsset.Variant With(ScenarioAsset.Variant v, params (string path, string value)[] set)
         {
             foreach (var (path, value) in set) v.set.Add(new ScenarioAsset.Override(path, value));
@@ -698,9 +770,13 @@ namespace EvoSim.Editor
             set = new List<ScenarioAsset.Override> { new ScenarioAsset.Override("World/noMutation", "true") },
         };
 
+        /// <summary>A T4 variant that asks a real brain (and mutates), with objects to switch off.</summary>
         static ScenarioAsset.Variant Online(string name, string brain, params string[] remove) =>
             new ScenarioAsset.Variant { name = name, brain = brain, tier = "T4", remove = new List<string>(remove) };
 
+        /// <summary>
+        /// The scenario asset <c>&lt;file&gt;.asset</c>, created if missing, with these settings and the seeds 1234, 7, 42.
+        /// </summary>
         static ScenarioAsset Scenario(string file, string title, string scene, int ticks, string brain, string tier, params string[] expect)
         {
             string path = ScenariosFolder + "/" + file + ".asset";
@@ -721,6 +797,7 @@ namespace EvoSim.Editor
             return s;
         }
 
+        /// <summary>A new empty child object of <paramref name="parent"/>.</summary>
         static GameObject Child(GameObject parent, string name)
         {
             var go = new GameObject(name);

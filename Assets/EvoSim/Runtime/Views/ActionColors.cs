@@ -9,6 +9,7 @@ namespace EvoSim
     /// </summary>
     public static class ActionColors
     {
+        /// <summary>The colours of the reference actions, by action name.</summary>
         static readonly Dictionary<string, Color> Known = new Dictionary<string, Color>
         {
             { "eat", new Color(0.35f, 0.85f, 0.25f) },
@@ -25,16 +26,24 @@ namespace EvoSim
         /// <summary>Shown before an animal's first decision.</summary>
         public static readonly Color None = new Color(0.15f, 0.15f, 0.15f);
 
+        /// <summary>The colour of an action name.</summary>
+        /// <param name="action">The action's name (its GameObject's name), such as <c>eat</c>; null or empty for none.</param>
+        /// <returns>
+        /// A fixed colour for the reference actions (eat, flee, hide, follow, rest, mate, hunt), a colour made from the
+        /// name's characters for any other, or <see cref="None"/> for no action.
+        /// </returns>
         public static Color Of(string action)
         {
             if (string.IsNullOrEmpty(action)) return None;
             if (Known.TryGetValue(action, out var c)) return c;
             int h = 0;
-            foreach (char ch in action) h = h * 31 + ch;
+            foreach (char ch in action) h = h * 31 + ch;                       // our own hash: the same on every run and machine
             return Color.HSVToRGB((h & 0xffff) / 65536f, 0.7f, 0.95f);
         }
 
         /// <summary>The colour of an animal's current action (white while searching).</summary>
+        /// <param name="a">The animal; it is only read.</param>
+        /// <returns><see cref="Searching"/> while it searches, else the colour of its current action, or <see cref="None"/>.</returns>
         public static Color Of(Animal a) => a.Searching ? Searching : Of(a.CurrentAction?.Name);
     }
 }

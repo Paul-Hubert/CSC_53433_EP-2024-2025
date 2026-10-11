@@ -8,7 +8,13 @@ using UnityEngine;
 // its kind (Test Runner, EditMode) only checks that it fits the system, for example that a seed repeats a run.
 #pragma warning disable CS0414 // settings your code will read
 
-/// <summary>Exercise 2: a stat as low, medium or high (SENSE-10…13). Reference: LevelSense.</summary>
+/// <summary>Exercise 2: a stat as low, medium or high (ANIM-12, SENSE-10…13). Reference: <see cref="LevelSense"/>.</summary>
+/// <remarks>
+/// <para>Write <see cref="Read"/> and <see cref="Write"/>. The settings, the tokens and the label are given, as in the
+/// reference. You will also need a field for the stat and an <c>Initialize</c> override that finds it once.</para>
+/// <para>The reference also checks its settings in <c>Validate</c>: low above high is an error (V-31), and so is a stat no
+/// module declares (V-20).</para>
+/// </remarks>
 [ExerciseOf(typeof(LevelSense))]
 public class MyLevelSense : Sense
 {
@@ -21,14 +27,28 @@ public class MyLevelSense : Sense
     [SerializeField, Tooltip("V2 sentences for low, medium and high (SENSE-11).")]
     string[] words = { "I am hungry and weak.", "I have some energy.", "I am well fed and strong." };
 
-    readonly List<string> tokens = new List<string> { "low", "medium", "high" };
+    readonly List<string> tokens = new List<string> { "low", "medium", "high" };   // backs Tokens: index 0, 1, 2
 
+    /// <summary>"low", "medium" and "high".</summary>
     public override IReadOnlyList<string> Tokens => tokens;
+
+    /// <summary>The stat's name with a capital letter ("Energy"), or "Level" when no stat is named.</summary>
     protected override string DefaultLabel => stat.Length == 0 ? "Level" : char.ToUpperInvariant(stat[0]) + stat.Substring(1);
 
-    /// <summary>The token index of the animal's stat now (find the stat once, in Initialize: Species.Declarations.FindStat).</summary>
+    /// <summary>
+    /// The token index of the animal's stat now. The reference finds the stat once, in <c>Initialize</c>
+    /// (<c>Species.Declarations.FindStat(stat)</c>, a <see cref="StatId"/>), reads it with <c>a[id]</c> (0 when the id is not
+    /// valid), and returns 0 (low) below <c>low</c>, 2 (high) above <c>high</c>, else 1 (medium): the thresholds themselves
+    /// are medium.
+    /// </summary>
+    /// <inheritdoc/>
     public override int Read(Animal a, SenseContext s) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyLevelSense", "Read"));
 
-    /// <summary>V1 "Energy: low." (the base class does it) or V2 the sentence of the token.</summary>
+    /// <summary>
+    /// The token as text. The reference writes, in the V2 style, the token's sentence from <c>words</c> when there is a
+    /// non-empty one ("I am hungry and weak."); otherwise, and in V1, what the base class writes: "Energy: low." (the
+    /// <c>Label</c>, a colon, the token, a period).
+    /// </summary>
+    /// <inheritdoc/>
     public override string Write(int token, TextStyle style) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyLevelSense", "Write"));
 }

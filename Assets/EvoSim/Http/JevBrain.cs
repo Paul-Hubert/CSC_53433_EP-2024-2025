@@ -14,17 +14,35 @@ namespace EvoSim
     /// softmax((log-prob + head bias) / T) with the head and T of the pinned revision. Options always in the species'
     /// action order; at most 16 (DEC-14); inputs above the training length are counted, not cut.
     /// </summary>
+    /// <remarks>
+    /// <para>The reference brain. The server is vLLM on <c>http://localhost:8000</c>, serving the model
+    /// <c>autotrust/JEV-9B</c> with its LoRA module under the name <c>jev-decision</c>. The decision head and the
+    /// calibration come from two files of the pinned revision, given as TextAssets (Data/Models/JEV-9B); the model's GGUF
+    /// files are the bare backbone, without that head.</para>
+    /// <para>The text of a query follows the template bare-v1 (<see cref="Text"/>): the species prompt without its answer
+    /// instruction, a question line (<see cref="Question"/>) and the options A, B, C… Requests go by option count (the
+    /// allowed tokens differ), with at most <c>maxTextsPerRequest</c> texts each. The model identity (repository,
+    /// revision, served name) and the mode (template and questions) are part of the answer cache's keys (DEC-33).</para>
+    /// </remarks>
     public class JevBrain : HttpBrain
     {
+        /// <summary>
+        /// The option letters, A to P: action i is shown as the i-th letter, so a species has at most 16 actions (DEC-14).
+        /// </summary>
         public const string Letters = "ABCDEFGHIJKLMNOP";
+        /// <summary>The question line of a species that has no question of its own.</summary>
         public const string DefaultQuestion = "Which action does this animal take now?";
 
-        /// <summary>The question asked for one species (the prototype asked predators "Which action does this predator take now?").</summary>
+        /// <summary>
+        /// The question asked for one species (the prototype asked predators "Which action does this predator take now?").
+        /// </summary>
         [Serializable]
         public class SpeciesQuestion
         {
+            /// <summary>The species' id.</summary>
             [Tooltip("The species id.")]
             public string species = "";
+            /// <summary>The question line for that species.</summary>
             [Tooltip("The question line for that species.")]
             public string question = DefaultQuestion;
         }
@@ -49,22 +67,47 @@ namespace EvoSim
         JevHead head;
         int tooLong;
 
+        /// <summary>Sets JEV's defaults: the vLLM server on <c>http://localhost:8000</c>, a time-out of 60 s per try.</summary>
         public JevBrain()
         {
             host = "http://localhost:8000";
             timeoutSeconds = 60f;
         }
 
+        /// <summary><c>jev</c>.</summary>
+        /// <inheritdoc/>
         public override string Id => "jev";
+        /// <summary>16: one option letter per action (DEC-14).</summary>
+        /// <inheritdoc/>
         public override int MaxActions => Letters.Length;
+        /// <summary>
+        /// The model's training length, in tokens (reference 1 024): validation checks the longest prompt against it (V-11);
+        /// a longer text met during a run is sent whole and counted in <see cref="TooLong"/>.
+        /// </summary>
+        /// <inheritdoc/>
         public override int MaxPromptTokens => maxTokens;
+        /// <summary>Empty: JEV reads a question and lettered options instead of an answer instruction.</summary>
+        /// <inheritdoc/>
         public override string AnswerInstruction => "";
+        /// <summary><c>repository@revision:served name</c>, the revision cut to 12 characters (part of cache keys, DEC-33).</summary>
+        /// <inheritdoc/>
         public override string ModelIdentity => $"{repo}@{(revision.Length > 12 ? revision.Substring(0, 12) : revision)}:{servedModel}";
+        /// <summary>
+        /// <c>choice:bare-v1:</c> and a hash of the species' questions: changing a question changes the cache keys (DEC-33).
+        /// </summary>
+        /// <inheritdoc/>
         public override string Mode => "choice:bare-v1:" + Hashing.Sha256Hex(QuestionsKey(), 8);
-        /// <summary>Inputs above the training length so far (B-06).</summary>
+        /// <summary>Texts above the training length sent so far in this run (B-06); they are counted, not cut.</summary>
         public int TooLong => tooLong;
+        /// <summary>The decision head and calibration, read from the two files on first use (main thread: TextAsset.text).</summary>
+        /// <exception cref="ArgumentException">A file is missing, or lacks the choice slots or the choice temperature.</exception>
         public JevHead Head => head ?? (head = LoadHead());
 
+        /// <summary>
+        /// Sets the head and calibration files from code (tests, scenes built by script); the head is read again on next use.
+        /// </summary>
+        /// <param name="headFile"><c>adapter_vllm/decision_head.json</c> of the pinned revision.</param>
+        /// <param name="calibrationFile"><c>calibration.json</c> of the pinned revision.</param>
         public void SetModelFiles(TextAsset headFile, TextAsset calibrationFile)
         {
             decisionHead = headFile;
@@ -72,18 +115,26 @@ namespace EvoSim
             head = null;
         }
 
+        /// <summary>Sets the question line of one species, replacing the one it had.</summary>
+        /// <param name="speciesId">The species' id.</param>
+        /// <param name="question">The question line, such as "Which action does this predator take now?".</param>
         public void SetQuestion(string speciesId, string question)
         {
             questions.RemoveAll(q => q.species == speciesId);
             questions.Add(new SpeciesQuestion { species = speciesId, question = question });
         }
 
+        /// <summary>Gives the question line asked for a species.</summary>
+        /// <param name="s">The species.</param>
+        /// <returns>The species' own question, or <see cref="DefaultQuestion"/> when it has none.</returns>
         public string Question(Species s)
         {
             foreach (var q in questions) if (q.species == s.Id && !string.IsNullOrEmpty(q.question)) return q.question;
             return DefaultQuestion;
         }
 
+        /// <summary>Also forgets the head, so it is read again from the files, and sets the too-long count to 0.</summary>
+        /// <inheritdoc/>
         public override void Initialize()
         {
             base.Initialize();
@@ -91,9 +142,29 @@ namespace EvoSim
             tooLong = 0;
         }
 
+        /// <summary>Reads the head and calibration from the two TextAssets (main thread only).</summary>
         JevHead LoadHead() => JevHead.Parse(decisionHead != null ? decisionHead.text : null, calibration != null ? calibration.text : null);
 
-        /// <summary>The model's input (template bare-v1): the species prompt without the answer instruction, the question, the options.</summary>
+        /// <summary>
+        /// The model's input (template bare-v1): the species prompt without the answer instruction, the question, the options.
+        /// </summary>
+        /// <remarks>
+        /// The text, for a species with the actions eat, flee and rest:
+        /// <code>
+        /// [kind] choice
+        /// [state] &lt;the state&gt;
+        /// [question] Which action does this animal take now?
+        /// [options]
+        /// A) eat
+        /// B) flee
+        /// C) rest
+        /// [decision]:
+        /// </code>
+        /// </remarks>
+        /// <param name="state">The species prompt with genes and situation, without the answer instruction.</param>
+        /// <param name="question">The question line.</param>
+        /// <param name="options">The action names, in the species' action order (at most 16).</param>
+        /// <returns>The text the model reads.</returns>
         public static string Text(string state, string question, IReadOnlyList<string> options)
         {
             var sb = new StringBuilder();
@@ -106,6 +177,11 @@ namespace EvoSim
             return sb.Append("\n[decision]:").ToString();
         }
 
+        /// <summary>
+        /// Builds the bare-v1 text from the trimmed prompt, the species' question and its action names (<see cref="Text"/>),
+        /// and counts it in <see cref="TooLong"/> when it is above the training length. Also loads the head (main thread).
+        /// </summary>
+        /// <inheritdoc/>
         public override string TextFor(DecisionQuery q)
         {
             if (head == null) head = LoadHead();                                        // main thread: TextAsset.text
@@ -114,6 +190,11 @@ namespace EvoSim
             return text;
         }
 
+        /// <summary>
+        /// Groups the requests by option count, since the allowed tokens differ, and sends each group in requests of at most
+        /// <c>maxTextsPerRequest</c> texts, all at once.
+        /// </summary>
+        /// <inheritdoc/>
         protected override async Task AnswerAsync(HttpCaller c, IReadOnlyList<BrainRequest> requests, BrainAnswer answer)
         {
             var h = head ?? throw new InvalidOperationException("the JEV head isn't loaded");
@@ -131,8 +212,13 @@ namespace EvoSim
         }
 
         /// <summary>The request body for some texts with n options (also used by the golden test).</summary>
+        /// <remarks>Call it on the main thread the first time: it may read the head from its files.</remarks>
+        /// <param name="texts">The model's inputs, from <see cref="Text"/>.</param>
+        /// <param name="n">The number of options of every text (1 to 16).</param>
+        /// <returns>The /v1/completions body: one token among the first n option letters, with their log-probabilities.</returns>
         public JObject Body(IReadOnlyList<string> texts, int n) => Body(Head, texts, n);
 
+        /// <summary>The /v1/completions body for some texts with n options, with a head already loaded.</summary>
         JObject Body(JevHead h, IReadOnlyList<string> texts, int n)
         {
             var prompts = new JArray();
@@ -150,6 +236,10 @@ namespace EvoSim
             };
         }
 
+        /// <summary>
+        /// Posts one chunk of texts with n options and fills each text's row from its options' log-probabilities; a text
+        /// without them, or a failed call, fails its rows (thread pool).
+        /// </summary>
         async Task Send(HttpCaller c, JevHead h, List<BrainRequest> chunk, int n, BrainAnswer answer)
         {
             try
@@ -162,7 +252,7 @@ namespace EvoSim
                 for (int k = 0; k < choices.Count; k++)
                 {
                     var choice = choices[k];
-                    int index = (int?)choice["index"] ?? k;
+                    int index = (int?)choice["index"] ?? k;                             // the text's place in this chunk
                     if (index < 0 || index >= chunk.Count) continue;
                     var top = choice["logprobs"]?["top_logprobs"]?[0] as JObject;
                     if (top == null) continue;
@@ -186,6 +276,7 @@ namespace EvoSim
             return int.TryParse(colon >= 0 ? key.Substring(colon + 1) : key, out int id) ? id : -1;
         }
 
+        /// <summary>The species' questions as one text, hashed into <see cref="Mode"/>.</summary>
         string QuestionsKey()
         {
             var sb = new StringBuilder();
@@ -193,8 +284,12 @@ namespace EvoSim
             return sb.ToString();
         }
 
+        /// <summary><c>/v1/models</c>.</summary>
+        /// <inheritdoc/>
         protected override string HealthPath => "/v1/models";
 
+        /// <summary>Also checks that the head and calibration files are set and readable (V-20).</summary>
+        /// <inheritdoc/>
         public override void Validate(ValidationReport report)
         {
             base.Validate(report);

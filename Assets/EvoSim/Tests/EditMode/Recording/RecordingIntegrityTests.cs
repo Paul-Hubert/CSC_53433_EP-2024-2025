@@ -9,11 +9,30 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Run files the P1 audit found incomplete (13 §2–§5): short runs, species added during a run, brain time, the compatibility summary.</summary>
+    /// <summary>
+    /// Checks the run files in the cases the coding-agent audit found incomplete (13 §2–§5; OUT-01, OUT-05, SPEC-30, CTRL-01,
+    /// RAND-20): short runs, species added during a run, brain time per species, one folder per run, the controls in
+    /// <c>run_info.json</c>, the wall-clock limit, random founders, and the compatibility summary.
+    /// </summary>
+    /// <remarks>
+    /// Most tests run the Lab 1 world with a recorder that writes files (<see cref="Recorded"/>) and read them back from
+    /// <c>Logs/EvoSim/test-runs/&lt;name&gt;</c> at the repository root; each test deletes its folder first. The JEV brain of
+    /// <see cref="BrainTimeIsRecorded"/> talks to a <see cref="FakeHttpTransport"/>, never to a server.
+    /// </remarks>
     public class RecordingIntegrityTests : WorldFixture
     {
+        /// <summary>The folder of test runs that write files, <c>Logs/EvoSim/test-runs</c> at the repository root.</summary>
         static string Root => Path.Combine(Path.GetDirectoryName(Application.dataPath), "Logs", "EvoSim", "test-runs");
 
+        /// <summary>
+        /// The Lab 1 world (seed 19, 20 prey, 3 predators) with a recorder writing its files to
+        /// <c>Logs/EvoSim/test-runs/</c><paramref name="name"/>, a folder deleted first.
+        /// </summary>
+        /// <param name="name">The run's name, and its folder's.</param>
+        /// <param name="more">Extra set-up on the builder before it builds, or null.</param>
+        /// <param name="compatibility">True to write the prototype's file formats (OUT-05).</param>
+        /// <param name="randomBrain">True for the random brain; false when <paramref name="more"/> sets a brain.</param>
+        /// <returns>The built, initialised world.</returns>
         World Recorded(string name, Action<WorldBuilder> more = null, bool compatibility = false, bool randomBrain = true)
         {
             string folder = Path.Combine(Root, name);
@@ -23,6 +42,7 @@ namespace EvoSim.Tests
             return b.Build();
         }
 
+        /// <summary>The path of one file of a world's run folder (<c>stats.csv</c>, <c>summary.json</c>…).</summary>
         static string FileOf(World w, string file) => Path.Combine(w.Service<RunRecorder>().RunFolder, file);
 
         [Test, Description("13 §2 (OUT-01): a run shorter than one statistics period still has stats.csv, with its header")]
@@ -104,7 +124,7 @@ namespace EvoSim.Tests
         [Test, Description("RAND-20: the wall-clock limit stops the run at a tick boundary, with its files")]
         public void WallClockLimit()
         {
-            var w = Recorded("wall clock", b => b.Configure(x => x.WallClockMinutes = 0.0002f));
+            var w = Recorded("wall clock", b => b.Configure(x => x.WallClockMinutes = 0.0002f));   // 12 ms
             var clock = System.Diagnostics.Stopwatch.StartNew();
             while (w.State != RunState.Stopped && clock.Elapsed.TotalSeconds < 60) w.Advance(1);
             Assert.AreEqual("wall-clock limit", w.StopReason);

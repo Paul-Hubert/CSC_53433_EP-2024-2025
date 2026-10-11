@@ -8,12 +8,27 @@ using UnityEngine;
 // its kind (Test Runner, EditMode) only checks that it fits the system, for example that a seed repeats a run.
 #pragma warning disable CS0414 // settings your code will read
 
-/// <summary>Exercise 13: uniform probabilities over the species' actions (DEC-11, 08 §6). Reference: RandomBrain.</summary>
+/// <summary>Exercise 13: uniform probabilities over the species' actions (DEC-11, 08 §6). Reference: <see cref="RandomBrain"/>.</summary>
+/// <remarks>
+/// Write <see cref="Ask"/>. A brain only gives probabilities: the World draws each animal's action from its row with the
+/// sampling stream (DEC-20). The random brain is the null model: whatever the genes and the situation, every action is as
+/// likely.
+/// </remarks>
 [ExerciseOf(typeof(RandomBrain))]
 public class MyRandomBrain : Brain
 {
+    /// <summary>"random": part of the memo and cache keys (DEC-30, DEC-33).</summary>
     public override string Id => "random";
 
-    /// <summary>One uniform row per query, in query order, answered now (BrainAnswer).</summary>
+    /// <summary>
+    /// One uniform row per query, in query order, answered now (BrainAnswer). The reference makes one row per query,
+    /// <c>Uniform(batch[i].Species.Actions.Count)</c> (each action 1 / n), and returns <c>BrainAnswer.Now(rows)</c>: an
+    /// answer that is already complete.
+    /// </summary>
+    /// <param name="batch">The queries to answer: each has its species, genes, observation and situation text.</param>
+    /// <returns>
+    /// The answer: one row per query, in the same order; each row has one probability per action of the query's species and sums to 1.
+    /// </returns>
+    /// <inheritdoc/>
     public override BrainAnswer Ask(IReadOnlyList<DecisionQuery> batch) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyRandomBrain", "Ask"));
 }

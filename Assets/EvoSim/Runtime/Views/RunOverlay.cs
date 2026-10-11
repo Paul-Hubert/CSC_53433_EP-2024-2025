@@ -9,6 +9,14 @@ namespace EvoSim
     /// and deaths, mutations, model calls; and the followed animal's action, stats and genes (<see cref="WorldCamera"/>).
     /// It only reads the World (<see cref="RunNumbers"/>). Tab hides it.
     /// </summary>
+    /// <remarks>
+    /// <para>One of the run views: put it on any GameObject of the scene, outside the World (the "Run views" object of the
+    /// reference scenes). The run panel sits at the top left with the action colour legend under it (the colours of
+    /// <see cref="ActionColors"/>, and white for searching); the followed animal's panel sits at the top right. Text
+    /// scales with the window's height.</para>
+    /// <para>Keys: Tab shows or hides the panels. Clicks on a panel don't reach the camera: the overlay gives
+    /// <see cref="Covers"/> to <see cref="WorldCamera.Blocks"/>.</para>
+    /// </remarks>
     [DisallowMultipleComponent]
     public class RunOverlay : MonoBehaviour
     {
@@ -22,23 +30,28 @@ namespace EvoSim
         bool visible = true;
 
         readonly RunNumbers numbers = new RunNumbers();
-        readonly StringBuilder sb = new StringBuilder();
+        readonly StringBuilder sb = new StringBuilder();                   // builds the panels' text, reused
+        // The legend's action names, each once.
         readonly System.Collections.Generic.List<string> legend = new System.Collections.Generic.List<string>();
-        GUIStyle box, label;
-        Rect runPanel, animalPanel;
-        float scale = 1f;
+        GUIStyle box, label;                                               // panel and legend styles, made in the first OnGUI
+        Rect runPanel, animalPanel;                                        // where the panels were drawn, in GUI units
+        float scale = 1f;                                                  // GUI units to pixels: the window height / 1080
 
         // Pacing, measured over about a second of real time; and over the whole run (from its second second).
         float windowStart = -1f, waitingSince = -1f, runStart = -1f, runSeconds;
-        int windowFrames, windowStartTick, runFrames, runStartTick, windows;
+        int windowFrames, windowStartTick, runFrames, runStartTick, windows;            // frames and ticks counted; windows measured
 
+        /// <summary>The World shown; when null, the first World of the scene is found on the next frame.</summary>
         public World World { get => world; set => world = value; }
+        /// <summary>The numbers shown, read again every frame.</summary>
         public RunNumbers Numbers => numbers;
         /// <summary>Ticks per second achieved over the last second.</summary>
         public float TicksPerSecond { get; private set; }
+        /// <summary>Frames per second over the last second.</summary>
         public float FramesPerSecond { get; private set; }
         /// <summary>Real seconds the current tick has waited, or 0.</summary>
         public float WaitingSeconds => waitingSince < 0f ? 0f : Time.unscaledTime - waitingSince;
+        /// <summary>True while the panels are shown; Tab switches it.</summary>
         public bool Visible { get => visible; set => visible = value; }
         /// <summary>The lowest one-second frame rate of the run so far (the first second, loading, is left out).</summary>
         public float MinFramesPerSecond { get; private set; } = float.PositiveInfinity;
@@ -46,11 +59,16 @@ namespace EvoSim
         public int MostLiving { get; private set; }
 
         /// <summary>The run's pace in one line: mean ticks/s against the target, mean and lowest FPS, most animals alive.</summary>
+        /// <returns>The line, or "no pace measured yet" before the run's second second.</returns>
         public string PaceSummary() =>
             runSeconds <= 0f ? "no pace measured yet" :
             $"{(numbers.Tick - runStartTick) / runSeconds:0.00} ticks/s (target {TargetText()}), {runFrames / runSeconds:0} FPS mean, " +
             $"{(float.IsInfinity(MinFramesPerSecond) ? 0f : MinFramesPerSecond):0} FPS lowest, {MostLiving} animals at most, over {runSeconds:0} s";
 
+        /// <summary>
+        /// Shows or hides the panels on Tab, measures the pace over windows of about one second of real time, and reads the
+        /// World's numbers. Called by Unity each frame.
+        /// </summary>
         void Update()
         {
             if (world == null) world = FindAnyObjectByType<World>();
@@ -87,6 +105,8 @@ namespace EvoSim
         }
 
         /// <summary>Whether a screen point (origin bottom left) lies on a panel: the camera doesn't pick there.</summary>
+        /// <param name="screen">A point on the screen, in pixels, from the bottom left, as <c>Input.mousePosition</c> gives it.</param>
+        /// <returns>True when the panels are shown and the point is on one of them.</returns>
         public bool Covers(Vector2 screen)
         {
             if (!visible) return false;
@@ -95,6 +115,7 @@ namespace EvoSim
         }
 
         /// <summary>The run panel's text (the overlay draws exactly this).</summary>
+        /// <returns>Several lines: tick and state, pace, one line per species, mutations, model calls.</returns>
         public string RunText()
         {
             sb.Clear();
@@ -112,6 +133,7 @@ namespace EvoSim
             return sb.ToString();
         }
 
+        /// <summary>The state in words: what the tick waits for and for how long, why the run stopped, or the state's name.</summary>
         string StateText()
         {
             switch (numbers.State)
@@ -124,6 +146,7 @@ namespace EvoSim
             }
         }
 
+        /// <summary>The target pace in ticks per second for the World's run speed, or "as fast as possible".</summary>
         string TargetText()
         {
             switch (world.RunSpeed)
@@ -135,6 +158,10 @@ namespace EvoSim
         }
 
         /// <summary>The followed animal's panel text, or null.</summary>
+        /// <returns>
+        /// The followed animal's id, age, generation, action, stats, last decision's probabilities and genes; a line saying
+        /// it is gone when it left the world; or null when no animal was followed.
+        /// </returns>
         public string AnimalText()
         {
             var a = worldCamera != null ? worldCamera.Followed : null;
@@ -165,6 +192,10 @@ namespace EvoSim
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Draws the run panel (top left), the action colour legend under it, and the followed animal's panel (top right),
+        /// scaled with the window's height. Called by Unity's immediate-mode GUI, once or more per frame.
+        /// </summary>
         void OnGUI()
         {
             if (!visible || world == null || !world.IsInitialized) return;
@@ -208,6 +239,7 @@ namespace EvoSim
             else animalPanel = Rect.zero;
         }
 
+        /// <summary>Draws one legend entry: a square of the colour, then the name.</summary>
         void Legend(Rect r, Color c, string text)
         {
             var old = GUI.color;

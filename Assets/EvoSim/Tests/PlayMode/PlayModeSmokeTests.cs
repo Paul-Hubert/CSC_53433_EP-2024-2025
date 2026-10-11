@@ -5,7 +5,10 @@ using UnityEngine.TestTools;
 
 namespace EvoSim.Tests
 {
-    /// <summary>M0 skeleton: PlayMode tests run and see the runtime assembly.</summary>
+    /// <summary>
+    /// A smoke test of the play-mode test assembly: play-mode tests run, reach <c>FixedUpdate</c> and see the runtime
+    /// assembly. If it fails, the problem is the test set-up, not EvoSim.
+    /// </summary>
     public class PlayModeSmokeTests
     {
         [UnityTest, Description("M0 skeleton: a PlayMode test runs through FixedUpdate")]

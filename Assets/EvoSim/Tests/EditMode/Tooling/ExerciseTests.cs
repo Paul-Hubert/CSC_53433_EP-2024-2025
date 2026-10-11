@@ -10,11 +10,22 @@ using UnityEngine.TestTools;
 
 namespace EvoSim.Tests
 {
-    /// <summary>The teaching path (22 §0) and EvoSim ▸ Exercises (21 §6): stub templates, the swap and its undo.</summary>
+    /// <summary>
+    /// Checks the teaching path (22 §0) and the EvoSim ▸ Exercises menu (21 §6): one stub template per reference module in
+    /// the path's order, stubs that compile, Replace with stub that keeps the module's settings and place, and Restore
+    /// reference.
+    /// </summary>
+    /// <remarks>
+    /// A student who rewrites a reference module (the first step of the teaching path) passes when that module's own tests
+    /// and the conformance suites of <see cref="ConformanceTests"/> pass with the stub in place. Here
+    /// <see cref="ExerciseProbe"/>, a test class deriving from <see cref="Litter"/>, stands in for a student's stub.
+    /// </remarks>
     public class ExerciseTests : WorldFixture
     {
+        /// <summary>The world a test made through the menus' code, or null; destroyed after the test.</summary>
         GameObject made;
 
+        /// <summary>Destroys the world made through the menus' code, after each test.</summary>
         [TearDown] public void Clean() { if (made != null) Object.DestroyImmediate(made); }
 
         [Test, Description("22 §0: a stub for each of the 14 reference modules of the teaching path, in its order, of the same base class, marked with its reference")]
@@ -108,6 +119,7 @@ namespace EvoSim.Tests
             Assert.AreEqual(50, w.Tick);
         }
 
+        /// <summary>Sets a serialized string field of a component, as the Inspector would, without an undo step.</summary>
         static void SetString(Component c, string field, string value)
         {
             var so = new SerializedObject(c);

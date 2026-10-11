@@ -6,9 +6,19 @@ using UnityEditor;
 
 namespace EvoSim.Tests
 {
-    /// <summary>The scenario assets (31, CFG-02): every variant applies to its scene and validates; T2 variants run twice to the same hash.</summary>
+    /// <summary>
+    /// Checks the scenario assets of <c>Assets/EvoSim/Scenarios</c> (31 §1, CFG-02): every variant applies to its scene and
+    /// validates, and every T2 variant runs twice to the same hash without a model call.
+    /// </summary>
+    /// <remarks>
+    /// The tests open each scenario's scene additively through <see cref="Batch.WithScene"/> and <see cref="Batch.Run"/>:
+    /// close the scene in the editor first. A new scenario asset, or a new variant, is picked up automatically.
+    /// </remarks>
     public class ScenarioAssetTests
     {
+        /// <summary>
+        /// Every variant of every scenario asset, as <c>"asset name|variant name"</c>: the cases of <see cref="VariantApplies"/>.
+        /// </summary>
         static IEnumerable<string> Variants()
         {
             foreach (var guid in AssetDatabase.FindAssets("t:ScenarioAsset", new[] { "Assets/EvoSim/Scenarios" }))
@@ -19,6 +29,7 @@ namespace EvoSim.Tests
             }
         }
 
+        /// <summary>Loads a scenario asset of <c>Assets/EvoSim/Scenarios</c> by its file name, without the extension.</summary>
         static ScenarioAsset Load(string name) =>
             AssetDatabase.LoadAssetAtPath<ScenarioAsset>("Assets/EvoSim/Scenarios/" + name + ".asset");
 
@@ -62,6 +73,7 @@ namespace EvoSim.Tests
             Assert.Greater(ran, 2, "T2 variants found");
         }
 
+        /// <summary>The first 16 characters of the hash in a <see cref="Batch.Run"/> result line, after <c>"hash "</c>.</summary>
         static string Hash(string line) => line.Substring(line.IndexOf("hash ") + 5, 16);
     }
 }

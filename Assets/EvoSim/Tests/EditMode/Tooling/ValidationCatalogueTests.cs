@@ -16,17 +16,31 @@ namespace EvoSim.Tests
     /// triggers it with its severity, every fix the catalogue offers repairs its problem, the clean Lab 1 world triggers
     /// none, and every message names the object at fault. V-60 (unreachable server) is checked on demand.
     /// </summary>
+    /// <remarks>
+    /// <para>Each fixture in <see cref="Fixtures"/> breaks one thing in a clean, uninitialised Lab 1 world
+    /// (<see cref="Make"/>); the test then validates the world and looks for the code. A new validator needs a row in the
+    /// catalogue of 21 §2 and a fixture here: <see cref="EveryCatalogueCodeHasAFixture"/> fails until both exist.</para>
+    /// <para>No server is called: the JEV brain and the mutator client of <see cref="UnreachableServers"/> talk to a
+    /// <see cref="FakeHttpTransport"/> that fails or answers on demand.</para>
+    /// </remarks>
     public class ValidationCatalogueTests : WorldFixture
     {
+        /// <summary>The world a fixture breaks, with its two species and helpers to reach or add modules.</summary>
         sealed class Lab
         {
+            /// <summary>The uninitialised Lab 1 world.</summary>
             public World World;
+            /// <summary>The prey and predator species of <see cref="World"/>.</summary>
             public Species Prey, Predator;
+            /// <summary>The first component of a type under a species, inactive ones included, or null.</summary>
             public T Of<T>(Species s) where T : Component => s.GetComponentInChildren<T>(true);
+            /// <summary>A new, empty GameObject under a species, to hold a module a fixture adds.</summary>
             public GameObject Under(Species s, string name) { var go = new GameObject(name); go.transform.SetParent(s.transform, false); return go; }
+            /// <summary>A new, empty GameObject under any transform, to hold a module a fixture adds.</summary>
             public GameObject Under(Transform t, string name) { var go = new GameObject(name); go.transform.SetParent(t, false); return go; }
         }
 
+        /// <summary>A clean, uninitialised Lab 1 world (6 prey, 2 predators) with its two species found, for one fixture.</summary>
         Lab Make(string name)
         {
             var w = New(5, name: name).Lab1(prey: 6, predators: 2).BuildUninitialized();
@@ -39,8 +53,13 @@ namespace EvoSim.Tests
             return lab;
         }
 
+        /// <summary>Loads one file of the JEV model's data (<c>decision_head.json</c>, <c>calibration.json</c>).</summary>
         static TextAsset Model(string file) => AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/EvoSim/Data/Models/JEV-9B/" + file);
 
+        /// <summary>
+        /// The text gene of the prey's eat action with no founder pool asset, so the founders a fixture configures are the
+        /// ones used.
+        /// </summary>
         static TextGene EatGene(Lab l)
         {
             var g = l.Prey.GetComponentInChildren<EatAction>(true).GetComponent<TextGene>();
@@ -48,9 +67,11 @@ namespace EvoSim.Tests
             return g;
         }
 
+        /// <summary>Sets a field by reflection, private ones included: for a setting with no setter (the ground's width).</summary>
         static void SetField(Object target, string field, object value) =>
             target.GetType().GetField(field, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).SetValue(target, value);
 
+        /// <summary>One fixture per validation code: what to break in a clean Lab 1 world so that the code fires.</summary>
         static readonly Dictionary<string, Action<Lab>> Fixtures = new Dictionary<string, Action<Lab>>
         {
             ["V-01"] = l => l.Under(l.Prey, "inner").AddComponent<Species>(),
@@ -130,6 +151,7 @@ namespace EvoSim.Tests
             ["V-46"] = Severity.Warning, ["V-47"] = Severity.Info, ["V-48"] = Severity.Warning, ["V-63"] = Severity.Warning,
         };
 
+        /// <summary>The severity a code must have: the one in <see cref="Severities"/>, else an error.</summary>
         static Severity SeverityOf(string code) => Severities.TryGetValue(code, out var s) ? s : Severity.Error;
 
         /// <summary>The codes whose catalogue row offers a fix that runs without the editor (V-20, V-36 and V-62 need a person's choice).</summary>
@@ -139,6 +161,7 @@ namespace EvoSim.Tests
             "V-35", "V-37", "V-41", "V-42", "V-43", "V-46", "V-48", "V-49", "V-61",
         };
 
+        /// <summary>Every code with a fixture, sorted: the cases of <see cref="EachValidatorFires"/>.</summary>
         static IEnumerable<string> Codes() => Fixtures.Keys.OrderBy(k => k, StringComparer.Ordinal);
 
         [Test, Description("T-EDIT-01 (EDIT-01, EDIT-02): each validator's fixture triggers it with its severity, and every message names an object")]

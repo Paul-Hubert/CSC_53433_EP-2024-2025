@@ -8,11 +8,31 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Mutator clients against fake transports (10 §2, B-11 offline): what the model receives, caching, failures.</summary>
+    /// <summary>
+    /// Checks the HTTP mutator clients against fake transports (10 §2; MUT-04, MUT-11, MUT-12, MUT-14, CORE-07, DEC-42;
+    /// T-MUT-06 and -08 over HTTP, the offline part of the integrity check B-11 of 32): exactly what the model receives,
+    /// the answer cache, failures, and the OpenAI-compatible request.
+    /// </summary>
+    /// <remarks>
+    /// Each test builds a world where two adults mate on the first tick and every baby locus mutates (<see cref="Breeding"/>);
+    /// the client under test sends its requests to a <see cref="FakeHttpTransport"/>, which records them. No server is
+    /// called.
+    /// </remarks>
     public class HttpMutatorTests : WorldFixture
     {
+        /// <summary>The context line of the reference LLM mutation, the first line of every mutation prompt.</summary>
         const string Context = "The sentence below is a rule that a wild animal follows.";
 
+        /// <summary>
+        /// A 20 m world with only the breed and hatch phases, a prey species whose one text gene always mutates through the
+        /// reference LLM mutation, a mutator service using a client of type <typeparamref name="T"/> pointed at
+        /// <paramref name="fake"/>, and two ready adults side by side that chose <c>mate</c>.
+        /// </summary>
+        /// <typeparam name="T">The mutator client under test.</typeparam>
+        /// <param name="fake">The fake server.</param>
+        /// <param name="cache">A folder for the answer cache, or null for no cache.</param>
+        /// <param name="name">The world's name.</param>
+        /// <returns>The built world; its first tick breeds.</returns>
         World Breeding<T>(FakeHttpTransport fake, string cache = null, string name = "mutator") where T : HttpMutatorClient
         {
             var b = New(name: name).Flat(20, 20).Food(0f, 0f).Service<EggSystem>("Eggs")
@@ -27,6 +47,9 @@ namespace EvoSim.Tests
             return w;
         }
 
+        /// <summary>
+        /// A fake Ollama server that lists the model <c>qwen3.5:0.8b</c> and answers every chat with <paramref name="answer"/>.
+        /// </summary>
         static FakeHttpTransport Ollama(string answer = "Mate very often.") => new FakeHttpTransport
         {
             Respond = (method, path, body) => path == "/api/tags"

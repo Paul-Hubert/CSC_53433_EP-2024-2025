@@ -8,7 +8,13 @@ using UnityEngine;
 // its kind (Test Runner, EditMode) only checks that it fits the system, for example that a seed repeats a run.
 #pragma warning disable CS0414 // settings your code will read
 
-/// <summary>Exercise 6: run away from the nearest threat (ACT-04, SPEC-12). Reference: FleeAction.</summary>
+/// <summary>Exercise 6: run away from the nearest threat (ACT-04, SPEC-12). Reference: <see cref="FleeAction"/>.</summary>
+/// <remarks>
+/// <para>Write <see cref="Act"/>. The settings, the prompt line and <see cref="IsRelevant"/> are given, as in the reference.</para>
+/// <para>The reference also finds the <c>listed</c> species once, in <c>Initialize</c> (<c>World.FindSpeciesByName</c> for
+/// each name, skipping unknown ones), and warns in <c>Validate</c> when there is nothing to flee from (V-21) or a listed name
+/// is no species (V-20).</para>
+/// </remarks>
 [ExerciseOf(typeof(FleeAction))]
 public class MyFleeAction : AnimalAction
 {
@@ -23,14 +29,26 @@ public class MyFleeAction : AnimalAction
     [SerializeField, Tooltip("The sense whose token says whether a threat is in sight (CTRL-10).")]
     string relevantSense = "Predator";
 
+    /// <summary>The action's line in the prompt (08 §7), used when the Inspector's description is empty.</summary>
     protected override string DefaultDescription => "run away from the nearest predator";
 
-    /// <summary>Find the nearest threat in sight (ActContext) and run away from it; none in sight: search.</summary>
+    /// <summary>
+    /// Find the nearest threat in sight (ActContext) and run away from it; none in sight: search. The reference asks
+    /// <c>c.NearestAnimal(a, from, listedSpecies)</c>; with none it calls <c>c.Search()</c> (ACT-04). With
+    /// <c>fleeIntoCover</c> on, it first stays when already in cover (<c>c.InCover(a)</c>), or runs into cover found within
+    /// <c>coverSeek</c> meters (<c>c.NearestCover(a, coverSeek)</c>, then <c>c.RunTo(cover.Value.Point, 0f)</c>). Otherwise
+    /// it runs straight away from the threat: <c>c.RunAwayFrom(threat.Value.Animal)</c>.
+    /// </summary>
+    /// <inheritdoc/>
     public override void Act(Animal a, ActContext c) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyFleeAction", "Act"));
 
-        public override bool IsRelevant(ObservationView o)
-        {
-            var token = o.Token(relevantSense);
-            return token != null && token != "none";
-        }
+    /// <summary>
+    /// True when the sense named by <c>relevantSense</c> sees a threat: its token is neither missing nor "none" (CTRL-10).
+    /// </summary>
+    /// <inheritdoc/>
+    public override bool IsRelevant(ObservationView o)
+    {
+        var token = o.Token(relevantSense);
+        return token != null && token != "none";
+    }
 }

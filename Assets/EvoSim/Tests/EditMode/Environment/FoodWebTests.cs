@@ -4,9 +4,23 @@ using NUnit.Framework;
 
 namespace EvoSim.Tests
 {
-    /// <summary>The food web derived from diets and edible components (SPEC-10…15).</summary>
+    /// <summary>
+    /// Checks the food web derived from diets and edible components (04 §2; SPEC-10…15; T-SPEC-03 and parts of T-SPEC-04
+    /// and -08): threats and prey come from the diets alone, a cannibal is its own threat, and a diet entry needs an edible
+    /// target (V-20, V-24).
+    /// </summary>
+    /// <remarks>
+    /// The species hold only a <see cref="ProbeAction"/>, a <see cref="Diet"/> and, for the prey, an <see cref="Edible"/>:
+    /// no reference action is needed to derive the food web. No tick is run.
+    /// </remarks>
     public class FoodWebTests : WorldFixture
     {
+        /// <summary>
+        /// Adds a minimal food web to a builder: 48 m flat ground, grass, carcasses, a prey that eats grass and can be struck,
+        /// and a predator whose diet is the prey and its carcasses.
+        /// </summary>
+        /// <param name="b">The builder, from <c>New()</c>.</param>
+        /// <returns>The same builder, not yet built.</returns>
         static WorldBuilder Lab(WorldBuilder b) => b.Flat(48, 48).Food().Carcasses()
             .Species("prey", s => s.Action<ProbeAction>()
                 .On<Edible>(e => e.Configure(EatMethod.Strike, 60, 2, 30, 100))

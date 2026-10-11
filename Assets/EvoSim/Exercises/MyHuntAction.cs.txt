@@ -8,7 +8,15 @@ using UnityEngine;
 // its kind (Test Runner, EditMode) only checks that it fits the system, for example that a seed repeats a run.
 #pragma warning disable CS0414 // settings your code will read
 
-/// <summary>Exercise 12: chase the nearest prey or carcass, strike or scavenge on arrival (ACT-11). Reference: HuntAction.</summary>
+/// <summary>
+/// Exercise 12: chase the nearest prey or carcass, strike or scavenge on arrival (ACT-11). Reference: <see cref="HuntAction"/>.
+/// </summary>
+/// <remarks>
+/// <para>Write <see cref="Act"/>. The settings, the prompt line and <see cref="IsRelevant"/> are given, as in the reference.
+/// Whether a strike kills, and what a meal gives, is the diet's business (ACT-11), not the action's.</para>
+/// <para>The reference also says <c>public override bool Hunts =&gt; true;</c>, so senses such as the sample ChasedSense know
+/// the animal is hunting; add it if you want the same. It warns in <c>Validate</c> when the species has nothing to hunt (V-21).</para>
+/// </remarks>
 [ExerciseOf(typeof(HuntAction))]
 public class MyHuntAction : AnimalAction
 {
@@ -17,14 +25,25 @@ public class MyHuntAction : AnimalAction
     [SerializeField, Tooltip("The sense whose token says whether prey is in sight (CTRL-10).")]
     string relevantSense = "Prey";
 
+    /// <summary>The action's line in the prompt (08 §7), used when the Inspector's description is empty.</summary>
     protected override string DefaultDescription => "chase the nearest visible prey animal or carcass; next to a prey animal,\n  try to kill and eat it; next to a carcass, eat from it";
 
-    /// <summary>The nearer of prey and carcass: run to it; strike the prey or eat from the carcass on arrival; none: search.</summary>
+    /// <summary>
+    /// The nearer of prey and carcass: run to it; strike the prey or eat from the carcass on arrival; none: search. The
+    /// reference asks <c>c.NearestAnimal(a, AnimalSet.Prey)</c> (never a killed or hidden animal) and <c>c.NearestCarcass(a)</c>.
+    /// A carcass at most as far as the prey wins, being a sure meal: <c>c.RunTo(carcass.Value.Position, stopAt)</c> and
+    /// <c>c.OnArrival(Interaction.Scavenge(carcass.Value.Entity))</c>. Else, with no prey either, <c>c.Search()</c> (ACT-04);
+    /// with prey, <c>c.RunTo(prey.Value.Animal, stopAt)</c> (which follows the animal) and
+    /// <c>c.OnArrival(Interaction.Strike(prey.Value.Animal))</c>.
+    /// </summary>
+    /// <inheritdoc/>
     public override void Act(Animal a, ActContext c) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyHuntAction", "Act"));
 
-        public override bool IsRelevant(ObservationView o)
-        {
-            var token = o.Token(relevantSense);
-            return token != null && token != "none";
-        }
+    /// <summary>True when the sense named by <c>relevantSense</c> sees prey: its token is neither missing nor "none" (CTRL-10).</summary>
+    /// <inheritdoc/>
+    public override bool IsRelevant(ObservationView o)
+    {
+        var token = o.Token(relevantSense);
+        return token != null && token != "none";
+    }
 }

@@ -10,8 +10,16 @@ namespace EvoSim
     /// Writes JSON with sorted keys and fixed number formatting, so equal data gives equal text (RAND-10).
     /// Separators follow Python's json.dumps defaults (", " and ": "), the prototype's format.
     /// </summary>
+    /// <remarks>
+    /// Every event line, and so the events hash, goes through it: changing how a value is written changes every hash.
+    /// Keys are sorted by ordinal (byte) order.
+    /// </remarks>
     public static class CanonicalJson
     {
+        /// <summary>Writes a value as one line of canonical JSON.</summary>
+        /// <param name="value">null, a string, a bool, an int, long, float or double, a dictionary or a list of those;
+        /// anything else is written as its invariant text, in quotes.</param>
+        /// <returns>The JSON text.</returns>
         public static string Write(object value)
         {
             var sb = new StringBuilder(128);
@@ -19,6 +27,9 @@ namespace EvoSim
             return sb.ToString();
         }
 
+        /// <summary>Appends a value as canonical JSON (see <see cref="Write"/> for the types it takes).</summary>
+        /// <param name="sb">The text to append to.</param>
+        /// <param name="value">The value to write.</param>
         public static void Append(StringBuilder sb, object value)
         {
             switch (value)
@@ -37,6 +48,11 @@ namespace EvoSim
         }
 
         /// <summary>A number with at most 6 decimals, no trailing zeros, no negative zero.</summary>
+        /// <param name="d">The number.</param>
+        /// <returns>
+        /// Its text: <c>null</c> for NaN or infinity, <c>0</c> for zero, a whole number with <c>.0</c> as Python writes
+        /// floats (<c>3.0</c>), else up to 6 decimals (<c>0.0015</c>).
+        /// </returns>
         public static string Number(double d)
         {
             if (double.IsNaN(d) || double.IsInfinity(d)) return "null";
@@ -46,6 +62,7 @@ namespace EvoSim
             return r.ToString("0.######", CultureInfo.InvariantCulture);
         }
 
+        /// <summary>Writes a dictionary as a JSON object, its keys as text in ordinal order.</summary>
         static void AppendObject(StringBuilder sb, IDictionary dict)
         {
             var keys = new List<string>(dict.Count);
@@ -62,6 +79,7 @@ namespace EvoSim
             sb.Append('}');
         }
 
+        /// <summary>Writes a list as a JSON array, in its own order.</summary>
         static void AppendList(StringBuilder sb, IEnumerable list)
         {
             sb.Append('[');
@@ -76,6 +94,8 @@ namespace EvoSim
         }
 
         /// <summary>A JSON string as the prototype writes it (json.dumps with ensure_ascii=False): UTF-8, control characters escaped.</summary>
+        /// <param name="sb">The text to append to.</param>
+        /// <param name="s">The string, written between double quotes.</param>
         public static void AppendString(StringBuilder sb, string s)
         {
             sb.Append('"');

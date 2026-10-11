@@ -1329,3 +1329,68 @@ batch run (`AssemblyBuilder.Build()` returned false, the compiler busy) and pass
 Owner. `ReferenceDecisionPeriod = 4`; Update Reference Scenes (10 → 4) leaves the six scenes byte-identical to M13.6;
 `Tests/Golden/hashes.json` restored from M13.6 (e735804) and PinnedHashes passes on it; 01, 08 and 14 restored to their
 M13.6 text. The trials of 20 and 10 stay above for the record.
+
+## M14 (2026-10-11): documentation for students
+Owner: document the entire code base, concise and readable for students: every class and every piece of code with full
+inline documentation that can be extracted into a website, plus pages on the website that explain how the system works
+and every way to extend it on top of the existing components.
+
+**Tools** (owner allowed installing them user-locally): the .NET 8 SDK and DocFX 2.81 under `%LOCALAPPDATA%\EvoSimDocs`.
+`Docs/Site/tools/DocAudit` (C#, compiled against the Roslyn that ships with Unity) compiles the seven EvoSim assemblies
+from Unity's `.csproj` files and the 14 exercise stubs, and reports: the compiler's documentation warnings (CS1591, bad
+XML, bad crefs…), non-public declarations without a comment (DOC01), public members without param / typeparam / returns
+(DOC02). `--same-code GITREF` compares every file with its version at a revision by Roslyn syntax equivalence (comments
+and white space ignored, strings and tokens not) and checks line endings; `--examples` compiles every ```csharp block of
+the site that declares a type; `--inventory`, `--api-toc` and `--spec` generate site pages. House style:
+`Docs/Site/extending/documenting-your-code.md` (also the students' page on documenting their modules).
+
+**The pass**: 3 769 issues at the start (1 567 public members without a comment, 811 non-public, 1 383 incomplete).
+Nine agents, one per area, comments only; then each wrote the site pages of its area from what it had read. Result:
+0 issues; 353 files (339 .cs and 14 stubs) syntax-equivalent to d5769e0; 347 files changed, +10 149 / -792 lines,
+all `///` and `//` (a few one-line enums split over lines). EditMode 438/438 in batch; PlayMode 23/23 in batch with
+`-nographics` (22/23 with a graphics device: see 50, Known problems). Golden files, scenes, ProjectSettings untouched.
+
+**The site** (`Docs/Site`, build `build.ps1 [-Serve] [-Strict]`): home, getting started, how it works, 16 guides of the
+simulation and of running it; the extension map ("I want to… → mechanism → page") and 19 extending pages, each with a
+members table, a complete example, the rules, and the test; "Every extension point", generated: every abstract and
+virtual member of every public type with the EvoSim classes that implement it; the API reference (298 types) grouped by
+folder; this specification, with a note on 20 and 22 that their sketches predate the code. `template/public/main.js`
+links rule ids (SENSE-01, V-08, T-ACT-09, "07 §4"…) to the specification and collapses the members every class
+inherits from Unity. Strict build: 0 warnings; 50 complete examples compile; every anchor resolves.
+
+**Findings** (none fixed: the pass changed comments only; the pages leave the bugs out):
+- Genes, mutation, breeding: a Block cap can be exceeded (eggs don't count toward the places left; several pairs a tick);
+  `MutationJob.ModelCalls` never set; a `MutatorClient` or brain that never calls `Complete()` hangs Freeze;
+  `AlleleValue.Equals` compares at 4 decimals while the registry uses `Gene.Decimals`; out-of-range number founders only
+  warn (V-46).
+- Senses, brains: `NearestAnimalSense` with readiness reports "none" for far kin when a vision gene exceeds the bands'
+  vision; `PromptTemplate.Fill` lets a gene containing "{situation}" or "{ask}" receive text; `Sampling.Temper` at small τ
+  can underflow to the untempered row; `AnswerCache` loses the first answer after a torn last line and throws on a
+  malformed row; `NearestEntitySense` labels eggs "Carcass"; the AgeSense Tooltip about maturity is wrong (V-38).
+- Actions, food, stats: `AnimalAction.IsRelevant` has no caller (CTRL-10 relevance never computed); `Edible.method` is
+  never read when eating; `Diet` keeps a disabled layer's or egg system's Edible (ARCH-06); any `<kind>:<species>` diet
+  entry other than carcass means eggs; `EatAction` with an unknown `egg:` species eats any egg, no Validate.
+- Core: an unresolved `StatId`/`TraitId` (default) reads and writes slot 0, and a default StatId clamps writes to ≤ 0;
+  `[RequiresModule]` on a world module is never checked; `RandomStream.Choose` on an empty list returns 0;
+  `SpatialIndex.Within` includes killed animals; `Secrets.NamesSecret` masks `-author`, `-keyword`.
+- Environment, recording: LiveStatistics samples tick t while stats rows say t + 1; compatibility mode throws on a death
+  event without a cause; `WorldQueries.NearestCover` ignores `Cover.Hides`; `ScenarioAsset.expect` is never checked;
+  TerrainGround without terrainData gives a silent 1 × 1 m world.
+- Views, HTTP: `ContactSheet.Make` divides by zero for one capture; capture names sort wrongly from 1 000 captures;
+  `RunCapture` handles one run per component; the two mutator clients disagree on an empty answer ("" vs null); model
+  digests are never reset; a server down at start makes the identity "@unknown" (replays miss the cache); `ActionView`
+  sets only `_Color` (no colour under URP/HDRP); V-20 reused for a bad server address; DEC-42's "1, 2, 4 s" needs 4 tries.
+- Editor: `ScriptTemplates.Ask` ignores the save dialog's folder and overwrites a file of the same name;
+  `ReferenceScenes.BuildAll` rewrites open scenes; `RealTimeRuns.Behaviour` assumes prey and predator;
+  `FromCommandLine` needs `-quit` and always exits 0; the Scenario Runner lists assets the batch can't find.
+- Tests, teaching path: student brains never reach the brain conformance suite (it scans EvoSim assemblies only); the
+  reference unit tests build worlds with the reference class, so they don't grade a stub (22 §0, 30 §4 say otherwise);
+  the conformance suites check less than 30 §4 lists; `FakeClock` (30 §2) doesn't exist; `Student.Tests.asmdef` lacks
+  Newtonsoft (a test using `FakeHttpTransport.Respond` doesn't compile); stubs `MyHuntAction` (Hunts),
+  `MyLlmMutation` (UsesMutatorService), `MyNearestAnimalSense` (Write) leave out overrides of their reference.
+- Contract text: 20 §3–§5 and 22 §2, §6, §8, §13, §14 sketch names that don't exist (`Start`, `TryPlan`, `EdibleBy`,
+  `IEdibleTarget`, `t.Plan`, `bands.Vision`…); 21 §3–§6 describes drawers and window contents that don't exist; 10 names
+  qwen3.5:0.8b where the code's reference mutator is gemma4:26b; DEC-40 promises a resume that doesn't exist.
+Corrected in passing (comments only): about twenty wrong or stale comments (DeathPhase's rule order, DecisionSchedule
+staggering, MutatorClient.ModelIdentity, Batch.WithScene, the exercise stubs' rule ids…), each named in the agents'
+reports.

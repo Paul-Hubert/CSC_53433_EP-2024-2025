@@ -1,0 +1,52 @@
+- name: Extending EvoSim
+  href: index.md
+- name: Species modules, the common base
+  href: species-modules.md
+- name: Behaviour
+  items:
+  - name: A sense
+    href: sense.md
+  - name: An action or an interaction
+    href: action.md
+  - name: A locomotion
+    href: locomotion.md
+  - name: Stats, costs and death rules
+    href: stats-and-death.md
+- name: Evolution
+  items:
+  - name: Genes
+    href: genes.md
+  - name: Mutation
+    href: mutation.md
+  - name: Reproduction and population
+    href: reproduction.md
+- name: Decisions
+  items:
+  - name: A brain
+    href: brain.md
+  - name: An HTTP brain or mutator server
+    href: http-brains.md
+- name: The world
+  items:
+  - name: Phases, services and world hooks
+    href: world-modules.md
+  - name: Food, cover, entities and ground
+    href: environment.md
+  - name: Recording and statistics
+    href: recording.md
+  - name: Views
+    href: views.md
+- name: Tools and practice
+  items:
+  - name: The editor
+    href: editor.md
+  - name: Testing your module
+    href: testing-your-module.md
+  - name: The teaching path (exercises)
+    href: exercises.md
+  - name: The samples
+    href: samples.md
+  - name: Documenting your code
+    href: documenting-your-code.md
+- name: Every extension point
+  href: extension-points.md

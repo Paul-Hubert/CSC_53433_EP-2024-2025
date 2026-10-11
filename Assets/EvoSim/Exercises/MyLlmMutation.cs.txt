@@ -8,7 +8,18 @@ using UnityEngine;
 // its kind (Test Runner, EditMode) only checks that it fits the system, for example that a seed repeats a run.
 #pragma warning disable CS0414 // settings your code will read
 
-/// <summary>Exercise 14: a gene rewritten by the mutator model (MUT-10…14, MUT-30). Reference: LlmMutation.</summary>
+/// <summary>Exercise 14: a gene rewritten by the mutator model (MUT-10…14, MUT-30). Reference: <see cref="LlmMutation"/>.</summary>
+/// <remarks>
+/// <para>Write <see cref="StartMutation"/>. The settings and <see cref="Accepts"/> are given, as in the reference. You will
+/// also need the deck's instructions: the reference reads them once, in <c>Initialize</c>, with
+/// <c>MutationText.Instructions(deck != null ? deck.text : "")</c> (comment and blank lines dropped, MUT-10).</para>
+/// <para>The operator is blind (CORE-07): it sees the gene and the parent allele, never the world or other genes. The
+/// World's <see cref="MutatorService"/> builds the prompt (MUT-11), calls the model, cleans and checks the answers and
+/// redraws rejected ones (MUT-12, MUT-13).</para>
+/// <para>The reference also says <c>public override bool UsesMutatorService =&gt; true;</c>, so a mutator client knows it is
+/// used, and checks its settings in <c>Validate</c> (no deck: V-20; no mutator service or client: V-63; a context line on
+/// several lines or with placeholders: V-49).</para>
+/// </remarks>
 [ExerciseOf(typeof(LlmMutation))]
 public class MyLlmMutation : MutationOperator
 {
@@ -21,8 +32,19 @@ public class MyLlmMutation : MutationOperator
     [SerializeField, Range(1, 64), Tooltip("Longest mutant, in words (reference 12).")]
     int maxWords = 12;
 
+    /// <summary>Text genes only.</summary>
+    /// <inheritdoc/>
     public override bool Accepts(Gene g) => g.Kind == AlleleKind.Text;
 
-    /// <summary>Draw every try's instruction and seed now, from rng (MUT-30), then submit them to the world's MutatorService.</summary>
+    /// <summary>
+    /// Draw every try's instruction and seed now, from rng (MUT-30), then submit them to the world's MutatorService.
+    /// The reference draws, for each of the <c>tries</c>, an instruction index (<c>rng.Range(0, count)</c>, at least 1) and
+    /// a seed (<c>rng.NextUInt() &amp; 0x7FFFFFFF</c>), always, before anything can fail, so the stream advances the same way.
+    /// Then, with no <c>World.Service&lt;MutatorService&gt;()</c> or no instruction, it returns
+    /// <c>MutationJob.Failed("no mutator")</c>; otherwise it returns
+    /// <c>service.Submit(parent.Text, plan, seeds, contextLine, instructions, words)</c>, a job that finishes when the model
+    /// answers, with <c>words</c> the smaller of <c>maxWords</c> and the text gene's own limit (<c>TextGene.MaxWords</c>).
+    /// </summary>
+    /// <inheritdoc/>
     public override MutationJob StartMutation(Gene gene, Allele parent, RandomStream rng) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyLlmMutation", "StartMutation"));
 }

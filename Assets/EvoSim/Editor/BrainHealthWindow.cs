@@ -9,16 +9,24 @@ namespace EvoSim.Editor
     /// Brain health (21 §4): every brain and mutator client of the current world with its host, a Test connection
     /// button (V-60, on demand), model and revision or digest, latency, failures, and the answer cache's size and hits.
     /// </summary>
+    /// <remarks>
+    /// Open it with <c>Window ▸ EvoSim ▸ Brain Health</c>. It works in Edit mode (hosts, Test connection, cache folder) and
+    /// in Play mode (tries, latencies, model and cache calls of the run). Test connection runs in the background; its
+    /// verdict, <c>reachable</c> or the V-60 message, appears under the host.
+    /// </remarks>
     public class BrainHealthWindow : EditorWindow
     {
         readonly System.Collections.Concurrent.ConcurrentDictionary<Object, string> tested = new System.Collections.Concurrent.ConcurrentDictionary<Object, string>();   // written by test tasks
-        Vector2 scroll;
+        Vector2 scroll;   // the window's scroll position
 
+        /// <summary>Opens the window (<c>Window ▸ EvoSim ▸ Brain Health</c>).</summary>
         [MenuItem("Window/EvoSim/Brain Health")]
         public static void Open() => GetWindow<BrainHealthWindow>("Brain Health").Show();
 
+        /// <summary>Redraws about ten times a second, so test results and latencies appear as they come.</summary>
         void OnInspectorUpdate() => Repaint();
 
+        /// <summary>Draws every brain and mutator client under the current world, then the answer cache and the run's calls.</summary>
         void OnGUI()
         {
             var w = EditorWorlds.Current();
@@ -49,6 +57,10 @@ namespace EvoSim.Editor
             EditorGUILayout.EndScrollView();
         }
 
+        /// <summary>
+        /// Draws one HTTP client: its host, a Test connection button that runs <paramref name="test"/> in the background
+        /// and turns its answer into a V-60 verdict, and its tries, failures and latencies (seconds).
+        /// </summary>
         void Http(Object owner, string host, HttpStats stats, System.Func<System.Threading.Tasks.Task<string>> test)
         {
             EditorGUILayout.BeginHorizontal();

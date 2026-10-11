@@ -7,6 +7,10 @@ namespace EvoSim
     /// Time series for the editor's ecology monitor (21 §4, OUT-06): population, mean energy and stamina, births,
     /// deaths and memo hit rate per species, sampled every few ticks into fixed-size buffers.
     /// </summary>
+    /// <remarks>
+    /// Place it under the World's Recording object, next to the <see cref="RunRecorder"/>. The record phase calls
+    /// <see cref="Sample"/> every tick. It only reads the world: removing it changes no result.
+    /// </remarks>
     public class LiveStatistics : WorldService
     {
         [SerializeField, Min(1), Tooltip("A sample every this many ticks.")]
@@ -17,17 +21,24 @@ namespace EvoSim
         /// <summary>One sample of one species.</summary>
         public struct Point
         {
+            /// <summary>
+            /// <c>Tick</c>: when it was taken; <c>Population</c>: living animals; <c>Births</c>, <c>Deaths</c>,
+            /// <c>Decisions</c>, <c>MemoHits</c>: the species' totals since the start of the run.
+            /// </summary>
             public int Tick, Population, Births, Deaths, Decisions, MemoHits;
+            /// <summary>Mean energy and mean stamina of the living animals, in points (0 without the stat or without animals).</summary>
             public float MeanEnergy, MeanStamina;
         }
 
-        readonly Dictionary<string, List<Point>> series = new Dictionary<string, List<Point>>();
-        readonly System.Diagnostics.Stopwatch clock = new System.Diagnostics.Stopwatch();
-        int lastTick;
+        readonly Dictionary<string, List<Point>> series = new Dictionary<string, List<Point>>();   // species id → its samples, oldest first
+        readonly System.Diagnostics.Stopwatch clock = new System.Diagnostics.Stopwatch();         // wall time since the last sample
+        int lastTick;                                                                              // the tick of the last sample
 
         /// <summary>Ticks per second over the last sampling interval.</summary>
         public float TicksPerSecond { get; private set; }
 
+        /// <summary>Forgets every series and restarts the clock.</summary>
+        /// <inheritdoc/>
         public override void Initialize()
         {
             series.Clear();
@@ -36,9 +47,12 @@ namespace EvoSim
         }
 
         /// <summary>The samples of a species, oldest first.</summary>
+        /// <param name="speciesId">The species id.</param>
+        /// <returns>Its samples, at most the capacity; an empty list for an unknown species.</returns>
         public IReadOnlyList<Point> Of(string speciesId) => series.TryGetValue(speciesId, out var l) ? l : (IReadOnlyList<Point>)new List<Point>();
 
         /// <summary>Takes a sample if the tick is on the interval (the record phase calls it every tick).</summary>
+        /// <param name="tick">The current tick.</param>
         public void Sample(int tick)
         {
             if (tick % every != 0) return;

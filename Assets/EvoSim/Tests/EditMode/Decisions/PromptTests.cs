@@ -8,14 +8,40 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>The prompt (08 §7): assembly, placeholders, ids, frozen prompts, names in texts.</summary>
+    /// <summary>
+    /// Checks the prompt (08 §7; rule family PROMPT; T-PROMPT-01…04, -06, T-SPEC-01, V-53): its assembly from the modules,
+    /// numbers filled in from settings, the pinned snapshot <c>Tests/Golden/prompts.txt</c>, frozen prompts, prompt ids and
+    /// cache keys, and species names in situation texts.
+    /// </summary>
+    /// <remarks>
+    /// The world is the Lab ecology with a <see cref="ScriptedBrain"/> whose answer instruction is the points brain's
+    /// (<see cref="Points"/>). Queries are made by hand from a row of sense tokens (<see cref="Query"/>), so a prompt can be
+    /// checked for any situation without running a tick. If a deliberate change to the prompt texts breaks
+    /// <see cref="PromptSnapshotAndFrozenPrompts"/>, delete <c>prompts.txt</c>, rerun to pin the new text, and say why in
+    /// the commit.
+    /// </remarks>
     public class PromptTests : WorldFixture
     {
+        /// <summary>The answer instruction of the points brain, which ends every prompt built here.</summary>
         const string Points = "Distribute 100 points across the actions according to how likely this animal is to choose each.";
 
+        /// <summary>The Lab ecology with the reference phases and a scripted brain that asks for points, built.</summary>
+        /// <param name="name">The world's name.</param>
+        /// <returns>The built, initialised world.</returns>
         World Lab(string name = "Test World") => New(name: name).Ecology(48f).ReferencePhases()
             .DefaultBrain<ScriptedBrain>(b => b.Instruction = Points).Build();
 
+        /// <summary>
+        /// Builds the decision query a brain would get for one situation, given as sense tokens, and one genome.
+        /// </summary>
+        /// <param name="w">The world, whose text style the situation uses.</param>
+        /// <param name="s">The species that decides.</param>
+        /// <param name="tokens">The token of each sense, by sense label in lower case (<c>"energy" → "low"</c>).</param>
+        /// <param name="genome">
+        /// The genome whose genes the query carries, or null to place a new animal with each gene's first founder allele and
+        /// take its genome.
+        /// </param>
+        /// <returns>The query, as the Ask brains phase would build it.</returns>
         static DecisionQuery Query(World w, Species s, Dictionary<string, string> tokens, Genome genome = null)
         {
             var set = new ObservationSet();
@@ -27,11 +53,16 @@ namespace EvoSim.Tests
             return new DecisionQuery(s, genes, o, s.Describe(o, w.TextStyle), w.TextStyle, genome.BrainKey);
         }
 
+        /// <summary>The prey's situation of the example in 08 §7, as one token per sense.</summary>
         static readonly Dictionary<string, string> ExampleSituation = new Dictionary<string, string>
         {
             { "energy", "low" }, { "stamina", "high" }, { "food", "close" }, { "predator", "medium" }, { "cover", "close" }, { "animal", "none" }, { "age", "adult" },
         };
 
+        /// <summary>
+        /// The full prompt of the 08 §7 example, word for word: what the reference prey with each gene's first founder allele
+        /// must give in <see cref="ExampleSituation"/>.
+        /// </summary>
         const string ExamplePrompt =
             "You decide what a wild animal does next in a simple world.\n\n" +
             "Actions:\n" +
@@ -85,6 +116,7 @@ namespace EvoSim.Tests
         {
             var w = Lab();
             var brain = w.GetComponentInChildren<ScriptedBrain>();
+            // The snapshot: three prey situations from the reference observation set, one predator situation, the example.
             var sb = new StringBuilder();
             var preySet = ObservationSet.FromJsonLines(System.IO.File.ReadAllText(System.IO.Path.Combine(Application.dataPath, "EvoSim/Data/Observations/prey_observations_v2.jsonl")));
             foreach (var s in w.AllSpecies)

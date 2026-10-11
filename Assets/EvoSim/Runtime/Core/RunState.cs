@@ -1,6 +1,8 @@
 namespace EvoSim
 {
     /// <summary>The World's run loop states (brief, chapter B §13).</summary>
+    /// <remarks>Read it from <see cref="World.State"/>; the run controls (<see cref="World.Play"/>,
+    /// <see cref="World.Pause"/>, <see cref="World.Step"/>…) change it.</remarks>
     public enum RunState
     {
         /// <summary>Not initialised.</summary>

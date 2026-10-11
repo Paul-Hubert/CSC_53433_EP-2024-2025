@@ -6,24 +6,35 @@ namespace EvoSim.Editor
 {
     /// <summary>
     /// Ask the brain (21 §4, labs C and I): build a genome (founders, edited sentences, a gene's contrast pair, control
-    /// sentences), pick a situation, and ask several brains side by side; a directed test gives P(action) with the pro
-    /// sentence minus with the anti one. Queries are built from texts only: nothing is registered in the world, so asking
-    /// never changes a run.
+    /// sentences), pick a situation, and ask several brains side by side; a directed test asks with a gene's pro sentence,
+    /// then with its anti one, so P(action) can be compared. Queries are built from texts only: nothing is registered in
+    /// the world, so asking never changes a run.
     /// </summary>
+    /// <remarks>
+    /// <para>Open it with <c>Window ▸ EvoSim ▸ Ask the Brain</c>. In Edit mode, press <c>Prepare the world</c> first (it
+    /// validates the world). Edit each text gene's sentence, or set it to the gene's <c>pro</c>, <c>anti</c> or
+    /// <c>neutral</c> sentence; <c>Founders</c> resets every gene to its first founder, <c>Control sentences</c> puts the
+    /// world's control (random) sentences in their place. Pick one token per sense, tick the brains, press <c>Ask</c>.</para>
+    /// <para>Each answer arrives as one line: the brain, a label, and P(action) for every action. <c>Directed test</c> asks
+    /// twice, with the chosen gene's pro and then anti sentence: compare the two lines for that gene's action (B-02).</para>
+    /// </remarks>
     public class AskTheBrainWindow : EditorWindow
     {
-        World world;
-        int speciesIndex, directedGene;
-        string[] texts;
-        int[] tokens;
-        bool[] use;
+        World world;                      // the world whose species and brains are used, or null
+        int speciesIndex, directedGene;   // the chosen species; the gene of the directed test (an index in locus order)
+        string[] texts;                   // the genome being built: one sentence per locus
+        int[] tokens;                     // the situation: one token index per sense
+        bool[] use;                       // which brains to ask, in the order of the world's Brain components
+        // Questions still waiting for their answer.
         readonly List<(Brain brain, string label, BrainAnswer answer, int species)> pending = new List<(Brain, string, BrainAnswer, int)>();
-        readonly List<string> results = new List<string>();
-        Vector2 scroll;
+        readonly List<string> results = new List<string>();   // one line per answer, oldest first
+        Vector2 scroll;                   // the window's scroll position
 
+        /// <summary>Opens the window (<c>Window ▸ EvoSim ▸ Ask the Brain</c>).</summary>
         [MenuItem("Window/EvoSim/Ask the Brain")]
         public static void Open() => GetWindow<AskTheBrainWindow>("Ask the Brain").Show();
 
+        /// <summary>Collects the answers that arrived since the last frame and turns each into a result line.</summary>
         void Update()
         {
             for (int i = pending.Count - 1; i >= 0; i--)
@@ -41,6 +52,7 @@ namespace EvoSim.Editor
             }
         }
 
+        /// <summary>Draws the species picker, the genome editor, the situation pickers, the brains, the buttons and the results.</summary>
         void OnGUI()
         {
             var w = EditorWorlds.Current();
@@ -112,6 +124,7 @@ namespace EvoSim.Editor
             EditorGUILayout.EndScrollView();
         }
 
+        /// <summary>Sets every gene to its first founder, every sense to its first token, and the directed gene to the first.</summary>
         void Reset(Species s)
         {
             texts = new string[s.Genes.Count];
@@ -120,6 +133,10 @@ namespace EvoSim.Editor
             directedGene = 0;
         }
 
+        /// <summary>
+        /// Sends one question to a brain: the brain-visible sentences of <paramref name="geneTexts"/> and the chosen situation,
+        /// with a genome key hashed from the texts (no allele is registered). The answer is collected by <see cref="Update"/>.
+        /// </summary>
         void Ask(Brain brain, Species s, string[] geneTexts, string label)
         {
             var genes = new List<KeyValuePair<string, string>>();

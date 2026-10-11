@@ -7,16 +7,25 @@ namespace EvoSim.Editor
     /// The selected animal (21 §4, lab C): stats, traits, genome sentences, last situation, last probabilities as bars,
     /// current action and target, busy reason, parents and offspring. Click an animal's view to select it.
     /// </summary>
+    /// <remarks>
+    /// Open it with <c>Window ▸ EvoSim ▸ Animal Inspector</c>. It works in Play mode: pause the world, click an animal in
+    /// the Scene view, and read why it chose what it does. The probability bars use the action colours of
+    /// <see cref="EditorWorlds.ActionColor"/>.
+    /// </remarks>
     public class AnimalInspectorWindow : EditorWindow
     {
-        Vector2 scroll;
+        Vector2 scroll;   // the window's scroll position
 
+        /// <summary>Opens the window (<c>Window ▸ EvoSim ▸ Animal Inspector</c>).</summary>
         [MenuItem("Window/EvoSim/Animal Inspector")]
         public static void Open() => GetWindow<AnimalInspectorWindow>("Animal").Show();
 
+        /// <summary>Redraws when another animal is selected.</summary>
         void OnSelectionChange() => Repaint();
+        /// <summary>Redraws about ten times a second in Play mode, so the stats follow the running world.</summary>
         void OnInspectorUpdate() { if (Application.isPlaying) Repaint(); }
 
+        /// <summary>Draws the selected animal: identity, stats, traits, genome, current decision and last probabilities.</summary>
         void OnGUI()
         {
             var a = EditorWorlds.SelectedAnimal(out var w);

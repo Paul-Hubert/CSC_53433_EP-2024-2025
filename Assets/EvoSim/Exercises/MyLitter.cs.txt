@@ -9,12 +9,25 @@ using UnityEngine;
 #pragma warning disable CS0414 // settings your code will read
 
 /// <summary>
-/// Exercise 9: the litter size (REPRO-10, REPRO-11). Reference: Litter. The stub derives from the reference (its
+/// Exercise 9: the litter size (REPRO-10, REPRO-11). Reference: <see cref="Litter"/>. The stub derives from the reference (its
 /// settings Min, Max, ChildEnergy) because the breed and hatch phases look the litter up by its type.
 /// </summary>
+/// <remarks>
+/// Write <see cref="Size"/>. The breed phase calls it once per mating; the parents then pay <c>ChildEnergy</c> per baby, in
+/// equal shares (REPRO-11). Draw only from the stream you are given, so a seed repeats the run.
+/// </remarks>
 [ExerciseOf(typeof(Litter))]
 public class MyLitter : Litter
 {
-    /// <summary>k uniform in [Min, Max] from rng, cut to what every parent can pay (ChildEnergy shared equally), never below Min.</summary>
+    /// <summary>
+    /// k uniform in [Min, Max] from rng, cut to what every parent can pay (ChildEnergy shared equally), never below Min.
+    /// The reference draws <c>k = rng.Range(Min, Max + 1)</c> (the upper bound is excluded); each parent's share of a baby
+    /// is <c>ChildEnergy / parentEnergies.Length</c>; a parent can pay for <c>Mathf.FloorToInt(energy / share)</c> babies;
+    /// the result is k cut to the fewest any parent can pay for, then raised back to Min if below: parents may go below 0 energy.
+    /// </summary>
+    /// <param name="rng">The species' litter stream: the only source of randomness (RAND-03).</param>
+    /// <param name="parentEnergies">Each parent's energy, in points: two parents, or one in asexual mode.</param>
+    /// <returns>The number of babies, at least Min.</returns>
+    /// <inheritdoc/>
     public override int Size(RandomStream rng, float[] parentEnergies) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyLitter", "Size"));
 }

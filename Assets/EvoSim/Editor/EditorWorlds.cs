@@ -9,6 +9,7 @@ namespace EvoSim.Editor
     public static class EditorWorlds
     {
         /// <summary>The Worlds of the open scenes, enabled ones first.</summary>
+        /// <returns>Every World of the loaded scenes, inactive ones included, possibly none.</returns>
         public static List<World> All()
         {
             var list = new List<World>();
@@ -23,6 +24,7 @@ namespace EvoSim.Editor
         }
 
         /// <summary>The world of the selection, else the first running one, else the first one.</summary>
+        /// <returns>A World of the open scenes, or null when there is none.</returns>
         public static World Current()
         {
             if (Selection.activeGameObject != null)
@@ -36,6 +38,9 @@ namespace EvoSim.Editor
         }
 
         /// <summary>The animal whose view is selected, or null.</summary>
+        /// <param name="world">The world of the selected view, or null when no animal view is selected.</param>
+        /// <returns>The living animal behind the selected view (or a child of it), or null when none is selected, the view
+        /// is free, or the animal no longer lives.</returns>
         public static Animal SelectedAnimal(out World world)
         {
             world = null;
@@ -46,6 +51,10 @@ namespace EvoSim.Editor
             return world != null ? Find(world, view.AnimalId) : null;
         }
 
+        /// <summary>Finds a living animal by its id among every species of a world.</summary>
+        /// <param name="w">The world to search.</param>
+        /// <param name="id">The animal id.</param>
+        /// <returns>The animal, or null when no living animal has that id.</returns>
         public static Animal Find(World w, int id)
         {
             foreach (var s in w.AllSpecies)
@@ -55,6 +64,8 @@ namespace EvoSim.Editor
         }
 
         /// <summary>A stable colour per action index (21 §5): the same order always gives the same colours.</summary>
+        /// <param name="index">The action's place in its species' action order, or -1 for none.</param>
+        /// <returns>A bright hue spread by the golden ratio, or grey for -1.</returns>
         public static Color ActionColor(int index) =>
             index < 0 ? Color.gray : Color.HSVToRGB(index * 0.61803398875f % 1f, 0.75f, 0.95f);
     }

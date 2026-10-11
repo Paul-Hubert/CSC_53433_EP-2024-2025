@@ -6,7 +6,14 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>When senses read (SENSE-04) and what they never see (SPACE-12, RAND-11).</summary>
+    /// <summary>
+    /// Checks when senses read (SENSE-04, TICK-04) and what they never see (SPACE-12, RAND-11): every decider senses the
+    /// state at the start of its tick, and sense rays never hit the views, so what is drawn on screen cannot change a run.
+    /// </summary>
+    /// <remarks>
+    /// The second test uses <see cref="AllLayersObstacleSense"/>, a test sense whose rays ask for every physics layer, and
+    /// real cube colliders that it destroys at the end.
+    /// </remarks>
     public class SenseTimingTests : WorldFixture
     {
         [Test, Description("SENSE-04, TICK-04: every decider senses the state at the start of the tick, whatever moves later in that tick")]

@@ -1,0 +1,42 @@
+- name: Guides
+  href: index.md
+- name: Getting started
+  href: getting-started.md
+- name: How EvoSim works
+  href: overview.md
+- name: The simulation
+  items:
+  - name: The world and its modules
+    href: world-and-modules.md
+  - name: A tick, phase by phase
+    href: the-tick.md
+  - name: Animals, stats and death
+    href: animals-and-stats.md
+  - name: Senses and prompts
+    href: senses-and-prompts.md
+  - name: Decisions and brains
+    href: brains-and-decisions.md
+  - name: Actions and movement
+    href: actions-and-movement.md
+  - name: The food web
+    href: food-web.md
+  - name: Genes and mutation
+    href: genes-and-mutation.md
+  - name: Reproduction and population
+    href: reproduction-and-population.md
+  - name: The environment
+    href: environment.md
+- name: Running and checking
+  items:
+  - name: Determinism and replay
+    href: determinism.md
+  - name: Recording and outputs
+    href: recording-and-outputs.md
+  - name: Views and real time
+    href: views-and-real-time.md
+  - name: Editor tooling
+    href: editor-tooling.md
+  - name: Running and building
+    href: running-and-building.md
+  - name: Testing
+    href: testing.md

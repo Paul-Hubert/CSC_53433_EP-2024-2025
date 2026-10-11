@@ -8,17 +8,27 @@ namespace EvoSim.Editor
     /// The scenario runner (21 §4, lab G): the scenario assets, a variant, seeds and length; runs them headless (Freeze,
     /// the same code as EvoSim.Batch.RunScenario) and lists the results; "twice" checks the reproducibility fact.
     /// </summary>
+    /// <remarks>
+    /// <para>Open it with <c>Window ▸ EvoSim ▸ Scenario Runner</c>, in Edit mode. Pick a scenario and a variant, edit the
+    /// seeds (comma-separated) and the length, and press <c>Run</c>: each seed runs through <see cref="Batch.Run"/> with
+    /// a cancellable progress bar, and its one-line summary (ticks, event hash, model calls, run folder) is listed. The
+    /// run's files go to <c>Logs/EvoSim/runs/&lt;scenario&gt;-&lt;variant&gt;-s&lt;seed&gt;-&lt;time&gt;/</c>.</para>
+    /// <para>The scenario's scene must not be open in the editor (<see cref="Batch.WithScene"/> refuses it). The
+    /// <c>Expect</c> line is shown for reading; only the "deterministic" fact is checked, by <c>Run each seed twice</c>.</para>
+    /// </remarks>
     public class ScenarioRunnerWindow : EditorWindow
     {
-        int scenarioIndex, variantIndex, ticks = -1;
-        string seeds = "";
-        bool twice;
-        readonly List<string> results = new List<string>();
-        Vector2 scroll;
+        int scenarioIndex, variantIndex, ticks = -1;   // the chosen scenario and variant; ticks per run, -1 = the scenario's
+        string seeds = "";                              // comma-separated seeds; filled from the scenario when it changes
+        bool twice;                                     // runs each seed twice and compares the event hashes
+        readonly List<string> results = new List<string>();   // one summary line per run, newest last
+        Vector2 scroll;                                 // the results' scroll position
 
+        /// <summary>Opens the window (<c>Window ▸ EvoSim ▸ Scenario Runner</c>).</summary>
         [MenuItem("Window/EvoSim/Scenario Runner")]
         public static void Open() => GetWindow<ScenarioRunnerWindow>("Scenarios").Show();
 
+        /// <summary>Draws the scenario, variant, seeds and length fields, the Run and Clear buttons, and the results.</summary>
         void OnGUI()
         {
             var assets = new List<ScenarioAsset>();
@@ -49,6 +59,7 @@ namespace EvoSim.Editor
             EditorGUILayout.EndScrollView();
         }
 
+        /// <summary>Runs the scenario variant once (or twice) per seed of the Seeds field, headless, and lists the results.</summary>
         void Run(ScenarioAsset scenario, string variant)
         {
             var list = new List<int>();
@@ -69,6 +80,7 @@ namespace EvoSim.Editor
             finally { EditorUtility.ClearProgressBar(); }
         }
 
+        /// <summary>The 16-character event hash in a run's summary line, or empty when the line has none (a failed run).</summary>
         static string Hash(string line)
         {
             int i = line.IndexOf("hash ");

@@ -8,22 +8,45 @@ namespace EvoSim
     /// </summary>
     public sealed class RunNumbers
     {
+        /// <summary>One species' line of the overlay.</summary>
         public struct SpeciesLine
         {
+            /// <summary>The species' display name.</summary>
             public string Name;
+            /// <summary>
+            /// Animals alive now; births, deaths and kills since the run began; eggs laid and not yet hatched; the highest
+            /// generation so far.
+            /// </summary>
             public int Living, Births, Deaths, Kills, Eggs, MaxGeneration;
         }
 
+        /// <summary>The World's tick.</summary>
         public int Tick;
+        /// <summary>The run's state: running, paused, waiting, stopped…</summary>
         public RunState State;
         /// <summary>What the tick waits for ("JEV: 12 queries", "the mutator: 2 eggs"), or null.</summary>
         public string WaitingFor;
+        /// <summary>One line per species, in the World's species order.</summary>
         public readonly List<SpeciesLine> Species = new List<SpeciesLine>();
+        /// <summary>
+        /// Since the run began: new alleles given to babies at hatching, mutations that left the inherited allele (MUT-04),
+        /// and mutations started at conception (<see cref="MutationStats"/>).
+        /// </summary>
         public int MutationsOk, MutationsFailed, MutationAttempts;
+        /// <summary>
+        /// Model calls of the brains and of the mutator; answers taken from the answer cache (brains and mutator); decisions
+        /// answered by the memo; and decisions made, all since the run began.
+        /// </summary>
         public int BrainCalls, MutatorCalls, CacheHits, MemoHits, Decisions;
+        /// <summary>
+        /// The brains' answer time, in seconds: each batch's wall-clock time shared among its queries, summed over the species
+        /// (the summary's backend_s).
+        /// </summary>
         public double BrainSeconds;
 
         /// <summary>Fills the numbers from the World as it is now.</summary>
+        /// <param name="w">The World; it is only read.</param>
+        /// <returns>This object, filled, so that a call can be chained.</returns>
         public RunNumbers Read(World w)
         {
             Tick = w.Tick;
@@ -57,6 +80,11 @@ namespace EvoSim
         }
 
         /// <summary>The brains or the mutator the current tick waits for, with how many queries or eggs.</summary>
+        /// <param name="w">The World; it is only read.</param>
+        /// <returns>
+        /// Such as "JEV: 12 queries" or "the mutator: 2 eggs", the name of another phase that waits, or null when the tick
+        /// waits for nothing.
+        /// </returns>
         public static string Waiting(World w)
         {
             var phase = w.WaitingFor;
@@ -74,7 +102,7 @@ namespace EvoSim
             {
                 int eggs = 0;
                 var system = w.Service<EggSystem>();
-                if (system != null)
+                if (system != null)                                            // eggs due to hatch whose genes aren't all in
                     foreach (var e in system.Entities) if (e.HatchTick <= w.Tick && !e.IsComplete) eggs++;
                 return $"the mutator: {eggs} eggs";
             }

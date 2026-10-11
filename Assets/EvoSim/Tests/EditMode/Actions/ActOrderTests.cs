@@ -5,7 +5,16 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>What each act order lets an animal see (ACT-31), and what the act phase never does (ACT-13).</summary>
+    /// <summary>
+    /// Checks what each act order lets an animal see (ACT-31, 07 §3), that the act phase never lays eggs (ACT-13, 11), and
+    /// that babies are aged on their birth tick (ANIM-35).
+    /// </summary>
+    /// <remarks>
+    /// Each test builds a small Lab ecology (<see cref="Lab.Ecology"/>: 40 m, no food, no cover) with only the phases it
+    /// needs. Animals are placed by hand with <see cref="Place.Animal"/> and given an action with <see cref="Lab.Choose"/>;
+    /// without a decision phase they keep it. Only <see cref="BabiesAgeOnTheirBirthTick"/> asks a brain: a
+    /// <see cref="ScriptedBrain"/> that always prefers <c>mate</c>.
+    /// </remarks>
     public class ActOrderTests : WorldFixture
     {
         [Test, Description("T-MOVE-05 (ACT-31): in sequential orders an animal acts on the state left by the animals before it; when simultaneous, every intent comes from the start state")]
@@ -37,6 +46,7 @@ namespace EvoSim.Tests
         public void EggsComeFromTheBreedPhase()
         {
             int laidAfterAct = -1;
+            // A callback phase between the act and breed phases reads the egg count the act phase left behind.
             var w = New(name: "eggs").Ecology(40f, 0f, 0f, regrow: 0f, prey: s => s.LifeRules(40, 0))
                 .Phase<ActPhase>().Phase<CallbackPhase>(p => p.OnRun = t => laidAfterAct = t.World.FindSpecies("prey").Counters.EggsLaid)
                 .Phase<BreedPhase>().Phase<HatchPhase>().Build();

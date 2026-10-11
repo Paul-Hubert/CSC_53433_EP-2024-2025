@@ -8,6 +8,11 @@ namespace EvoSim
     /// The reference mutator (10 §2): a model in Ollama on the CPU (gemma4:26b, owner 2026-10-10; num_gpu 0, num_ctx 1 024),
     /// thinking off, so the GPU stays JEV's.
     /// </summary>
+    /// <remarks>
+    /// The server is Ollama on <c>http://localhost:11434</c>: the chat endpoint <c>/api/chat</c> without streaming, and
+    /// <c>/api/tags</c> for the connection test and the model's digest. The model's name comes from the
+    /// <see cref="MutatorService"/>, as it is part of each request.
+    /// </remarks>
     public class OllamaMutatorClient : HttpMutatorClient
     {
         [SerializeField, Tooltip("Run the model on the CPU (num_gpu 0, reference on: the GPU is JEV's).")]
@@ -17,10 +22,20 @@ namespace EvoSim
         [SerializeField, Tooltip("Let thinking models reason before answering (reference off: gemma4 and Qwen3.5 think by default).")]
         bool think;
 
-        string digest;
+        string digest;                                                     // from /api/tags, asked once in Begin; null before
 
+        /// <summary>
+        /// The MutatorService's model and its digest from the server, such as <c>gemma4:26b@1a2b3c4d5e6f</c>; the digest is
+        /// <c>unknown</c> before <see cref="Begin"/> asked, or when the server didn't say.
+        /// </summary>
+        /// <inheritdoc/>
         public override string ModelIdentity => (World != null && World.Service<MutatorService>() != null ? World.Service<MutatorService>().Model : "") + "@" + (digest ?? "unknown");
 
+        /// <summary>
+        /// Asks Ollama for the model's digest, once, when the run begins with mutation on and an operator that uses the
+        /// MutatorService. It blocks the main thread for at most about 5 s; an unreachable server gives <c>unknown</c>.
+        /// </summary>
+        /// <inheritdoc/>
         public override void Begin()
         {
             var service = World.Service<MutatorService>();
@@ -37,9 +52,18 @@ namespace EvoSim
             return false;
         }
 
+        /// <summary><c>/api/chat</c>.</summary>
+        /// <inheritdoc/>
         protected override string ChatPath => "/api/chat";
+        /// <summary><c>/api/tags</c>.</summary>
+        /// <inheritdoc/>
         protected override string HealthPath => "/api/tags";
 
+        /// <summary>
+        /// The <c>/api/chat</c> body: the prompt as the only user message, no streaming, the request's seed and temperature,
+        /// the context length, the CPU switch (<c>num_gpu</c> 0) and the thinking switch.
+        /// </summary>
+        /// <inheritdoc/>
         public override JObject Body(MutatorRequest r)
         {
             var options = new JObject();
@@ -57,6 +81,8 @@ namespace EvoSim
             };
         }
 
+        /// <summary>The <c>message.content</c> of an Ollama chat answer, or null.</summary>
+        /// <inheritdoc/>
         protected override string Content(JToken response) => (string)response["message"]?["content"];
     }
 }

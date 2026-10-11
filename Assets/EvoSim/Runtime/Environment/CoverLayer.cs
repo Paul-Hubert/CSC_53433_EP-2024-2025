@@ -6,6 +6,13 @@ namespace EvoSim
     /// Cover in clustered patches (thickets): the top <see cref="fraction"/> of walkable cells of a value-noise
     /// map, drawn from the world stream (03 §2 reference: 20 %, octaves 8 and 4 m).
     /// </summary>
+    /// <remarks>
+    /// <para>The map is built once, in <see cref="Initialize"/>, after the ground: the noise comes from the stream
+    /// "world/&lt;GameObject name&gt;", which uses the world seed, so runs that share a world seed share their thickets
+    /// (RAND-04). Cover never changes during a run, except by <see cref="SetCover"/> and <see cref="Clear"/>.</para>
+    /// <para>The food layer reads it in its <see cref="WorldModule.Begin"/> to keep cover cells free of food ("hungry
+    /// cover", ENV-04).</para>
+    /// </remarks>
     public class CoverLayer : Cover
     {
         [SerializeField, Range(0f, 1f), Tooltip("Share of walkable ground in cover (reference 0.2; 0 = none).")]
@@ -16,13 +23,21 @@ namespace EvoSim
         float cellSize = 1f;
 
         CellGrid grid;
-        bool[] cover;
+        bool[] cover;           // one flag per cell of grid: true in cover
         int coverCells;
 
+        /// <summary>The cover cells' grid over the ground's rectangle (the inspector and views draw it).</summary>
         public CellGrid Grid => grid;
+        /// <summary>How many cells are in cover now.</summary>
         public int CoverCells => coverCells;
+        /// <summary>The share of walkable cells put in cover at initialisation, from 0 to 1.</summary>
         public float Fraction => fraction;
 
+        /// <summary>
+        /// Builds the map: samples the noise at the centre of every walkable cell and puts the top <see cref="Fraction"/> of
+        /// them in cover, ties by cell index.
+        /// </summary>
+        /// <inheritdoc/>
         public override void Initialize()
         {
             var ground = World.Ground ?? World.Service<Ground>();
@@ -49,12 +64,19 @@ namespace EvoSim
             coverCells = n;
         }
 
+        /// <summary>True when the cell that contains the point is in cover; false outside the grid.</summary>
+        /// <inheritdoc/>
         public override bool InCover(Vector3 p)
         {
             int c = grid.CellOf(p);
             return c >= 0 && cover[c];
         }
 
+        /// <summary>
+        /// The point itself when it is in cover; else the centre of the nearest cover cell within the radius, laid on the
+        /// ground, by the world distance (ties to the lower cell index).
+        /// </summary>
+        /// <inheritdoc/>
         public override bool NearestCover(Vector3 p, float radius, out Vector3 point, out float distance)
         {
             if (InCover(p)) { point = p; distance = 0f; return true; }
@@ -65,6 +87,8 @@ namespace EvoSim
         }
 
         /// <summary>Marks cells by hand (Place.Cover in tests, hand-made maps).</summary>
+        /// <param name="p">A point in the cell to change; nothing happens outside the grid.</param>
+        /// <param name="value">True to put the cell in cover, false to clear it.</param>
         public void SetCover(Vector3 p, bool value)
         {
             int c = grid.CellOf(p);
@@ -80,8 +104,12 @@ namespace EvoSim
             coverCells = 0;
         }
 
+        /// <summary>Sets the share of walkable ground in cover from code (scene builders, scenarios); it applies at the next initialisation.</summary>
+        /// <param name="f">The share, clamped to [0, 1].</param>
         public void SetFraction(float f) => fraction = Mathf.Clamp01(f);
 
+        /// <summary>Reports a fraction outside [0, 1] (V-35) and a missing noise octave (V-37).</summary>
+        /// <inheritdoc/>
         public override void Validate(ValidationReport report)
         {
             if (!(fraction >= 0f && fraction <= 1f))

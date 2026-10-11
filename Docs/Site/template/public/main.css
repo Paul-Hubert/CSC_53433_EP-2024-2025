@@ -1,0 +1,38 @@
+/* EvoSim site styles (Docs/Site/README.md). */
+
+/* References to the specification (rule ids, sections), linked by main.js. */
+a.evo-ref {
+  font-family: var(--bs-font-monospace);
+  font-size: 0.9em;
+  text-decoration: none;
+  border-bottom: 1px dotted currentColor;
+}
+
+a.evo-ref:hover {
+  border-bottom-style: solid;
+}
+
+/* Anchors added on the specification pages: keep the target below the sticky navbar. */
+.evo-anchor {
+  display: inline-block;
+  scroll-margin-top: 5rem;
+}
+
+/* The note that replaces the members inherited from Unity and .NET (main.js). */
+.evo-note {
+  color: var(--bs-secondary-color);
+  font-style: italic;
+}
+
+/* The "I want to…" tables of the extension guide. */
+article table td:first-child {
+  white-space: normal;
+}
+
+/* Callouts used by the guides: > [!NOTE], > [!TIP], > [!WARNING] are DocFX's; this one marks the rules a module must keep. */
+.evo-rules {
+  border-left: 4px solid var(--bs-warning);
+  padding: 0.5rem 1rem;
+  margin: 1rem 0;
+  background: var(--bs-tertiary-bg);
+}

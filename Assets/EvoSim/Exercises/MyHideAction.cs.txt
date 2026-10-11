@@ -8,7 +8,11 @@ using UnityEngine;
 // its kind (Test Runner, EditMode) only checks that it fits the system, for example that a seed repeats a run.
 #pragma warning disable CS0414 // settings your code will read
 
-/// <summary>Exercise 7: go to the nearest cover and stay in it (ENV-12). Reference: HideAction.</summary>
+/// <summary>Exercise 7: go to the nearest cover and stay in it (ENV-12, ENV-13). Reference: <see cref="HideAction"/>.</summary>
+/// <remarks>
+/// Write <see cref="Act"/>. The settings, the prompt line and <see cref="IsRelevant"/> are given, as in the reference. An
+/// animal in cover is hidden from the species that hunt it (ENV-11): the action only has to get it there and keep it there.
+/// </remarks>
 [ExerciseOf(typeof(HideAction))]
 public class MyHideAction : AnimalAction
 {
@@ -17,14 +21,23 @@ public class MyHideAction : AnimalAction
     [SerializeField, Tooltip("The sense whose token says whether cover is in sight (CTRL-10).")]
     string relevantSense = "Cover";
 
+    /// <summary>The action's line in the prompt (08 §7), used when the Inspector's description is empty.</summary>
     protected override string DefaultDescription => "go to the nearest cover and stay in it; predators can't see or catch an animal in cover";
 
-    /// <summary>In cover: stay. Else walk (or run) to the nearest cover in sight (ActContext); none: search.</summary>
+    /// <summary>
+    /// In cover: stay. Else walk (or run) to the nearest cover in sight (ActContext); none: search. The reference stays when
+    /// <c>c.InCover(a)</c>; otherwise it asks <c>c.NearestCover(a)</c> (within vision) and, with none (or no cover module in
+    /// the world, ENV-12), calls <c>c.Search()</c>. With cover in sight it goes to <c>cover.Value.Point</c> without stopping
+    /// short: <c>c.RunTo(point, 0f)</c> when <c>run</c> is on, else <c>c.WalkTo(point, 0f)</c>.
+    /// </summary>
+    /// <inheritdoc/>
     public override void Act(Animal a, ActContext c) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyHideAction", "Act"));
 
-        public override bool IsRelevant(ObservationView o)
-        {
-            var token = o.Token(relevantSense);
-            return token != null && token != "none";
-        }
+    /// <summary>True when the sense named by <c>relevantSense</c> sees cover: its token is neither missing nor "none" (CTRL-10).</summary>
+    /// <inheritdoc/>
+    public override bool IsRelevant(ObservationView o)
+    {
+        var token = o.Token(relevantSense);
+        return token != null && token != "none";
+    }
 }

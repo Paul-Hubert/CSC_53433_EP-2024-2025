@@ -8,10 +8,20 @@ namespace EvoSim
     /// A litter is conceived (REPRO-10, REPRO-11): one egg per baby with its own crossover and its mutations drawn now
     /// (GENE-32, MUT-30); the LLM mutations are sent as one batch at the end (MUT-31).
     /// </summary>
+    /// <remarks>
+    /// <para>Fifth phase of the reference tick, after Act and before Hatch. Species without a <see cref="MatingRule"/>, or a
+    /// World without an <see cref="EggSystem"/>, don't breed. Seekers are taken in id order (REPRO-03); a partner that
+    /// breeds is marked, so it doesn't breed again this decision period.</para>
+    /// <para>Random streams (RAND-03): the litter size and each baby's heading come from the species' <c>litter</c> stream;
+    /// crossover and mutation choices from its <c>mutation</c> stream, drawn now, at conception, so they don't depend on
+    /// when the mutator answers. Under a cap in Block mode, a litter is cut to the room left (POP-01).</para>
+    /// </remarks>
     public class BreedPhase : TickPhase
     {
-        readonly List<Animal> seekers = new List<Animal>();
+        readonly List<Animal> seekers = new List<Animal>();     // this species' animals that want to breed now, in id order
 
+        /// <summary>Conceives the litters of every species, then sends the mutator's requests as one batch.</summary>
+        /// <inheritdoc/>
         public override void Run(TickContext t)
         {
             var eggs = World.Service<EggSystem>();
@@ -52,6 +62,10 @@ namespace EvoSim
             return best;
         }
 
+        /// <summary>
+        /// Conceives a litter (REPRO-10, REPRO-11): draws its size, makes the parents pay the child energy, and lays one egg per
+        /// baby with its own crossover and drawn mutations. <paramref name="second"/> is null for asexual breeding.
+        /// </summary>
         void Conceive(TickContext t, Species s, EggSystem eggs, Animal first, Animal second)
         {
             var litter = s.Module<Litter>();
@@ -103,6 +117,15 @@ namespace EvoSim
         }
 
         /// <summary>Which loci of an egg mutate and how, drawn now in locus order (MUT-01, MUT-02, MUT-30).</summary>
+        /// <remarks>
+        /// For each gene: one draw against its operator's rate (0 under the no-mutation control), then the operator starts its
+        /// job, which may finish later (an LLM mutation). A gene with no operator, or whose allele may not mutate (MUT-22),
+        /// is skipped. Tests call it on hand-made eggs.
+        /// </remarks>
+        /// <param name="world">The World, for the controls and the mutation counters.</param>
+        /// <param name="s">The egg's species.</param>
+        /// <param name="egg">The egg, its inherited alleles set; its mutation list receives the jobs.</param>
+        /// <param name="rng">The species' <c>mutation</c> stream (RAND-03).</param>
         public static void DrawMutations(World world, Species s, Egg egg, RandomStream rng)
         {
             for (int i = 0; i < s.Genes.Count; i++)
@@ -119,6 +142,11 @@ namespace EvoSim
         }
 
         /// <summary>The operator configured for the gene, else the species' default for its kind (MUT-02).</summary>
+        /// <remarks>The first operator, in module order, that accepts the gene and lists it in <see cref="MutationOperator.OnlyThese"/>
+        /// wins; otherwise the first that accepts it and lists no gene at all.</remarks>
+        /// <param name="s">The gene's species.</param>
+        /// <param name="gene">The gene to mutate.</param>
+        /// <returns>The operator to use, or null when none accepts the gene (V-48).</returns>
         public static MutationOperator OperatorFor(Species s, Gene gene)
         {
             MutationOperator fallback = null;
@@ -131,6 +159,7 @@ namespace EvoSim
             return fallback;
         }
 
+        /// <summary>How many animals of the species are alive and not killed this tick.</summary>
         static int Living(Species s)
         {
             int n = 0;
@@ -146,6 +175,11 @@ namespace EvoSim
             go.AddComponent<T>();
         });
 
+        /// <summary>
+        /// For each breeding species, reports a missing egg system (V-20), a missing litter or crossover (V-26), and genes no
+        /// mutation operator accepts (V-48).
+        /// </summary>
+        /// <inheritdoc/>
         public override void Validate(ValidationReport report)
         {
             foreach (var s in World.AllSpecies)

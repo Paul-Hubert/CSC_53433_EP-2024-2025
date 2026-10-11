@@ -7,14 +7,34 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Senses, observations and situation texts (06).</summary>
+    /// <summary>
+    /// Checks senses, observations and situation texts (06; rule family SENSE; T-SENSE-01…09 and the sense parts of
+    /// T-ENV-05, -06): declared tokens, observations as tuples, senses as pure functions of the state, distance bands,
+    /// partner range, observation-space size (V-50), the pinned situation texts (<c>Tests/Golden/situations.tsv</c>) and
+    /// batched raycasts.
+    /// </summary>
+    /// <remarks>
+    /// Most tests use <see cref="Eco"/>, the Lab ecology with the reference senses, and read one animal's senses directly
+    /// through a <see cref="SenseContext"/> after <c>w.Space.Rebuild()</c>, without running a tick. A student's sense is
+    /// checked by the sense suite of <see cref="ConformanceTests"/>; these tests show how to check its tokens one by one.
+    /// If a deliberate change to the situation texts breaks <see cref="SituationTextsSnapshot"/>, delete
+    /// <c>situations.tsv</c>, rerun to pin the new texts, and say why in the commit.
+    /// </remarks>
     public class SenseTests : WorldFixture
     {
+        /// <summary>
+        /// The Lab ecology (48 m, no food) with the given cover and only the act and death phases, built.
+        /// </summary>
+        /// <param name="seed">The world seed.</param>
+        /// <param name="cover">The fraction of the ground in cover, 0 to 1; 0 leaves out the cover module.</param>
+        /// <returns>The built, initialised world.</returns>
         World Eco(int seed = 1, float cover = 0.2f) =>
             New(seed).Ecology(48f, cover, 0f, regrow: 0f).Phase<ActPhase>().Phase<DeathPhase>().Build();
 
+        /// <summary>Reads every sense of an animal now: its observation, one token per sense.</summary>
         static Observation Read(World w, Animal a) => a.Species.Observe(a, new SenseContext(w));
 
+        /// <summary>The token one sense of an animal gives now, found by the sense's label (<c>"Food"</c>, <c>"Predator"</c>…).</summary>
         static string Token(World w, Animal a, string label)
         {
             var sense = a.Species.FindSense(label);
@@ -32,6 +52,7 @@ namespace EvoSim.Tests
             var animals = new List<Animal>();
             for (int i = 0; i < 12; i++) animals.Add(Place.Animal(prey, Place.At(1, 1)));
             for (int i = 0; i < 4; i++) animals.Add(Place.Animal(predator, Place.At(1, 1)));
+            // 1 000 random states of the same world: food, positions, stats, ages and killed flags all drawn again.
             for (int state = 0; state < 1000; state++)
             {
                 food.Clear();
@@ -57,6 +78,7 @@ namespace EvoSim.Tests
                     }
                 }
             }
+            // Then one animal alone in an empty world: every sense of something outside gives its "nothing" token.
             foreach (var a in animals) { a.Killed = false; a.IsGone = true; }
             food.Clear();
             var lone = Place.Animal(prey, Place.At(40, 40));
@@ -183,6 +205,7 @@ namespace EvoSim.Tests
             var set = ObservationSet.FromJsonLines(System.IO.File.ReadAllText(System.IO.Path.Combine(Application.dataPath, "EvoSim/Data/Observations/prey_observations_v2.jsonl")));
             var preyObs = set.For(prey);
             Assert.AreEqual(48, preyObs.Count, "every prototype situation maps to the Unity prey");
+            // 48 predator situations: 3 energy levels × 4 prey distances × 2 carcass tokens × 2 other-predator tokens.
             var predatorSet = new ObservationSet();
             foreach (var e in new[] { "low", "medium", "high" })
                 foreach (var p in new[] { "none", "adjacent", "close", "far" })
@@ -246,6 +269,7 @@ namespace EvoSim.Tests
             {
                 var animals = new List<Animal>();
                 for (int i = 0; i < 500; i++) animals.Add(Place.Animal(sp, Place.At(rng.Range(0f, 100f), rng.Range(0f, 100f)), heading: rng.Range(0f, 360f)));
+                // All rays cast in one batch, then each animal's rays cast alone and at once: the tokens must agree.
                 var batched = new SenseContext(w);
                 batched.CastRays(animals);
                 var tokens = animals.Select(a => sp.Senses[0].Read(a, batched)).ToList();

@@ -1,0 +1,10 @@
+- name: Guides
+  href: guides/
+- name: Extending
+  href: extending/
+- name: API reference
+  href: api/
+  homepage: api/index.md
+- name: Specification
+  href: spec/
+  homepage: spec/README.md

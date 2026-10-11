@@ -13,8 +13,21 @@ namespace EvoSim
     /// reference situations (15 §2), through the scene's real prompt and brain. Queries are built from texts only:
     /// nothing is registered in the world. Each writes a report (IntegrityReport).
     /// </summary>
+    /// <remarks>
+    /// <para>Each gate opens the scene additively, makes the named brain the default with no mutation, initialises the world
+    /// (for its species, prompts and texts), asks the brain directly, and writes its report under <c>Logs/EvoSim/Reports</c>.
+    /// None is blocking: a failed gate is a finding to track (32 §2). Run them through <see cref="Integrity.RunIntegrity"/>
+    /// (<c>-checks B-02,B-03…</c>) or <see cref="Integrity.RunNamed"/>.</para>
+    /// <para>The reference situations come from <c>Data/Observations/prey_observations_v2.jsonl</c> for prey and from
+    /// <c>ObservationSet.PredatorReference</c> for a species that senses prey.</para>
+    /// </remarks>
     public static class IntegrityGates
     {
+        /// <summary>
+        /// The pass thresholds of 32 §2: B-02 sign accuracy ≥ 0.85 (<c>SignAccuracy</c>) and mean ΔP ≥ 0.25 (<c>MeanDeltaP</c>);
+        /// B-03 MI_G(founders) ≥ 2 × MI_G(random text) (<c>MiMargin</c>); B-04 locality ratio ≤ 0.5 (<c>LocalityRatio</c>) and
+        /// Spearman ρ ≥ 0.3 (<c>Rho</c>).
+        /// </summary>
         public const double SignAccuracy = 0.85, MeanDeltaP = 0.25, MiMargin = 2.0, LocalityRatio = 0.5, Rho = 0.3;
 
         /// <summary>The action a gene's contrast pair should move and the situation tag where it is relevant (prototype RELEVANT_TAG).</summary>
@@ -27,10 +40,16 @@ namespace EvoSim
         /// <summary>A species' situations with their tags.</summary>
         sealed class Situations
         {
+            /// <summary>The situations, one token per sense of the species.</summary>
             public readonly List<Observation> Observations = new List<Observation>();
+            /// <summary>The tags of each situation, in the same order (<c>predator_present</c>, <c>food_present</c>…).</summary>
             public readonly List<List<string>> Tags = new List<List<string>>();
         }
 
+        /// <summary>
+        /// The reference situations of a species (15 §2) that its senses can express; with <paramref name="keep"/> &gt; 0, a
+        /// deterministic subset of that size where every tag appears.
+        /// </summary>
         static Situations Reference(Species s, int keep = 0)
         {
             var set = s.Senses.Any(x => x is NearestAnimalSense n && n.Targets == AnimalSet.Prey)
@@ -58,10 +77,13 @@ namespace EvoSim
 
         // ---- Genomes as texts (locus order of the brain-read genes) ----
 
+        /// <summary>The species' text genes the brain reads, in locus order: the slots of a genome as texts.</summary>
         static List<TextGene> TextGenes(Species s) => s.Genes.Where(g => g.ReadByBrain).OfType<TextGene>().ToList();
 
+        /// <summary>The neutral genome: every gene's neutral sentence.</summary>
         static string[] Neutral(List<TextGene> genes) => genes.Select(g => g.Neutral).ToArray();
 
+        /// <summary>Up to <paramref name="n"/> distinct genomes, each gene a founder drawn from <paramref name="rng"/>.</summary>
         static List<string[]> Founders(List<TextGene> genes, int n, RandomStream rng)
         {
             var list = new List<string[]>();
@@ -73,9 +95,13 @@ namespace EvoSim
             return list;
         }
 
+        /// <summary>
+        /// <paramref name="n"/> random-text genomes: each gene a control sentence (GENE-23) drawn from <paramref name="rng"/>.
+        /// </summary>
         static List<string[]> Controls(List<TextGene> genes, IReadOnlyList<string> sentences, int n, RandomStream rng) =>
             Enumerable.Range(0, n).Select(_ => genes.Select(x => sentences[rng.Range(0, sentences.Count)]).ToArray()).ToList();
 
+        /// <summary>A query for a genome given as texts, with a genome key hashed from the texts (nothing registered).</summary>
         static DecisionQuery Query(Species s, List<TextGene> genes, string[] texts, Observation o, TextStyle style)
         {
             var list = new List<KeyValuePair<string, string>>();
@@ -112,10 +138,15 @@ namespace EvoSim
 
         // ---- Metrics (prototype promptevo/metrics.py) ----
 
+        /// <summary>The Shannon entropy of a distribution, in bits.</summary>
         static double Entropy(IReadOnlyList<double> p) { double h = 0; foreach (var x in p) if (x > 0) h -= x * Math.Log(x, 2); return h; }
+        /// <summary>The Shannon entropy of a probability row, in bits.</summary>
         static double Entropy(float[] p) => Entropy(p.Select(x => (double)x).ToList());
 
         /// <summary>MI_G = mean over situations of H(mean over genomes p) − mean over genomes H(p).</summary>
+        /// <remarks>How much the genome changes the answer, in bits: 0 when every genome gives the same rows (B-03).</remarks>
+        /// <param name="P">The probability rows, indexed [genome][situation][action]; at least one genome and one situation.</param>
+        /// <returns>The mutual information between genome and action, in bits.</returns>
         public static double MiGenome(float[][][] P)
         {
             int G = P.Length, O = P[0].Length, A = P[0][0].Length;
@@ -131,6 +162,9 @@ namespace EvoSim
         }
 
         /// <summary>MI_O = mean over genomes of H(mean over situations p) − mean over situations H(p).</summary>
+        /// <remarks>How much the situation changes the answer, in bits: 0 when the brain ignores what the animal senses.</remarks>
+        /// <param name="P">The probability rows, indexed [genome][situation][action]; at least one genome and one situation.</param>
+        /// <returns>The mutual information between situation and action, in bits.</returns>
         public static double MiObs(float[][][] P)
         {
             int G = P.Length, O = P[0].Length, A = P[0][0].Length;
@@ -145,6 +179,7 @@ namespace EvoSim
             return total / G;
         }
 
+        /// <summary>The Jensen-Shannon divergence of two probability rows, in bits (0 = the same, 1 = disjoint).</summary>
         static double Jsd(float[] p, float[] q)
         {
             var m = new double[p.Length];
@@ -155,6 +190,7 @@ namespace EvoSim
         /// <summary>d(g, g') = mean over situations of JSD(p(.|o,g), p(.|o,g')).</summary>
         static double Distance(float[][] a, float[][] b) => Enumerable.Range(0, a.Length).Average(o => Jsd(a[o], b[o]));
 
+        /// <summary>How different two genomes' texts are: the edit distance of the joined texts over the longer length (0 to 1).</summary>
         static double TextDistance(string[] a, string[] b)
         {
             string x = string.Join(" | ", a), y = string.Join(" | ", b);
@@ -167,8 +203,10 @@ namespace EvoSim
             return (double)d[x.Length, y.Length] / Math.Max(1, Math.Max(x.Length, y.Length));
         }
 
+        /// <summary>The Spearman rank correlation of two series (ties get their mean rank), or NaN when one is constant.</summary>
         static double Spearman(IList<double> x, IList<double> y)
         {
+            // Ranks from 1, ties sharing the mean of their ranks.
             double[] Rank(IList<double> v)
             {
                 var order = Enumerable.Range(0, v.Count).OrderBy(i => v[i]).ToArray();
@@ -190,8 +228,13 @@ namespace EvoSim
 
         // ---- The gates ----
 
+        /// <summary>The measurement of one gate, given the initialised world, the brain under test and the report to fill.</summary>
         delegate void Body(World w, Brain brain, IntegrityReport r);
 
+        /// <summary>
+        /// Opens the scene, makes the named brain the default (no mutation, Freeze, no run files), initialises the world,
+        /// records the common facts, runs the gate's body and writes the report.
+        /// </summary>
         static IntegrityReport Run(string id, string title, bool blocking, string scene, string brainName, Body body)
         {
             var report = new IntegrityReport(id, title, blocking);
@@ -218,6 +261,11 @@ namespace EvoSim
         }
 
         /// <summary>B-02 G1 directed: every contrast pair (pro / anti, neutral elsewhere) × the relevant situations → sign accuracy and mean ΔP.</summary>
+        /// <remarks>ΔP is P(the gene's action | pro) − P(the same action | anti) in one situation. Passes with a sign accuracy
+        /// ≥ 0.85 and a mean ΔP ≥ 0.25. A hide gene's situations get cover in sight (see WithCoverInSight).</remarks>
+        /// <param name="scene">The scene, relative to the project; it must not be open in the editor.</param>
+        /// <param name="brainName">The brain under test: a GameObject name or a brain id.</param>
+        /// <returns>The written report: one row per species and locus with its mean ΔP and sign accuracy.</returns>
         public static IntegrityReport Directed(string scene, string brainName) => Run("B-02", "G1 directed", false, scene, brainName, (w, brain, r) =>
         {
             int calls = 0, failures = 0, signs = 0, cells = 0;
@@ -284,6 +332,12 @@ namespace EvoSim
         }
 
         /// <summary>B-03 G2 information: 10 founder genomes, 10 random-text genomes, the neutral genome × 24 situations.</summary>
+        /// <remarks>Passes when, for every species, MI_G(founders) ≥ 2 × MI_G(random text): real genes must carry more
+        /// information than random sentences. Also reports MI_O and the distances of founders and random texts to the neutral
+        /// genome.</remarks>
+        /// <param name="scene">The scene, relative to the project; it must not be open in the editor.</param>
+        /// <param name="brainName">The brain under test: a GameObject name or a brain id.</param>
+        /// <returns>The written report: one row per species.</returns>
         public static IntegrityReport Information(string scene, string brainName) => Run("B-03", "G2 information", false, scene, brainName, (w, brain, r) =>
         {
             int calls = 0, failures = 0;
@@ -312,6 +366,12 @@ namespace EvoSim
         });
 
         /// <summary>B-04 G3 locality: 10 parents × 4 single mutations by the scene's mutator; locality ratio ≤ 0.5, Spearman ρ ≥ 0.3.</summary>
+        /// <remarks>On the first species only. The locality ratio is the median behaviour distance parent → child over the
+        /// median distance between unrelated parents: a small edit should change behaviour less than a new genome. ρ
+        /// correlates text distance with behaviour distance. Needs the mutator server.</remarks>
+        /// <param name="scene">The scene, relative to the project; it needs a mutator service, a client and an LLM mutation.</param>
+        /// <param name="brainName">The brain under test: a GameObject name or a brain id.</param>
+        /// <returns>The written report, with the ratio, ρ and the number of edits in its facts.</returns>
         public static IntegrityReport Locality(string scene, string brainName) => Run("B-04", "G3 locality", false, scene, brainName, (w, brain, r) =>
         {
             int calls = 0, failures = 0, mutatorCalls = 0;
@@ -353,6 +413,7 @@ namespace EvoSim
             var unrelD = new List<double>(); var unrelT = new List<double>();
             for (int i = 0; i < parents.Count; i++)
                 for (int j = i + 1; j < parents.Count; j++) { unrelD.Add(Distance(P[i], P[j])); unrelT.Add(TextDistance(parents[i], parents[j])); }
+            // The middle value of a list, or NaN when it is empty.
             double Median(List<double> v) { var o = v.OrderBy(x => x).ToList(); return o.Count == 0 ? double.NaN : o.Count % 2 == 1 ? o[o.Count / 2] : 0.5 * (o[o.Count / 2 - 1] + o[o.Count / 2]); }
             double ratio = Median(editD) / Median(unrelD);
             double rho = Spearman(editT.Concat(unrelT).ToList(), editD.Concat(unrelD).ToList());
@@ -363,6 +424,11 @@ namespace EvoSim
         });
 
         /// <summary>B-05 option order (JEV): the same queries with the options reversed → the share of changed top answers (reported).</summary>
+        /// <remarks>On the first species, 5 founder genomes × 20 situations. Reported only: it fails only when the brain isn't
+        /// JEV.</remarks>
+        /// <param name="scene">The scene, relative to the project; it must not be open in the editor.</param>
+        /// <param name="brainName">The brain under test; it must be a <see cref="JevBrain"/>.</param>
+        /// <returns>The written report, with the share of changed top answers in its facts.</returns>
         public static IntegrityReport OptionOrder(string scene, string brainName) => Run("B-05", "Option order", false, scene, brainName, (w, brain, r) =>
         {
             if (!(brain is JevBrain jev)) { r.Fail("a multiple-choice brain (JEV) is needed"); return; }
@@ -382,6 +448,7 @@ namespace EvoSim
                     texts.Add(JevBrain.Text(state, jev.Question(s), names));
                     reversed.Add(JevBrain.Text(state, jev.Question(s), names.Reverse().ToArray()));
                 }
+            // JEV's probability rows for a list of input texts, asked straight from its completions endpoint.
             float[][] Rows(List<string> list)
             {
                 var body = jev.Body(list, n);                                             // built on the main thread
@@ -412,6 +479,9 @@ namespace EvoSim
         });
 
         /// <summary>B-06 prompt length: the longest founder genome with the longest situation, for every species, under the brain's limit.</summary>
+        /// <param name="scene">The scene, relative to the project; it must not be open in the editor.</param>
+        /// <param name="brainName">The brain under test: a GameObject name or a brain id.</param>
+        /// <returns>The written report: one row per species with its estimated tokens and the brain's limit.</returns>
         public static IntegrityReport PromptLength(string scene, string brainName) => Run("B-06", "Prompt length", false, scene, brainName, (w, brain, r) =>
         {
             foreach (var s in w.AllSpecies)
@@ -431,6 +501,13 @@ namespace EvoSim
         });
 
         /// <summary>B-07 points sanity (Ollama points brain): shares of answers summing to 100 and of all-zero answers, by genome kind.</summary>
+        /// <remarks>On the first species: 2 founder genomes, 2 random-text genomes and the neutral genome × 3 situations. Fails
+        /// when a founder genome gets an all-zero answer.</remarks>
+        /// <param name="scene">The scene, relative to the project; it must not be open in the editor.</param>
+        /// <param name="brainName">The brain under test; it must be an <see cref="OllamaPointsBrain"/> (Integrity passes
+        /// <c>Ollama points</c>).</param>
+        /// <param name="cpuOnly">True to run the model on the CPU.</param>
+        /// <returns>The written report: one row per genome kind.</returns>
         public static IntegrityReport PointsSanity(string scene, string brainName, bool cpuOnly) => Run("B-07", "Points sanity", false, scene, brainName, (w, brain, r) =>
         {
             if (!(brain is OllamaPointsBrain points)) { r.Fail("an Ollama points brain is needed"); return; }
@@ -470,8 +547,15 @@ namespace EvoSim
         });
 
         /// <summary>B-08 names: the predator named "wolf" or "shadow"; the prey gene "Run from any wolf you see." → P(flee) lower for "shadow".</summary>
+        /// <remarks>The scene is run twice, the predator's display name set by a field override; the mean P(flee) is taken over
+        /// the situations with a predator present. Passes when it is lower for "shadow": the brain reads the names.</remarks>
+        /// <param name="scene">The scene, relative to the project; it needs species <c>prey</c> (with a <c>flee</c> gene) and
+        /// <c>Predator</c>.</param>
+        /// <param name="brainName">The brain under test: a GameObject name or a brain id.</param>
+        /// <returns>The written report, with both P(flee) in its facts.</returns>
         public static IntegrityReport Names(string scene, string brainName)
         {
+            // The prey's mean P(flee) near a predator called predatorName, with the flee gene naming a wolf.
             double Flee(string predatorName, out int calls)
             {
                 calls = 0;
@@ -513,6 +597,11 @@ namespace EvoSim
         }
 
         /// <summary>B-09 repeatability: the same 50 queries twice (no cache) → identical rows; differences above 1e-3 reported.</summary>
+        /// <remarks>On the first species: 5 founder genomes × 10 situations. Fails on a difference unless the brain is JEV,
+        /// whose small differences are only reported.</remarks>
+        /// <param name="scene">The scene, relative to the project; it must not be open in the editor.</param>
+        /// <param name="brainName">The brain under test: a GameObject name or a brain id.</param>
+        /// <returns>The written report, with the number of differing rows and the largest difference in its facts.</returns>
         public static IntegrityReport Repeatability(string scene, string brainName) => Run("B-09", "Repeatability", false, scene, brainName, (w, brain, r) =>
         {
             int calls = 0, failures = 0, differing = 0;
@@ -550,6 +639,7 @@ namespace EvoSim
             { "predator.hunt", "when and how to hunt prey" }, { "predator.follow", "when to follow other predators" },
         };
 
+        /// <summary>The judge's topic for a slot: the species-specific one, else the slot's, else "when to &lt;slot&gt;".</summary>
         static string Topic(string species, string slot) =>
             Topics.TryGetValue(species + "." + slot, out var t) || Topics.TryGetValue(slot, out t) ? t : "when to " + slot;
 
@@ -558,6 +648,13 @@ namespace EvoSim
         /// without selection; a judge model says whether each gene is still a usable rule (≥ 80 % after one mutation),
         /// and rates the founders first, as the baseline.
         /// </summary>
+        /// <remarks>The world runs with its <c>Random</c> brain; the judge is asked through the scene's Ollama points brain
+        /// connection (without one, nothing is judged). Needs the mutator and judge models in Ollama.</remarks>
+        /// <param name="scene">The scene, relative to the project; it needs a mutator service and client.</param>
+        /// <param name="judgeModel">The Ollama model that judges, such as <c>gemma4:12b</c>; empty = no judging.</param>
+        /// <param name="chain">The number of mutations in a row.</param>
+        /// <returns>The written report: the guard pass rate, the usable shares (founders, after 1 and after
+        /// <paramref name="chain"/> mutations) and the first 12 sentences after the chain.</returns>
         public static IntegrityReport MutatorQuality(string scene, string judgeModel, int chain = 10) => Run("B-10", "Mutator", false, scene, "Random", (w, brain, r) =>
         {
             var service = w.GetComponentInChildren<MutatorService>(true);
@@ -580,6 +677,7 @@ namespace EvoSim
                 if ((step <= 1 || step == chain) && judge != null && !string.IsNullOrEmpty(judgeModel)) usableAfter[step] = Judge();
             }
 
+            // One mutation of every sentence with a random deck instruction; a sentence the guards reject stays as it was.
             void Mutate(int step)
             {
                 var requests = current.Select(c => new MutatorRequest(MutationText.Prompt(c.op.ContextLine, c.op.Instructions[rng.Range(0, c.op.Instructions.Count)], c.text),
@@ -597,6 +695,7 @@ namespace EvoSim
                 }
             }
 
+            // The share of current sentences the judge calls a usable rule for their slot (a failed call counts as no).
             double Judge()
             {
                 {

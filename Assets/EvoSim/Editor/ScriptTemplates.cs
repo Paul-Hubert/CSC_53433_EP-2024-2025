@@ -9,12 +9,27 @@ namespace EvoSim.Editor
     /// mutation operator — each with the methods to override and a matching test — and a mutation deck. Scripts go to
     /// Assets/Student (with its assembly), tests to Assets/Student/Tests (with a test assembly that sees EvoSim.Testing).
     /// </summary>
+    /// <remarks>
+    /// <para>In the Project window: <c>Assets ▸ Create ▸ EvoSim ▸ Script ▸ Sense / Action / Gene kind / Stat / Phase / Brain /
+    /// Mutation operator</c>. A save dialog asks for the class name (the file name); the script
+    /// <c>Assets/Student/&lt;Name&gt;.cs</c> and its test <c>Assets/Student/Tests/&lt;Name&gt;Tests.cs</c> are written and the
+    /// script is selected. Each script compiles as it is and does something trivial, with the methods to override; each
+    /// test builds a small world in code (<c>WorldBuilder</c>) that uses the new class, and checks one fact.
+    /// <c>Assets ▸ Create ▸ EvoSim ▸ Mutation Deck</c> saves a copy of the reference deck to edit.</para>
+    /// <para>The first time, the <c>Student</c> assembly (it sees EvoSim.Runtime, EvoSim.Http and EvoSim.Samples) and the
+    /// <c>Student.Tests</c> assembly (editor only, with EvoSim.Testing and NUnit) are created.</para>
+    /// </remarks>
     public static class ScriptTemplates
     {
+        /// <summary>The students' folder: <c>Assets/Student</c>, tests in <c>Assets/Student/Tests</c>.</summary>
         public const string StudentFolder = "Assets/Student";
+        /// <summary>The kinds of script a template exists for, as <see cref="Render"/> and <see cref="Create"/> take them.</summary>
         public static readonly string[] Kinds = { "Sense", "Action", "Gene", "Stat", "Phase", "Brain", "MutationOperator" };
 
         /// <summary>The script and its test for a kind and a class name.</summary>
+        /// <param name="kind">One of <see cref="Kinds"/>; an unknown kind gets the mutation operator template.</param>
+        /// <param name="name">The class name; the test class is <c>&lt;name&gt;Tests</c>.</param>
+        /// <returns>The C# source of the script and of its test.</returns>
         public static (string script, string test) Render(string kind, string name)
         {
             string lower = name.ToLowerInvariant();
@@ -23,9 +38,12 @@ namespace EvoSim.Editor
             return (script, test);
         }
 
+        /// <summary>The using lines of every script.</summary>
         const string Header = "using System.Collections.Generic;\nusing EvoSim;\nusing UnityEngine;\n\n";
+        /// <summary>The using lines of every test.</summary>
         const string TestHeader = "using EvoSim;\nusing EvoSim.Testing;\nusing NUnit.Framework;\n\n";
 
+        /// <summary>The script template of a kind, with <c>#NAME#</c> and <c>#LOWER#</c> for the class name and its lower case.</summary>
         static string Body(string kind)
         {
             switch (kind)
@@ -86,6 +104,7 @@ namespace EvoSim.Editor
             }
         }
 
+        /// <summary>The test template of a kind: a world built in code that uses the new class, and one check.</summary>
         static string TestBody(string kind)
         {
             string build = kind == "Phase" || kind == "Brain"
@@ -111,11 +130,13 @@ namespace EvoSim.Editor
             }
         }
 
+        /// <summary>A test class <c>#NAME#Tests</c> with one test, <c>Works</c>, around the given body.</summary>
         static string Wrap(string body) =>
             "/// <summary>Tests of #NAME# (30 §2: worlds built in code with WorldBuilder).</summary>\n" +
             "public class #NAME#Tests : WorldFixture\n{\n    [Test]\n    public void Works()\n    {\n" + body + "    }\n}\n";
 
         /// <summary>Makes Assets/Student with its assembly and its test assembly, the first time.</summary>
+        /// <remarks>Existing assembly files are left as they are, so a student may add references to them.</remarks>
         public static void EnsureStudentAssemblies()
         {
             Directory.CreateDirectory(StudentFolder + "/Tests");
@@ -130,6 +151,10 @@ namespace EvoSim.Editor
         }
 
         /// <summary>Writes a script and its test under Assets/Student, making the two assemblies the first time.</summary>
+        /// <remarks>Files of the same name are overwritten. Unity imports and compiles the new files.</remarks>
+        /// <param name="kind">One of <see cref="Kinds"/>.</param>
+        /// <param name="name">The class name, which is also the file name.</param>
+        /// <returns>The script's path, <c>Assets/Student/&lt;name&gt;.cs</c>.</returns>
         public static string Create(string kind, string name)
         {
             var (script, test) = Render(kind, name);
@@ -141,6 +166,10 @@ namespace EvoSim.Editor
             return path;
         }
 
+        /// <summary>
+        /// Asks for a class name in a save dialog, then creates the script and its test and selects the script. Only the
+        /// chosen file name is used: the files always go to <see cref="StudentFolder"/>.
+        /// </summary>
         static void Ask(string kind)
         {
             string path = EditorUtility.SaveFilePanelInProject("New " + kind, "My" + kind, "cs", "The class name is the file name.", StudentFolder);
@@ -150,14 +179,30 @@ namespace EvoSim.Editor
             Selection.activeObject = AssetDatabase.LoadAssetAtPath<MonoScript>(created);
         }
 
+        /// <summary><c>Assets ▸ Create ▸ EvoSim ▸ Script ▸ Sense</c>: a <see cref="Sense"/> with three tokens, and its test.</summary>
         [MenuItem("Assets/Create/EvoSim/Script/Sense", false, 80)] static void NewSense() => Ask("Sense");
+        /// <summary><c>Assets ▸ Create ▸ EvoSim ▸ Script ▸ Action</c>: an <see cref="AnimalAction"/> that searches, and its test.</summary>
         [MenuItem("Assets/Create/EvoSim/Script/Action", false, 80)] static void NewAction() => Ask("Action");
+        /// <summary>
+        /// <c>Assets ▸ Create ▸ EvoSim ▸ Script ▸ Gene kind</c>: a number <see cref="Gene"/> that sets a trait, and its test.
+        /// </summary>
         [MenuItem("Assets/Create/EvoSim/Script/Gene kind", false, 80)] static void NewGene() => Ask("Gene");
+        /// <summary><c>Assets ▸ Create ▸ EvoSim ▸ Script ▸ Stat</c>: a species module that declares a stat, and its test.</summary>
         [MenuItem("Assets/Create/EvoSim/Script/Stat", false, 80)] static void NewStat() => Ask("Stat");
+        /// <summary><c>Assets ▸ Create ▸ EvoSim ▸ Script ▸ Phase</c>: an empty <see cref="TickPhase"/>, and its test.</summary>
         [MenuItem("Assets/Create/EvoSim/Script/Phase", false, 80)] static void NewPhase() => Ask("Phase");
+        /// <summary>
+        /// <c>Assets ▸ Create ▸ EvoSim ▸ Script ▸ Brain</c>: a <see cref="Brain"/> that answers uniform probabilities, and its test.
+        /// </summary>
         [MenuItem("Assets/Create/EvoSim/Script/Brain", false, 80)] static void NewBrain() => Ask("Brain");
+        /// <summary><c>Assets ▸ Create ▸ EvoSim ▸ Script ▸ Mutation operator</c>: a <see cref="MutationOperator"/> that adds ±1 to a
+        /// number, and its test.</summary>
         [MenuItem("Assets/Create/EvoSim/Script/Mutation operator", false, 80)] static void NewOperator() => Ask("MutationOperator");
 
+        /// <summary>
+        /// <c>Assets ▸ Create ▸ EvoSim ▸ Mutation Deck</c>: asks where to save a <c>.txt</c> deck and writes a copy of the
+        /// reference deck <c>mutate_v4.txt</c> there, one mutation instruction per line (MUT-10).
+        /// </summary>
         [MenuItem("Assets/Create/EvoSim/Mutation Deck", false, 81)]
         static void NewDeck()
         {

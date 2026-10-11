@@ -8,13 +8,27 @@ using UnityEngine;
 // its kind (Test Runner, EditMode) only checks that it fits the system, for example that a seed repeats a run.
 #pragma warning disable CS0414 // settings your code will read
 
-/// <summary>Exercise 3: death when energy runs out (ANIM-40). Reference: Starvation.</summary>
+/// <summary>Exercise 3: death when energy runs out (ANIM-40). Reference: <see cref="Starvation"/>.</summary>
+/// <remarks>
+/// <para>Write <see cref="CauseOfDeath"/>; the cause's name is given. You will also need a field for the species'
+/// <see cref="Energy"/> module and an <c>Initialize</c> override that finds it once (<c>Species.Module&lt;Energy&gt;()</c>).</para>
+/// <para>The death phase calls the rule for every living animal once per tick; the World records the death with its cause.
+/// The reference also warns in <c>Validate</c> when the species has no Energy module (V-26).</para>
+/// </remarks>
 [ExerciseOf(typeof(Starvation))]
 public class MyStarvation : DeathRule
 {
-    static readonly string[] causes = { "starvation" };
+    static readonly string[] causes = { "starvation" };   // backs Causes; shared, never changed
+
+    /// <summary>
+    /// "starvation": the one cause this rule gives, which gets its own column in <c>stats.csv</c> (<c>deaths_starvation</c>).
+    /// </summary>
     public override IEnumerable<string> Causes => causes;
 
-    /// <summary>"starvation" when the animal's energy is at or below 0, else null (find Energy once, in Initialize).</summary>
+    /// <summary>
+    /// "starvation" when the animal's energy is at or below 0, else null (find Energy once, in Initialize). The reference
+    /// reads the stat with <c>a[energy.Value]</c>, and returns null when the species has no Energy module.
+    /// </summary>
+    /// <inheritdoc/>
     public override string CauseOfDeath(Animal a) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyStarvation", "CauseOfDeath"));
 }

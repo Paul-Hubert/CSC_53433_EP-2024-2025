@@ -6,9 +6,18 @@ using NUnit.Framework;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Static checks of the runtime code (30 §3).</summary>
+    /// <summary>
+    /// Static checks of the runtime code (30 §3, tier T0): the source of the Runtime, Http and Samples folders is scanned
+    /// for what the contract forbids — iteration over hash collections (RAND-05), per-animal state in species modules
+    /// (CORE-05, ARCH-03), global or time-based randomness (RAND-01), and species or action names in the core (CORE-03).
+    /// </summary>
+    /// <remarks>
+    /// The scans read source text through <see cref="SourceScan"/>, which strips comments, or reflect over the compiled
+    /// assemblies; they build no world. They do not scan a student's folder.
+    /// </remarks>
     public class StaticChecks
     {
+        /// <summary>The C# files of the Runtime, Http and Samples folders of EvoSim.</summary>
         static IEnumerable<string> RuntimeFiles => SourceScan.Files("Runtime").Concat(SourceScan.Files("Http")).Concat(SourceScan.Files("Samples"));
 
         [Test, Description("RAND-05 (T-RAND-04, static): no foreach over a Dictionary or a HashSet in the runtime code and samples: their order isn't defined (sorted collections and lists are)")]

@@ -7,9 +7,26 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Decisions, brains, memo, cache and failures (08 §1–§6).</summary>
+    /// <summary>
+    /// Checks decisions, brains, the memo, the answer cache and failures (08 §1–§6; rule family DEC; T-DEC-01…09, -11,
+    /// T-CORE-10, T-RAND-04, T-SENSE-10), and holds the brain conformance suite of 30 §4, <see cref="BrainConformance"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>Most tests build the Lab ecology with the reference phases (<see cref="Lab"/>) and either the random brain or a
+    /// <see cref="ScriptedBrain"/>, a test brain that answers with a policy written in the test, counts its calls and
+    /// batches, keeps every query it saw and can fail on demand. No test calls a real model.</para>
+    /// <para><see cref="BrainConformance"/> runs over every concrete brain class of the EvoSim assemblies. An HTTP brain is
+    /// pointed at a <see cref="FakeHttpTransport"/> that plays its server; a brain with no fake is ignored.</para>
+    /// </remarks>
     public class DecisionTests : WorldFixture
     {
+        /// <summary>
+        /// The Lab ecology (48 m, 20 % cover, 10 % food) with the reference phases and no brain yet: the caller adds one.
+        /// </summary>
+        /// <param name="seed">The world seed.</param>
+        /// <param name="prey">Founders of the prey.</param>
+        /// <param name="predators">Founders of the predator.</param>
+        /// <returns>The builder, not yet built.</returns>
         WorldBuilder Lab(int seed = 1, int prey = 0, int predators = 0) =>
             New(seed).Ecology(48f, 0.2f, 0.1f, prey: s => s.Population(prey), predator: s => s.Population(predators)).ReferencePhases();
 
@@ -74,6 +91,11 @@ namespace EvoSim.Tests
             Assert.AreEqual(0, q.Attachments.Count);
         }
 
+        /// <summary>
+        /// Every concrete brain class with a namespace in an assembly whose name starts with <c>EvoSim</c> (test brains
+        /// included), except those whose full name contains <c>Http</c>, sorted by full name: the cases of
+        /// <see cref="BrainConformance"/>.
+        /// </summary>
         static IEnumerable<Type> BrainTypes() => AppDomain.CurrentDomain.GetAssemblies()
             .Where(x => x.GetName().Name.StartsWith("EvoSim"))
             .SelectMany(x => x.GetTypes())
@@ -100,6 +122,7 @@ namespace EvoSim.Tests
             var w = b.Build();
             var prey = w.FindSpecies("prey");
             var predator = w.FindSpecies("predator");
+            // Twenty queries from animals at random places, prey and predator in turn, asked twice in one batch each.
             var rng = new RandomStream(3, "queries");
             var queries = new List<DecisionQuery>();
             for (int i = 0; i < 20; i++)
@@ -191,7 +214,7 @@ namespace EvoSim.Tests
             w.Advance(1);
             Assert.AreEqual(3, brain.Calls, "one query per distinct key");
             Assert.AreEqual(1, brain.Batches);
-            foreach (var a in sp.Animals) a.Action = -1;
+            foreach (var a in sp.Animals) a.Action = -1;                    // no action: every animal decides again
             w.Advance(1);
             Assert.AreEqual(3, brain.Calls, "next tick: all memo hits");
             Assert.AreEqual(50, sp.Counters.MemoHits);
@@ -262,7 +285,7 @@ namespace EvoSim.Tests
             string Snapshot() => string.Join(";", w.AllSpecies.SelectMany(s => s.Animals).Select(a => $"{a.Id}:{a.Position}:{a.StatOf("energy")}:{a.StatOf("stamina")}"))
                                  + "|" + w.Service<FoodGrid>().Count + "|" + w.Service<CarcassSystem>().EntityCount;
             var before = Snapshot();
-            for (int i = 0; i < 3; i++) w.Phases[i].Run(w.Context);
+            for (int i = 0; i < 3; i++) w.Phases[i].Run(w.Context);       // Sense, Ask brains, Choose actions only
             Assert.AreEqual(before, Snapshot());
             Assert.IsTrue(w.AllSpecies.SelectMany(s => s.Animals).All(a => a.Action >= 0), "but every animal has an action");
         }
@@ -291,6 +314,7 @@ namespace EvoSim.Tests
             Assert.IsFalse(b.BuildUninitialized().Prepare(r));
             Assert.IsTrue(r.Has("V-51"));
 
+            // Decisions at ticks 0, 4 and 8 (period 4) in 9 ticks.
             ScriptedBrain brain = null;
             var w = New(name: "accepts").Flat(20, 20).ReferencePhases().DefaultBrain<ScriptedBrain>(x => { x.TakesAttachments = true; brain = x; })
                 .Species("eyes", s => s.Module<KinematicLocomotion>().Sense<CameraProbeSense>().Action<RestAction>("rest", founders: new[] { "Rest." }).Population(5))

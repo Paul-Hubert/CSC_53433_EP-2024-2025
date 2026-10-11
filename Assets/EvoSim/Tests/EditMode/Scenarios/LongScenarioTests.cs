@@ -7,18 +7,36 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>The T3 scenarios of 31 with scripted or random brains: mechanics over thousands of ticks (nightly).</summary>
+    /// <summary>
+    /// The T3 scenarios of 31 run with scripted or random brains (category <c>T3</c>, nightly): mechanics over thousands of
+    /// ticks — hide versus flee (S06), a six-species food web (S10), water and thirst (S16), slopes on terrain (S17) and
+    /// scale (S23).
+    /// </summary>
+    /// <remarks>
+    /// The behaviour comes from scripted policies written here (<see cref="Prey"/>, <see cref="Thirsty"/>) and given to a
+    /// <see cref="ScriptedBrain"/>: they read sense tokens and prefer one action. So the tests check mechanics, not what a
+    /// language model would do. Directional checks hold over several seeds (<see cref="Seeds"/>). The tests run thousands of
+    /// ticks each, so they are slow. S17 and S23 open a scene: close it in the editor first.
+    /// </remarks>
     [Category("T3")]
     public class LongScenarioTests : WorldFixture
     {
+        /// <summary>The seeds a directional check runs over.</summary>
         static readonly int[] Seeds = { 1234, 7, 42, 99, 2026 };
 
+        /// <summary>True when a distance token says the thing is within reach, adjacent or close.</summary>
         static bool Near(string token) => token != null && (token == "here" || token.StartsWith("adjacent") || token.StartsWith("close"));
+        /// <summary>True when a distance token says near (<see cref="Near"/>) or at medium range.</summary>
         static bool InRange(string token) => Near(token) || (token != null && token.StartsWith("medium"));
+        /// <summary>True when a sense token reports something in sight: not null and not "none".</summary>
         static bool Seen(string token) => token != null && token != "none" && !token.StartsWith("none");
 
         // ---- S06 ----
 
+        /// <summary>
+        /// The S06 policy: a predator hunts prey in sight, else rests; a prey hides when a threat is in range and cover is
+        /// near (if it can hide), else flees a threat in range, else eats food in sight, else rests.
+        /// </summary>
         static float[] Prey(DecisionQuery q)
         {
             var s = q.Species;
@@ -109,6 +127,9 @@ namespace EvoSim.Tests
 
         // ---- S16 ----
 
+        /// <summary>
+        /// The S16 policy: drink when thirst is high and water is in sight (if it can drink), else eat food in sight, else rest.
+        /// </summary>
         static float[] Thirsty(DecisionQuery q)
         {
             var s = q.Species;
@@ -149,6 +170,7 @@ namespace EvoSim.Tests
         {
             string result = Batch.WithScene("Assets/EvoSim/Scenes/Terrain_Locomotion.unity", w =>
             {
+                // The scene's predator gets the slope locomotion of the samples in place of the kinematic one.
                 var predatorGo = w.GetComponentsInChildren<Species>(true).First(s => s.gameObject.name == "Predator");
                 var kinematic = predatorGo.GetComponentInChildren<KinematicLocomotion>(true);
                 var holder = kinematic.gameObject;
@@ -171,6 +193,7 @@ namespace EvoSim.Tests
                             if (s.Id != "predator" || a.MetersMoved < 0.5f) continue;
                             float rise = a.Position.y - a.PreviousPosition.y;
                             float run = new Vector2(a.Position.x - a.PreviousPosition.x, a.Position.z - a.PreviousPosition.z).magnitude;
+                            // 8° of slack over the limit: the angle is taken from the whole step's rise and run.
                             if (rise > 0f && run > 0.5f)
                                 Assert.LessOrEqual(Mathf.Atan2(rise, run) * Mathf.Rad2Deg, 30f + 8f, $"{a} climbed too steeply");
                         }

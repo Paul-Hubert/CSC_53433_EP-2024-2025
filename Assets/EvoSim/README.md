@@ -6,6 +6,12 @@ and the sentences mutate and cross over from one generation to the next. The
 contract is in [`Docs/Interface`](../../Docs/Interface/) (start with
 [22 — Extending](../../Docs/Interface/22-extending-recipes.md)).
 
+**Documentation website**: guides on how EvoSim works, one page per way to extend
+it, and the API reference built from the code's comments. Build and open it with
+`powershell -File Docs\Site\build.ps1 -Serve` (setup in
+[`Docs/Site/README.md`](../../Docs/Site/README.md)), then browse
+`http://localhost:8080`.
+
 ## 1. Open a scene and run it
 
 1. Open `Assets/EvoSim/Scenes/Lab1_Small.unity` (48 m, prey and predators).

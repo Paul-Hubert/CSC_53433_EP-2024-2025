@@ -9,8 +9,22 @@ namespace EvoSim
     /// What ran (13 §2, CFG-03): the scene, the full effective configuration by path, git commit, Unity version,
     /// brains and mutator (models, hosts), seeds, wait mode, act order and controls. Never any secret (OUT-04).
     /// </summary>
+    /// <remarks>
+    /// The <see cref="RunRecorder"/> writes it to <c>run_info.json</c> when the run starts and again when it stops, with
+    /// its own <see cref="RunRecorder.ExtraInfo"/> (the scenario and its overrides) added.
+    /// </remarks>
     public static class RunInfo
     {
+        /// <summary>Gathers what ran into one sorted dictionary, ready for canonical JSON.</summary>
+        /// <remarks>
+        /// Keys: <c>world</c>, <c>scene</c>, <c>unity</c>, <c>git</c>, <c>seed</c>, <c>world_seed</c>, <c>wait_mode</c>,
+        /// <c>act_order</c>, <c>decision_period</c>, <c>sampling_temperature</c>, <c>text_style</c>, <c>brain</c> (the
+        /// default), <c>command</c> (masked), <c>started</c>, <c>controls</c>, <c>brains</c>, <c>mutator</c> (when there is
+        /// one), <c>settings</c> (every serialized setting by path, <see cref="FieldPath.Snapshot"/>) and <c>config</c> (the
+        /// mutation deck path the prototype's tools read).
+        /// </remarks>
+        /// <param name="w">The World, initialised.</param>
+        /// <returns>The run information, keys in ordinal order.</returns>
         public static SortedDictionary<string, object> Collect(World w)
         {
             var info = new SortedDictionary<string, object>(StringComparer.Ordinal)
@@ -57,7 +71,6 @@ namespace EvoSim
             return info;
         }
 
-        /// <summary>The command line, with keys and the values of options naming one masked (OUT-04).</summary>
         /// <summary>The NULL control (15 §1): every species is decided by the random brain, whatever the default.</summary>
         static bool NullBrain(World w)
         {
@@ -67,9 +80,14 @@ namespace EvoSim
             return true;
         }
 
+        /// <summary>The command line, with keys and the values of options naming one masked (OUT-04).</summary>
+        /// <returns>The process's arguments joined by spaces, secrets replaced (<see cref="Secrets.Mask"/>).</returns>
         public static string MaskedCommandLine() => Secrets.Mask(Environment.GetCommandLineArgs());
 
         /// <summary>The commit checked out in the project's repository, read from .git (no process started).</summary>
+        /// <remarks>Looks for <c>.git</c> in the project folder and up to two folders above it; follows a branch reference,
+        /// loose or packed.</remarks>
+        /// <returns>The commit hash, the raw HEAD text when the reference can't be resolved, or "" when no repository is found.</returns>
         public static string GitCommit()
         {
             try

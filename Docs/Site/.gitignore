@@ -1,0 +1,10 @@
+# Built by Docs/Site/build.ps1 and the doc audit: never committed.
+_site/
+obj/
+spec/
+api/
+tools/DocAudit/bin/
+tools/DocAudit/obj/
+
+# The checker's project file is source (the repository ignores Unity's generated *.csproj).
+!tools/DocAudit/DocAudit.csproj

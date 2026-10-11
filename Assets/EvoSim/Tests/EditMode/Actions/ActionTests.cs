@@ -7,9 +7,28 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Actions, intents and interactions (07 §1, §3, §4; 04 §2).</summary>
+    /// <summary>
+    /// Checks actions, intents and interactions (07 §1, §3, §4; 04 §2): the T-ACT-01…10 tests, the act-phase parts of
+    /// T-ENV-02, -05, -06, -07 and the food-web cases T-SPEC-04, -05, -08 (rule families ACT, ENV, SPEC).
+    /// </summary>
+    /// <remarks>
+    /// Most tests use <see cref="Eco"/>, a Lab ecology without decisions: each animal is placed by hand and keeps the action
+    /// given with <see cref="Lab.Choose"/>. Some call an action's <c>Act</c> directly through an <see cref="ActContext"/> to
+    /// read its intent, or an <see cref="InteractionResolver"/> to apply one interaction, without running a tick.
+    /// <see cref="ActionConformance"/> is an older form of the action suite of <see cref="ConformanceTests"/>, over every
+    /// action class of the EvoSim assemblies, test probes included.
+    /// </remarks>
     public class ActionTests : WorldFixture
     {
+        /// <summary>
+        /// A Lab ecology 40 m square with no food (tests place items by hand), cover only when <paramref name="cover"/> is
+        /// true, and only the act, death and environment phases: no brain is asked, animals keep their chosen action.
+        /// </summary>
+        /// <param name="seed">The world seed.</param>
+        /// <param name="order">The act order of the act phase.</param>
+        /// <param name="killChance">The predator's chance to kill with one strike, 0 to 1.</param>
+        /// <param name="cover">True for 20 % cover, false for no cover module at all.</param>
+        /// <returns>The built, initialised world.</returns>
         World Eco(int seed = 1, ActOrder order = ActOrder.SpeciesInTurn, float killChance = 1f, bool cover = false)
         {
             return New(seed).Ecology(40f, cover ? 0.2f : 0f, 0f, predator: p => p.Get<Diet>().SetKillChance(killChance), regrow: 0f)
@@ -17,6 +36,10 @@ namespace EvoSim.Tests
                 .Build();
         }
 
+        /// <summary>
+        /// Every concrete <see cref="AnimalAction"/> class in an assembly whose name starts with <c>EvoSim</c> (test probes
+        /// included), sorted by full name: the cases of <see cref="ActionConformance"/>.
+        /// </summary>
         static IEnumerable<Type> AllActionTypes() => AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => a.GetName().Name.StartsWith("EvoSim"))
             .SelectMany(a => a.GetTypes())
@@ -57,6 +80,7 @@ namespace EvoSim.Tests
                 action.Act(a, c);
                 Assert.AreEqual(otherBefore, (other.Position, other.StatOf("energy"), other.StatOf("stamina"), other.Killed), "ACT-06");
                 Assert.AreEqual(Place.At(10, 10), a.Position, "an action never moves the animal itself (ACT-06)");
+                // Only the reference actions (runtime assembly) must search or stay when alone; probes may do otherwise.
                 Assert.IsTrue(c.Intent.IsStay || c.Intent.Wandering || type.Assembly != typeof(AnimalAction).Assembly,
                               $"{type.Name} alone: searches or stays (ACT-04)");
             }
@@ -110,6 +134,8 @@ namespace EvoSim.Tests
             var c = new ActContext(w);
             Intent Plan(Animal x, string action) { c.Begin(x); x.Species.FindAction(action).Act(x, c); return c.Intent; }
 
+            // MaxDistance is the distance to the target minus the stop distance: the food is 3 m away, the cover 4 m,
+            // the kin 6 m, and the prey 4 m from the hunter.
             var eat = Plan(a, "eat");
             Assert.IsFalse(eat.Run); Assert.AreEqual(Place.At(10.5f, 13.5f), eat.Target); Assert.AreEqual(3f, eat.MaxDistance, 1e-4f, "stop 0");
             Assert.AreEqual(InteractionKind.Graze, c.Interaction.Kind);
@@ -188,6 +214,7 @@ namespace EvoSim.Tests
             for (int i = 0; i < n; i++)
             {
                 var prey = Place.Animal(w.FindSpecies("prey"), Place.At(10.5f, 10));
+                // Reset the hunter so each strike is its first of the tick, with room in its energy for the +60 gain.
                 hunter.StruckThisTick = false;
                 hunter.BusyTicks = 0;
                 hunter.SetStat("energy", 20f);
@@ -201,7 +228,7 @@ namespace EvoSim.Tests
                     Assert.AreEqual(80f, hunter.StatOf("energy"), 1e-4f, "+60");
                     Assert.AreEqual(hunter.Id, prey.KilledBy);
                 }
-                prey.IsGone = true;
+                prey.IsGone = true;                                         // out of the way of the next one
             }
             Stat.Binomial(kills, n, 0.5, 4, "kills");
         }
@@ -324,7 +351,7 @@ namespace EvoSim.Tests
             var w = good.Build();
             Assert.IsFalse(w.LastReport.Has("V-24"), "the egg kind is edible now");
             var eggs = w.Service<EggSystem>();
-            w.Events.Lines = new List<string>();
+            w.Events.Lines = new List<string>();                            // keep the event lines in memory to find egg_lost
             var prey = w.FindSpecies("prey");
             var egg = eggs.Lay(new Egg { Species = prey, Parents = new[] { 1, 2 }, Position = Place.At(10, 10), HatchTick = 999, Alleles = new Allele[0] });
             var eater = Place.Animal(w.FindSpecies("eggeater"), Place.At(10f, 10f));
@@ -333,6 +360,7 @@ namespace EvoSim.Tests
             w.Advance(1);
             Assert.IsTrue(egg.UsedUp);
             Assert.AreEqual("eaten", egg.LostReason);
+            // 15 points of edible energy × the diet's scale 2, minus one tick of base metabolism (0.7).
             Assert.AreEqual(50f + 15f * 2f - 0.7f, eater.StatOf("energy"), 1e-4f, "edible energy × diet scale");
             Assert.IsTrue(w.Events.Lines.Any(l => l.Contains("\"kind\": \"egg_lost\"") && l.Contains("\"reason\": \"eaten\"")));
             Assert.AreEqual(0, eggs.EntityCount, "removed in the environment phase");

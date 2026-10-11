@@ -3,7 +3,11 @@ using NUnit.Framework;
 
 namespace EvoSim.Tests
 {
-    /// <summary>The assembly layout of Docs/Interface/20 §7.</summary>
+    /// <summary>
+    /// Checks the assembly layout of 20 §7 by reflection, without building a world: the runtime code compiles into
+    /// <c>EvoSim.Runtime</c>, and no runtime assembly (Runtime, Http, Samples) references <c>UnityEditor</c> (EDIT-03), so a
+    /// player build never needs the editor.
+    /// </summary>
     public class AssemblyLayoutTests
     {
         [Test, Description("M0 skeleton: the runtime assembly exists under its name")]

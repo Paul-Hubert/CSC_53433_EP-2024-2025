@@ -14,8 +14,9 @@ namespace EvoSim
     /// </summary>
     public sealed class SystemHttpTransport : IHttpTransport, IDisposable
     {
-        readonly HttpClient client;
+        readonly HttpClient client;                                            // no time-out of its own: HttpCaller has one
 
+        /// <summary>Makes the HttpClient, and raises the process's connection limit per server to 64.</summary>
         public SystemHttpTransport()
         {
             // Mono allows 2 connections per server by default; the brains' own cap (maxParallel) is the limit that counts.
@@ -23,6 +24,11 @@ namespace EvoSim
             client = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
         }
 
+        /// <summary>
+        /// Sends the request with a JSON body and a bearer token when given; an error status throws an
+        /// <see cref="HttpFailure"/> with the status, whether to try again, and the start of the body.
+        /// </summary>
+        /// <inheritdoc/>
         public async Task<string> SendAsync(string method, string url, string json, string apiKey, CancellationToken cancel)
         {
             using (var request = new HttpRequestMessage(new HttpMethod(method), url))
@@ -33,15 +39,17 @@ namespace EvoSim
                 {
                     string text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     int status = (int)response.StatusCode;
-                    if (!response.IsSuccessStatusCode)
+                    if (!response.IsSuccessStatusCode)                             // the path only: a URL could carry a key
                         throw new HttpFailure($"{method} {new Uri(url).AbsolutePath}: HTTP {status} {Short(text)}", status, HttpFailure.IsRetryable(status));
                     return text;
                 }
             }
         }
 
+        /// <summary>Releases the HttpClient. The owning brain or mutator client calls it when it is destroyed.</summary>
         public void Dispose() => client.Dispose();
 
+        /// <summary>The start of a response body for an error message: at most 300 characters.</summary>
         static string Short(string s) => string.IsNullOrEmpty(s) ? "" : s.Length <= 300 ? s : s.Substring(0, 300) + "…";
     }
 }

@@ -6,14 +6,35 @@ using UnityEngine.TestTools;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Whole worlds driven by FixedUpdate in Play mode (T2).</summary>
+    /// <summary>
+    /// Checks the tick loop driven by <c>FixedUpdate</c> in Play mode (tier T2; SPACE-10…14, TICK-03, RAND-10…13;
+    /// T-SPACE-05, T-SPACE-07, T-RAND-05): the hash does not depend on ticks per call, on the fixed time step or on the wait
+    /// mode, and follows the seed.
+    /// </summary>
+    /// <remarks>
+    /// The worlds hold one species with a <see cref="ProbeAction"/>, a <see cref="RandomEventPhase"/> for the hash, and a
+    /// <see cref="DelayedPhase"/> that waits two calls every 4 ticks, as a slow brain would. The tests change
+    /// <c>Time.fixedDeltaTime</c>; <see cref="SaveTime"/> and <see cref="RestoreTime"/> put it back.
+    /// </remarks>
     public class TickLoopPlayTests : WorldFixture
     {
+        /// <summary>The fixed time step before the test, in seconds.</summary>
         float savedFixedDelta;
 
+        /// <summary>Remembers the fixed time step before each test.</summary>
         [SetUp] public void SaveTime() => savedFixedDelta = Time.fixedDeltaTime;
+        /// <summary>Puts the fixed time step back after each test.</summary>
         [TearDown] public void RestoreTime() => Time.fixedDeltaTime = savedFixedDelta;
 
+        /// <summary>
+        /// A small world started with <c>Play()</c>: one species of 6 with a probe action, random events every tick, and a
+        /// phase that waits 2 calls every 4 ticks.
+        /// </summary>
+        /// <param name="seed">The world seed.</param>
+        /// <param name="mode">How the world waits for the delayed phase.</param>
+        /// <param name="ticksPerCall">Ticks run per <c>FixedUpdate</c>.</param>
+        /// <param name="limit">The tick limit.</param>
+        /// <returns>The running world.</returns>
         World Make(int seed, WaitMode mode, int ticksPerCall, int limit)
         {
             var w = New(seed, mode).Flat(20, 20)
@@ -26,6 +47,7 @@ namespace EvoSim.Tests
             return w;
         }
 
+        /// <summary>Waits fixed updates until the world stops at its tick limit (5 000 at most), then checks that it did.</summary>
         IEnumerator RunToEnd(World w)
         {
             int guard = 0;

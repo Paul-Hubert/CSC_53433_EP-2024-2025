@@ -10,6 +10,21 @@ namespace EvoSim
     /// cached by model, prompt, seed and temperature (MUT-14). It advances only when pumped on the main thread, so
     /// the Freeze and Responsive wait modes give the same results.
     /// </summary>
+    /// <remarks>
+    /// <para>A world service, one per world. It reaches the model through the World's <see cref="MutatorClient"/> and
+    /// stores answers in the <see cref="AnswerCache"/> service when caching is on.</para>
+    /// <para>A tick, in order:</para>
+    /// <list type="number">
+    /// <item><description>in the breed phase, <see cref="LlmMutation"/> calls <see cref="Submit"/> for each mutating text
+    /// gene; a first try already in the cache is answered at once;</description></item>
+    /// <item><description>at the end of the breed phase, <see cref="Flush"/> sends every queued try as one batch;</description></item>
+    /// <item><description>in the hatch phase, <see cref="Pump"/> reads a finished batch: each answer is cleaned and checked
+    /// (MUT-12); an accepted answer completes its job, a rejected one queues the job's next try (MUT-13), and the next
+    /// round goes out at once;</description></item>
+    /// <item><description>when a due egg's jobs are not done, the hatch phase waits on <see cref="PendingFor"/>
+    /// (MUT-32).</description></item>
+    /// </list>
+    /// </remarks>
     public class MutatorService : WorldService
     {
         [SerializeField, Tooltip("The mutator model (reference gemma4:26b on the CPU, owner 2026-10-10; qwen3.5:0.8b is the small, faster choice).")]
@@ -21,31 +36,47 @@ namespace EvoSim
         [SerializeField, Tooltip("Store and reuse the mutator's answers (MUT-14).")]
         bool useCache = true;
 
+        /// <summary>One LLM mutation in progress: its job, the prompt's parts, and every try drawn at conception.</summary>
         sealed class Job
         {
+            /// <summary>The job handed to the operator, completed or failed here.</summary>
             public MutationJob Result;
+            /// <summary>The parent sentence, and the fixed context line.</summary>
             public string Parent, Context;
+            /// <summary>The deck's instructions.</summary>
             public IReadOnlyList<string> Instructions;
+            /// <summary>For each try, the index of its instruction in the deck.</summary>
             public int[] Instruction;
+            /// <summary>For each try, its seed.</summary>
             public long[] Seed;
+            /// <summary>The longest mutant allowed, in words; and the try being asked, from 0.</summary>
             public int MaxWords, Next;
         }
 
-        readonly List<Job> queue = new List<Job>();
-        readonly List<Job> inFlight = new List<Job>();
-        readonly List<MutatorRequest> requests = new List<MutatorRequest>();
-        MutatorReply reply;
-        MutatorClient client;
-        AnswerCache cache;
-        int outstanding;
+        readonly List<Job> queue = new List<Job>();                   // jobs whose current try waits for the next batch
+        readonly List<Job> inFlight = new List<Job>();                // jobs of the batch out, in request order
+        readonly List<MutatorRequest> requests = new List<MutatorRequest>();   // reused for each batch sent
+        MutatorReply reply;                                           // the batch out, or null when none is
+        MutatorClient client;                                         // the World's mutator client, or null
+        AnswerCache cache;                                            // the World's answer cache, or null when caching is off
+        int outstanding;                                              // jobs submitted and not finished yet
 
+        /// <summary>The mutator model's name, sent with every request and recorded with mutants (reference gemma4:26b).</summary>
         public string Model => model;
+        /// <summary>The sampling temperature of the mutator (reference 1.2).</summary>
         public float Temperature => temperature;
+        /// <summary>
+        /// True: a failed mutator call also stops the run, at the end of the tick. False (reference): the gene stays
+        /// unchanged and the run goes on (MUT-04).
+        /// </summary>
         public bool Strict { get => strict; set => strict = value; }
         /// <summary>Batches sent so far, with their sizes (T-MUT-11).</summary>
         public List<int> BatchSizes { get; } = new List<int>();
+        /// <summary>True when the World has a mutator client; without one every LLM mutation fails ("no mutator").</summary>
         public bool HasClient => client != null;
 
+        /// <summary>Finds the client and the cache and empties the queues, at the start of a run.</summary>
+        /// <inheritdoc/>
         public override void Initialize()
         {
             client = World.Service<MutatorClient>();
@@ -55,6 +86,10 @@ namespace EvoSim
             outstanding = 0;
         }
 
+        /// <summary>Sets the service from code (WorldBuilder, tests).</summary>
+        /// <param name="modelName">The mutator model's name.</param>
+        /// <param name="temp">The sampling temperature.</param>
+        /// <param name="cached">Whether answers are stored and reused (MUT-14).</param>
         public void Configure(string modelName, float temp, bool cached = true)
         {
             model = modelName;
@@ -63,6 +98,14 @@ namespace EvoSim
         }
 
         /// <summary>Starts a job whose tries are already drawn (MUT-30); its first try waits for the next Flush.</summary>
+        /// <param name="parent">The sentence to change.</param>
+        /// <param name="instructionPerTry">For each try, in order, the index of its instruction in <paramref name="instructions"/>.</param>
+        /// <param name="seedPerTry">For each try, its seed; same length as <paramref name="instructionPerTry"/>.</param>
+        /// <param name="contextLine">The fixed first line of the prompt, or empty.</param>
+        /// <param name="instructions">The deck's instructions.</param>
+        /// <param name="maxWords">The longest mutant allowed, in words.</param>
+        /// <returns>The job; it is done when an answer passes the guards or every try is rejected.</returns>
+        /// <remarks>Called by <see cref="LlmMutation.StartMutation"/>, or by a student's operator that uses the mutator.</remarks>
         public MutationJob Submit(string parent, int[] instructionPerTry, long[] seedPerTry, string contextLine,
                                   IReadOnlyList<string> instructions, int maxWords)
         {
@@ -76,9 +119,13 @@ namespace EvoSim
             return job.Result;
         }
 
+        /// <summary>The request for a job's current try: its prompt and seed, with this service's temperature and model.</summary>
         MutatorRequest RequestFor(Job j) =>
             new MutatorRequest(MutationText.Prompt(j.Context, j.Instructions[j.Instruction[j.Next]], j.Parent), j.Seed[j.Next], temperature, model);
 
+        /// <summary>
+        /// Answers a job's current try from the cache, or queues it for the next batch; fails the job when there is no client.
+        /// </summary>
         void Enqueue(Job j)
         {
             var request = RequestFor(j);
@@ -93,6 +140,7 @@ namespace EvoSim
         }
 
         /// <summary>Sends the queued tries as one batch, if no batch is out (MUT-31).</summary>
+        /// <remarks>Called at the end of the breed phase, and by <see cref="Pump"/> for the next round.</remarks>
         public void Flush()
         {
             if (reply != null || queue.Count == 0) return;
@@ -106,6 +154,8 @@ namespace EvoSim
         }
 
         /// <summary>Processes a finished batch, queues and sends the next round; true when no job is left.</summary>
+        /// <returns>True when every submitted job is done.</returns>
+        /// <remarks>Called on the main thread by the hatch phase each tick, and by the pending of <see cref="PendingFor"/>.</remarks>
         public bool Pump()
         {
             if (reply != null && reply.Pending.IsDone)
@@ -121,11 +171,16 @@ namespace EvoSim
             return outstanding == 0;
         }
 
+        /// <summary>
+        /// Handles the answer to a job's current try: a failed call fails the job (MUT-04); an answer is cached, cleaned and
+        /// checked (MUT-12), then completes the job or is rejected, and the job's next try is queued (MUT-13).
+        /// </summary>
         void Answer(Job j, string answer, string error, bool fromCache)
         {
             if (answer == null)
             {
-                if (strict) World.RequestStop("mutator failure: " + error);   // at the tick boundary: this tick ends with the gene unchanged (RAND-20)
+                // Strict: the run stops at the tick boundary; this tick still ends with the gene unchanged (RAND-20).
+                if (strict) World.RequestStop("mutator failure: " + error);
                 Finish(j, "mutator unavailable: " + error);
                 return;
             }
@@ -146,6 +201,7 @@ namespace EvoSim
             else Finish(j, "every try rejected");
         }
 
+        /// <summary>Ends a job without a value: the gene keeps its allele (MUT-04).</summary>
         void Finish(Job j, string reason)
         {
             j.Result.Fail(reason);
@@ -153,13 +209,17 @@ namespace EvoSim
         }
 
         /// <summary>What a phase waits for: done when these jobs are; waiting pumps and blocks on the batch out (Freeze).</summary>
+        /// <param name="jobs">Jobs this service runs, e.g. the unfinished mutations of the eggs due to hatch.</param>
+        /// <returns>A pending that is done when every one of the jobs is done.</returns>
         public Pending PendingFor(IReadOnlyList<MutationJob> jobs) => new JobsPending(this, jobs);
 
+        /// <summary>The pending of <see cref="PendingFor"/>: checking it pumps the service.</summary>
         sealed class JobsPending : Pending
         {
-            readonly MutatorService service;
-            readonly MutationJob[] jobs;
+            readonly MutatorService service;                          // the service to pump
+            readonly MutationJob[] jobs;                              // a copy of the jobs waited for
 
+            /// <summary>Waits for a copy of the list of jobs.</summary>
             public JobsPending(MutatorService service, IReadOnlyList<MutationJob> jobs)
             {
                 this.service = service;
@@ -167,6 +227,8 @@ namespace EvoSim
                 for (int i = 0; i < jobs.Count; i++) this.jobs[i] = jobs[i];
             }
 
+            /// <summary>Pumps the service, then true when every job is done.</summary>
+            /// <inheritdoc/>
             public override bool IsDone
             {
                 get
@@ -177,11 +239,13 @@ namespace EvoSim
                 }
             }
 
+            /// <summary>Blocks until done (Freeze): waits for the batch out, round after round, sending one when none is out.</summary>
+            /// <inheritdoc/>
             public override void Wait()
             {
-                for (int guard = 0; guard < 100000 && !IsDone; guard++)
+                for (int guard = 0; guard < 100000 && !IsDone; guard++)        // a bound on rounds: a broken client can't hang the editor
                 {
-                    if (service.reply == null) { service.Flush(); if (service.reply == null) break; }
+                    if (service.reply == null) { service.Flush(); if (service.reply == null) break; }   // nothing left to send
                     service.reply.Pending.Wait();
                 }
             }

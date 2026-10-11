@@ -7,7 +7,16 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Watching a run (07 real-time test): the player's command line, and reference scenes that can be watched.</summary>
+    /// <summary>
+    /// Checks what is needed to watch a run (07 §1, §4, §5; SPACE-12, RAND-11, DEC-04): the player's command line is read
+    /// and applied to the World, every reference scene has its run views and camera, and the reference bodies show their
+    /// action and heading without a collider.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="ReferenceScenesCanBeWatched"/> opens every scene of the reference scenes folder through
+    /// <see cref="Batch.WithScene"/>: close them in the editor first. The play-mode side of watching is in
+    /// <c>Tests/PlayMode</c> (<c>RunViewPlayTests</c>, <c>ViewPlayTests</c>).
+    /// </remarks>
     public class RunViewTests : WorldFixture
     {
         [Test, Description("07 §4: the player's command line is read: scene, seed, ticks, speed, wait, brain, capture, cache, no mutation, quit at the end; wrong values are reported, not guessed")]

@@ -3,9 +3,17 @@ using NUnit.Framework;
 
 namespace EvoSim.Tests
 {
-    /// <summary>The information measures of the brain gates (32 §2 B-03), as the prototype computes them (promptevo/metrics.py).</summary>
+    /// <summary>
+    /// Checks the information measures of the brain integrity gates (32 §2, B-03) against hand-computed values, as the
+    /// prototype computes them (<c>promptevo/metrics.py</c>), and the judge prompt of B-10 against the contract's text.
+    /// </summary>
+    /// <remarks>
+    /// Pure computations on probability rows written in the test: no world, no model. The gates themselves run with real
+    /// models in tier T4 (32).
+    /// </remarks>
     public class IntegrityGateTests
     {
+        /// <summary>One probability row, written inline: <c>R(0.5f, 0.5f)</c>.</summary>
         static float[] R(params float[] p) => p;
 
         [Test, Description("B-03: MI_G is 0 when every genome answers alike and 1 bit when two genomes give opposite certain answers")]

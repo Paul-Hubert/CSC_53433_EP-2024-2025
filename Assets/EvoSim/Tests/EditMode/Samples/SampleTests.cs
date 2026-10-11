@@ -5,7 +5,17 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>The recipes of 22 built as samples (Assets/EvoSim/Samples): each does what its recipe says.</summary>
+    /// <summary>
+    /// Checks the recipes of 22 built as samples in <c>Assets/EvoSim/Samples</c> (namespace <c>EvoSim.Samples</c>): thirst,
+    /// the water sense, drinking, the intensity ladder (MUT-21), seasons, the chased sense and slope locomotion each do what
+    /// their recipe says.
+    /// </summary>
+    /// <remarks>
+    /// These are the closest models for a student's own module tests: a small world built in code with only the module under
+    /// test and the phases it needs, an animal placed by hand, a few ticks, then asserts on its stats, position or sense
+    /// tokens. <see cref="PondGround"/> and <see cref="RampGround"/> are test grounds of <c>EvoSim.Testing</c> with a round
+    /// pond and a 45° ramp. The samples also go through the conformance suites of <see cref="ConformanceTests"/>.
+    /// </remarks>
     public class SampleTests : WorldFixture
     {
         [Test, Description("22 §1: thirst grows every tick in the death phase and kills at its deadly level; the cause is \"thirst\"")]

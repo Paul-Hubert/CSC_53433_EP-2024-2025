@@ -9,11 +9,22 @@ using UnityEngine.TestTools;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Watching a run (07 real-time test): the overlay's numbers, RealTime pacing, the camera, the launcher's hook.</summary>
+    /// <summary>
+    /// Checks what is needed to watch a run in Play mode (07 §1, §4, §5; OUT-02, SPACE-12, SPACE-14): the overlay's numbers
+    /// equal the events, RealTime pacing moves the views between ticks without changing the hash, the camera frames the
+    /// ground and picks animals, and <c>World.Configuring</c> lets a launcher set the World before it starts.
+    /// </summary>
+    /// <remarks>
+    /// These are <c>[UnityTest]</c> coroutines: the World runs from its own <c>FixedUpdate</c> after <c>Play()</c>, and the
+    /// test looks at each frame. Each test waits at most one or two minutes of real time. Views, overlay and camera added
+    /// by a test are kept in <see cref="extras"/> and destroyed after it.
+    /// </remarks>
     public class RunViewPlayTests : WorldFixture
     {
+        /// <summary>GameObjects a test added outside the World (overlay, camera, a configured world), destroyed after it.</summary>
         readonly List<GameObject> extras = new List<GameObject>();
 
+        /// <summary>Destroys the GameObjects of <see cref="extras"/> after each test.</summary>
         [TearDown]
         public void DestroyExtras()
         {
@@ -21,6 +32,11 @@ namespace EvoSim.Tests
             extras.Clear();
         }
 
+        /// <summary>The Lab 1 world (20 prey, 4 predators) with a body on each species, so animals get views.</summary>
+        /// <param name="seed">The world seed.</param>
+        /// <param name="name">The world's name.</param>
+        /// <param name="mode">How the world waits for answers.</param>
+        /// <returns>The builder, not yet built.</returns>
         WorldBuilder Lab(int seed, string name, WaitMode mode = WaitMode.Freeze)
         {
             var b = New(seed, mode, name).Lab1(prey: 20, predators: 4);
@@ -29,6 +45,13 @@ namespace EvoSim.Tests
             return b;
         }
 
+        /// <summary>
+        /// Adds a run view of type <typeparamref name="T"/> on a new GameObject outside the World (with a camera for a
+        /// <see cref="WorldCamera"/>), kept in <see cref="extras"/>; the caller sets its <c>World</c>.
+        /// </summary>
+        /// <typeparam name="T">The view: <see cref="RunOverlay"/>, <see cref="WorldCamera"/>…</typeparam>
+        /// <param name="w">The world the view will watch (not set here).</param>
+        /// <returns>The new component.</returns>
         T Add<T>(World w) where T : Component
         {
             var go = new GameObject(typeof(T).Name + " (test)");

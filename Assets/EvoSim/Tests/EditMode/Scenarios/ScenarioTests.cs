@@ -9,17 +9,27 @@ namespace EvoSim.Tests
 {
     /// <summary>
     /// The T2 scenarios of 31 that run with random or scripted brains and fakes, as tests: exact facts and the
-    /// directional checks that hold with scripted policies. (S11, S14, S21, S22, S24 live with their systems' tests.)
+    /// directional checks that hold with scripted policies — a lone grazer (S01), the controls (S05), cannibals (S08),
+    /// mutation operators (S13), moving carcasses (S18), decision timing (S25) and egg eaters (S28). S11, S14, S21, S22
+    /// and S24 live with their systems' tests.
     /// </summary>
+    /// <remarks>
+    /// Most worlds are the Lab 1 world of <see cref="Lab.Lab1"/> with one thing changed; facts are read from the event
+    /// stream through <see cref="Events"/>. No model is called: mutations go to a <see cref="FakeMutator"/>. Only
+    /// <see cref="LoneGrazer"/> is in category <c>T3</c> (5 seeds of up to 3 000 ticks).
+    /// </remarks>
     public class ScenarioTests : WorldFixture
     {
         /// <summary>Records every event of a world (for scenario facts read from the event stream).</summary>
         sealed class Events : IEventSink
         {
+            /// <summary>Every event recorded since the sink was added, in order.</summary>
             public readonly List<SimEvent> All = new List<SimEvent>();
+            /// <summary>Keeps the event; the JSON line is not needed.</summary>
             public void OnEvent(SimEvent e, string line) => All.Add(e);
         }
 
+        /// <summary>Adds an <see cref="Events"/> sink to a world's event log: it sees every event from now on.</summary>
         static Events Watch(World w)
         {
             var sink = new Events();
@@ -29,6 +39,7 @@ namespace EvoSim.Tests
 
         // ---- S01 ----
 
+        /// <summary>The S01 policy: eat food in sight, else mate with a ready partner in sight, else rest.</summary>
         static float[] Grazer(DecisionQuery q)
         {
             string food = ScriptedBrain.Token(q, "Food"), kin = ScriptedBrain.Token(q, "Animal");
@@ -67,6 +78,7 @@ namespace EvoSim.Tests
         [Test, Description("S05 controls (CTRL-01, CTRL-02): C2 keeps the founders' alleles, C4 founders use control sentences, C7 births have one parent, C3 queries carry other animals' genes; each reproducible")]
         public void Controls()
         {
+            // One Lab 1 run of 300 ticks with one control switched on, mutation at rate 0.5 so it would show.
             (World w, Events e) Run(System.Action<World> control, string name, bool scripted = false)
             {
                 var b = New(5, name: name).Lab1(prey: 20, predators: 3, randomBrain: !scripted)
@@ -136,6 +148,7 @@ namespace EvoSim.Tests
             World Run(string op)
             {
                 var b = New(13, name: "S13 " + op).Lab1(prey: 20, predators: 3);
+                // "deck" keeps the LLM mutation (fake mutator), "ladder" replaces it with the intensity ladder, "none" removes it.
                 foreach (var m in b.Root.GetComponentsInChildren<LlmMutation>(true))
                 {
                     if (op == "deck") { m.Rate = 0.2f; continue; }

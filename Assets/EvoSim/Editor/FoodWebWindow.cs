@@ -8,14 +8,22 @@ namespace EvoSim.Editor
     /// The food web (21 §4): species and layers as a graph with graze, strike, scavenge and egg edges, the derived
     /// threats, and the food-web warnings of validation.
     /// </summary>
+    /// <remarks>
+    /// Open it with <c>Window ▸ EvoSim ▸ Food Web</c>. In Edit mode, press <c>Build the food web</c>: it validates the world
+    /// (which prepares it) to resolve every diet. Edge colours: green graze a layer, red strike a species, brown scavenge
+    /// carcasses, yellow eat eggs. Below the graph: the derived threats per species and the food-web messages V-20, V-22,
+    /// V-24 and V-25.
+    /// </remarks>
     public class FoodWebWindow : EditorWindow
     {
-        ValidationReport report;
-        World shown;
+        ValidationReport report;   // the last validation of the shown world, or null
+        World shown;               // the world the graph was built for, or null
 
+        /// <summary>Opens the window (<c>Window ▸ EvoSim ▸ Food Web</c>).</summary>
         [MenuItem("Window/EvoSim/Food Web")]
         public static void Open() => GetWindow<FoodWebWindow>("Food Web").Show();
 
+        /// <summary>Draws the graph of diets (species above, layers below), the derived threats and the food-web messages.</summary>
         void OnGUI()
         {
             var w = EditorWorlds.Current();

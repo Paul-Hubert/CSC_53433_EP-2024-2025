@@ -10,11 +10,17 @@ namespace EvoSim
     /// loads instead. With -quitAtEnd, the player quits once the run stopped and its captures are written.
     /// Run files, captures and the answer cache land next to the build (paths are relative to its folder).
     /// </summary>
+    /// <remarks>
+    /// It installs itself before the first scene loads; nothing needs to be placed in a scene. Settings from the command
+    /// line never go into the scene file: they are applied to the World in memory, run after run.
+    /// </remarks>
     public static class PlayerLauncher
     {
+        /// <summary>The parsed command line, or null in the editor.</summary>
         public static PlayerArgs Args { get; private set; }
-        static bool loading;
+        static bool loading;    // the -scene scene is loading: load it only once
 
+        /// <summary>Parses the command line, sets the window size, and listens for Worlds being configured (players only).</summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void Install()
         {
@@ -25,6 +31,10 @@ namespace EvoSim
             World.Configuring += Configure;
         }
 
+        /// <summary>
+        /// Sets a World from the arguments, or, when -scene names another scene, keeps it from starting and loads that scene;
+        /// then sets the capture and -quitAtEnd, and logs what was set.
+        /// </summary>
         static void Configure(World w)
         {
             if (!string.IsNullOrEmpty(Args.Scene) && !string.Equals(w.gameObject.scene.name, Args.Scene, StringComparison.OrdinalIgnoreCase))
@@ -50,11 +60,17 @@ namespace EvoSim
     }
 
     /// <summary>Quits the player once its World stopped and the captures are written (-quitAtEnd).</summary>
+    /// <remarks>
+    /// Added to the World's GameObject by <see cref="PlayerLauncher"/>. It waits at most 30 seconds for the captures, then
+    /// logs the stop reason, the tick, the events hash and the pace before quitting.
+    /// </remarks>
     public sealed class QuitWhenStopped : MonoBehaviour
     {
+        /// <summary>The World to watch.</summary>
         public World World;
-        float stoppedAt = -1f;
+        float stoppedAt = -1f;      // real time when the stop was first seen, in seconds; -1 before
 
+        /// <summary>Each frame: once the World stopped and the captures are written (or 30 s passed), logs and quits.</summary>
         void Update()
         {
             if (World == null || World.State != RunState.Stopped) return;

@@ -6,10 +6,27 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Mating, litters, eggs, crossover (11 §1–§3, 09 §4).</summary>
+    /// <summary>
+    /// Checks mating, litters, eggs and crossover (11 §1–§3, 09 §4; rule families REPRO and GENE; T-REPRO-01…08, T-TICK-04,
+    /// T-GENE-08, -09, T-SPEC-02, T-ANIM-01): readiness, who breeds with whom, what parents pay, what babies start with,
+    /// incubation, crossover statistics and genomes that never cross species.
+    /// </summary>
+    /// <remarks>
+    /// Most tests use <see cref="Breeders"/>, a prey-only world with no decision phase, and <see cref="Adult"/>, a ready
+    /// adult that cannot move. Many run <see cref="BreedPhase"/> or <see cref="HatchPhase"/> directly through
+    /// <c>Run(w.Context)</c> to look at the state between two phases.
+    /// </remarks>
     public class ReproductionTests : WorldFixture
     {
-        /// <summary>Prey only, with the act, breed, hatch, death and migration phases, no decisions (actions are set by hand).</summary>
+        /// <summary>
+        /// Prey only, with the act, breed, hatch, death, migration and environment phases, no decisions (actions are set by
+        /// hand).
+        /// </summary>
+        /// <param name="incubation">The incubation, in ticks: 0 hatches in the tick of conception.</param>
+        /// <param name="asexual">True for the asexual control: one parent pays the whole litter.</param>
+        /// <param name="cap">The species' population cap.</param>
+        /// <param name="mode">What the cap does: migrate the extra animals, or block conception.</param>
+        /// <param name="seed">The world seed.</param>
         World Breeders(int incubation = 0, bool asexual = false, int cap = 400, CapRule.Mode mode = CapRule.Mode.Migrate, int seed = 1234)
         {
             return New(seed).Flat(40, 40).Food(0f, 0f).Service<EggSystem>("Eggs").Configure(w => w.Asexual = asexual)
@@ -22,6 +39,15 @@ namespace EvoSim.Tests
                 .Build();
         }
 
+        /// <summary>
+        /// Places an adult (age 200) with the given energy, in points, and no stamina, so it cannot move: only being within
+        /// reach decides whether it breeds.
+        /// </summary>
+        /// <param name="s">The species.</param>
+        /// <param name="p">Where it stands.</param>
+        /// <param name="energy">Its energy, in points.</param>
+        /// <param name="action">The name of the action it has chosen.</param>
+        /// <returns>The new animal.</returns>
         static Animal Adult(Species s, Vector3 p, float energy = 90f, string action = "rest")
         {
             var a = Place.Animal(s, p);
@@ -206,6 +232,7 @@ namespace EvoSim.Tests
             Assert.Greater(laid, 0);
             Assert.AreEqual(0, s.Counters.Hatched);
             var positions = eggs.Entities.Select(e => e.Position).ToList();
+            // The partner is moved far away, so the only things near the first parent are its eggs.
             a.Choose("rest");
             b.Position = Place.At(35, 35);
             w.Space.Rebuild();
@@ -242,6 +269,7 @@ namespace EvoSim.Tests
         {
             var w = Breeders();
             var s = w.AllSpecies[0];
+            // Two parents that differ at every locus: x has each pool's first sentence, y its second.
             var x = new Genome(s, s.Genes.Select(g => w.Alleles.Register(g, g.FounderPool[0].Value, "founder")).ToArray());
             var y = new Genome(s, s.Genes.Select(g => w.Alleles.Register(g, g.FounderPool[1].Value, "founder")).ToArray());
             var cross = s.Module<Crossover>();

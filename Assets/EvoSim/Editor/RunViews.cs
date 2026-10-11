@@ -12,13 +12,25 @@ namespace EvoSim.Editor
     /// <see cref="WorldCamera"/> on the main camera; and the reference bodies (a capsule standing on the ground, a nose
     /// that shows where it goes, a marker in the colour of its action). All of them only read the World (SPACE-12).
     /// </summary>
+    /// <remarks>
+    /// Menu: <c>EvoSim ▸ Views ▸ Add Run Views to Reference Scenes</c>. The reference scene builder
+    /// (<see cref="ReferenceScenes"/>) also calls <see cref="AddTo"/> on every scene it writes.
+    /// </remarks>
     public static class RunViews
     {
+        /// <summary>The name of the root object that holds the view components.</summary>
         public const string ObjectName = "Run views";
+        /// <summary>The asset path of the action marker's material (white; <see cref="ActionView"/> tints it).</summary>
         const string MarkerMaterial = ReferenceScenes.BodiesFolder + "/ViewMarker.mat";
+        /// <summary>The asset path of the nose's dark material.</summary>
         const string NoseMaterial = ReferenceScenes.BodiesFolder + "/ViewNose.mat";
 
         /// <summary>Adds what is missing to the open scene's run views and camera; returns what it added.</summary>
+        /// <remarks>Adds the <c>Run views</c> root with <see cref="GroundView"/>, <see cref="EntityMarkers"/>,
+        /// <see cref="RunOverlay"/> and <see cref="RunCapture"/>, and a <see cref="WorldCamera"/> on the scene's first camera.
+        /// Components already there are kept. The scene is not saved.</remarks>
+        /// <param name="scene">A loaded scene.</param>
+        /// <returns>The names of what was added, comma-separated, or <c>nothing</c>.</returns>
         public static string AddTo(Scene scene)
         {
             var added = new List<string>();
@@ -47,6 +59,7 @@ namespace EvoSim.Editor
             return added.Count == 0 ? "nothing" : string.Join(", ", added);
         }
 
+        /// <summary>Adds a component of type <typeparamref name="T"/> to the object unless it has one, and records its name.</summary>
         static void Add<T>(GameObject go, List<string> added) where T : Component
         {
             if (go.GetComponent<T>() != null) return;
@@ -55,6 +68,12 @@ namespace EvoSim.Editor
         }
 
         /// <summary>Adds the run views to the six reference scenes and rebuilds the two reference bodies; saves.</summary>
+        /// <remarks>
+        /// <c>EvoSim ▸ Views ▸ Add Run Views to Reference Scenes</c>. It opens every scene of
+        /// <see cref="ReferenceScenes.ScenesFolder"/> additively, adds what is missing, saves the scenes it changed and closes
+        /// them. The result is logged.
+        /// </remarks>
+        /// <returns>One line for the bodies, then one line per scene with what was added.</returns>
         [MenuItem("EvoSim/Views/Add Run Views to Reference Scenes")]
         public static string AddToReferenceScenes()
         {
@@ -78,6 +97,7 @@ namespace EvoSim.Editor
         }
 
         /// <summary>Rebuilds PreyBody and PredatorBody in place (same assets, same GUIDs), keeping their materials.</summary>
+        /// <returns>The names of the bodies rebuilt, comma-separated; a body without its material is skipped.</returns>
         public static string RebuildBodies()
         {
             var made = new List<string>();
@@ -107,6 +127,7 @@ namespace EvoSim.Editor
             return prefab;
         }
 
+        /// <summary>A primitive child of a body, without its collider, placed (meters, local) and coloured.</summary>
         static GameObject Part(GameObject root, PrimitiveType type, string name, Vector3 position, Vector3 scale, Material material)
         {
             var go = GameObject.CreatePrimitive(type);
@@ -119,6 +140,7 @@ namespace EvoSim.Editor
             return go;
         }
 
+        /// <summary>The material asset at a path, created there with the Standard shader and a colour when it doesn't exist.</summary>
         static Material Material(string path, Color color)
         {
             var m = AssetDatabase.LoadAssetAtPath<Material>(path);

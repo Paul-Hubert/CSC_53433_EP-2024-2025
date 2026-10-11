@@ -10,14 +10,25 @@ using UnityEngine;
 namespace EvoSim.Tests
 {
     /// <summary>
-    /// M11 done-when: every MUST rule of the contract is cited by a test (its Description names the rule id, singly,
-    /// as a range "SENSE-01…05" or a list "ACT-10/11"); the test runs then show those tests pass.
+    /// The coverage gate (30, first paragraph): every MUST rule of the contract documents is cited by at least one test,
+    /// whose Description names the rule id singly, as a range <c>SENSE-01…05</c> or as a list <c>ACT-10/11</c>. The test
+    /// runs then show whether those tests pass.
     /// </summary>
+    /// <remarks>
+    /// It reads the Markdown files of <c>Docs/Interface</c> from the repository and the Descriptions of every test in the
+    /// EvoSim test assemblies by reflection; it builds no world. A test that keeps a new MUST rule only has to name the rule
+    /// in its Description.
+    /// </remarks>
     public class CoverageTests
     {
+        /// <summary>The folder of the contract documents, <c>Docs/Interface</c> at the repository root.</summary>
         static string Docs => Path.Combine(Path.GetDirectoryName(Application.dataPath), "Docs", "Interface");
 
-        /// <summary>The MUST rules of the contract documents (01–22), as "**SENSE-03 (MUST)**".</summary>
+        /// <summary>
+        /// Reads the MUST rules of the contract documents 01–22, written in them as <c>**SENSE-03 (MUST)**</c> or
+        /// <c>**TICK-04 (MUST) Title.**</c>.
+        /// </summary>
+        /// <returns>The rule ids, sorted.</returns>
         public static SortedSet<string> MustRules()
         {
             var rules = new SortedSet<string>(StringComparer.Ordinal);
@@ -30,7 +41,11 @@ namespace EvoSim.Tests
             return rules;
         }
 
-        /// <summary>The rule ids cited by the descriptions of every test in the EvoSim test assemblies.</summary>
+        /// <summary>
+        /// Collects the rule ids cited by the Descriptions of every <c>[Test]</c> and <c>[UnityTest]</c> method in the
+        /// EvoSim test assemblies (EditMode and PlayMode).
+        /// </summary>
+        /// <returns>The rule ids, sorted.</returns>
         public static SortedSet<string> CitedRules()
         {
             var cited = new SortedSet<string>(StringComparer.Ordinal);
@@ -47,7 +62,12 @@ namespace EvoSim.Tests
             return cited;
         }
 
-        /// <summary>The rule ids a description cites: "SENSE-03", "SENSE-01…05", "ACT-10/11"; never a test id such as "T-DEC-02".</summary>
+        /// <summary>
+        /// Adds the rule ids a Description cites: <c>SENSE-03</c>, every id of a range <c>SENSE-01…05</c>, every id of a list
+        /// <c>ACT-10/11</c>; never a test id such as <c>T-DEC-02</c>.
+        /// </summary>
+        /// <param name="text">The Description of one test.</param>
+        /// <param name="cited">The set the ids are added to, written with two digits (<c>ACT-01</c>).</param>
         public static void Cite(string text, ISet<string> cited)
         {
             foreach (Match x in Regex.Matches(text, @"(?<![A-Z]-)\b([A-Z]+)-(\d+)(?:…(\d+))?((?:/\d+)*)"))

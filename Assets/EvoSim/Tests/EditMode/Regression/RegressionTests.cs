@@ -10,10 +10,31 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Regression (30 §6): pinned hashes, equivalences, scene validation, the reference phase order.</summary>
+    /// <summary>
+    /// The regression tests of 30 §6 (tier T3, category <c>T3</c>): pinned events hashes of the reference scenes (R-01),
+    /// soak (R-06), performance (R-07), the prototype's analysis tools on a compatibility run (R-08) and equivalences of wait
+    /// modes and ticks per call (R-04); plus a headless scenario run, the validation of every scene (T-EDIT-03) and the
+    /// reference phase order of a real scene (T-TICK-01).
+    /// </summary>
+    /// <remarks>
+    /// <para>Most tests open a scene of <c>Assets/EvoSim/Scenes</c> additively through <see cref="Batch.WithScene"/> or
+    /// <see cref="Batch.HashOf"/> and close it unsaved: close that scene in the editor first, or the test fails. Every run
+    /// is offline: the random brain or a <see cref="ScriptedBrain"/>, and a <see cref="FakeMutator"/> in place of the
+    /// scene's mutator client (<see cref="OfflineMutator"/>). Only R-08 needs something outside Unity: the prototype's
+    /// Python environment (<c>prototype/.venv</c>); without it the test is ignored.</para>
+    /// <para>The T3 tests are slow (minutes; the soak up to 30): run them before a merge, from the Test Runner by category
+    /// or with <c>-executeMethod EvoSim.Batch.RunRegression</c>.</para>
+    /// <para>R-01 compares 12 hashes (2 scenes × 3 seeds × 2 brains) with <c>Tests/Golden/hashes.json</c>. A change of
+    /// hash means the simulation now behaves differently. When that change is intended (a rule changed, a reference value
+    /// changed), re-pin: delete <c>hashes.json</c>, run <see cref="PinnedHashes"/> once to write it again, and commit it
+    /// with a message that says why. Never re-pin to silence a change you did not mean, such as after a refactoring or a
+    /// change to comments: find what changed the behaviour instead.</para>
+    /// </remarks>
     public class RegressionTests : WorldFixture
     {
+        /// <summary>The two reference scenes whose hashes are pinned: Lab 1 small and Lab 1 full.</summary>
         static readonly string[] Scenes = { "Assets/EvoSim/Scenes/Lab1_Small.unity", "Assets/EvoSim/Scenes/Lab1_Full.unity" };
+        /// <summary>The seeds of the pinned runs (R-01).</summary>
         static readonly int[] Seeds = { 1234, 7, 42 };
 
         /// <summary>A scripted policy for the prey (R-01): flee a close threat, eat food in sight, mate with a near partner, else rest.</summary>
@@ -62,6 +83,10 @@ namespace EvoSim.Tests
             Golden.Check("hashes.json", sb.ToString());
         }
 
+        /// <summary>
+        /// Makes a scene's World run offline: the random brain, no mutation, Freeze mode, no start on Play, no run files.
+        /// </summary>
+        /// <returns>Always null.</returns>
         static string Offline(World w)
         {
             w.DefaultBrain = w.GetComponentInChildren<RandomBrain>(true);
@@ -104,6 +129,7 @@ namespace EvoSim.Tests
             string result = Batch.WithScene(Scenes[1], w =>
             {
                 Offline(w);
+                // Two allocation probes around the act phase measure what it allocates each tick.
                 var phases = w.transform.Find("Phases");
                 var act = w.GetComponentInChildren<ActPhase>(true).transform;
                 var before = new GameObject("alloc before act").AddComponent<AllocationProbe>();
@@ -169,6 +195,7 @@ namespace EvoSim.Tests
             }
         }
 
+        /// <summary>Copies a folder and everything under it, leaving out Python's <c>__pycache__</c> folders.</summary>
         static void CopyDirectory(string from, string to)
         {
             Directory.CreateDirectory(to);
@@ -236,6 +263,7 @@ namespace EvoSim.Tests
         {
             string order = Batch.WithScene(Scenes[0], w =>
             {
+                // A trace phase after each phase of the scene, inserted from the last so the indices stay right.
                 var phases = w.transform.Find("Phases");
                 var log = new List<string>();
                 int n = phases.childCount;

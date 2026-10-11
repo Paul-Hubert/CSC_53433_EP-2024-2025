@@ -3,9 +3,12 @@ using System.Collections.Generic;
 
 namespace EvoSim
 {
-    /// <summary>World-wide checks that look across species: edibles nobody eats (V-25), stale species names in genes (V-23).</summary>
+    // World-wide checks that look across species or modules: edibles nobody eats (V-25), stale species names in genes (V-23),
+    // missing companion modules (V-26) and secrets in serialized fields (V-61).
     public partial class World
     {
+        /// <summary>The checks that look across species: edibles nobody eats (V-25), founder sentences naming unknown species
+        /// (V-23).</summary>
         void ValidateAcrossSpecies(ValidationReport report)
         {
             ValidateEdibles(report);
@@ -22,7 +25,8 @@ namespace EvoSim
                     Secrets.CheckFields(report, c);
         }
 
-        /// <summary>V-26: a module whose [RequiresModule] names a module that isn't there, unless the module reported an error itself.</summary>
+        /// <summary>V-26: a module whose [RequiresModule] names a module that isn't there, unless the module reported an error
+        /// itself.</summary>
         void ValidateCompanions(Species s, ValidationReport report)
         {
             foreach (var m in s.Modules)
@@ -39,6 +43,7 @@ namespace EvoSim
             }
         }
 
+        /// <summary>True when the species or the World has a module of type t (a subclass counts).</summary>
         bool HasModule(Species s, Type t)
         {
             foreach (var m in s.Modules) if (t.IsInstanceOfType(m)) return true;
@@ -46,6 +51,7 @@ namespace EvoSim
             return false;
         }
 
+        /// <summary>True when the report already holds an error about this object.</summary>
         static bool ReportedError(ValidationReport report, UnityEngine.Object o)
         {
             foreach (var m in report.Messages) if (m.Object == o && m.Severity == Severity.Error) return true;
@@ -82,6 +88,7 @@ namespace EvoSim
             }
         }
 
+        /// <summary>True when some species' diet lists a target that matches.</summary>
         bool Eaten(Func<EdibleTarget, bool> match)
         {
             foreach (var s in species)
@@ -96,6 +103,7 @@ namespace EvoSim
         /// <summary>V-23 (warning): a founder sentence names an animal that is no species of this world (SPEC-21).</summary>
         void ValidateSpeciesWords(ValidationReport report)
         {
+            // Every species' id and display name, with simple English plurals (wolf, wolves; fox, foxes).
             var known = new HashSet<string>(StringComparer.Ordinal);
             foreach (var s in species)
                 foreach (var n in new[] { s.Id, s.DisplayName })
@@ -124,6 +132,7 @@ namespace EvoSim
                 }
         }
 
+        /// <summary>The words of a text, lower case: runs of letters, in order.</summary>
         static IEnumerable<string> Words(string text)
         {
             int start = -1;

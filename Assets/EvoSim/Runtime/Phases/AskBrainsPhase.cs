@@ -7,15 +7,30 @@ namespace EvoSim
     /// sends the rest as one batch per brain — per species for brains that can't mix species — with identical keys
     /// sent once (DEC-13, DEC-15, DEC-32). Nothing in the world changes here (CORE-06).
     /// </summary>
+    /// <remarks>
+    /// <para>Second phase of the reference tick, after Sense (V-08) and before Choose actions, which waits for the answers.
+    /// Each decision gets a source: <c>memo</c> (answered earlier in the run), <c>same</c> (another animal of this tick has
+    /// the same key), <c>cache</c> (the answer cache on disk) or <c>brain</c> (sent now). Batches go out in the order of
+    /// their first decision, and a brain answers at once or later (<see cref="BrainAnswer"/>).</para>
+    /// <para>A brain that is not memoizable (it has a memory) gets every query: no memo, no sharing, no cache. Under the
+    /// shuffled control (CTRL-01) the brain reads another living animal's genome, drawn from the species' <c>sampling</c>
+    /// stream.</para>
+    /// <para>Validation checks each species' brain: present and set up (V-10), within its action and prompt limits (V-11),
+    /// able to read the senses' attachments (V-51).</para>
+    /// </remarks>
     public class AskBrainsPhase : TickPhase
     {
-        readonly Dictionary<string, Decision> firstWithKey = new Dictionary<string, Decision>();
-        readonly List<Brain> brains = new List<Brain>();
-        readonly List<List<Decision>> batches = new List<List<Decision>>();
-        AnswerCache cache;
+        readonly Dictionary<string, Decision> firstWithKey = new Dictionary<string, Decision>();   // memo key → the first decision of this tick with it (DEC-32)
+        readonly List<Brain> brains = new List<Brain>();                                           // the brain of each batch, in order of first use
+        readonly List<List<Decision>> batches = new List<List<Decision>>();                         // the decisions sent in each batch; lists reused
+        AnswerCache cache;                                                                          // the World's answer cache, or null
 
+        /// <summary>Finds the World's answer cache, if any.</summary>
+        /// <inheritdoc/>
         public override void Initialize() => cache = World.Service<AnswerCache>();
 
+        /// <summary>Builds every deciding animal's query, answers what the memo or cache can, and sends the rest in batches.</summary>
+        /// <inheritdoc/>
         public override void Run(TickContext t)
         {
             var state = World.Decisions;
@@ -51,6 +66,7 @@ namespace EvoSim
                 BatchFor(d.Brain, species).Add(d);
             }
 
+            // One call per batch; an answer may still be on its way: Choose actions waits for it (TICK-03).
             for (int i = 0; i < brains.Count; i++)
             {
                 var batch = batches[i];
@@ -64,6 +80,7 @@ namespace EvoSim
         }
 
         /// <summary>The genome the brain reads: the animal's own, or another living animal's under the shuffled control (CTRL-01/02).</summary>
+        /// <remarks>The other animal is drawn uniformly among the rest of the species, from its <c>sampling</c> stream.</remarks>
         Genome QueryGenome(Animal a, TickContext t)
         {
             if (!World.ShuffledGenes) return a.Genome;
@@ -75,6 +92,10 @@ namespace EvoSim
             return other.Genome;
         }
 
+        /// <summary>
+        /// The batch a decision of species <paramref name="s"/> joins for brain <paramref name="b"/>: one per brain, or one per
+        /// brain and species when the brain can't mix species (DEC-15); a new one when none fits.
+        /// </summary>
         List<Decision> BatchFor(Brain b, Species s)
         {
             for (int i = 0; i < brains.Count; i++)
@@ -88,6 +109,11 @@ namespace EvoSim
             return batches[brains.Count - 1];
         }
 
+        /// <summary>
+        /// Reports this phase placed before Sense (V-08), and for each species a missing or unusable brain (V-10), too many
+        /// actions or too long a prompt for it (V-11), or attachments it can't read (V-51).
+        /// </summary>
+        /// <inheritdoc/>
         public override void Validate(ValidationReport report)
         {
             int me = IndexOf(this), sense = IndexOf(World.Phase<SensePhase>());
@@ -116,6 +142,7 @@ namespace EvoSim
             }
         }
 
+        /// <summary>True when the brain is one of the World's enabled services, so it was set up and validated (ARCH-06).</summary>
         bool IsService(Brain b)
         {
             foreach (var svc in World.Services) if (svc == b) return true;
@@ -159,6 +186,7 @@ namespace EvoSim
             return q.Prompt(brain);
         }
 
+        /// <summary>The place of a phase in the World's phase list, or -1 when it is not there.</summary>
         int IndexOf(TickPhase p)
         {
             var list = World.Phases;

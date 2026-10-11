@@ -8,6 +8,23 @@ namespace EvoSim
     /// follows it (Esc stops). Picking is done on screen, from the views' positions: views have no colliders (SPACE-12),
     /// and the camera only reads the World.
     /// </summary>
+    /// <remarks>
+    /// <para>Put it on the scene's camera (it needs a Camera on the same GameObject). It orbits a focus point on the ground,
+    /// at <see cref="Distance"/> meters, looking down at the Inspector's pitch. Controls, read only while the window has
+    /// the focus, in real time, so they work while the run is paused or waits:</para>
+    /// <list type="bullet">
+    /// <item><description>W A S D or the arrow keys: pan, at <c>panSpeed</c> camera distances per second; stops
+    /// following.</description></item>
+    /// <item><description>Mouse wheel: zoom, from 3 to 2 000 m; not over the overlay's panels.</description></item>
+    /// <item><description>Right mouse button held: orbit (mouse left and right) and tilt (mouse up and down, 10° to
+    /// 89°).</description></item>
+    /// <item><description>Q and E: orbit left and right, at <c>orbitSpeed</c> degrees per second.</description></item>
+    /// <item><description>Middle mouse button held: drag the ground; stops following.</description></item>
+    /// <item><description>F: frame the whole world again; stops following.</description></item>
+    /// <item><description>Left click (press and release within 5 pixels) on an animal: follow it; Esc: stop following.</description></item>
+    /// </list>
+    /// <para>The <see cref="RunOverlay"/> shows the followed animal and keeps clicks on its panels from picking.</para>
+    /// </remarks>
     [RequireComponent(typeof(Camera))]
     [DefaultExecutionOrder(1000)]                                                          // after the World placed the views
     public class WorldCamera : MonoBehaviour
@@ -27,24 +44,32 @@ namespace EvoSim
         [SerializeField, Min(2f), Tooltip("Distance of the camera from an animal it starts following, in meters.")]
         float followDistance = 15f;
 
-        Camera cam;
+        Camera cam;                                                            // the Camera on this GameObject
         Vector3 focus;
         float distance = 50f;
-        bool framed;
-        Vector3 pressedAt;
+        bool framed;                                                           // the world was framed once this run
+        Vector3 pressedAt;                                                     // where the left button went down, in pixels
 
+        /// <summary>The World watched; when null, the first World of the scene is found on the next frame.</summary>
         public World World { get => world; set => world = value; }
         /// <summary>The animal followed, or null.</summary>
         public Animal Followed { get; private set; }
         /// <summary>The last followed animal that left the world (dead or gone), shown by the overlay.</summary>
         public Animal Lost { get; private set; }
+        /// <summary>The point on the ground the camera looks at and orbits, in world coordinates.</summary>
         public Vector3 Focus => focus;
+        /// <summary>The camera's distance from <see cref="Focus"/>, in meters.</summary>
         public float Distance => distance;
         /// <summary>A screen point the overlay covers: clicks there don't pick (set by <see cref="RunOverlay"/>).</summary>
         public System.Func<Vector2, bool> Blocks { get; set; }
 
+        /// <summary>Finds the Camera on this GameObject. Called by Unity once.</summary>
         void Awake() => cam = GetComponent<Camera>();
 
+        /// <summary>
+        /// Frames the world on the first frame of a run, reads the keys and the mouse, eases the focus toward the followed
+        /// animal's view, then places the camera. Called by Unity each frame, after the World placed the views.
+        /// </summary>
         void LateUpdate()
         {
             if (world == null) world = FindAnyObjectByType<World>();
@@ -55,12 +80,14 @@ namespace EvoSim
             {
                 var v = world.ViewOf(Followed);
                 if (Followed.IsGone || v == null) { Lost = Followed; Followed = null; }
+                // An ease that takes the same time at any frame rate.
                 else focus = Vector3.Lerp(focus, v.transform.position, 1f - Mathf.Exp(-8f * Time.unscaledDeltaTime));
             }
             Place();
         }
 
         /// <summary>Looks at the whole world from the current angles.</summary>
+        /// <remarks>Call it once the World is initialised: it reads the ground's bounds.</remarks>
         public void Frame()
         {
             var b = world.Ground.Bounds;
@@ -77,6 +104,9 @@ namespace EvoSim
             Place();
         }
 
+        /// <summary>
+        /// True when the camera, as placed, sees the four corners of a ground rectangle, inside a margin of the viewport.
+        /// </summary>
         bool Shows(Rect b, float margin)
         {
             foreach (var c in new[] { new Vector3(b.xMin, 0f, b.yMin), new Vector3(b.xMax, 0f, b.yMin), new Vector3(b.xMin, 0f, b.yMax), new Vector3(b.xMax, 0f, b.yMax) })
@@ -87,7 +117,8 @@ namespace EvoSim
             return true;
         }
 
-        /// <summary>Follows an animal (null stops), coming as close as <see cref="followDistance"/>.</summary>
+        /// <summary>Follows an animal (null stops), coming as close as the <c>followDistance</c> field says.</summary>
+        /// <param name="a">The animal to follow, or null to stop following.</param>
         public void Follow(Animal a)
         {
             Followed = a;
@@ -96,6 +127,9 @@ namespace EvoSim
             distance = Mathf.Min(distance, followDistance);
         }
 
+        /// <summary>
+        /// Puts the camera at its distance from the focus, at the current pitch and yaw, and pushes its far plane out if needed.
+        /// </summary>
         void Place()
         {
             var rot = Quaternion.Euler(pitch, yaw, 0f);
@@ -103,6 +137,10 @@ namespace EvoSim
             cam.farClipPlane = Mathf.Max(cam.farClipPlane, distance * 3f);
         }
 
+        /// <summary>
+        /// Applies the keys and the mouse of this frame (the controls in the class remarks); does nothing while the window
+        /// doesn't have the focus.
+        /// </summary>
         void HandleInput(float dt)
         {
             if (!Application.isFocused) return;
@@ -131,6 +169,7 @@ namespace EvoSim
                 focus -= flat * new Vector3(delta.x, 0f, delta.y) * (distance * 0.02f);
             }
             if (Input.GetMouseButtonDown(0)) pressedAt = Input.mousePosition;
+            // A click, not a drag: the button came up within 5 pixels of where it went down.
             if (Input.GetMouseButtonUp(0) && (Input.mousePosition - pressedAt).sqrMagnitude < 25f && !Blocked(Input.mousePosition))
             {
                 var picked = Pick(Input.mousePosition);
@@ -138,9 +177,13 @@ namespace EvoSim
             }
         }
 
+        /// <summary>True when the overlay covers a screen point.</summary>
         bool Blocked(Vector2 p) => Blocks != null && Blocks(p);
 
         /// <summary>The living animal whose view is nearest to a screen point, within the picking radius; null if none.</summary>
+        /// <remarks>It compares screen positions of the views (a little above their feet), so views need no collider.</remarks>
+        /// <param name="screen">A point on the screen, in pixels, from the bottom left, as <c>Input.mousePosition</c> gives it.</param>
+        /// <returns>The animal, or null when no living animal's view is within <c>pickPixels</c> (scaled to the window's height).</returns>
         public Animal Pick(Vector2 screen)
         {
             Animal best = null;

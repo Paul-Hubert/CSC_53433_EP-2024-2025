@@ -5,7 +5,16 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Space, layers, cover and entities (02, 03).</summary>
+    /// <summary>
+    /// Checks space, resource layers, cover and entities (02, 03; rule families SPACE, ENV, RAND; T-SPACE-02, -04,
+    /// T-ENV-01, -03, -04, -07, -08, T-RAND-03): distances, ties, food and cover queries against brute force, regrowth
+    /// statistics, hungry cover, carcass portions and lifetime, and the world seed.
+    /// </summary>
+    /// <remarks>
+    /// The worlds are bare: flat ground with the layers under test and, when animals are needed, species that hold only a
+    /// <see cref="ProbeAction"/>. Most tests call the layers' queries directly and run no tick. A student's resource layer
+    /// is checked by the layer suite of <see cref="ConformanceTests"/>; these tests show how to compare one with brute force.
+    /// </remarks>
     public class EnvironmentTests : WorldFixture
     {
         [Test, Description("T-SPACE-02 (SPACE-02, SPACE-06): distances are horizontal Euclidean; a replaced distance function is used by every query")]
@@ -14,6 +23,7 @@ namespace EvoSim.Tests
             var w = New().Flat(20, 20).Build();
             Assert.AreEqual(5f, w.Distance(new Vector3(0, 0, 0), new Vector3(3, 100, 4)), 1e-5f, "height doesn't count");
 
+            // A test ground whose distance function doubles every distance: every query must use it.
             var w2 = New(name: "Doubled").Ground<DoubleDistanceGround>(20, 20).Food(0f, 0f).Carcasses()
                 .Species("prey", s => s.Action<ProbeAction>())
                 .Build();
@@ -82,6 +92,7 @@ namespace EvoSim.Tests
                 float radius = rng.Range(0.3f, 25f);
                 int bestCell = -1;
                 float bestD = float.PositiveInfinity;
+                // Brute force: every cell with an item, the lower cell index winning a tie (SPACE-08).
                 for (int c = 0; c < food.Grid.Count; c++)
                 {
                     if (!food.HasItem(c)) continue;
@@ -115,6 +126,7 @@ namespace EvoSim.Tests
             }
             int count = Run(false, out int eligible);
             Assert.AreEqual(48 * 48, eligible);
+            // A cell is filled after the run unless it failed to regrow at every one of the ticks.
             double pFilled = 1 - System.Math.Pow(1 - p, ticks);
             Stat.Binomial(count, eligible, pFilled, 4, "regrown cells");
             Assert.AreEqual(count, Run(true, out _), "extra draws on another stream leave the regrowth identical");
@@ -195,6 +207,7 @@ namespace EvoSim.Tests
             w.Advance(1);
             Assert.AreEqual(0, cs.EntityCount, "removed in the environment phase when eaten up");
 
+            // A second carcass nobody eats rots after its lifetime of 100 ticks.
             var rotting = cs.Create(victim, killer.Id);
             w.Advance(99);
             Assert.AreEqual(1, cs.EntityCount, "still there after 99 environment phases");

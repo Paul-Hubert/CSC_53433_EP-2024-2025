@@ -5,7 +5,15 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Caps, migration, floors, newcomers, founders (11 §4).</summary>
+    /// <summary>
+    /// Checks caps, migration, floors, newcomers and founders (11 §4; POP-01…04, TICK-05, ANIM-40; T-POP-01…04, T-TICK-03):
+    /// who migrates above the cap, that migration ignores genes and energy, how newcomers fill a species up to its floor,
+    /// and when they first decide.
+    /// </summary>
+    /// <remarks>
+    /// The worlds hold one reference prey species with only the phase under test (migration, floor or breed). Some tests run
+    /// <see cref="MigrationPhase"/> directly through <c>Run(w.Context)</c> to repeat one step many times without ticking.
+    /// </remarks>
     public class PopulationTests : WorldFixture
     {
         [Test, Description("T-POP-01 (POP-01): migrate: 7 above the cap with 3 babies born this tick → 7 older animals leave, the babies stay; block → no conception at the cap")]
@@ -32,6 +40,7 @@ namespace EvoSim.Tests
             }
             blocked.Advance(1);
             Assert.AreEqual(0, b.Counters.EggsLaid, "no conception at the cap");
+            // Two animals leave, so two places are free; the others may breed again.
             b.Animals[3].IsGone = true;
             b.Animals[2].IsGone = true;
             foreach (var a in b.Animals) a.BredThisPeriod = false;
@@ -49,6 +58,7 @@ namespace EvoSim.Tests
             var x = w.Alleles.Register(gene, AlleleValue.OfText("Rest."), "founder");
             var other = w.Alleles.Register(gene, AlleleValue.OfText("Run."), "founder");
             int xLeft = 0, n = 1000, highEnergyLeft = 0;
+            // Each round: two animals, one carrying X, with a cap of 1, so exactly one migrates. Energy alternates between them.
             for (int i = 0; i < n; i++)
             {
                 foreach (var a in s.Animals.ToList()) a.IsGone = true;

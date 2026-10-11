@@ -8,7 +8,16 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Configuration: fields, scenario overrides, traits (14).</summary>
+    /// <summary>
+    /// Checks configuration (14; T-CFG-01…03, rule family CFG): every serialized module field has a tooltip and a range,
+    /// a scenario's overrides are applied and saved in <c>run_info.json</c>, and every parameter a number gene may target
+    /// is read through its trait.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="EveryFieldIsDocumented"/> reflects over the runtime and HTTP assemblies only, so it does not check a
+    /// student's modules. <see cref="TraitsDriveBehaviour"/> builds one Lab ecology per trait, with a number gene that sets it
+    /// on both species, and watches one animal for a tick.
+    /// </remarks>
     public class ConfigTests : WorldFixture
     {
         [Test, Description("T-CFG-01 (CFG-01): every module setting is visible in the inspector with a tooltip; numbers carry a range (Range or Min)")]
@@ -26,6 +35,7 @@ namespace EvoSim.Tests
                     var tip = f.GetCustomAttribute<TooltipAttribute>();
                     if (tip == null || string.IsNullOrWhiteSpace(tip.tooltip)) { problems.Add($"{t.Name}.{f.Name}: no tooltip"); continue; }
                     bool number = f.FieldType == typeof(float) || f.FieldType == typeof(int);
+                    // A number needs a [Range], a [Min], or at least a reference value (a digit) in its tooltip.
                     if (number && f.GetCustomAttribute<UnityEngine.RangeAttribute>() == null && f.GetCustomAttribute<MinAttribute>() == null
                         && !tip.tooltip.Any(char.IsDigit))
                         problems.Add($"{t.Name}.{f.Name}: a number without a range or a reference value");

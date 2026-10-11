@@ -7,12 +7,20 @@ using UnityEngine;
 namespace EvoSim.Tests
 {
     /// <summary>
-    /// The seams that let students build anything (owner 2026-10-10: no criteria, the system is open): births and deaths
-    /// reach every module, modules add statistics columns and name their companions, diets and custom interactions decide
-    /// what a meal is, brains with memory see every animal, covers combine, and entities of one's own kind are found.
+    /// Checks the seams that let students build anything (the system is open: there are no criteria a module must meet):
+    /// births and deaths reach every module, modules add statistics columns and name their companions, diets and custom
+    /// interactions decide what a meal is, brains with memory see every animal, covers combine, and entities of one's own
+    /// kind are found (ANIM-42, ACT-10, ACT-11, DEC-30, ENV-10, ENV-11, ENV-20, PROMPT-03, V-26).
     /// </summary>
+    /// <remarks>
+    /// Each seam is exercised by a test probe of <c>EvoSim.Testing</c> that plays a student's module:
+    /// <see cref="HookProbe"/>, <see cref="WorldHookProbe"/>, <see cref="NeedsEnergyProbe"/>, <see cref="SureKillDiet"/>,
+    /// <see cref="FeedAction"/>, <see cref="MemoryBrain"/>, <see cref="SideCover"/> and <see cref="FruitSystem"/>. These are
+    /// good models to copy. <see cref="ModulesAddStatsColumns"/> writes a run folder under <c>Logs/EvoSim/test-runs</c>.
+    /// </remarks>
     public class OpenHooksTests : WorldFixture
     {
+        /// <summary>The folder of test runs that write files, <c>Logs/EvoSim/test-runs</c> at the repository root.</summary>
         static string Root => Path.Combine(Path.GetDirectoryName(Application.dataPath), "Logs", "EvoSim", "test-runs");
 
         [Test, Description("ANIM-42, open: species modules and world modules hear every birth (founders, babies, immigrants) and every death")]
@@ -50,6 +58,7 @@ namespace EvoSim.Tests
             var w = b.Build();
             w.Advance(300);
             w.Stop("test");
+            // stats.csv has one row every 100 ticks: rows for ticks 100, 200 and 300; the lightning death fell at tick 150.
             var lines = File.ReadAllLines(Path.Combine(w.Service<RunRecorder>().RunFolder, "stats.csv"));
             var header = lines[0].Split(',');
             Assert.AreEqual(4, lines.Length, "the header and three rows");

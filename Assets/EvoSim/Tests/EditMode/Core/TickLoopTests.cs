@@ -5,7 +5,17 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>The tick loop, phases and wait modes (TICK-01…07, SPACE-10…14, RAND-11, RAND-20).</summary>
+    /// <summary>
+    /// Checks the tick loop, phases and wait modes (02 §4, 12; TICK-01…07, SPACE-10…14, RAND-11, RAND-20; T-TICK-01, -02,
+    /// T-SPACE-07): phases run in hierarchy order, a change is seen only by later phases, a waiting phase holds the tick in
+    /// both wait modes with the same hash, and runs stop cleanly at a tick boundary.
+    /// </summary>
+    /// <remarks>
+    /// The worlds hold no species, only test phases of <c>EvoSim.Testing</c>: <see cref="TracePhase"/> logs each run,
+    /// <see cref="BlackboardPhase"/> reads and writes a shared value, <see cref="DelayedPhase"/> waits a given number of
+    /// <c>Advance</c> calls as a slow brain would, <see cref="RandomEventPhase"/> records random events for the hash, and
+    /// <see cref="ThrowingPhase"/> throws.
+    /// </remarks>
     public class TickLoopTests : WorldFixture
     {
         [Test, Description("T-TICK-01 (TICK-01, TICK-07): phases run in hierarchy order every tick; a phase added or removed runs or vanishes without other changes")]
@@ -14,7 +24,7 @@ namespace EvoSim.Tests
             var b = New().Flat(10, 10).Phase<TracePhase>(p => p.Label = "A").Phase<TracePhase>(p => p.Label = "B").Phase<TracePhase>(p => p.Label = "C");
             var phases = b.Root.GetComponentsInChildren<TracePhase>(true);
             var log = phases[0].Log;
-            foreach (var p in phases) p.Log = log;
+            foreach (var p in phases) p.Log = log;                        // one shared log shows the order across phases
             var w = b.Build();
             w.Advance(2);
             CollectionAssert.AreEqual(new[] { "0:A", "0:B", "0:C", "1:A", "1:B", "1:C" }, log);
@@ -144,6 +154,7 @@ namespace EvoSim.Tests
             Assert.AreEqual(1, w2.Tick);
             Assert.AreEqual("button", w2.StopReason);
 
+            // A STOP file, when it exists, stops the run before its first tick.
             var dir = System.IO.Path.Combine(Application.temporaryCachePath, "evosim-stop-test");
             System.IO.Directory.CreateDirectory(dir);
             var stop = System.IO.Path.Combine(dir, "STOP");

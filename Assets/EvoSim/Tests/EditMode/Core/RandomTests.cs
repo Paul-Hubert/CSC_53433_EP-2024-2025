@@ -4,7 +4,16 @@ using NUnit.Framework;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Named random streams (RAND-02…05) and the events hash (RAND-10, RAND-13).</summary>
+    /// <summary>
+    /// Checks the named random streams (12; RAND-02…05) and the events hash (RAND-10, RAND-11, RAND-13): a stream depends on
+    /// the seed and its name only, streams never shift one another, draws are uniform, events are canonical JSON, and two
+    /// worlds share no state (T-RAND-02, -05, T-CORE-09).
+    /// </summary>
+    /// <remarks>
+    /// Most tests use <see cref="RandomStream"/> and <see cref="EventLog"/> directly. The world tests use
+    /// <see cref="RandomEventPhase"/>, a test phase that records an event drawn from its stream every tick, so the hash has
+    /// something to cover. Statistical checks go through <see cref="Stat"/> with fixed seeds.
+    /// </remarks>
     public class RandomTests : WorldFixture
     {
         [Test, Description("RAND-02: a stream is a function of the seed and its name only")]

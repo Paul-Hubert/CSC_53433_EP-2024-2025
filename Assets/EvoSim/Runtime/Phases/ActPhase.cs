@@ -9,6 +9,21 @@ namespace EvoSim
     /// locomotion moves it, interactions apply within reach, then its metabolism is paid and busy counters drop
     /// (TICK-04 #4, ANIM-20, ANIM-30).
     /// </summary>
+    /// <remarks>
+    /// <para>Fourth phase of the reference tick, after Choose actions and before Breed. For each animal, in the act order:
+    /// plan (its current action's <see cref="AnimalAction.ActAll"/> gives an intent and maybe an interaction; busy animals
+    /// and animals without an action stay), move (its species' <see cref="Locomotion.MoveAll"/>), interact (the
+    /// <see cref="InteractionResolver"/> applies graze, strike, scavenge, egg eating or a custom interaction within reach,
+    /// diet-checked), settle (metabolism and stamina, then the busy countdown).</para>
+    /// <para>The order (ACT-30): in <see cref="ActOrder.SpeciesInTurn"/> and <see cref="ActOrder.AllMixed"/> each animal
+    /// does all four steps before the next one, on the state left by those before it (ACT-31); in
+    /// <see cref="ActOrder.Simultaneous"/> every animal plans from the same state, all move, then interactions apply in a
+    /// random order. Every shuffle comes from the <c>act-order</c> stream (ACT-32); strike rolls and sidesteps use each
+    /// species' <c>actions</c> stream.</para>
+    /// <para>A killed animal is only marked here; it acts no more this tick and dies in the death phase (ANIM-41). If a
+    /// locomotion leaves an animal on non-walkable ground, the phase puts it back where it started, with a warning
+    /// (MOVE-02).</para>
+    /// </remarks>
     public class ActPhase : TickPhase
     {
         [SerializeField, Tooltip("Species in turn (reference), all mixed, or simultaneous (ACT-30).")]
@@ -20,22 +35,29 @@ namespace EvoSim
         [SerializeField, Min(0f), Tooltip("Scavenge reach, in meters (reference 1; ACT-10).")]
         float scavengeReach = 1f;
 
-        readonly List<Animal> actors = new List<Animal>();
-        Intent[] intents = new Intent[16];
-        Interaction[] interactions = new Interaction[16];
-        bool[] busyAtStart = new bool[16];
-        float[] moved = new float[16];
-        Vector3[] from = new Vector3[16];
-        int[] order2 = new int[16];
-        ActContext act;
-        MoveContext move;
-        InteractionResolver resolver;
+        // Per-tick work arrays, indexed like actors (slot 0 only in the sequential orders); grown by Ensure, never shrunk (R-07).
+        readonly List<Animal> actors = new List<Animal>();      // the animals acting now: one species, or all, in act order
+        Intent[] intents = new Intent[16];                      // each actor's planned intent (where to go)
+        Interaction[] interactions = new Interaction[16];       // each actor's planned interaction (what to do on arrival)
+        bool[] busyAtStart = new bool[16];                      // busy when the tick began: the busy countdown applies
+        float[] moved = new float[16];                          // meters moved this tick
+        Vector3[] from = new Vector3[16];                       // position before the move
+        int[] order2 = new int[16];                             // Simultaneous: the shuffled order of interactions
+        ActContext act;                                         // what actions plan with; reused for every animal
+        MoveContext move;                                       // what locomotions move with
+        InteractionResolver resolver;                           // applies interactions within reach (ACT-10, ACT-11)
 
+        /// <summary>The act order (ACT-30); a scenario or test may change it before the World initialises.</summary>
         public ActOrder Order { get => order; set => order = value; }
+        /// <summary>Within this distance of a food item, in meters, an animal grazes it (ACT-10).</summary>
         public float GrazeReach => grazeReach;
+        /// <summary>Within this distance of its prey, in meters, a hunter strikes (ACT-10).</summary>
         public float StrikeReach => strikeReach;
+        /// <summary>Within this distance of a carcass, in meters, an animal eats a portion (ACT-10).</summary>
         public float ScavengeReach => scavengeReach;
 
+        /// <summary>Creates the contexts and the resolver with this phase's reaches, and makes room for as many animals as the caps allow.</summary>
+        /// <inheritdoc/>
         public override void Initialize()
         {
             act = new ActContext(World) { GrazeReach = grazeReach };
@@ -51,6 +73,8 @@ namespace EvoSim
             if (order != ActOrder.SpeciesInTurn) Ensure(most);
         }
 
+        /// <summary>Rebuilds the spatial index, clears last tick's per-animal flags, and lets every living animal act in the act order.</summary>
+        /// <inheritdoc/>
         public override void Run(TickContext t)
         {
             World.Space.Rebuild();
@@ -124,15 +148,15 @@ namespace EvoSim
 
         // ---- The batch entry points (20 §10, ARCH-12): actions plan and locomotions move groups of animals ----
 
-        readonly Animal[] one = new Animal[1];
-        readonly ActPlan[] onePlan = new ActPlan[1];
-        readonly Intent[] oneIntent = new Intent[1];
+        readonly Animal[] one = new Animal[1];                  // a group of one, for the sequential orders (no allocation)
+        readonly ActPlan[] onePlan = new ActPlan[1];            // its plan
+        readonly Intent[] oneIntent = new Intent[1];            // its intent
         readonly List<object> groupOwners = new List<object>();                     // an action or a locomotion, in order of first use
-        readonly List<List<int>> groupMembers = new List<List<int>>();
-        readonly List<Animal> groupAnimals = new List<Animal>();
-        ActPlan[] groupPlans = new ActPlan[16];
-        Intent[] groupIntents = new Intent[16];
-        float[] groupMoved = new float[16];
+        readonly List<List<int>> groupMembers = new List<List<int>>();               // per owner: indexes into actors; lists reused
+        readonly List<Animal> groupAnimals = new List<Animal>();                     // the animals of the group being handled
+        ActPlan[] groupPlans = new ActPlan[16];                 // the plans of the group being handled
+        Intent[] groupIntents = new Intent[16];                 // the intents of the group being moved
+        float[] groupMoved = new float[16];                     // meters moved by each animal of that group
 
         /// <summary>The animal's action gives an intent and an interaction; busy animals and animals without an action stay.</summary>
         void Plan(Animal a, int i)
@@ -145,6 +169,7 @@ namespace EvoSim
             Apply(a, i, onePlan[0]);
         }
 
+        /// <summary>Simultaneous: plans every actor from the same state, one call per action for all the animals that chose it.</summary>
         void PlanTogether(int n)
         {
             ClearGroups();
@@ -165,6 +190,7 @@ namespace EvoSim
             }
         }
 
+        /// <summary>Counts an animal-tick, and an exhausted one when it starts without stamina (13 §4 <c>exhausted</c>); notes whether it is busy.</summary>
         void Count(Animal a, int i)
         {
             var counters = a.Species.Counters;
@@ -174,6 +200,7 @@ namespace EvoSim
             busyAtStart[i] = a.IsBusy;
         }
 
+        /// <summary>Stores a plan in slot i, and the animal's target (its prey when striking, else the plan's animal) for the inspector.</summary>
         void Apply(Animal a, int i, ActPlan plan)
         {
             intents[i] = plan.Intent;
@@ -183,6 +210,7 @@ namespace EvoSim
             a.TargetPoint = intents[i].Target;
         }
 
+        /// <summary>Simultaneous: moves every actor that doesn't stay, one call per locomotion for all its animals.</summary>
         void MoveTogether(int n)
         {
             ClearGroups();
@@ -209,12 +237,14 @@ namespace EvoSim
             }
         }
 
+        /// <summary>Empties every group, keeping the lists for reuse.</summary>
         void ClearGroups()
         {
             foreach (var list in groupMembers) list.Clear();
             groupOwners.Clear();
         }
 
+        /// <summary>The member list of an owner's group (an action or a locomotion), opened on first use.</summary>
         List<int> GroupOf(object owner)
         {
             for (int g = 0; g < groupOwners.Count; g++) if (groupOwners[g] == owner) return groupMembers[g];
@@ -223,6 +253,7 @@ namespace EvoSim
             return groupMembers[groupOwners.Count - 1];
         }
 
+        /// <summary>Fills groupAnimals with the animals of group g and returns their indexes into actors.</summary>
         List<int> Gather(int g)
         {
             var members = groupMembers[g];
@@ -244,6 +275,10 @@ namespace EvoSim
             AfterMove(a, i, loco);
         }
 
+        /// <summary>
+        /// Puts an animal back if its locomotion left it on non-walkable ground (MOVE-02); records the meters moved, updates
+        /// the spatial index and, unless it wandered, turns its heading toward the move.
+        /// </summary>
         void AfterMove(Animal a, int i, Locomotion loco)
         {
             var ground = World.Ground;
@@ -280,12 +315,14 @@ namespace EvoSim
             }
         }
 
+        /// <summary>Replaces the list's content with the species' living, not killed animals, in id order.</summary>
         static void Living(Species s, List<Animal> result)
         {
             result.Clear();
             Append(s, result);
         }
 
+        /// <summary>Adds the species' living, not killed animals to the list, in id order.</summary>
         static void Append(Species s, List<Animal> result)
         {
             var animals = s.Animals;
@@ -293,6 +330,7 @@ namespace EvoSim
                 if (!animals[i].Killed && !animals[i].IsGone) result.Add(animals[i]);
         }
 
+        /// <summary>Grows the per-actor arrays to hold at least n animals (doubling, so it rarely allocates).</summary>
         void Ensure(int n)
         {
             if (intents.Length >= n) return;
@@ -305,6 +343,8 @@ namespace EvoSim
             Array.Resize(ref order2, size);
         }
 
+        /// <summary>Reports a species without exactly one locomotion (V-13), with a fix that adds a kinematic one when there is none.</summary>
+        /// <inheritdoc/>
         public override void Validate(ValidationReport report)
         {
             foreach (var s in World.AllSpecies)

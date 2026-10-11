@@ -13,6 +13,21 @@ namespace EvoSim
     /// every file is written when the run stops, whatever the reason (RAND-20). The compatibility mode writes a
     /// two-species world exactly as the prototype does (OUT-05).
     /// </summary>
+    /// <remarks>
+    /// <para>Place it under the World's Recording object, with a <see cref="RecordPhase"/> among the phases (V-09). In
+    /// <see cref="Begin"/>, after every module is ready and before the founders, it opens a new folder under
+    /// <see cref="OutputRoot"/> (OUT-01), listens to <see cref="World.Events"/>, and writes the stats header and
+    /// <c>run_info.json</c>. The record phase then calls <see cref="WriteStats"/> and <see cref="AfterTick"/>; when the run
+    /// stops, <see cref="WorldModule.OnRunStopped"/> writes <c>alleles.jsonl</c>, <c>final_population.json</c>,
+    /// <c>summary.json</c> and <c>run_info.json</c> again.</para>
+    /// <para>stats.csv columns: <c>t</c>; then per species, with the prefix <c>&lt;species&gt;_</c>, <c>pop</c>,
+    /// <c>mean_energy</c>, <c>mean_stamina</c>, <c>exhausted</c>, <c>mean_gen</c>, <c>max_gen</c>, <c>births</c>,
+    /// <c>immigrants</c>, the <c>deaths_…</c> columns, <c>decisions</c>, <c>backend_queries</c>, <c>invalid</c>,
+    /// <c>portions</c>, one <c>act_&lt;action&gt;</c> per action and its modules' <see cref="IStatsColumns"/>;
+    /// <c>alleles</c> after the first species; then the World modules' columns. Counts are cumulative.</para>
+    /// <para>The events hash is always computed on the canonical line, so the compatibility mode changes the files, never
+    /// the hash. The summary's <c>events_hash</c> and <c>events_sha</c> (its first 16 hex digits) identify the run.</para>
+    /// </remarks>
     public class RunRecorder : WorldService, IEventSink
     {
         [SerializeField, Tooltip("Folder that receives one sub-folder per run, relative to the project (gitignored Logs by default).")]
@@ -30,23 +45,32 @@ namespace EvoSim
         [SerializeField, Tooltip("Write files (off: keep the hash and statistics only, e.g. in tests).")]
         bool writeFiles = true;
 
-        StreamWriter events, stats;
-        readonly List<string> statColumns = new List<string>();
+        StreamWriter events, stats;                                     // events.jsonl and stats.csv, open during the run; null otherwise
+        readonly List<string> statColumns = new List<string>();         // the stats.csv header as written now
         readonly List<Dictionary<string, string>> statRows = new List<Dictionary<string, string>>();   // to rewrite the file when a species is added
-        readonly System.Diagnostics.Stopwatch clock = new System.Diagnostics.Stopwatch();
-        bool started, finished;
+        readonly System.Diagnostics.Stopwatch clock = new System.Diagnostics.Stopwatch();              // wall-clock time of the run, for the summary
+        bool started, finished;                                         // Begin ran; the final files are written
 
+        /// <summary>The full path of this run's folder, or null before <see cref="Begin"/> or when files are off.</summary>
         public string RunFolder { get; private set; }
+        /// <summary>True to write a two-species world as the prototype does (OUT-05), for its analysis tools.</summary>
         public bool Compatibility { get => compatibility; set => compatibility = value; }
+        /// <summary>True to write files; false keeps only the hash and the counters (tests).</summary>
         public bool WriteFiles { get => writeFiles; set => writeFiles = value; }
+        /// <summary>A statistics row every this many ticks (reference 100).</summary>
         public int StatsEvery => statsEvery;
+        /// <summary>The folder that receives one sub-folder per run, relative to the project (in a player: to its folder).</summary>
         public string OutputRoot { get => outputRoot; set => outputRoot = value; }
+        /// <summary>The run folder's name; empty = <c>&lt;world&gt;-s&lt;seed&gt;-&lt;date&gt;</c>. <c>{world}</c> and <c>{seed}</c> are replaced.</summary>
         public string RunName { get => runName; set => runName = value; }
         /// <summary>Extra entries for run_info.json (the scenario, its overrides), set before the run.</summary>
         public SortedDictionary<string, object> ExtraInfo { get; } = new SortedDictionary<string, object>(StringComparer.Ordinal);
 
+        /// <summary>The folder above Assets: the project in the editor, the build's folder in a player.</summary>
         static string ProjectRoot => Path.GetDirectoryName(Application.dataPath);
 
+        /// <summary>Closes any file left open and forgets the previous run's folder and rows.</summary>
+        /// <inheritdoc/>
         public override void Initialize()
         {
             Close();
@@ -56,6 +80,8 @@ namespace EvoSim
         }
 
         /// <summary>After everything is ready, before founders: open the folder and the files.</summary>
+        /// <remarks>A folder that exists already gets a suffix (<c>-2</c>, <c>-3</c>…), so a run never writes into another's (OUT-01).</remarks>
+        /// <inheritdoc/>
         public override void Begin()
         {
             World.Events.AddSink(this);
@@ -79,11 +105,17 @@ namespace EvoSim
 
         // ---- Events (OUT-02, OUT-03) ----
 
+        /// <summary>Writes the event's line to events.jsonl, in the prototype's form in the compatibility mode.</summary>
+        /// <inheritdoc/>
         public void OnEvent(SimEvent e, string line)
         {
             events?.WriteLine(compatibility ? CompatLine(e) : line);
         }
 
+        /// <summary>
+        /// The event as the prototype wrote it (OUT-05): no species field for the first species, the cause <c>predator</c>
+        /// for a kill, and the first species' allele and locus ids without their prefix.
+        /// </summary>
         string CompatLine(SimEvent e)
         {
             var fields = new SortedDictionary<string, object>(StringComparer.Ordinal);
@@ -108,9 +140,12 @@ namespace EvoSim
             return CanonicalJson.Write(fields);
         }
 
+        /// <summary>True when the id is the World's first species (the prototype's "agents").</summary>
         bool IsFirstSpecies(string speciesId) => World.AllSpecies.Count > 0 && World.AllSpecies[0].Id == speciesId;
 
         /// <summary>In the compatibility mode the first species' loci have no prefix: "prey.eat:3" → "eat:3" (OUT-05).</summary>
+        /// <param name="id">An allele or locus id, or null.</param>
+        /// <returns>The id without the first species' prefix in the compatibility mode; otherwise unchanged.</returns>
         public string CompatId(string id)
         {
             if (!compatibility || World.AllSpecies.Count == 0 || id == null) return id;
@@ -121,6 +156,9 @@ namespace EvoSim
         // ---- Statistics rows (13 §4) ----
 
         /// <summary>One statistics row; the record phase calls it every statsEvery ticks.</summary>
+        /// <remarks>When the columns changed since the last row (a species added, a new death cause or module column), the
+        /// file is rewritten with the new header first; older rows get empty cells in the new columns.</remarks>
+        /// <param name="tick">The row's <c>t</c>: the number of ticks done.</param>
         public void WriteStats(int tick)
         {
             if (stats == null) return;
@@ -146,6 +184,7 @@ namespace EvoSim
             foreach (var row in statRows) stats.WriteLine(StatLine(row));
         }
 
+        /// <summary>A row as one CSV line, in the current column order; an empty cell for a column the row lacks.</summary>
         string StatLine(Dictionary<string, string> row)
         {
             var sb = new StringBuilder();
@@ -157,8 +196,10 @@ namespace EvoSim
             return sb.ToString();
         }
 
+        /// <summary>A species' column prefix: "&lt;id&gt;_"; in the compatibility mode none for the first species and "pred_" for the second.</summary>
         string Prefix(Species s, int index) => compatibility ? (index == 0 ? "" : index == 1 ? PrototypeFormat.SecondSpeciesPrefix : s.Id + "_") : s.Id + "_";
 
+        /// <summary>Sets the header to the columns of the world as it is now.</summary>
         void BuildColumns()
         {
             statColumns.Clear();
@@ -189,6 +230,7 @@ namespace EvoSim
             return columns;
         }
 
+        /// <summary>True when both lists hold the same names in the same order.</summary>
         static bool SameAs(List<string> a, List<string> b)
         {
             if (a.Count != b.Count) return false;
@@ -196,6 +238,7 @@ namespace EvoSim
             return true;
         }
 
+        /// <summary>The World's phases, then its services, that add statistics columns, in hierarchy order.</summary>
         IEnumerable<IStatsColumns> WorldColumns()
         {
             foreach (var ph in World.Phases) if (ph is IStatsColumns c) yield return c;
@@ -213,6 +256,7 @@ namespace EvoSim
                 if (!seen.Contains(kv.Key)) { seen.Add(kv.Key); yield return kv.Key; }
         }
 
+        /// <summary>The values of one row by column name: counters, means over the living animals, and the modules' columns.</summary>
         Dictionary<string, string> StatRow(int tick)
         {
             var row = new Dictionary<string, string> { ["t"] = tick.ToString(CultureInfo.InvariantCulture), ["alleles"] = Num(World.Alleles.Count) };
@@ -262,14 +306,17 @@ namespace EvoSim
             return row;
         }
 
+        /// <summary>A module column's value: at most 4 decimals, no trailing zeros.</summary>
         static string Value(double v) => Math.Round(v, 4).ToString("0.####", CultureInfo.InvariantCulture);
 
+        /// <summary>A built-in column's value: a whole number, or up to 2 decimals for the means.</summary>
         static string Num(double v, int decimals = 0) =>
             decimals == 0 ? Math.Round(v).ToString(CultureInfo.InvariantCulture) : Math.Round(v, decimals).ToString("0.##", CultureInfo.InvariantCulture);
 
         // ---- Flushes (RAND-22) ----
 
         /// <summary>Called by the record phase every tick: flushes events and stats, and the allele list, on their periods.</summary>
+        /// <param name="tick">The number of ticks done (the record phase passes its tick + 1).</param>
         public void AfterTick(int tick)
         {
             if (tick > 0 && tick % flushEvery == 0) { events?.Flush(); stats?.Flush(); }
@@ -278,6 +325,8 @@ namespace EvoSim
 
         // ---- Files at the end (13 §2, RAND-20) ----
 
+        /// <summary>Writes the final files (alleles, final population, summary with the stop reason, run info) and closes the run's files; only once.</summary>
+        /// <inheritdoc/>
         public override void OnRunStopped(string reason)
         {
             if (!started || finished) return;
@@ -301,6 +350,7 @@ namespace EvoSim
             Close();
         }
 
+        /// <summary>Closes events.jsonl and stats.csv, flushing what is left.</summary>
         void Close()
         {
             events?.Dispose();
@@ -308,6 +358,7 @@ namespace EvoSim
             events = stats = null;
         }
 
+        /// <summary>Rewrites alleles.jsonl whole: every allele registered so far, all species, in registration order.</summary>
         void WriteAlleles()
         {
             if (!writeFiles || RunFolder == null) return;
@@ -328,6 +379,7 @@ namespace EvoSim
             File.WriteAllText(Path.Combine(RunFolder, "alleles.jsonl"), sb.ToString(), new UTF8Encoding(false));
         }
 
+        /// <summary>The living animals for final_population.json: id, generation, genome (allele ids) and species.</summary>
         List<object> FinalPopulation()
         {
             var list = new List<object>();
@@ -349,6 +401,7 @@ namespace EvoSim
             return list;
         }
 
+        /// <summary>One species' totals for summary.json (13 §5); rates are per decision, kills only for hunters.</summary>
         SortedDictionary<string, object> SpeciesSummary(Species s)
         {
             var c = s.Counters;
@@ -374,6 +427,10 @@ namespace EvoSim
             return d;
         }
 
+        /// <summary>
+        /// The run's totals for summary.json (13 §5): ticks, seeds, brains, mutations, alleles, the events hash, why it stopped
+        /// and how long it took; the species' totals under <c>species</c>, or flat and under "&lt;id&gt;s" in the compatibility mode.
+        /// </summary>
         SortedDictionary<string, object> Summary(string reason)
         {
             var mutations = new SortedDictionary<string, object>(StringComparer.Ordinal)
@@ -414,6 +471,7 @@ namespace EvoSim
             return d;
         }
 
+        /// <summary>Writes run_info.json: <see cref="RunInfo.Collect"/> plus <see cref="ExtraInfo"/>.</summary>
         void WriteRunInfo()
         {
             if (!writeFiles || RunFolder == null) return;
@@ -422,9 +480,11 @@ namespace EvoSim
             WriteJson("run_info.json", info);
         }
 
+        /// <summary>Writes a value as one line of canonical JSON into a file of the run folder (UTF-8, no BOM).</summary>
         void WriteJson(string file, object value) =>
             File.WriteAllText(Path.Combine(RunFolder, file), CanonicalJson.Write(value) + "\n", new UTF8Encoding(false));
 
+        /// <summary>A folder name with every character other than letters, digits, '-', '_' and '.' replaced by '_'.</summary>
         static string Sanitize(string s)
         {
             var sb = new StringBuilder(s.Length);
@@ -432,6 +492,12 @@ namespace EvoSim
             return sb.ToString();
         }
 
+        /// <summary>Sets the recorder from code (WorldBuilder, batch runs, tests), before the World initialises.</summary>
+        /// <param name="root">The folder that receives the run folders, relative to the project.</param>
+        /// <param name="name">The run folder's name; empty = <c>&lt;world&gt;-s&lt;seed&gt;-&lt;date&gt;</c>.</param>
+        /// <param name="compat">True for the prototype's formats (OUT-05).</param>
+        /// <param name="files">False to write no file (hash and counters only).</param>
+        /// <param name="statsInterval">A statistics row every this many ticks (at least 1).</param>
         public void Configure(string root, string name, bool compat = false, bool files = true, int statsInterval = 100)
         {
             outputRoot = root;

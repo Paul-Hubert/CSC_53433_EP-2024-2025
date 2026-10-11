@@ -14,34 +14,72 @@ namespace EvoSim
     /// {name} and {species.name} are display names. A placeholder reads a field or a property; {{ and }} write a brace.
     /// A module is named by its class, a base class, or its GameObject.
     /// </summary>
+    /// <remarks>
+    /// <para><see cref="Build"/> makes one writer per species when the run starts, and hands it to every module's
+    /// <see cref="SpeciesModule.WritePromptRules"/> in hierarchy order (so action lines come in action order), then to every
+    /// world service's <see cref="WorldService.WritePromptRules"/>. A module calls <see cref="Action"/> or
+    /// <see cref="Rule"/>; it writes nothing else.</para>
+    /// <para>Placeholders keep the prompt true to the world: change a speed in the Inspector and the prompt says the new
+    /// number (PROMPT-03). The species' header and genes intro, and a frozen prompt, are filled with no writing module:
+    /// there only {name} and the qualified forms work. {genes}, {situation} and {ask} are left for
+    /// <see cref="PromptTemplate.Fill"/>. An unknown placeholder stays in the text and is reported (V-53).</para>
+    /// </remarks>
+    /// <example>
+    /// A module writes its Inspector text as a rule; the reference prey locomotion's text begins
+    /// <c>"Animals move {walkSpeed} meter per step. Predators run {predator.Locomotion.runSpeed} meters per step when they hunt,"</c>
+    /// and goes on with <c>"{predator.Stamina.max} stamina against an animal's {Stamina.max}"</c>. The sample <c>Thirst</c>
+    /// writes its number itself:
+    /// <code>
+    /// public override void WritePromptRules(PromptWriter w) =>
+    ///     w.Rule($"Thirst grows every step; an animal dies of thirst at {Bands.Number(deadly)}. Drinking resets it.");
+    /// </code>
+    /// </example>
     public sealed class PromptWriter
     {
+        /// <summary>Matches "{{", "}}", or a placeholder of one to three dotted names (letters, digits, '_' and spaces).</summary>
         static readonly Regex Placeholder = new Regex(@"\{\{|\}\}|\{([A-Za-z_][\w ]*(?:\.[A-Za-z_][\w ]*){0,2})\}");
 
-        readonly List<string> actions = new List<string>();
-        readonly List<string> rules = new List<string>();
+        readonly List<string> actions = new List<string>();    // the action lines, "- name: description", in call order
+        readonly List<string> rules = new List<string>();      // the rule lines, placeholders filled, in call order
         readonly List<string> problems = new List<string>();
 
+        /// <summary>The species whose prompt is being written: {name} is its display name, {Module.field} reads its modules.</summary>
         public Species Species { get; }
+
         /// <summary>The module writing now: {field} placeholders read it.</summary>
         public object Current { get; internal set; }
+
+        /// <summary>The action lines written so far, "- eat: go to the nearest visible food and eat it".</summary>
         public IReadOnlyList<string> ActionLines => actions;
+
+        /// <summary>The rule lines written so far, placeholders filled.</summary>
         public IReadOnlyList<string> RuleLines => rules;
+
         /// <summary>Unknown placeholders found while writing (V-53).</summary>
         public IReadOnlyList<string> Problems => problems;
 
+        /// <summary>Makes an empty writer for a species. <see cref="Build"/> makes one; tools and tests may too.</summary>
+        /// <param name="species">The species whose prompt is written.</param>
         public PromptWriter(Species species) { Species = species; }
 
-        /// <summary>One line of the action list: "- name: description".</summary>
+        /// <summary>Adds one line of the action list: "- name: description" (PROMPT-01).</summary>
+        /// <param name="name">The action's name, as the brain reads it ("eat").</param>
+        /// <param name="description">What the action does, from its Inspector text; its placeholders are filled.</param>
+        /// <remarks>Every action writes its own line (<c>AnimalAction.WritePromptRules</c>); other modules write rules.</remarks>
         public void Action(string name, string description) => actions.Add("- " + name + ": " + Fill(description));
 
-        /// <summary>One rule line, its placeholders filled.</summary>
+        /// <summary>Adds one rule line, its placeholders filled.</summary>
+        /// <param name="line">The rule, usually a module's Inspector text; it may hold several lines. Null, empty or blank adds
+        /// nothing, so a module with an empty rule text writes nothing.</param>
         public void Rule(string line)
         {
             if (!string.IsNullOrWhiteSpace(line)) rules.Add(Fill(line));
         }
 
         /// <summary>Fills {placeholders} from module settings; unknown ones are kept and reported.</summary>
+        /// <param name="text">A text with placeholders, or null.</param>
+        /// <returns>The text with each placeholder replaced by the value it names, "{{" and "}}" by single braces; {genes},
+        /// {situation}, {ask} and unknown placeholders unchanged.</returns>
         public string Fill(string text)
         {
             if (string.IsNullOrEmpty(text) || (text.IndexOf('{') < 0 && text.IndexOf('}') < 0)) return text;
@@ -57,6 +95,10 @@ namespace EvoSim
             });
         }
 
+        /// <summary>
+        /// Finds the value of a placeholder path: "name" or "field" (the writing module); "Module.field", or "species.name" /
+        /// "species.id"; "species.Module.field". False when nothing matches.
+        /// </summary>
         bool TryResolve(string path, out string value)
         {
             value = null;
@@ -70,6 +112,7 @@ namespace EvoSim
             }
             else if (parts.Length == 2)
             {
+                // A module of this species wins; else the first part may name another species ({predator.name}).
                 target = FindModule(Species, parts[0]);
                 field = parts[1];
                 var other = target == null && Species.World != null ? Species.World.FindSpeciesByName(parts[0]) : null;
@@ -84,6 +127,9 @@ namespace EvoSim
             return target != null && TryRead(target, field, out value);
         }
 
+        /// <summary>
+        /// The first module of a species whose class, a base class below SpeciesModule, or GameObject has this name; or null.
+        /// </summary>
         static object FindModule(Species s, string name)
         {
             if (s == null) return null;
@@ -96,7 +142,14 @@ namespace EvoSim
             return null;
         }
 
-        /// <summary>Reads a field, else a property (public or private, of the class or a base class), formatted as the brain reads it.</summary>
+        /// <summary>
+        /// Reads a field, else a property (public or private, of the class or a base class), formatted as the brain reads it.
+        /// </summary>
+        /// <param name="target">The module or object to read.</param>
+        /// <param name="field">The field's or property's name, exactly as in the code ("runSpeed", "max").</param>
+        /// <param name="value">The value as text: numbers as <see cref="Bands.Number"/> writes them, booleans "yes" / "no";
+        /// null when not found.</param>
+        /// <returns>True when a readable field or property was found and its getter did not throw.</returns>
         public static bool TryRead(object target, string field, out string value)
         {
             value = null;
@@ -114,6 +167,7 @@ namespace EvoSim
             return false;
         }
 
+        /// <summary>A setting's value as the brain reads it: "2.5", "4", "yes" / "no", or its plain text.</summary>
         static string Format(object v)
         {
             switch (v)
@@ -130,6 +184,11 @@ namespace EvoSim
         /// The species' prompt template (PROMPT-01): header, actions, rules from its modules and from world services,
         /// the genes intro and {genes}, the situation and {ask}; or its frozen prompt (PROMPT-04).
         /// </summary>
+        /// <param name="s">The species, its modules discovered.</param>
+        /// <returns>The template and the problems found (unknown placeholders, holes missing from a frozen prompt).</returns>
+        /// <remarks>Called by the World for each species when the run starts and when a species is added (SPEC-30), and by
+        /// <see cref="Species.RebuildPrompt"/>. With a frozen prompt the modules still write, so their problems are reported,
+        /// but only the frozen text is used.</remarks>
         public static PromptTemplate Build(Species s)
         {
             var w = new PromptWriter(s);

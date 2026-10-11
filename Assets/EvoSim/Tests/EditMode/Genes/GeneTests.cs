@@ -5,7 +5,17 @@ using NUnit.Framework;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Genes, alleles, the registry and founders (09).</summary>
+    /// <summary>
+    /// Checks genes, alleles, the allele registry and founders (09; rule family GENE; T-GENE-01…07, -10, -11): gene kinds
+    /// and how they are expressed, equal values collapsed into one allele, allele ids and lineage, genome keys, founder
+    /// draws, founder guards (V-40) and the neutral allele (V-43).
+    /// </summary>
+    /// <remarks>
+    /// The worlds are small and run no tick: genes are registered and expressed by hand through <c>w.Alleles</c> and
+    /// <see cref="Expression"/>. <see cref="TraitProbe"/> is a test module that declares the trait <c>probe.trait</c> a
+    /// number gene can set. Crossover and mutation are tested in <see cref="ReproductionTests"/> and
+    /// <see cref="MutationTests"/>.
+    /// </remarks>
     public class GeneTests : WorldFixture
     {
         [Test, Description("T-GENE-01 (GENE-01…04): every gene kind has an id, a label, a kind and a founder pool; text expression only adds a prompt line, number expression only sets its trait")]

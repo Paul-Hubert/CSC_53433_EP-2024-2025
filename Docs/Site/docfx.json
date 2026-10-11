@@ -1,0 +1,47 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "../..",
+          "files": [
+            "EvoSim.Runtime.csproj",
+            "EvoSim.Http.csproj",
+            "EvoSim.Samples.csproj",
+            "EvoSim.Testing.csproj",
+            "EvoSim.Editor.csproj"
+          ]
+        }
+      ],
+      "dest": "api",
+      "noRestore": true,
+      "namespaceLayout": "flattened",
+      "memberLayout": "samePage",
+      "enumSortOrder": "declaringOrder"
+    }
+  ],
+  "build": {
+    "content": [
+      { "files": [ "index.md", "toc.yml" ] },
+      { "files": [ "guides/**.md", "guides/toc.yml" ] },
+      { "files": [ "extending/**.md", "extending/toc.yml" ] },
+      { "files": [ "api/**.yml", "api/index.md" ] },
+      { "files": [ "spec/**.md", "spec/toc.yml" ] }
+    ],
+    "resource": [
+      { "files": [ "images/**" ] }
+    ],
+    "output": "_site",
+    "template": [ "default", "modern", "template" ],
+    "globalMetadata": {
+      "_appName": "EvoSim",
+      "_appTitle": "EvoSim",
+      "_appFooter": "EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.",
+      "_enableSearch": true,
+      "_lang": "en",
+      "_disableContribution": true,
+      "pdf": false
+    }
+  }
+}

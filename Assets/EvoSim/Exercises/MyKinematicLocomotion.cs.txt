@@ -8,10 +8,27 @@ using UnityEngine;
 // its kind (Test Runner, EditMode) only checks that it fits the system, for example that a seed repeats a run.
 #pragma warning disable CS0414 // settings your code will read
 
-/// <summary>Exercise 11: straight lines, limited by speed, stamina and the intent (MOVE-01…04). Reference: KinematicLocomotion.</summary>
+/// <summary>
+/// Exercise 11: straight lines, limited by speed, stamina and the intent (MOVE-01…04). Reference: <see cref="KinematicLocomotion"/>.
+/// </summary>
+/// <remarks>
+/// Write <see cref="Move"/>. The base class <see cref="Locomotion"/> gives the speed traits <c>WalkSpeed</c> and
+/// <c>RunSpeed</c> (read them with <c>a.Trait(...)</c>), the speed settings and the prompt rule. The act phase calls Move
+/// for every animal, after its action gave an intent; the metabolism then charges the meters Move returns.
+/// </remarks>
 [ExerciseOf(typeof(KinematicLocomotion))]
 public class MyKinematicLocomotion : Locomotion
 {
-    /// <summary>Move toward the intent; return the meters actually moved; never end on non-walkable ground (MOVE-02).</summary>
+    /// <summary>
+    /// Move toward the intent; return the meters actually moved; never end on non-walkable ground (MOVE-02). The reference:
+    /// a "stay" intent (<c>intent.IsStay</c>) moves 0 m. Otherwise the distance is the smallest of the speed
+    /// (<c>RunSpeed</c> when <c>intent.Run</c>, else <c>WalkSpeed</c>), <paramref name="staminaBudget"/> and
+    /// <c>intent.MaxDistance</c>; 0 or less moves nothing. The target point is the position plus <c>intent.Direction</c> times
+    /// that distance; <c>c.Ground.SlideTo(from, target)</c> gives the point reached, sliding along borders and obstacles
+    /// (MOVE-04). When that moves less than <c>Units.Epsilon</c> the animal is stuck and takes a random sidestep,
+    /// <c>c.Ground.SideStep(from, distance, c.Stream(Species, "actions"))</c>. Set <c>a.Position</c> and return
+    /// <c>c.Distance(from, reached)</c>. Without a ground, it moves in a straight line.
+    /// </summary>
+    /// <inheritdoc/>
     public override float Move(Animal a, Intent intent, float staminaBudget, MoveContext c) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyKinematicLocomotion", "Move"));
 }

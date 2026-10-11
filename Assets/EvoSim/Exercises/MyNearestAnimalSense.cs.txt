@@ -8,7 +8,20 @@ using UnityEngine;
 // its kind (Test Runner, EditMode) only checks that it fits the system, for example that a seed repeats a run.
 #pragma warning disable CS0414 // settings your code will read
 
-/// <summary>Exercise 5: how far the nearest animal of a set is, with readiness (SENSE-20…22, SPEC-12). Reference: NearestAnimalSense.</summary>
+/// <summary>
+/// Exercise 5: how far the nearest animal of a set is, with readiness (SENSE-20…22, SPEC-12).
+/// Reference: <see cref="NearestAnimalSense"/>.
+/// </summary>
+/// <remarks>
+/// <para>Write <see cref="BuildTokens"/> and <see cref="Read"/>. The base class <see cref="BandedSense"/> gives the distance
+/// bands (<c>bands</c>), the token lists (<c>tokens</c>, and <c>bandOf</c>: each token's band, -1 for none), <c>Add</c>,
+/// <c>NoneToken</c> and the vision trait (<c>Vision</c>); it calls BuildTokens from <c>Initialize</c>. You will need a list
+/// of your own for each token's readiness.</para>
+/// <para>The reference also: finds the <c>listed</c> species once, in <c>Initialize</c>, before calling the base's
+/// (<c>World.FindSpeciesByName</c>); overrides <c>Write</c> to add ", ready to mate." or ", not ready to mate." to a
+/// readiness token's text (V2: " It is ready to mate."); uses the species' display name as the label when the set holds
+/// one species; and warns in <c>Validate</c> when the set is empty (V-21) or a listed name is no species (V-20).</para>
+/// </remarks>
 [ExerciseOf(typeof(NearestAnimalSense))]
 public class MyNearestAnimalSense : BandedSense
 {
@@ -21,11 +34,26 @@ public class MyNearestAnimalSense : BandedSense
     [SerializeField, Min(0f), Tooltip("Readiness is seen within this distance, in meters (reference 20 = the vision).")]
     float partnerRange = 20f;
 
+    /// <summary>"Animal" for kin, "Prey" for prey, else "Predator".</summary>
     protected override string DefaultLabel => targets == AnimalSet.Kin ? "Animal" : targets == AnimalSet.Prey ? "Prey" : "Predator";
 
-    /// <summary>none, then per band: "close, ready" and "close, not ready" within the partner range when readiness is on.</summary>
+    /// <summary>
+    /// none, then per band: "close, ready" and "close, not ready" within the partner range when readiness is on. The
+    /// reference clears the lists, then for each band b (<c>bands.Count</c> of them; range <c>bands.Range(b, bands.vision)</c>,
+    /// name <c>bands.NameOf(b)</c>) adds "name, ready" and "name, not ready" when readiness is on and the band starts closer
+    /// than <c>partnerRange</c>, and the plain "name" when readiness is off or the band reaches beyond <c>partnerRange</c>.
+    /// "none" (<c>Bands.None</c>, band -1) comes last.
+    /// </summary>
+    /// <inheritdoc/>
     protected override void BuildTokens() => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyNearestAnimalSense", "BuildTokens"));
 
-    /// <summary>The token of the nearest visible animal of the set (SenseContext), or none.</summary>
+    /// <summary>
+    /// The token of the nearest visible animal of the set (SenseContext), or none. The reference reads the vision trait
+    /// (<c>a.Trait(Vision)</c>), asks <c>s.NearestAnimal(a, targets, vision, listedSpecies)</c> (hidden and killed animals are
+    /// never reported, SENSE-06), finds the band of its distance (<c>bands.IndexOf(distance, vision)</c>; -1: none), and
+    /// within <c>partnerRange</c>, with readiness on, whether that animal is ready to mate (<c>s.IsReady</c>). It returns the
+    /// token of that band and readiness.
+    /// </summary>
+    /// <inheritdoc/>
     public override int Read(Animal a, SenseContext s) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyNearestAnimalSense", "Read"));
 }

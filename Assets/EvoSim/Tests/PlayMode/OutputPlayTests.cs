@@ -9,14 +9,35 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Run files (13), replay (12 §4), secrets (OUT-04): T2 whole-world runs.</summary>
+    /// <summary>
+    /// Checks the run files (13), resuming by replay (12 §4) and secrets (OUT-04) on whole Lab 1 runs of hundreds of ticks
+    /// (tier T2; OUT-01…05, RAND-20, RAND-21, MUT-14, DEC-33, V-61; T-OUT-01…03, T-RAND-06, R-05).
+    /// </summary>
+    /// <remarks>
+    /// Each run writes a real run folder under <c>Logs/EvoSim/test-runs/&lt;name&gt;</c> at the repository root
+    /// (<see cref="Run"/>) and the test reads it back. Brains and mutators are fakes: the random brain, a
+    /// <see cref="ScriptedBrain"/>, a <see cref="FakeMutator"/>, or HTTP clients talking to a <see cref="FakeHttpTransport"/>.
+    /// <see cref="NoSecrets"/> puts a fake key in the <c>OLLAMA_API_KEY</c> environment variable for its duration and
+    /// searches every run file, log line and asset for it.
+    /// </remarks>
     public class OutputPlayTests : WorldFixture
     {
+        /// <summary>The folder of test runs that write files, <c>Logs/EvoSim/test-runs</c> at the repository root.</summary>
         static string Root => Path.Combine(Path.GetDirectoryName(Application.dataPath), "Logs", "EvoSim", "test-runs");
 
+        /// <summary>The non-empty lines of a JSON Lines file (<c>events.jsonl</c>, <c>alleles.jsonl</c>), parsed.</summary>
         static IEnumerable<JObject> Lines(string file) =>
             File.ReadAllLines(file).Where(l => l.Trim().Length > 0).Select(JObject.Parse);
 
+        /// <summary>
+        /// Runs the Lab 1 world (seed 17, 30 prey, 5 predators) with a recorder writing files, until its tick limit; the run
+        /// folder <c>Logs/EvoSim/test-runs/</c><paramref name="name"/> is deleted first.
+        /// </summary>
+        /// <param name="name">The run's name, and its folder's.</param>
+        /// <param name="ticks">The tick limit.</param>
+        /// <param name="more">Extra set-up on the builder before it builds, or null.</param>
+        /// <param name="compatibility">True to write the prototype's file formats (OUT-05).</param>
+        /// <returns>The stopped world.</returns>
         World Run(string name, int ticks, Action<WorldBuilder> more = null, bool compatibility = false)
         {
             string folder = Path.Combine(Root, name);
@@ -72,6 +93,7 @@ namespace EvoSim.Tests
             Assert.Greater(w.Mutations.Successes, 0, "mutations happened");
             string folder = w.Service<RunRecorder>().RunFolder;
             var alleles = Lines(Path.Combine(folder, "alleles.jsonl")).ToDictionary(a => (string)a["id"]);
+            // Replay the event file tick by tick: founders, immigrants and births add an animal with its genome, deaths remove it.
             var genome = new Dictionary<int, string>();
             var alive = new HashSet<int>();
             var events = Lines(Path.Combine(folder, "events.jsonl")).ToList();
@@ -108,6 +130,7 @@ namespace EvoSim.Tests
             try
             {
                 int brainCalls = 0, mutatorCalls = 0;
+                // Fake servers that fail one call in 5 (brain) and one in 4 (mutator), so failure messages are logged too.
                 var brainServer = FakeHttpTransport.OllamaPoints();
                 brainServer.FailWith = (path, body) => path == "/api/chat" && System.Threading.Interlocked.Increment(ref brainCalls) % 5 == 0 ? 500 : 0;
                 string[] mutants = { "Eat when the sun is high.", "Run from anything that moves.", "Stay near cover at night.", "Rest after every meal.", "Follow the oldest animal." };
@@ -205,6 +228,7 @@ namespace EvoSim.Tests
             string stop = Path.Combine(Application.temporaryCachePath, "evosim-STOP");
             if (File.Exists(stop)) File.Delete(stop);
 
+            // The same run twice, sharing one answer cache: the first fills it, the second replays from it.
             World Make(string name, out ScriptedBrain brain, out FakeMutator mutator)
             {
                 ScriptedBrain b = null;

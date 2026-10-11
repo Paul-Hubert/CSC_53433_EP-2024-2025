@@ -5,9 +5,17 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>The reference scenes of M9 (20 §7, 31): what each one is for, offline (random brain, no mutation).</summary>
+    /// <summary>
+    /// Checks the reference scenes (20 §7, 31) for what each one is for: the three-species food chain (S09), terrain and
+    /// locomotion (S17), the sandbox, and the action module prefabs the scenes are built from (SPEC-10, SPEC-20, SPACE-05).
+    /// </summary>
+    /// <remarks>
+    /// Each test opens a scene additively through <see cref="Batch.WithScene"/> and runs it offline (<see cref="Offline"/>):
+    /// close that scene in the editor first, or the test fails. No model is called and no file is written.
+    /// </remarks>
     public class SceneTests : WorldFixture
     {
+        /// <summary>The folder of the reference scenes.</summary>
         const string Scenes = "Assets/EvoSim/Scenes/";
 
         /// <summary>Runs a scene offline: the random brain, no mutation, no files; returns what the check returns.</summary>
@@ -28,6 +36,7 @@ namespace EvoSim.Tests
             });
         }
 
+        /// <summary>The ids of a species' threats, sorted and joined by commas, or an empty string when it has none.</summary>
         static string Names(World w, Species s) => string.Join(",", w.ThreatsOf(s).Select(x => x.Id).OrderBy(x => x));
 
         [Test, Description("S09 (SPEC-10, SPEC-20): ThreeSpecies derives threats rabbit {fox, wolf}, fox {wolf}, wolf {}; prompts and situation texts name the species; 300 ticks without error")]
@@ -60,6 +69,7 @@ namespace EvoSim.Tests
                 var ground = (TerrainGround)w.Ground;
                 int water = 0, blocked = 0, n = 0;
                 var b = ground.Bounds;
+                // Sample the ground at the center of every square meter.
                 for (float z = b.yMin + 0.5f; z < b.yMax; z += 1f)
                     for (float x = b.xMin + 0.5f; x < b.xMax; x += 1f)
                     {

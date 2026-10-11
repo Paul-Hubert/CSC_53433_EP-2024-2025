@@ -7,8 +7,26 @@ namespace EvoSim.Testing
     /// unique ids, no dead or killed animal left, valid actions and rows, populations between floor and cap, carcass
     /// portions ≥ 0, genomes of the right length and species.
     /// </summary>
+    /// <remarks>
+    /// Call <see cref="Check"/> between ticks, or add an <see cref="InvariantPhase"/> (<see cref="Lab.CheckInvariants"/>),
+    /// which fails the test at the first broken invariant.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// w.Advance(50);
+    /// var problems = Invariants.Check(w);
+    /// Assert.IsEmpty(problems, $"tick {w.Tick}: {string.Join("; ", problems.Take(5))}");
+    /// </code>
+    /// </example>
     public static class Invariants
     {
+        /// <summary>Checks every invariant of 30 §5 on the world as it is now.</summary>
+        /// <param name="w">The world, between two ticks (after its last phase).</param>
+        /// <returns>One line per broken invariant, naming the animal, species or carcass; empty when all hold.</returns>
+        /// <remarks>
+        /// The population checks apply only to a cap in migrate mode and to a floor; call it after the floor phase has run,
+        /// as between two ticks.
+        /// </remarks>
         public static List<string> Check(World w)
         {
             var problems = new List<string>();

@@ -12,16 +12,38 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>HTTP brains against fake transports (08 §5–§6, 30 §2): request formats, rows, failures, retries, caches, wait modes.</summary>
+    /// <summary>
+    /// Checks the HTTP brains against fake transports (08 §5–§6, 30 §2; DEC-10…14, DEC-30…42, SPACE-13, SPACE-14, V-61;
+    /// T-DEC-09 and -10 over HTTP): the JEV and Ollama points request formats, how rows are computed from the answers,
+    /// failures, retries, time-outs, the parallel cap, API keys, the answer cache, wait modes and replay.
+    /// </summary>
+    /// <remarks>
+    /// <para>No test reaches a server: each brain's <c>Transport</c> is a <see cref="FakeHttpTransport"/> that records every
+    /// request and answers like JEV (<see cref="FakeHttpTransport.Jev"/>: fake log-probabilities derived from a hash of
+    /// the text) or like Ollama (<see cref="FakeHttpTransport.Chat"/>). The JEV brain reads its real head and calibration
+    /// files from <c>Data/Models/JEV-9B</c>, so the expected rows are computed here the same way (<see cref="Expected"/>).</para>
+    /// <para>The worlds are the Lab 1 world of <see cref="Lab.Lab1"/> without its random brain. Some tests write a run
+    /// folder under <c>Logs/EvoSim/test-runs</c> or an answer cache in Unity's temporary cache folder.
+    /// <see cref="JevTextGolden"/> pins <c>Tests/Golden/jev_text.txt</c>.</para>
+    /// </remarks>
     public class HttpBrainTests : WorldFixture
     {
+        /// <summary>The question line the JEV brain asks for the predator, set in <see cref="JevWorld"/>.</summary>
         const string PredatorQuestion = "Which action does this predator take now?";
+        /// <summary>Loads one file of the JEV model's data (<c>decision_head.json</c>, <c>calibration.json</c>).</summary>
         static TextAsset Model(string file) => AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/EvoSim/Data/Models/JEV-9B/" + file);
+        /// <summary>The JEV decision head: the option letters' token ids and the bias of each option.</summary>
         static JObject HeadJson => JObject.Parse(Model("decision_head.json").text);
+        /// <summary>The calibration temperature of the JEV head for a choice question.</summary>
         static double ChoiceT => (double)JObject.Parse(Model("calibration.json").text)["per_kind"]["choice"];
 
+        /// <summary>A fake JEV server that answers after <paramref name="delayMs"/> milliseconds (0 = at once).</summary>
         static FakeHttpTransport FakeJev(int delayMs = 0) => FakeHttpTransport.Jev(delayMs);
 
+        /// <summary>
+        /// Computes the row the JEV brain must give for one text: the softmax of (fake log-probability + the head's bias)
+        /// divided by the calibration temperature, over the first <paramref name="n"/> options.
+        /// </summary>
         static double[] Expected(string text, int n)
         {
             var head = HeadJson;
@@ -33,6 +55,17 @@ namespace EvoSim.Tests
             return z.Select(x => x / sum).ToArray();
         }
 
+        /// <summary>
+        /// The Lab 1 world (20 prey, 4 predators) with a JEV brain that talks to <paramref name="fake"/>: 5 s time-out,
+        /// 3 tries, no wait between them, 4 requests in flight at most.
+        /// </summary>
+        /// <param name="fake">The fake server.</param>
+        /// <param name="seed">The world seed.</param>
+        /// <param name="mode">How the world waits for answers.</param>
+        /// <param name="cache">A folder for the answer cache, or null for no cache.</param>
+        /// <param name="more">Extra set-up of the brain, or null.</param>
+        /// <param name="name">The world's name.</param>
+        /// <returns>The built, initialised world.</returns>
         World JevWorld(FakeHttpTransport fake, int seed = 5, WaitMode mode = WaitMode.Freeze, string cache = null, Action<JevBrain> more = null, string name = "jev")
         {
             var b = New(seed, mode, name).Lab1(prey: 20, predators: 4, randomBrain: false);
@@ -48,6 +81,7 @@ namespace EvoSim.Tests
             return b.Build();
         }
 
+        /// <summary>A folder of that name in Unity's temporary cache folder, deleted first so each run starts empty.</summary>
         static string TempFolder(string name)
         {
             string dir = Path.Combine(Application.temporaryCachePath, name);
@@ -168,6 +202,7 @@ namespace EvoSim.Tests
                 Assert.IsTrue(actions.SequenceEqual(new[] { "eat", "flee", "hide", "follow", "rest", "mate" }) || actions.SequenceEqual(new[] { "hunt", "follow", "rest", "mate" }));
                 Assert.AreEqual(100, (int)body["format"]["properties"][actions[0]]["maximum"]);
             }
+            // Every action gets 0.01 point more before the row is normalised, so none has probability 0 (DEC-41).
             var preyRow = w.FindSpecies("prey").Animals[0].LastProbabilities;
             double total = 100 + 6 * 0.01;
             Assert.AreEqual((50 + 0.01) / total, preyRow[0], 1e-6);
@@ -223,6 +258,7 @@ namespace EvoSim.Tests
             Assert.AreEqual(0, soft.GetComponentInChildren<AnswerCache>().Stores, "never in the cache");
         }
 
+        /// <summary>Runs an asynchronous HTTP call on a worker thread and waits for its answer, or rethrows its failure.</summary>
         static JToken Sync(Func<Task<JToken>> call) => Task.Run(call).GetAwaiter().GetResult();
 
         [Test, Description("DEC-42: tries with doubling waits, a time-out per try, no retry on a client error (4xx), the parallel cap, the key from its environment variable only")]
@@ -239,12 +275,14 @@ namespace EvoSim.Tests
             Assert.Throws<HttpFailure>(() => Sync(() => c.PostAsync("/bad", new JObject())));
             Assert.AreEqual(1, fake.Requests.Count, "a 400 isn't tried again");
 
+            // A server that never answers: each of the 2 tries times out after 0.1 s.
             var hang = new FakeHttpTransport { Hang = (path, body) => true };
             var slow = new HttpCaller("http://x.test", "", 0.1f, 2, 0f, 4, hang);
             e = Assert.Throws<HttpFailure>(() => Sync(() => slow.GetAsync("/v1/models")));
             StringAssert.Contains("no answer in 0.1 s", e.Message);
             Assert.AreEqual(2, slow.Stats.Timeouts);
 
+            // Eight calls at once to a slow server through a caller capped at 2 in flight.
             var busy = new FakeHttpTransport { DelayMs = 40 };
             var capped = new HttpCaller("http://x.test", "", 5f, 1, 0f, 2, busy);
             Task.Run(() => Task.WhenAll(Enumerable.Range(0, 8).Select(i => capped.PostAsync("/p", new JObject { ["i"] = i })))).GetAwaiter().GetResult();
@@ -295,6 +333,7 @@ namespace EvoSim.Tests
                 if (mode == WaitMode.Responsive && requests > 0) Assert.Greater(calls, 40, "Responsive: some calls returned while the answers were out");
                 return w.Events.Hash;
             }
+            // Without a cache in both modes, then a first run that fills the cache and a second that replays from it.
             string cacheDir = TempFolder("evosim-http-replay-cache");
             string freeze = Run(WaitMode.Freeze, null, out int r1, 0);
             Assert.Greater(r1, 0);

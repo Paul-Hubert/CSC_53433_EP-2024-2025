@@ -8,9 +8,20 @@ using UnityEngine.TestTools;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Whole Lab 1 worlds over hundreds of ticks (T2): species added during a run, controls, act orders, slow mutators.</summary>
+    /// <summary>
+    /// Checks whole Lab 1 worlds over hundreds of ticks (tier T2): species added during a run or gone extinct (SPEC-30…32),
+    /// the shuffled, random-founder and asexual controls (CTRL-01, CTRL-02), the three act orders (ACT-30…32), slow
+    /// mutators (MUT-30) and worlds of many shapes (CORE-04) — T-SPEC-06, -07, T-CTRL-01, -02, T-MOVE-05, T-MUT-10,
+    /// T-CORE-07.
+    /// </summary>
+    /// <remarks>
+    /// Most tests are plain <c>[Test]</c> methods that drive the World with <c>Advance</c> while the editor is in Play mode;
+    /// only <see cref="SlowMutatorSameEvents"/> lets <c>FixedUpdate</c> drive it. Brains are random or scripted and the
+    /// mutator is a <see cref="FakeMutator"/>: no server is needed.
+    /// </remarks>
     public class WorldPlayTests : WorldFixture
     {
+        /// <summary>Advances a world to a tick (or until it stops) and returns its events hash there.</summary>
         static string HashAt(World w, int tick)
         {
             while (w.Tick < tick && w.State != RunState.Stopped) w.Advance(1);

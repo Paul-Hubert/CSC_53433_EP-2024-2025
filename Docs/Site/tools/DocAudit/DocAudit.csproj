@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The documentation checker of the EvoSim site (Docs/Site/README.md). It compiles the EvoSim assemblies with the
+       Roslyn compiler that ships with Unity, so it needs no package from the internet. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RollForward>Major</RollForward>
+    <UnityEditorData Condition="'$(UnityEditorData)' == ''">C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Data</UnityEditorData>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CodeAnalysis">
+      <HintPath>$(UnityEditorData)\DotNetSdkRoslyn\Microsoft.CodeAnalysis.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp">
+      <HintPath>$(UnityEditorData)\DotNetSdkRoslyn\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

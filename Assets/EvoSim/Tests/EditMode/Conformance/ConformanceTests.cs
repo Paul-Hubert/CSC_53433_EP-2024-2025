@@ -9,12 +9,32 @@ using Object = UnityEngine.Object;
 namespace EvoSim.Tests
 {
     /// <summary>
-    /// The conformance suites of 30 §4: parameterised over every class of a kind found in the project (reference,
-    /// HTTP, samples and student assemblies; test probes excluded), so a new module is tested the moment it exists.
-    /// The brain suite is DecisionTests.BrainConformance.
+    /// The conformance suites of 30 §4: one parameterised test per module kind (sense, action, stat, resource layer,
+    /// mutation operator, tick phase, locomotion), run once for every class of that kind found in the project, so a new
+    /// module is tested the moment it exists. They check the contract rules every module of a kind must keep (SENSE, ACT,
+    /// ANIM, ENV, MUT, TICK, MOVE). The brain suite is <see cref="DecisionTests.BrainConformance"/>.
     /// </summary>
+    /// <remarks>
+    /// <para>A student's module enters the suites by itself: nothing to derive from, nothing to register. Every concrete,
+    /// non-generic class with a parameterless constructor is found by reflection in the <c>EvoSim.*</c> assemblies (Runtime,
+    /// Http, Samples), in <c>Assembly-CSharp</c> (scripts outside any assembly) and in <c>Student</c> (the assembly of
+    /// <c>Assets/Student</c>, made by Assets ▸ Create ▸ EvoSim ▸ Script). The test probes of <c>EvoSim.Testing</c>, the test
+    /// assemblies and <c>EvoSim.Editor</c> are left out. The brain suite looks only in the <c>EvoSim</c> assemblies, so a
+    /// student's brain is not in it: test it with a copy of <see cref="DecisionTests.BrainConformance"/>.</para>
+    /// <para>Each suite builds its own small world (most often the Lab ecology of <see cref="Ecology"/>, with the random
+    /// brain) and puts the module under the prey species or the world; modules it names with <see cref="RequiresModuleAttribute"/>
+    /// are added too (<see cref="Companions"/>). No server is called.</para>
+    /// <para>To run them: Window ▸ General ▸ Test Runner, EditMode tab, then expand <c>EvoSim.Tests.EditMode</c> ▸
+    /// <c>EvoSim.Tests</c> ▸ <c>ConformanceTests</c>; each suite lists one case per class, named after it. Select the
+    /// cases of your class and choose Run Selected. A failure message names the rule broken.</para>
+    /// </remarks>
     public class ConformanceTests : WorldFixture
     {
+        /// <summary>
+        /// Every concrete class deriving from <typeparamref name="T"/> in the reference, HTTP, samples and student
+        /// assemblies (test probes and the editor excluded), sorted by full name: the cases of one suite.
+        /// </summary>
+        /// <typeparam name="T">The module kind: <see cref="Sense"/>, <see cref="AnimalAction"/>…</typeparam>
         static IEnumerable<Type> Kind<T>() => AppDomain.CurrentDomain.GetAssemblies()
             .Where(a =>
             {
@@ -26,12 +46,22 @@ namespace EvoSim.Tests
             .Where(t => typeof(T).IsAssignableFrom(t) && !t.IsAbstract && !t.IsGenericTypeDefinition && t.GetConstructor(Type.EmptyTypes) != null)
             .OrderBy(t => t.FullName, StringComparer.Ordinal);
 
+        /// <summary>Every sense class: the cases of <see cref="SenseConformance"/>.</summary>
         static IEnumerable<Type> Senses() => Kind<Sense>();
+        /// <summary>Every action class: the cases of <see cref="ActionConformance"/>.</summary>
         static IEnumerable<Type> Actions() => Kind<AnimalAction>();
+        /// <summary>Every mutation operator class: the cases of <see cref="MutationOperatorConformance"/>.</summary>
         static IEnumerable<Type> Operators() => Kind<MutationOperator>();
+        /// <summary>Every tick phase class: the cases of <see cref="PhaseConformance"/>.</summary>
         static IEnumerable<Type> Phases() => Kind<TickPhase>();
+        /// <summary>Every locomotion class: the cases of <see cref="LocomotionConformance"/>.</summary>
         static IEnumerable<Type> Locomotions() => Kind<Locomotion>();
+        /// <summary>Every resource layer class (food grids and other item layers): the cases of <see cref="LayerConformance"/>.</summary>
         static IEnumerable<Type> Layers() => Kind<ResourceLayer>();
+        /// <summary>
+        /// Every species module with a public <see cref="StatId"/> property, taken as a module that declares a stat: the
+        /// cases of <see cref="StatConformance"/>.
+        /// </summary>
         static IEnumerable<Type> StatModules() => Kind<SpeciesModule>().Where(t => t.GetProperties().Any(p => p.PropertyType == typeof(StatId)));
 
         /// <summary>
@@ -54,6 +84,7 @@ namespace EvoSim.Tests
             }
         }
 
+        /// <summary>Makes an empty GameObject under <paramref name="parent"/> to hold a module.</summary>
         static GameObject Child(GameObject parent, string name)
         {
             var go = new GameObject(name);
@@ -61,7 +92,17 @@ namespace EvoSim.Tests
             return go;
         }
 
-        /// <summary>The Lab ecology with something added to the prey: a populated, valid world to exercise it in.</summary>
+        /// <summary>
+        /// The Lab ecology (40 m, 20 % cover, carcasses, eggs, the reference phases and the random brain) with something
+        /// added to the prey: a populated, valid world to exercise a module in.
+        /// </summary>
+        /// <param name="name">The world's name, which shows in failure messages.</param>
+        /// <param name="addToPrey">Adds the module under test to the prey's GameObject, or null to add nothing.</param>
+        /// <param name="prey">Founders of the prey.</param>
+        /// <param name="predators">Founders of the predator.</param>
+        /// <param name="food">The fraction of food cells with an item at the start, 0 to 1.</param>
+        /// <param name="seed">The world seed.</param>
+        /// <returns>The builder, not yet built.</returns>
         WorldBuilder Ecology(string name, Action<GameObject> addToPrey, int prey = 16, int predators = 3, float food = 0.1f, int seed = 7) =>
             New(seed, name: name).Ecology(40f, 0.2f, food,
                     prey: s => { s.Population(prey); addToPrey?.Invoke(s.GameObject); },
@@ -90,9 +131,10 @@ namespace EvoSim.Tests
                     Assert.AreEqual(text, sense.Write(k, style), "Write is deterministic");
                 }
             var species = w.FindSpecies("prey");
-            int index = species.Senses.ToList().IndexOf(sense);
+            int index = species.Senses.ToList().IndexOf(sense);                 // the sense's place in each observation
             Assert.GreaterOrEqual(index, 0);
             int seen = 0;
+            // Only animals that decided in the tick just run carry a fresh observation.
             for (int tick = 0; tick < 60 && w.State != RunState.Stopped; tick++)
             {
                 w.Advance(1);
@@ -122,6 +164,7 @@ namespace EvoSim.Tests
             Assert.IsFalse(string.IsNullOrWhiteSpace(action.Description), "description present");
             Assert.IsNotNull(action.Gene, "bound gene");
 
+            // After a few ticks, call Act on every prey directly: no animal anywhere may have moved or changed.
             w.Advance(3);
             var everyone = w.AllSpecies.SelectMany(s => s.Animals).ToList();
             var before = everyone.Select(Snapshot).ToList();
@@ -134,6 +177,7 @@ namespace EvoSim.Tests
             var after = everyone.Select(Snapshot).ToList();
             for (int i = 0; i < everyone.Count; i++) Assert.AreEqual(before[i], after[i], $"Act changed {everyone[i]}: only intents (ACT-06)");
 
+            // An action that rests stays by design; any other, alone in an empty world, must search or stay.
             if (action.Rests) return;
             AnimalAction alone = null;
             var empty = New(9, name: "alone " + type.Name).Flat(40, 40).Food(0f, 0f).Carcasses().Service<EggSystem>("Eggs").ReferencePhases().DefaultBrain<RandomBrain>()
@@ -152,6 +196,10 @@ namespace EvoSim.Tests
             Assert.IsTrue(solo.Searching || ctx.Intent.IsStay, "alone with nothing in sight it searches (ACT-04), or stays");
         }
 
+        /// <summary>
+        /// One line with an animal's id, position, killed flag and every stat, written exactly (round-trip format): equal
+        /// lines before and after <c>Act</c> mean the action changed nothing (ACT-06).
+        /// </summary>
         static string Snapshot(Animal a)
         {
             var stats = string.Join(",", a.Species.Declarations.Stats.Select(d => a[d.Id].ToString("R")));
@@ -175,6 +223,7 @@ namespace EvoSim.Tests
             var decl = w.FindSpecies("prey").Declarations.Stats.First(d => d.Id.Name == stat.Name);
             foreach (var a in w.FindSpecies("prey").Animals)
             {
+                // A stat starts at a trait's value (Start.Trait ≥ 0) or at a fixed value, clamped to its range.
                 float expected = decl.Start.Trait >= 0 ? a.Trait(w.FindSpecies("prey").Declarations.Traits[decl.Start.Trait].Id) : decl.Start.Value;
                 Assert.AreEqual(Mathf.Clamp(expected, stat.Min, stat.Max), a[stat], 1e-4f, "founders start as declared");
             }
@@ -252,12 +301,15 @@ namespace EvoSim.Tests
         {
             var empty = New(1, name: "phase " + type.Name).Flat(20, 20).Food(0.1f, 0.01f).Carcasses().Service<EggSystem>("Eggs").ReferencePhases()
                 .DefaultBrain<RandomBrain>().BuildUninitialized();
+            // First part: the phase (added if it is not a reference phase) runs 20 ticks in a world without animals.
             var phases = empty.GetComponentInChildren<SensePhase>(true).transform.parent;
             if (empty.GetComponentInChildren(type, true) == null) Child(phases.gameObject, type.Name).AddComponent(type).transform.SetSiblingIndex(0);   // first: before Environment
             Assert.IsTrue(empty.Initialize(), empty.LastReport.ToString());
             empty.Advance(20);
             Assert.AreEqual(20, empty.Tick);
 
+            // Second part: the events hash of a populated world after 40 ticks, with the phase disabled and re-enabled
+            // before initialisation or not.
             string Hash(bool toggle)
             {
                 var w = Ecology($"phase {type.Name} {toggle}", null, seed: 13).BuildUninitialized();
@@ -287,6 +339,8 @@ namespace EvoSim.Tests
                 }).Build();
             var sp = w.FindSpecies("walker");
             var loco0 = sp.Module<Locomotion>();
+            // Eight walkers on a circle of 8 m around a pond of radius 3 m, all heading for its center: they must stop on
+            // the shore, never on the water.
             var walkers = new List<Animal>();
             for (int i = 0; i < 8; i++)
             {
@@ -306,6 +360,7 @@ namespace EvoSim.Tests
                     Assert.IsTrue(w.Ground.IsWalkable(a.Position) && w.Ground.Inside(a.Position), $"tick {w.Tick}: {a} on water or outside at {a.Position}");
                     Assert.AreEqual(w.Distance(from[i], a.Position), a.MetersMoved, 1e-3f, "the meters reported are the meters moved");
                     Assert.GreaterOrEqual(loco0.ExtraCost(a, from[i], a.Position), 0f, "extra cost ≥ 0");
+                    // Standing still counts as stuck only while the walker is more than 0.6 m from the shore.
                     float toShore = Vector2.Distance(new Vector2(a.Position.x, a.Position.z), new Vector2(10f, 10f)) - 3f;
                     stuckFor[i] = a.MetersMoved < Units.Epsilon && toShore > 0.6f ? stuckFor[i] + 1 : 0;
                     Assert.Less(stuckFor[i], 4, $"{a} stuck away from its goal for more than 3 ticks");

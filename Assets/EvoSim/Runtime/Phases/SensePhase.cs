@@ -8,13 +8,25 @@ namespace EvoSim
     /// on the others; rebuilds the spatial index; casts the rays of batched senses in one batch; reads every sense of
     /// every deciding animal from the state at the start of the tick (TICK-04 #1, SENSE-04, TICK-05).
     /// </summary>
+    /// <remarks>
+    /// <para>First phase of the reference tick. A species' <see cref="DecisionSchedule"/> says which ticks are its decision
+    /// ticks; without one, the World's decision period does (every <see cref="World.DecisionPeriod"/> ticks). An animal
+    /// with no action yet (a newborn, an animal whose busy time just ended) decides at once (REPRO-13).</para>
+    /// <para>For each deciding animal it fills a <see cref="Decision"/> in <see cref="World.Decisions"/>: the sense tokens
+    /// (its observation) and their text (its situation). Senses are read species by species, one sense at a time over the
+    /// whole group (<see cref="Sense.ReadAll"/>, ARCH-12). It only reads the world and draws no random number.</para>
+    /// </remarks>
     public class SensePhase : TickPhase
     {
-        SenseContext senses;
-        readonly List<Animal> deciders = new List<Animal>();
+        SenseContext senses;                                        // reused every tick; exposed as Context
+        readonly List<Animal> deciders = new List<Animal>();       // this tick's deciding animals, for the batched rays
 
+        /// <summary>Creates the sense context that every tick reuses.</summary>
+        /// <inheritdoc/>
         public override void Initialize() => senses = new SenseContext(World);
 
+        /// <summary>Starts the tick's decisions and reads every sense of every deciding animal.</summary>
+        /// <inheritdoc/>
         public override void Run(TickContext t)
         {
             var state = World.Decisions;
@@ -36,6 +48,7 @@ namespace EvoSim
             senses.CastRays(deciders);                                                      // SENSE-30
             var style = World.TextStyle;
             var due = state.Due;                                                            // species order, then id order
+            // One group per species (the due list keeps a species' animals together); each sense reads the whole group.
             for (int start = 0, end; start < due.Count; start = end)
             {
                 var species = due[start].Animal.Species;
@@ -59,10 +72,16 @@ namespace EvoSim
             }
         }
 
-        readonly List<Animal> group = new List<Animal>();
-        int[] tokens = new int[64];
+        readonly List<Animal> group = new List<Animal>();      // the deciding animals of one species, reused
+        int[] tokens = new int[64];                             // one sense's tokens for the group, reused and grown as needed
 
         /// <summary>The attachments of an animal's senses (SENSE-40), and a key for them or null (SENSE-41).</summary>
+        /// <remarks>Called by the ask-brains phase for each deciding animal, after the senses were read.</remarks>
+        /// <param name="a">The deciding animal.</param>
+        /// <param name="s">This tick's sense context.</param>
+        /// <param name="key">The attachments' keys joined by ";", or "" when there is none; part of the memo key.</param>
+        /// <param name="memoable">False when an attachment has no key: the decision can then be neither memoised nor cached.</param>
+        /// <returns>The attachments in sense order, or null when no sense gives one.</returns>
         public static List<object> Attachments(Animal a, SenseContext s, out string key, out bool memoable)
         {
             List<object> list = null;

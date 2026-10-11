@@ -8,10 +8,25 @@ using UnityEngine;
 // its kind (Test Runner, EditMode) only checks that it fits the system, for example that a seed repeats a run.
 #pragma warning disable CS0414 // settings your code will read
 
-/// <summary>Exercise 10: each locus from either parent with probability one half (REPRO-03). Reference: UniformCrossover.</summary>
+/// <summary>
+/// Exercise 10: each locus from either parent with probability one half (GENE-30). Reference: <see cref="UniformCrossover"/>.
+/// </summary>
+/// <remarks>
+/// Write <see cref="Cross"/>. The breed phase calls it once per baby, so siblings differ (GENE-32); asexual reproduction
+/// copies the parent instead (<c>Copy</c>, GENE-31).
+/// </remarks>
 [ExerciseOf(typeof(UniformCrossover))]
 public class MyUniformCrossover : Crossover
 {
-    /// <summary>One allele per locus, drawn from the given stream only (RAND-03).</summary>
+    /// <summary>
+    /// One allele per locus, drawn from the given stream only (RAND-03). The reference first checks that both genomes
+    /// belong to this species (<c>CheckSpecies(a, b)</c>, which throws otherwise: SPEC-04), then for each locus i takes
+    /// <c>a[i]</c> or <c>b[i]</c> on a coin flip, <c>rng.NextBool()</c>.
+    /// </summary>
+    /// <param name="a">The first parent's genome.</param>
+    /// <param name="b">The second parent's genome.</param>
+    /// <param name="rng">The species' mutation stream, shared by the whole litter.</param>
+    /// <returns>The baby's alleles, one per locus (<c>a.Count</c> of them).</returns>
+    /// <inheritdoc/>
     public override Allele[] Cross(Genome a, Genome b, RandomStream rng) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyUniformCrossover", "Cross"));
 }

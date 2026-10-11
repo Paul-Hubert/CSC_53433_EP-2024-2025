@@ -12,11 +12,33 @@ namespace EvoSim.Editor
     /// no mutation, L2 the scene's brain and mutator. Example:
     /// <code>unity command eval --code 'return EvoSim.Editor.RealTimeRuns.Headless("HideVsFlee", 1234, 600, "L2", "RT-L2-headless");'</code>
     /// </summary>
+    /// <remarks>
+    /// <para>A real-time test compares what a watcher sees in Play mode with a headless run of the same seed:</para>
+    /// <list type="bullet">
+    /// <item><description><see cref="Headless"/> (blocks until the end) or <see cref="HeadlessStart"/> and
+    /// <see cref="HeadlessStatus"/> (stepped, for long runs with model calls): the reference run, with its files and
+    /// hash.</description></item>
+    /// <item><description><see cref="PreparePlay"/>, then Play (the unity CLI's <c>editor_play</c>), then <see cref="Status"/>
+    /// while it plays: the watched run, with the same settings as the Windows player.</description></item>
+    /// <item><description><see cref="Behaviour"/>: counts, tick by tick, what the watcher should see (hiding, kills,
+    /// births).</description></item>
+    /// </list>
+    /// <para>With the editor closed: <c>Unity.exe -batchmode -nographics -projectPath . -executeMethod
+    /// EvoSim.Editor.RealTimeRuns.FromCommandLine -do headless|behaviour -scene HideVsFlee -seed 1234 -ticks 600 -level L2
+    /// [-run NAME] -quit</c> (see <see cref="FromCommandLine"/>). Headless runs write their run folder under
+    /// <c>Logs/EvoSim/runs</c>. The scene must not be open in the editor.</para>
+    /// </remarks>
     public static class RealTimeRuns
     {
+        /// <summary>The path of a reference scene from its name.</summary>
+        /// <param name="scene">A scene name of <see cref="ReferenceScenes.ScenesFolder"/>, such as <c>HideVsFlee</c>.</param>
+        /// <returns><c>Assets/EvoSim/Scenes/&lt;scene&gt;.unity</c>.</returns>
         public static string ScenePath(string scene) => ReferenceScenes.ScenesFolder + "/" + scene + ".unity";
 
         /// <summary>Sets a level on a World: L0 random brain and no mutation; L1 the scene's own default brain, no mutation; L2 both on.</summary>
+        /// <param name="w">A World that has not initialised yet.</param>
+        /// <param name="level"><c>L0</c>, <c>L1</c> or <c>L2</c>.</param>
+        /// <returns>Null when the level was set; otherwise the problem (an unknown level, or no random brain for L0).</returns>
         public static string SetLevel(World w, string level)
         {
             switch (level)
@@ -34,6 +56,14 @@ namespace EvoSim.Editor
         }
 
         /// <summary>A headless Freeze run with files (step 2): returns the events hash, the run folder and the model calls.</summary>
+        /// <remarks>It blocks the editor until the run ends; for a long run with model calls use <see cref="HeadlessStart"/>.</remarks>
+        /// <param name="scene">A reference scene name; it must not be open in the editor.</param>
+        /// <param name="seed">The world seed.</param>
+        /// <param name="ticks">The run length in ticks.</param>
+        /// <param name="level"><c>L0</c>, <c>L1</c> or <c>L2</c> (<see cref="SetLevel"/>).</param>
+        /// <param name="runName">The run folder's name under <c>Logs/EvoSim/runs</c>.</param>
+        /// <returns>A summary line (ticks, full events hash, brain, brain and mutator calls, cache hits, mutations, seconds, run
+        /// folder), or a line starting with <c>FAILED:</c>.</returns>
         public static string Headless(string scene, int seed, int ticks, string level, string runName)
         {
             return Batch.WithScene(ScenePath(scene), w =>                              // as Batch.HashOf, with the level's brain and the files
@@ -55,16 +85,25 @@ namespace EvoSim.Editor
             });
         }
 
-        static World stepping;
-        static UnityEngine.SceneManagement.Scene steppingScene;
-        static System.Diagnostics.Stopwatch steppingClock;
-        static string steppingInfo, lastResult;
+        static World stepping;                                     // the World of the stepped headless run, or null when none runs
+        static UnityEngine.SceneManagement.Scene steppingScene;    // its scene, opened additively and closed at the end
+        static System.Diagnostics.Stopwatch steppingClock;         // wall-clock time since it started
+        static string steppingInfo, lastResult;                    // "scene level seed n"; the last run's result line, or null
+        /// <summary>The file that holds the stepped run's state, then its result line.</summary>
         const string ResultFile = "Logs/EvoSim/realtime-headless.txt";
 
         /// <summary>
         /// The same headless run, advanced from the editor's update loop a few ticks at a time, so a long run with model calls
         /// never blocks a CLI call (the pipeline's timer); poll <see cref="HeadlessStatus"/>. The result also goes to Logs/EvoSim/realtime-headless.txt.
         /// </summary>
+        /// <remarks>One stepped run at a time. A script reload during the run loses it (the static state is reset).</remarks>
+        /// <param name="scene">A reference scene name; it must not be open in the editor.</param>
+        /// <param name="seed">The world seed.</param>
+        /// <param name="ticks">The run length in ticks.</param>
+        /// <param name="level"><c>L0</c>, <c>L1</c> or <c>L2</c> (<see cref="SetLevel"/>).</param>
+        /// <param name="runName">The run folder's name under <c>Logs/EvoSim/runs</c>.</param>
+        /// <returns><c>started …</c> with the run folder, the status of the run already going, or a line starting with
+        /// <c>FAILED:</c>.</returns>
         public static string HeadlessStart(string scene, int seed, int ticks, string level, string runName)
         {
             if (stepping != null) return "a headless run is going: " + HeadlessStatus();
@@ -93,6 +132,10 @@ namespace EvoSim.Editor
             return "started " + steppingInfo + ", folder " + w.Service<RunRecorder>()?.RunFolder;
         }
 
+        /// <summary>
+        /// Called by the editor's update loop: advances the stepped run one tick at a time for up to 50 ms, then, once it has
+        /// stopped (or failed), writes the result, unhooks itself and closes the scene.
+        /// </summary>
         static void Step()
         {
             var w = stepping;
@@ -114,6 +157,7 @@ namespace EvoSim.Editor
         }
 
         /// <summary>The stepped headless run's progress, or its result once it stopped.</summary>
+        /// <returns><c>running …</c> with the tick, calls and seconds; or the last result line; or <c>no headless run</c>.</returns>
         public static string HeadlessStatus()
         {
             var w = stepping;
@@ -122,9 +166,12 @@ namespace EvoSim.Editor
                    $"{w.Mutations.ModelCalls}, {steppingClock.Elapsed.TotalSeconds:0} s";
         }
 
+        /// <summary>The session key that holds the prepared player arguments until Play mode ends.</summary>
         const string PlayArgsKey = "EvoSim.RealTimeRuns.PlayArgs";
 
         /// <summary>The player's arguments of a level (PlayerArgs): L0 the random brain and no mutation, L1 no mutation, L2 the scene as it is.</summary>
+        /// <param name="level"><c>L0</c>, <c>L1</c> or <c>L2</c>; anything else counts as L2.</param>
+        /// <returns><c>-brain Random -noMutation</c>, <c>-noMutation</c>, or an empty string.</returns>
         public static string LevelArgs(string level) => level == "L0" ? "-brain Random -noMutation" : level == "L1" ? "-noMutation" : "";
 
         /// <summary>
@@ -132,6 +179,20 @@ namespace EvoSim.Editor
         /// line (PlayerArgs) and applied to the World when Play mode wakes it (World.Configuring), as the Windows player does.
         /// Enter Play mode afterwards (editor_play); leaving Play mode forgets them.
         /// </summary>
+        /// <remarks>
+        /// For example <c>unity command --result-only eval --code 'return EvoSim.Editor.RealTimeRuns.PreparePlay("HideVsFlee",
+        /// 1234, 600, 5f, "L2", "RUN");'</c>. The scene replaces the open scenes, so they must have no unsaved change.
+        /// </remarks>
+        /// <param name="scene">A reference scene name.</param>
+        /// <param name="seed">The world seed (<c>-seed</c>).</param>
+        /// <param name="ticks">The run length in ticks (<c>-ticks</c>).</param>
+        /// <param name="ticksPerSecond">The pace of the watched run, in ticks per second (<c>-speed</c>).</param>
+        /// <param name="level"><c>L0</c>, <c>L1</c> or <c>L2</c> (<see cref="LevelArgs"/>).</param>
+        /// <param name="runName">The run folder's name (<c>-run</c>).</param>
+        /// <param name="responsive">True to wait for the brains while Unity keeps rendering; false to freeze (<c>-wait</c>).</param>
+        /// <param name="captureSeconds">Seconds between two screen captures (<c>-capture</c>; 0 = start and end only).</param>
+        /// <param name="extra">More player arguments, such as <c>-stagger</c> or <c>-minutes 10</c>; empty for none.</param>
+        /// <returns><c>&lt;scene&gt; open, unchanged; on Play: &lt;arguments&gt;</c>, or why nothing was prepared.</returns>
         public static string PreparePlay(string scene, int seed, int ticks, float ticksPerSecond, string level, string runName, bool responsive = true,
                                          float captureSeconds = 10f, string extra = "")
         {
@@ -147,7 +208,11 @@ namespace EvoSim.Editor
             return $"{scene} open, unchanged; on Play: {args}";
         }
 
-        /// <summary>Applies the prepared arguments to the World that wakes in Play mode (once), like the player's launcher.</summary>
+        /// <summary>
+        /// Hooks <see cref="ApplyPrepared"/> on <see cref="World.Configuring"/> and <see cref="Forget"/> on Play mode changes;
+        /// Unity runs it when the editor loads or recompiles. The prepared arguments are then applied to the World that wakes
+        /// in Play mode, like the player's launcher.
+        /// </summary>
         [InitializeOnLoadMethod]
         static void HookPlayMode()
         {
@@ -157,6 +222,10 @@ namespace EvoSim.Editor
             EditorApplication.playModeStateChanged += Forget;
         }
 
+        /// <summary>
+        /// Applies the prepared player arguments to a World of the prepared scene as it configures, and to the scene's run
+        /// capture; logs what was set and any problem. Does nothing when nothing is prepared.
+        /// </summary>
         static void ApplyPrepared(World w)
         {
             string args = SessionState.GetString(PlayArgsKey, "");
@@ -169,12 +238,16 @@ namespace EvoSim.Editor
             Debug.Log($"EvoSim real-time run: {w.gameObject.scene.name}, {said}");
         }
 
+        /// <summary>Forgets the prepared arguments once the editor is back in Edit mode.</summary>
         static void Forget(PlayModeStateChange change)
         {
             if (change == PlayModeStateChange.EnteredEditMode) SessionState.EraseString(PlayArgsKey);
         }
 
         /// <summary>The run in Play mode now: tick, state, pace, numbers, hash, folders (step 3, polled).</summary>
+        /// <returns>One line about the first World found: tick, state and what it waits for, ticks per second and frames per
+        /// second, brain and mutator calls, events hash, run and capture folders, memory (MB); or <c>not playing</c> /
+        /// <c>no World</c>.</returns>
         public static string Status()
         {
             var w = Object.FindAnyObjectByType<World>();
@@ -196,6 +269,13 @@ namespace EvoSim.Editor
         /// in sight is hidden in cover (they lose it), hunters targeting a hidden prey (never), prey hiding in cover, kills,
         /// carcass portions, prey meals and food regrown, babies farther than 2 m from both parents.
         /// </summary>
+        /// <remarks>No run files are written. The scene needs species with the ids <c>prey</c> and <c>predator</c> (the Lab 1
+        /// scenes, HideVsFlee, Terrain_Locomotion).</remarks>
+        /// <param name="scene">A reference scene name; it must not be open in the editor.</param>
+        /// <param name="seed">The world seed.</param>
+        /// <param name="ticks">The run length in ticks.</param>
+        /// <param name="level"><c>L0</c>, <c>L1</c> or <c>L2</c> (<see cref="SetLevel"/>).</param>
+        /// <returns>One line of counts (in animal-ticks unless said), or a line starting with <c>FAILED:</c>.</returns>
         public static string Behaviour(string scene, int seed, int ticks, string level)
         {
             return Batch.WithScene(ScenePath(scene), w =>
@@ -269,8 +349,15 @@ namespace EvoSim.Editor
         /// Batch entry point (the editor closed): -do headless|behaviour -scene S -seed n -ticks n -level L0|L1|L2 [-run name];
         /// the result line goes to the log and to Logs/EvoSim/realtime-batch.txt (appended).
         /// </summary>
+        /// <remarks>
+        /// <c>Unity.exe -batchmode -nographics -projectPath . -executeMethod EvoSim.Editor.RealTimeRuns.FromCommandLine -do
+        /// headless -scene HideVsFlee -seed 1234 -ticks 600 -level L2 [-run NAME] -quit</c>. Defaults: <c>-do headless</c>,
+        /// <c>-scene HideVsFlee</c>, <c>-seed 1234</c>, <c>-ticks 600</c>, <c>-level L0</c>, <c>-run
+        /// &lt;scene&gt;-&lt;level&gt;-s&lt;seed&gt;-&lt;ticks&gt;</c>. It does not exit Unity by itself: pass <c>-quit</c>.
+        /// </remarks>
         public static void FromCommandLine()
         {
+            // The value after an option on the command line, or the fallback.
             string Arg(string name, string fallback)
             {
                 var args = System.Environment.GetCommandLineArgs();
@@ -292,6 +379,8 @@ namespace EvoSim.Editor
         }
 
         /// <summary>The events hash recorded in a run folder's summary.json.</summary>
+        /// <param name="runFolder">A run folder, such as one under <c>Logs/EvoSim/runs</c>.</param>
+        /// <returns>The <c>events_hash</c> of its <c>summary.json</c>, or a sentence saying the file is missing.</returns>
         public static string HashIn(string runFolder)
         {
             string path = Path.Combine(runFolder, "summary.json");

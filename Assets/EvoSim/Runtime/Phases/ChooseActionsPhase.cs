@@ -5,14 +5,29 @@ namespace EvoSim
     /// draws each deciding animal's action with its species' sampling stream after the temperature (DEC-20, RAND-03).
     /// A failed answer stops a strict run cleanly; otherwise it becomes a uniform row and is counted (DEC-40).
     /// </summary>
+    /// <remarks>
+    /// <para>Third phase of the reference tick, after Ask brains (V-08) and before Act. It is the phase the tick waits at
+    /// while the brains think: in the Freeze wait mode the main thread blocks, in the Responsive mode the tick resumes here
+    /// on a later frame (SPACE-14). Either way the result is the same.</para>
+    /// <para>An animal that shares another's key (DEC-32) takes that animal's row. Every deciding animal gets a new action,
+    /// its searching and bred-this-period flags are cleared (DEC-03), and its observation, situation and probabilities are
+    /// kept for the inspector (DEC-21).</para>
+    /// </remarks>
     public class ChooseActionsPhase : TickPhase
     {
-        AnswerCache cache;
+        AnswerCache cache;      // the World's answer cache, or null: fresh answers are then kept in the memo only
 
+        /// <summary>Finds the World's answer cache, if any.</summary>
+        /// <inheritdoc/>
         public override void Initialize() => cache = World.Service<AnswerCache>();
 
+        /// <summary>The brains' answers to this tick's batches that are not in yet, or null when all are in (or nothing was sent).</summary>
+        /// <inheritdoc/>
         public override Pending WaitsFor(TickContext t) => World.Decisions.Pending;
 
+        /// <summary>Stores the answers, then draws the action of every deciding animal.</summary>
+        /// <remarks>A strict brain's failure stops the World before any action is drawn, so the tick changes nothing (RAND-20).</remarks>
+        /// <inheritdoc/>
         public override void Run(TickContext t)
         {
             var state = World.Decisions;
@@ -68,6 +83,8 @@ namespace EvoSim
             }
         }
 
+        /// <summary>Reports this phase placed before Ask brains, or without it (V-08).</summary>
+        /// <inheritdoc/>
         public override void Validate(ValidationReport report)
         {
             var phases = World.Phases;

@@ -6,7 +6,16 @@ using UnityEngine.TestTools;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Discovery and ownership (20 §4, ARCH-04…06, SPEC-02…05, GENE-05).</summary>
+    /// <summary>
+    /// Checks discovery and ownership (20 §4; ARCH-04…06, SPEC-02…06, GENE-05, CORE-02; T-CORE-01…06): the World finds its
+    /// species, modules and genes from the hierarchy alone, leaves out inactive and disabled ones, binds each gene to the
+    /// nearest action, reorders everything when actions are swapped, and reports structural errors (V-01…V-04, V-07, V-12).
+    /// </summary>
+    /// <remarks>
+    /// The worlds hold only test probes (<see cref="ProbeAction"/>, <see cref="ProbeSense"/>, <see cref="TracePhase"/>), so
+    /// the tests depend on no reference module. Several tests change the hierarchy between building and initialising the
+    /// world, through <see cref="WorldBuilder.BuildUninitialized"/>, as a student would in the editor.
+    /// </remarks>
     public class DiscoveryTests : WorldFixture
     {
         [Test, Description("T-CORE-01 (SPEC-05, ARCH-05): a species inside another species → Initialize fails with V-01, nothing spawned")]
@@ -116,6 +125,8 @@ namespace EvoSim.Tests
             b.Root.transform.Find("prey/Actions/eat2").name = "eat";
             new GameObject("orphan").AddComponent<ProbeSense>().transform.SetParent(b.Root.transform, false);
             var w = b.BuildUninitialized();
+            // Each error is fixed in turn to reveal the next one: an orphan sense (V-02), two species named prey (V-07),
+            // then two actions named eat (V-03) and a species with no action (V-04).
             var r = new ValidationReport();
             Assert.IsFalse(w.Prepare(r));
             Assert.IsTrue(r.Has("V-02"), r.ToString());

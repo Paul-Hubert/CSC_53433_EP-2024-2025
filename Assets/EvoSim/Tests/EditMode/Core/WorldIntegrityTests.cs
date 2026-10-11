@@ -9,10 +9,17 @@ using Object = UnityEngine.Object;
 namespace EvoSim.Tests
 {
     /// <summary>
-    /// The set-up and run integrity found by the P1 audit (32 §3, phase 2): brains that aren't set up, settings an
-    /// override pushes out of range, species added during a run, strict mutator stops, mutations that change nothing,
-    /// signatures, the batch entry points, genome keys, clones' edibles and the mate action's range.
+    /// Checks set-up and run integrity, the cases of the coding-agent audit (32 §3, phase 2): brains that aren't set up,
+    /// settings an override pushes out of range, species added during a run, strict mutator stops, mutations that change
+    /// nothing, signatures, the batch entry points, genome keys, clones' edibles, the mate action's range, fixed traits and
+    /// genomes of the wrong species (rule families ARCH, DEC, SPEC, MUT, GENE, ACT, ANIM; V-07, V-10, V-12, V-13, V-35).
     /// </summary>
+    /// <remarks>
+    /// Most tests build the Lab 1 world of <see cref="Lab.Lab1"/> (random brain, fake mutator) and break one thing in it.
+    /// <see cref="BatchEntryPoints"/> uses the batch probes of <c>EvoSim.Testing</c> (<see cref="BatchProbeSense"/>,
+    /// <see cref="BatchProbeAction"/>, <see cref="BatchProbeLocomotion"/>), which record the size of every group they are
+    /// called with.
+    /// </remarks>
     public class WorldIntegrityTests : WorldFixture
     {
         [Test, Description("ARCH-06, DEC-13 (V-10): a disabled, inactive or other World's brain is an error, never used without being set up")]
@@ -52,6 +59,7 @@ namespace EvoSim.Tests
             Assert.AreEqual("predator-2", again.DisplayName, "a new name too, never one in use (SPEC-30)");
             Assert.AreSame(w.FindSpecies("predator"), w.FindSpeciesByName("predator"));
 
+            // A template from another, uninitialised world whose prey lost its locomotion (V-13) must be refused whole.
             var templates = New(name: "templates").Lab1(prey: 2, predators: 1).BuildUninitialized();
             var broken = templates.GetComponentsInChildren<Species>(true).First(s => s.gameObject.name == "prey");
             Object.DestroyImmediate(broken.GetComponentInChildren<KinematicLocomotion>(true));
@@ -70,6 +78,7 @@ namespace EvoSim.Tests
         public void StrictMutatorStopsAtTheBoundary()
         {
             var b = New(31, name: "strict").Lab1(prey: 24, predators: 4);
+            // Every baby locus mutates and every mutator call fails: the first birth stops a strict run.
             b.Get<FakeMutator>().FailWhen = (sentence, seed) => "the mutator is down";
             b.Get<MutatorService>().Strict = true;
             foreach (var m in b.Root.GetComponentsInChildren<LlmMutation>(true)) m.Rate = 1f;
@@ -96,6 +105,7 @@ namespace EvoSim.Tests
                     .Module<NumberGene>(g => g.Configure("stamina.max", 20f, 120f, new[] { 120f }, geneLabel: "endurance"))
                     .Module<GaussianMutation>(m => { m.Rate = 1f; m.Sigma = 5f; }))
                 .ReferencePhases().DefaultBrain<RandomBrain>().Build();
+            // Every founder carries 120, the top of the range: a Gaussian step up is clamped back to the parent's value.
             w.Events.Lines = new List<string>();
             int births = 0;
             for (int t = 0; t < 1500 && births < 40; t++) { w.Advance(1); births = w.AllSpecies[0].Counters.Births; }
@@ -115,6 +125,7 @@ namespace EvoSim.Tests
                 var species = w.GetComponentsInChildren<Species>(true);
                 species.First(s => s.gameObject.name == "predator").SetNames("predator", "wolf");
                 var prey = species.First(s => s.gameObject.name == "prey");
+                // An empty label makes the threat sense take its label from the food web: the predator's name, "wolf".
                 foreach (var n in prey.GetComponentsInChildren<NearestAnimalSense>(true)) if (n.Targets == AnimalSet.Threats) n.SetLabel("");
                 Assert.IsTrue(w.Prepare(new ValidationReport()));
                 if (twice) Assert.IsTrue(w.Prepare(new ValidationReport()));
@@ -212,7 +223,7 @@ namespace EvoSim.Tests
             Assert.IsNull(c.NearestReadyPartner(seeker), "15 m: beyond the partner range of 4 m, its readiness can't be sensed");
             var near = Adult(13);
             Assert.AreSame(near, c.NearestReadyPartner(seeker)?.Animal, "3 m: within the range");
-            Assert.IsNotNull(far);
+            Assert.IsNotNull(far);                                       // the far partner existed all along
         }
 
         [Test, Description("ANIM-17: a trait not declared changeable is set at creation only; setting it later throws, a changeable one may change")]

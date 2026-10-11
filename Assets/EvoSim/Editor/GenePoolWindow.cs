@@ -9,18 +9,28 @@ namespace EvoSim.Editor
     /// current top alleles with their text and origin, and the lineage of a selected allele as a chain of texts; number
     /// genes as histograms of the living animals' values.
     /// </summary>
+    /// <remarks>
+    /// Open it with <c>Window ▸ EvoSim ▸ Gene Pool</c> and keep it open while the world runs: it samples the living
+    /// animals' alleles every 20 ticks and keeps the last 300 samples, so the stacked chart only covers the time it was
+    /// open. Pick a species and a locus; click an allele of the top list to see its lineage, back to its founder. A text
+    /// gene's alleles are told apart by id and colour (the same id always gets the same colour).
+    /// </remarks>
     public class GenePoolWindow : EditorWindow
     {
+        /// <summary>Ticks between two samples of the gene pool (<c>SampleEvery</c>), and samples kept per locus (<c>History</c>).</summary>
         const int SampleEvery = 20, History = 300;
-        World watched;
-        int speciesIndex, locus, lastSample = -1;
-        string selected;
-        Vector2 scroll;
+        World watched;                       // the world being sampled, or null
+        int speciesIndex, locus, lastSample = -1;   // the chosen species and locus; the tick of the last sample
+        string selected;                     // the allele id whose lineage is shown, or null
+        Vector2 scroll;                      // the window's scroll position
+        // For each "species/locus", the kept samples, oldest first: allele id to the number of living carriers.
         readonly Dictionary<string, List<Dictionary<string, int>>> history = new Dictionary<string, List<Dictionary<string, int>>>();
 
+        /// <summary>Opens the window (<c>Window ▸ EvoSim ▸ Gene Pool</c>).</summary>
         [MenuItem("Window/EvoSim/Gene Pool")]
         public static void Open() => GetWindow<GenePoolWindow>("Gene Pool").Show();
 
+        /// <summary>Follows the current world (a new world clears the history), samples it every 20 ticks, redraws in Play mode.</summary>
         void OnInspectorUpdate()
         {
             var w = EditorWorlds.Current();
@@ -29,6 +39,7 @@ namespace EvoSim.Editor
             if (Application.isPlaying) Repaint();
         }
 
+        /// <summary>Records the allele counts of every locus of every species, dropping the oldest sample past 300.</summary>
         void Sample()
         {
             lastSample = watched.Tick;
@@ -42,6 +53,7 @@ namespace EvoSim.Editor
                 }
         }
 
+        /// <summary>How many living animals of a species carry each allele at a locus, by allele id.</summary>
         static Dictionary<string, int> Counts(Species s, int locus)
         {
             var counts = new Dictionary<string, int>();
@@ -55,6 +67,9 @@ namespace EvoSim.Editor
             return counts;
         }
 
+        /// <summary>
+        /// Draws the species and locus pickers, then a histogram (number gene) or the chart, top list and lineage (text gene).
+        /// </summary>
         void OnGUI()
         {
             if (watched == null || !watched.IsInitialized || watched.AllSpecies.Count == 0) { EditorGUILayout.HelpBox("No running world.", MessageType.Info); return; }
@@ -78,6 +93,7 @@ namespace EvoSim.Editor
             EditorGUILayout.EndScrollView();
         }
 
+        /// <summary>Draws the allele shares of one locus over the kept samples: one column per sample, one band per allele.</summary>
         void Stacked(string key)
         {
             var rect = GUILayoutUtility.GetRect(200, 120, GUILayout.ExpandWidth(true));
@@ -101,6 +117,7 @@ namespace EvoSim.Editor
             }
         }
 
+        /// <summary>Lists the 12 most common alleles of the locus now, with share, text, origin and id; a click selects one.</summary>
         void Top(Species s)
         {
             var counts = Counts(s, locus);
@@ -119,6 +136,7 @@ namespace EvoSim.Editor
             }
         }
 
+        /// <summary>Lists the selected allele and its parents, newest first, with origin and mutation operator (50 at most).</summary>
         void Lineage()
         {
             if (selected == null) return;
@@ -131,6 +149,7 @@ namespace EvoSim.Editor
             }
         }
 
+        /// <summary>Draws the living animals' values of a number gene in 20 bins between the smallest and the largest value.</summary>
         void Histogram(Species s)
         {
             var values = new List<float>();
@@ -151,6 +170,7 @@ namespace EvoSim.Editor
             EditorGUILayout.LabelField("Range of the living", $"{min:0.##} … {max:0.##} ({values.Count} animals)");
         }
 
+        /// <summary>A colour for an allele id, the same for the same id within an editor session.</summary>
         static Color ColorOf(string id) => Color.HSVToRGB((Mathf.Abs(id.GetHashCode()) % 1000) / 1000f, 0.6f, 0.9f);
     }
 }

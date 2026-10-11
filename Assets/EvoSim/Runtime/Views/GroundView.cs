@@ -7,38 +7,54 @@ namespace EvoSim
     /// ground and a texture of one pixel per cell, repainted when a tick changed a cell. It only reads the World
     /// (SPACE-12): no collider, the Ignore Raycast layer, no random numbers.
     /// </summary>
+    /// <remarks>
+    /// One of the run views: put it on any GameObject of the scene, outside the World (the "Run views" object of the
+    /// reference scenes). It draws a <see cref="FlatGround"/> only; a terrain shows itself. The pixel is the finest cell of
+    /// the food grids and cover layers. A pixel is the food colour when its centre's cell holds a food item, else the
+    /// cover colour when its centre is in cover, else the soil colour (food and cover only when their switch is on).
+    /// </remarks>
     [DisallowMultipleComponent]
     public class GroundView : MonoBehaviour
     {
         [SerializeField, Tooltip("The World drawn; empty = the first World of the scene.")]
         World world;
-        [SerializeField] Color soil = new Color(0.62f, 0.55f, 0.4f);
-        [SerializeField] Color cover = new Color(0.1f, 0.32f, 0.12f);
-        [SerializeField] Color food = new Color(0.55f, 0.95f, 0.3f);
+        [SerializeField] Color soil = new Color(0.62f, 0.55f, 0.4f);       // bare ground
+        [SerializeField] Color cover = new Color(0.1f, 0.32f, 0.12f);      // a cell in cover
+        [SerializeField] Color food = new Color(0.55f, 0.95f, 0.3f);       // a cell with a food item
         [SerializeField, Tooltip("Draw the cover cells.")]
         bool showCover = true;
         [SerializeField, Tooltip("Draw the food items.")]
         bool showFood = true;
 
         Texture2D texture;
-        Color32[] pixels, painted;
-        GameObject surface;
-        Rect bounds;
-        float pixel = 1f;
-        int width, height, paintedTick = -1, coverCells = -1;
-        bool[] coverMask;
-        FoodGrid[] foods;
-        Cover[] covers;
+        Color32[] pixels, painted;                                         // the colours now; those last uploaded
+        GameObject surface;                                                // the quad that shows the texture
+        Rect bounds;                                                       // the ground's rectangle (x, z), in meters
+        float pixel = 1f;                                                  // a pixel's side, in meters
+        int width, height, paintedTick = -1, coverCells = -1;              // texture size; tick last painted; cover cells in the mask
+        bool[] coverMask;                                                  // true for the pixels whose centre is in cover
+        FoodGrid[] foods;                                                  // the food layers drawn
+        Cover[] covers;                                                    // the cover services drawn
 
+        /// <summary>The World drawn; when null, the first World of the scene is found on the next frame.</summary>
         public World World { get => world; set => world = value; }
+        /// <summary>The ground's texture, one pixel per cell; null before the first frame of a run on flat ground.</summary>
         public Texture2D Texture => texture;
         /// <summary>Times the texture was uploaded: once per tick that changed a cell.</summary>
         public int Uploads { get; private set; }
+        /// <summary>The tick the texture last showed (-1 before the first frame of a run).</summary>
         public int PaintedTick => paintedTick;
+        /// <summary>The colour of bare ground.</summary>
         public Color32 SoilColor => soil;
+        /// <summary>The colour of a cell in cover.</summary>
         public Color32 CoverColor => cover;
+        /// <summary>The colour of a cell with a food item.</summary>
         public Color32 FoodColor => food;
 
+        /// <summary>
+        /// Makes the quad on the first frame of a run on flat ground, then repaints the texture once per new tick and
+        /// uploads it when a pixel changed. Called by Unity each frame, after the World's tick.
+        /// </summary>
         void LateUpdate()
         {
             if (world == null) world = FindAnyObjectByType<World>();
@@ -53,6 +69,8 @@ namespace EvoSim
         }
 
         /// <summary>The pixel of a world point (x right, z up in the texture), or -1 outside.</summary>
+        /// <param name="p">A point of the world, in meters; its height is ignored.</param>
+        /// <returns>The pixel's index in the texture, row by row from the ground's lower x and z corner; -1 outside the ground.</returns>
         public int PixelOf(Vector3 p)
         {
             int x = Mathf.FloorToInt((p.x - bounds.xMin) / pixel), z = Mathf.FloorToInt((p.z - bounds.yMin) / pixel);
@@ -60,8 +78,14 @@ namespace EvoSim
         }
 
         /// <summary>The colour now in the texture at a world point.</summary>
+        /// <param name="p">A point on the ground, in meters; it must be inside the ground and the texture made.</param>
+        /// <returns>The pixel's colour: <see cref="SoilColor"/>, <see cref="CoverColor"/> or <see cref="FoodColor"/>.</returns>
         public Color32 ColorAt(Vector3 p) => pixels[PixelOf(p)];
 
+        /// <summary>
+        /// Makes the texture, one pixel per cell of the finest food or cover grid, and the quad that shows it: the size of the
+        /// ground, lying 1 cm under y = 0, never saved with the scene.
+        /// </summary>
         void Create()
         {
             bounds = world.Ground.Bounds;
@@ -117,12 +141,14 @@ namespace EvoSim
             return changed;
         }
 
+        /// <summary>True when a point is in the cover of any cover service.</summary>
         bool InCover(Vector3 p)
         {
             foreach (var c in covers) if (c.InCover(p)) return true;
             return false;
         }
 
+        /// <summary>True when a point's cell holds a food item in any food layer.</summary>
         bool HasFood(Vector3 p)
         {
             foreach (var f in foods)
@@ -133,10 +159,13 @@ namespace EvoSim
             return false;
         }
 
+        /// <summary>The world point at the centre of pixel i, at height 0.</summary>
         Vector3 Center(int i) => new Vector3(bounds.xMin + (i % width + 0.5f) * pixel, 0f, bounds.yMin + (i / width + 0.5f) * pixel);
 
+        /// <summary>True when two colours are equal in every channel.</summary>
         static bool Same(Color32 a, Color32 b) => a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
 
+        /// <summary>Destroys the texture and the quad with the component. Called by Unity.</summary>
         void OnDestroy()
         {
             if (texture != null) Destroy(texture);

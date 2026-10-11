@@ -13,11 +13,28 @@ namespace EvoSim
     /// relative to the World, e.g. "Prey/Litter/max", "World/decisionPeriod", "prey/Actions/flee/FleeAction/fleeIntoCover".
     /// Names are matched without case; a component is found by its class or a base class, on the GameObject or below it.
     /// </summary>
+    /// <remarks>
+    /// <para>How a path is read: the last part is the field, the one before it the component, the rest a GameObject path
+    /// under the World. A GameObject matches by name, or a species by its id or display name. When the full GameObject path
+    /// has no such component, shorter ones are tried, down to the World itself; the first component found below wins
+    /// (depth-first). Failing a class name, the component part may be a GameObject's name: the first species module on that
+    /// GameObject is taken. <c>World/x</c> is the World's own field.</para>
+    /// <para>Only serialized fields count (public or <c>[SerializeField]</c>, not read-only): what the inspector shows.
+    /// Values convert from text in the invariant culture: string, int, long, float, double, bool, any enum (by name, any
+    /// case) and float arrays (<c>[8, 4]</c>).</para>
+    /// </remarks>
     public static class FieldPath
     {
+        /// <summary>The fields a type declares itself, public or not: base classes are walked one by one.</summary>
         const BindingFlags Fields = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
 
         /// <summary>Sets the field at the path from its text value; false with a reason if the path or value is wrong.</summary>
+        /// <remarks>Call it before the World initialises: modules read their settings then. It skips the inspector's limits.</remarks>
+        /// <param name="world">The World the path starts from.</param>
+        /// <param name="path">The setting's path, e.g. <c>Prey/Litter/max</c>.</param>
+        /// <param name="value">The new value as text.</param>
+        /// <param name="error">Why it failed (no such GameObject, component or field; a value that doesn't convert), or null.</param>
+        /// <returns>True when the field was set.</returns>
         public static bool Set(World world, string path, string value, out string error)
         {
             error = null;
@@ -35,6 +52,10 @@ namespace EvoSim
         }
 
         /// <summary>Deactivates the GameObject at a hierarchy path under the World (scenario "remove", S06).</summary>
+        /// <param name="world">The World the path starts from.</param>
+        /// <param name="path">A GameObject path under the World, e.g. <c>prey/Actions/hide</c>.</param>
+        /// <param name="error">Why it failed (no such GameObject), or null.</param>
+        /// <returns>True when the GameObject was found and switched off.</returns>
         public static bool Remove(World world, string path, out string error)
         {
             error = null;
@@ -45,12 +66,16 @@ namespace EvoSim
         }
 
         /// <summary>The current value of the field at the path, as text.</summary>
+        /// <param name="world">The World the path starts from.</param>
+        /// <param name="path">The setting's path, e.g. <c>World/decisionPeriod</c>.</param>
+        /// <returns>The value as <see cref="Format"/> writes it, or null when the path leads nowhere.</returns>
         public static string Get(World world, string path)
         {
             if (!Resolve(world, path, out var target, out var field, out _)) return null;
             return Format(field.GetValue(target));
         }
 
+        /// <summary>Finds the object and the serialized field a path names (see the class remarks); false with a reason otherwise.</summary>
         static bool Resolve(World world, string path, out object target, out FieldInfo field, out string error)
         {
             target = null; field = null; error = null;
@@ -81,6 +106,7 @@ namespace EvoSim
             return false;
         }
 
+        /// <summary>Follows count parts of a path from root, child by child (first match at each level), or null when one is missing.</summary>
         static Transform FindChild(Transform root, string[] parts, int from, int count)
         {
             var t = root;
@@ -95,6 +121,7 @@ namespace EvoSim
             return t;
         }
 
+        /// <summary>True when a GameObject has the name, or holds a species with that id or display name (any case).</summary>
         static bool Matches(Transform t, string name)
         {
             if (t.name.Equals(name, StringComparison.OrdinalIgnoreCase)) return true;
@@ -102,6 +129,10 @@ namespace EvoSim
             return s != null && (s.RequestedId.Equals(name, StringComparison.OrdinalIgnoreCase) || s.DisplayName.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
+        /// <summary>
+        /// The first component on t or below it whose class, or a base class, has the name; else the first species module on a
+        /// GameObject of that name; else null.
+        /// </summary>
         static Component FindComponent(Transform t, string name)
         {
             foreach (var c in t.GetComponentsInChildren<Component>(true))
@@ -115,6 +146,7 @@ namespace EvoSim
             return null;
         }
 
+        /// <summary>The serialized field of that name (any case) on the type or a base class below MonoBehaviour, or null.</summary>
         static FieldInfo FindField(Type type, string name)
         {
             for (var t = type; t != null && t != typeof(MonoBehaviour) && t != typeof(object); t = t.BaseType)
@@ -124,9 +156,12 @@ namespace EvoSim
         }
 
         /// <summary>Public or [SerializeField], not [NonSerialized]: what the inspector shows.</summary>
+        /// <param name="f">A field.</param>
+        /// <returns>True when the field is public or marked [SerializeField], and neither [NonSerialized] nor read-only.</returns>
         public static bool IsSerialized(FieldInfo f) =>
             !f.IsNotSerialized && !f.IsInitOnly && (f.IsPublic || f.GetCustomAttribute<SerializeField>() != null);
 
+        /// <summary>Parses a text value into the field's type (invariant culture); throws when the text or the type doesn't fit.</summary>
         static object Convert(string value, Type type)
         {
             if (type == typeof(string)) return value;
@@ -147,6 +182,11 @@ namespace EvoSim
         }
 
         /// <summary>A value as text (for run_info.json and the inspector).</summary>
+        /// <param name="v">The value.</param>
+        /// <returns>
+        /// "" for null; floats and doubles in round-trip form; a Unity object by its name; a list as <c>[a, b]</c>; anything
+        /// else as its invariant text.
+        /// </returns>
         public static string Format(object v)
         {
             switch (v)
@@ -166,6 +206,13 @@ namespace EvoSim
         }
 
         /// <summary>Every serialized setting of every component under the World, by path (CFG-03).</summary>
+        /// <remarks>
+        /// Covers the World, its modules, species, species modules and Edibles that are active and enabled. Keys are
+        /// <c>&lt;GameObject path&gt;/&lt;class&gt;/&lt;field&gt;</c>; values are numbers, strings, bools, enum names, Unity
+        /// objects by name, lists, or dictionaries for serialized classes. <see cref="RunInfo"/> writes it as <c>settings</c>.
+        /// </remarks>
+        /// <param name="world">The World.</param>
+        /// <returns>The settings, keys in ordinal order.</returns>
         public static SortedDictionary<string, object> Snapshot(World world)
         {
             var result = new SortedDictionary<string, object>(StringComparer.Ordinal);
@@ -181,6 +228,7 @@ namespace EvoSim
             return result;
         }
 
+        /// <summary>A setting's value in a form canonical JSON writes: plain values as they are, enums and objects by name, lists and classes taken apart.</summary>
         static object Value(object v)
         {
             switch (v)
@@ -201,6 +249,7 @@ namespace EvoSim
             }
         }
 
+        /// <summary>The GameObject path of t under root, names joined by "/"; "" for root itself.</summary>
         static string PathUnder(Transform root, Transform t)
         {
             var parts = new List<string>();

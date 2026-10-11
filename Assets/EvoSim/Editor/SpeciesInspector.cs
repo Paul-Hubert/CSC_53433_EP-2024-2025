@@ -9,18 +9,31 @@ namespace EvoSim.Editor
     /// and traits, food, population), the observation-space size, the signature, and a prompt preview built by the same
     /// code as the Ask brains phase (T-PROMPT-05).
     /// </summary>
+    /// <remarks>
+    /// <para>Unity shows it below the Species' own fields when a Species is selected. In Edit mode, press
+    /// <c>Show the computed tables</c>: it validates the world (which prepares it) and fills the tables; in Play mode they
+    /// show the running world. The validation panel ends the inspector, with its fix buttons.</para>
+    /// <para>The prompt preview: pick a brain, a founder genome (the n-th founder of each gene), a text style (V1 or V2) and
+    /// one token per sense (or <c>Random situation</c>), press <c>Build</c>, and read the exact prompt with its token estimate
+    /// and the brain's limit; <c>Copy</c> puts it on the clipboard.</para>
+    /// </remarks>
     [CustomEditor(typeof(Species))]
     public class SpeciesInspector : UnityEditor.Editor
     {
-        bool prepared;
-        ValidationReport report;
-        bool showActions = true, showSenses = true, showGenes, showStats, showFood, showPopulation, showPreview;
-        int founder, brainIndex;
-        int[] tokens;
-        TextStyle style = TextStyle.V1;
-        string preview = "";
-        Vector2 previewScroll;
+        bool prepared;                    // true once the tables were computed in Edit mode
+        ValidationReport report;          // the validation of the last computation, or null
+        bool showActions = true, showSenses = true, showGenes, showStats, showFood, showPopulation, showPreview;   // foldouts
+        int founder, brainIndex;          // the preview's founder index and brain
+        int[] tokens;                     // the preview's situation: one token index per sense
+        TextStyle style = TextStyle.V1;   // the preview's situation text style
+        string preview = "";              // the last built prompt
+        Vector2 previewScroll;            // the prompt's scroll position
 
+        /// <summary>
+        /// Draws the Species' fields, then, once computed, the observation-space size, the signature, the tables, the prompt
+        /// preview and the validation.
+        /// </summary>
+        /// <inheritdoc/>
         public override void OnInspectorGUI()
         {
             var s = (Species)target;
@@ -49,6 +62,7 @@ namespace EvoSim.Editor
             if (report != null && ValidationPanel.Draw(report)) report = ValidationPanel.Validate(w);
         }
 
+        /// <summary>Lists the actions in order, each with the gene that steers it (or V-05 when none).</summary>
         void Actions(Species s)
         {
             showActions = EditorGUILayout.Foldout(showActions, $"Actions ({s.Actions.Count})", true);
@@ -60,6 +74,7 @@ namespace EvoSim.Editor
             }
         }
 
+        /// <summary>Lists the senses in situation-text order, with their tokens and the V1 and V2 text of their first token.</summary>
         void Senses(Species s)
         {
             showSenses = EditorGUILayout.Foldout(showSenses, $"Senses ({s.Senses.Count}), in situation-text order", true);
@@ -75,6 +90,7 @@ namespace EvoSim.Editor
             }
         }
 
+        /// <summary>Lists the genes in locus order, with their kind, founder pool size, mutation operator and rate.</summary>
         void Genes(Species s)
         {
             showGenes = EditorGUILayout.Foldout(showGenes, $"Genes ({s.Genes.Count}), in locus order", true);
@@ -87,6 +103,7 @@ namespace EvoSim.Editor
             }
         }
 
+        /// <summary>Lists the declared stats and traits with the module that declares each; traits with default, range and cost.</summary>
         void Stats(Species s)
         {
             showStats = EditorGUILayout.Foldout(showStats, "Stats and traits", true);
@@ -98,6 +115,7 @@ namespace EvoSim.Editor
                                                                  (s.Declarations.HasCost(d.Id.Name) ? ", has a cost" : ""));
         }
 
+        /// <summary>Lists what the species eats (method, energy), whether it is edible itself, and its derived threats.</summary>
         void Food(Species s, World w)
         {
             showFood = EditorGUILayout.Foldout(showFood, "Food", true);
@@ -113,6 +131,7 @@ namespace EvoSim.Editor
             EditorGUILayout.LabelField("Threats", threats.Count > 0 ? string.Join(", ", threats) : "none");
         }
 
+        /// <summary>Shows the initial population, the floor, the cap and its rule, and the living count in Play mode.</summary>
         void Population(Species s)
         {
             showPopulation = EditorGUILayout.Foldout(showPopulation, "Population", true);
@@ -125,6 +144,7 @@ namespace EvoSim.Editor
             if (Application.isPlaying) EditorGUILayout.LabelField("Living", s.Animals.Count.ToString());
         }
 
+        /// <summary>Draws the prompt preview: brain, founder genome, text style and situation pickers, then the built prompt.</summary>
         void Preview(Species s, World w)
         {
             showPreview = EditorGUILayout.Foldout(showPreview, "Prompt preview", true);
@@ -159,6 +179,7 @@ namespace EvoSim.Editor
             EditorGUILayout.EndScrollView();
         }
 
+        /// <summary>The class name of the module that declared a stat or trait, or "?" when unknown.</summary>
         static string Who(SpeciesModule m) => m == null ? "?" : m.GetType().Name;
     }
 }

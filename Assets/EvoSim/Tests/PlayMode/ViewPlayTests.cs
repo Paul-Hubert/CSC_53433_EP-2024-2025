@@ -8,23 +8,42 @@ using UnityEngine.TestTools;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Views (20 §6): pools from each species' Body, placed in LateUpdate, never writing to the run (T2).</summary>
+    /// <summary>
+    /// Checks the views (20 §6; SPACE-12, RAND-11; T-SPACE-06): pools made from each species' <see cref="Body"/>, placed in
+    /// <c>LateUpdate</c> between an animal's two tick positions, one per living animal, and never writing to the run, so
+    /// showing, hiding or interpolating them, or adding the run views, never changes the hash (tier T2).
+    /// </summary>
+    /// <remarks>
+    /// The tests run the Lab 1 world in Play mode and compare, each frame, what is drawn with the state of the World.
+    /// <see cref="ShowProbeView"/> is a test view class, the model of a student's own <c>AnimalView</c>. The capture of
+    /// <see cref="ViewsNeverChangeTheRun"/> writes images to Unity's temporary cache folder and is only checked when a
+    /// graphics device exists (not with <c>-nographics</c>).
+    /// </remarks>
     public class ViewPlayTests : WorldFixture
     {
         /// <summary>The run views of the reference scenes (RunViews.AddTo): ground, entity markers, overlay, capture, a camera.</summary>
         sealed class RunViewSet
         {
+            /// <summary>Paints food and cover on the ground.</summary>
             public GroundView Ground;
+            /// <summary>One marker per carcass and egg.</summary>
             public EntityMarkers Markers;
+            /// <summary>The numbers of the run on screen.</summary>
             public RunOverlay Overlay;
+            /// <summary>Screenshots during the run and a contact sheet at the end.</summary>
             public RunCapture Capture;
+            /// <summary>The camera that frames the ground.</summary>
             public WorldCamera Camera;
         }
 
+        /// <summary>GameObjects a test added outside the World (the run views and their camera), destroyed after it.</summary>
         readonly List<GameObject> extras = new List<GameObject>();
+        /// <summary>The run views of the current world, or null when it has none.</summary>
         RunViewSet set;
+        /// <summary>Frames where the ground, and the markers, were compared with the world.</summary>
         int groundChecks, markerChecks;
 
+        /// <summary>Destroys the run views and their camera after each test.</summary>
         [TearDown]
         public void DestroyRunViews()
         {
@@ -32,6 +51,10 @@ namespace EvoSim.Tests
             extras.Clear();
         }
 
+        /// <summary>
+        /// Adds the run views (ground, markers, overlay, capture every half second) and a camera outside the World, all
+        /// watching <paramref name="w"/>; screenshots go to <paramref name="captures"/>.
+        /// </summary>
         RunViewSet AddRunViews(World w, string captures)
         {
             var go = new GameObject("Run views (test)");
@@ -49,6 +72,14 @@ namespace EvoSim.Tests
             return views;
         }
 
+        /// <summary>
+        /// The Lab 1 world (seed 11, 150 ticks) with a body on each species, started with <c>Play()</c>.
+        /// </summary>
+        /// <param name="show">True to show the animals' views.</param>
+        /// <param name="interpolate">True to place views between two tick positions, false to put them at the last one.</param>
+        /// <param name="name">The world's name.</param>
+        /// <param name="runViews">True to add the run views too (<see cref="set"/>).</param>
+        /// <returns>The running world.</returns>
         World Make(bool show, bool interpolate, string name, bool runViews = false)
         {
             var b = New(11, WaitMode.Freeze, name).Lab1(prey: 20, predators: 4)
@@ -61,10 +92,16 @@ namespace EvoSim.Tests
             return w;
         }
 
+        /// <summary>The number of living animals of every species.</summary>
         static int Living(World w) => w.AllSpecies.Sum(s => s.Animals.Count(a => !a.IsGone));
 
+        /// <summary>Frames where the animals' views were compared with the animals, over the whole test.</summary>
         int checks;
 
+        /// <summary>
+        /// Waits frames until the world stops (two minutes at most) and, at each frame whose views show the current tick,
+        /// compares the views, and the run views if any, with the world; differences go to <paramref name="problems"/>.
+        /// </summary>
         IEnumerator RunToEnd(World w, List<string> problems)
         {
             float until = Time.realtimeSinceStartup + 120f;                            // frames can be very short in batch mode
@@ -83,6 +120,7 @@ namespace EvoSim.Tests
                         if (v == null) continue;
                         if (v.AnimalId != a.Id) problems.Add($"view of {a.Id} shows {v.AnimalId}");
                         if (v.gameObject.layer != 2) problems.Add("a view outside the Ignore Raycast layer");
+                        // On the segment between the two tick positions: the two distances to its ends add up to its length.
                         var flat = new Vector2(v.transform.position.x, v.transform.position.z);
                         var from = new Vector2(a.PreviousPosition.x, a.PreviousPosition.z);
                         var to = new Vector2(a.Position.x, a.Position.z);

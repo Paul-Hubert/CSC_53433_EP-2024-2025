@@ -6,6 +6,7 @@ namespace EvoSim
     /// </summary>
     public static class AnimalWords
     {
+        // Lower case, singular and plural forms.
         static readonly string[] Words =
         {
             "wolf", "wolves", "fox", "foxes", "rabbit", "rabbits", "hare", "hares", "deer", "bear", "bears", "lion", "lions",
@@ -15,6 +16,8 @@ namespace EvoSim
         };
 
         /// <summary>Whether a lower-case word is one of them.</summary>
+        /// <param name="word">One word, in lower case, without punctuation.</param>
+        /// <returns>True when it is a common animal word.</returns>
         public static bool Contains(string word) => System.Array.IndexOf(Words, word) >= 0;
     }
 }

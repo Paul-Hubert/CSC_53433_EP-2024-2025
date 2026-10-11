@@ -5,18 +5,26 @@ using UnityEngine;
 namespace EvoSim.Editor
 {
     /// <summary>
-    /// The ecology monitor (21 §4, labs A and B): population per species over time, deaths by cause, births, mean
-    /// energy and stamina, action shares, memo hit rate, ticks per second — from LiveStatistics and the species counters.
+    /// The ecology monitor (21 §4, labs A and B): population per species over time, deaths by cause, births, action
+    /// shares, memo hit rate, ticks per second — from LiveStatistics and the species counters.
     /// </summary>
+    /// <remarks>
+    /// Open it with <c>Window ▸ EvoSim ▸ Ecology Monitor</c>, then enter Play mode. The population graph and the ticks per
+    /// second need a <see cref="LiveStatistics"/> service in the world; the counters below it (births, founders, deaths by
+    /// cause, decisions and memo hits, action shares) come from each species. Mean energy and stamina (21 §4) are not shown.
+    /// </remarks>
     public class EcologyMonitorWindow : EditorWindow
     {
-        Vector2 scroll;
+        Vector2 scroll;   // the window's scroll position
 
+        /// <summary>Opens the window (<c>Window ▸ EvoSim ▸ Ecology Monitor</c>).</summary>
         [MenuItem("Window/EvoSim/Ecology Monitor")]
         public static void Open() => GetWindow<EcologyMonitorWindow>("Ecology").Show();
 
+        /// <summary>Redraws about ten times a second in Play mode, so the graph follows the running world.</summary>
         void OnInspectorUpdate() { if (Application.isPlaying) Repaint(); }
 
+        /// <summary>Draws the world's tick, state and pace, the population graph, and one block of counters per species.</summary>
         void OnGUI()
         {
             var w = EditorWorlds.Current();
@@ -30,6 +38,7 @@ namespace EvoSim.Editor
             EditorGUILayout.EndScrollView();
         }
 
+        /// <summary>Draws the population of each species over ticks as one line, scaled to the largest population seen.</summary>
         static void Chart(World w, LiveStatistics live)
         {
             var rect = GUILayoutUtility.GetRect(200, 140, GUILayout.ExpandWidth(true));
@@ -53,6 +62,7 @@ namespace EvoSim.Editor
             GUI.Label(new Rect(rect.xMax - 80, rect.y + 2, 80, 16), $"max {maxPop}", EditorStyles.miniLabel);
         }
 
+        /// <summary>Draws one species' counters: living, births, founders, deaths by cause, decisions, memo hits, action shares.</summary>
         static void Species(Species s)
         {
             var c = s.Counters;

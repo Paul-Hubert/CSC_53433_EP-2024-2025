@@ -9,15 +9,35 @@ using UnityEngine;
 #pragma warning disable CS0414 // settings your code will read
 
 /// <summary>
-/// Exercise 8: stamina, paid per meter and recovered at rest (ANIM-21). Reference: Stamina. The stub derives from the
+/// Exercise 8: stamina, paid per meter and recovered at rest (ANIM-21). Reference: <see cref="Stamina"/>. The stub derives from the
 /// reference, which declares the stat and the traits, because other modules look stamina up by its type.
 /// </summary>
+/// <remarks>
+/// Write <see cref="Budget"/> and <see cref="Settle"/>. From the reference you get the stat <c>Value</c> (read and write it
+/// with <c>a[Value]</c>; it stays within [0, stamina.max]), the traits <c>Max</c> and <c>Regen</c> (read them with
+/// <c>a.Trait(Max)</c>) and the setting <c>RegenEnergyCost</c>. The locomotion moves an animal at most its budget; the
+/// metabolism calls Settle after the animal acted.
+/// </remarks>
 [ExerciseOf(typeof(Stamina))]
 public class MyStamina : Stamina
 {
-    /// <summary>How far the animal may move this tick: its stamina, never below 0.</summary>
+    /// <summary>
+    /// How far the animal may move this tick: its stamina, never below 0. The reference returns <c>Mathf.Max(0f, a[Value])</c>.
+    /// </summary>
+    /// <param name="a">The animal about to move.</param>
+    /// <returns>The meters it may move this tick (one point of stamina per meter).</returns>
+    /// <inheritdoc/>
     public override float Budget(Animal a) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyStamina", "Budget"));
 
-    /// <summary>After the animal acted: pay the meters moved, or recover stamina.regen (up to stamina.max) for RegenEnergyCost energy.</summary>
+    /// <summary>
+    /// After the animal acted: pay the meters moved, or recover stamina.regen (up to stamina.max) for RegenEnergyCost energy.
+    /// The reference: when the animal moved (more than <c>Units.Epsilon</c> meters) it takes the meters off its stamina and
+    /// stops there; otherwise, if stamina is below <c>a.Trait(Max)</c>, it adds <c>a.Trait(Regen)</c> (the stat clamps it
+    /// to the maximum) and pays <c>RegenEnergyCost</c> with <c>energy.Pay(a, cost)</c> when there is an Energy module.
+    /// </summary>
+    /// <param name="a">The animal that acted.</param>
+    /// <param name="metersMoved">The meters it moved this tick.</param>
+    /// <param name="energy">The species' Energy module, or null when it has none.</param>
+    /// <inheritdoc/>
     public override void Settle(Animal a, float metersMoved, Energy energy) => throw new NotImplementedException(ExerciseOfAttribute.Todo("MyStamina", "Settle"));
 }

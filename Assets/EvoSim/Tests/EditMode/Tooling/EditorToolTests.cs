@@ -6,11 +6,23 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Editor tooling (21): building from the menus, the play-mode gate.</summary>
+    /// <summary>
+    /// Checks the editor tooling (21 §6; EDIT-01, PROMPT-06; T-EDIT-03, T-PROMPT-05): a world built only from the menus,
+    /// every module prefab the menus offer, the prompt preview of the species inspector, the script templates of
+    /// Assets ▸ Create ▸ EvoSim, and the play-mode gate.
+    /// </summary>
+    /// <remarks>
+    /// Worlds made through <see cref="EvoSim.Editor.WorldFactory"/> (the menus' code) are kept in <see cref="made"/> and
+    /// destroyed by <see cref="Clean"/>; worlds made with <c>New()</c> are destroyed by <see cref="WorldFixture"/>.
+    /// <see cref="ScriptTemplatesCompile"/> compiles the templates with Unity's compiler into <c>Temp/EvoSimTemplates</c>
+    /// and takes a few seconds.
+    /// </remarks>
     public class EditorToolTests : WorldFixture
     {
+        /// <summary>The world a test made through the menus' code, or null; destroyed after the test.</summary>
         GameObject made;
 
+        /// <summary>Destroys the world made through the menus' code, after each test.</summary>
         [TearDown] public void Clean() { if (made != null) Object.DestroyImmediate(made); }
 
         [Test, Description("M10 done-when (21 §6): a world built only from the menus — New World, New Species, Add Action, Add Sense — validates and runs")]
@@ -43,6 +55,10 @@ namespace EvoSim.Tests
             foreach (var g in WorldFactory.Genes) Assert.IsNotNull(WorldFactory.AddModule(species, "Genes", g), g);
         }
 
+        /// <summary>
+        /// The path of every prefab under <c>Assets/EvoSim/Modules</c> except the bodies, sorted: the cases of
+        /// <see cref="EveryModulePrefabValidates"/>.
+        /// </summary>
         static System.Collections.Generic.IEnumerable<string> ModulePrefabs() => UnityEditor.AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/EvoSim/Modules" })
             .Select(UnityEditor.AssetDatabase.GUIDToAssetPath).Where(p => !p.Contains("/Bodies/")).OrderBy(p => p, System.StringComparer.Ordinal);
 
@@ -59,6 +75,7 @@ namespace EvoSim.Tests
                 var instance = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(prefab);
                 instance.name = "probe " + prefab.name.ToLowerInvariant();
                 instance.transform.SetParent(species.transform, false);
+                // Rename what would clash with the species' own modules (V-03, V-14, V-17), so only real errors remain.
                 foreach (var a in instance.GetComponentsInChildren<AnimalAction>(true))
                     if (species.GetComponentsInChildren<AnimalAction>(true).Any(x => x != a && x.Name == a.Name)) a.gameObject.name += " 2";
                 foreach (var s in instance.GetComponentsInChildren<Sense>(true)) s.SetLabel("Probe " + s.Label);
@@ -121,6 +138,7 @@ namespace EvoSim.Tests
                     sources.Add(path);
                 }
             }
+            // Compile all of them into one assembly against the compiled EvoSim.Runtime and EvoSim.Testing, as Assets/Student would.
             string scripts = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Application.dataPath), "Library", "ScriptAssemblies");
 #pragma warning disable CS0618                     // AssemblyBuilder is deprecated but still the editor's in-process compiler in 6000.3
             var builder = new UnityEditor.Compilation.AssemblyBuilder(System.IO.Path.Combine(dir, "Templates.dll"), sources.ToArray())

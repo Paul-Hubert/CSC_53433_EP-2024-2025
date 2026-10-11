@@ -6,10 +6,25 @@ using NUnit.Framework;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Mutation: rates, operators, the LLM deck with a fake mutator, guards, asynchronous answers (10).</summary>
+    /// <summary>
+    /// Checks mutation (10; rule family MUT; T-MUT-01…09, -11, -12 and the mutation part of T-GENE-11): rates, the choice
+    /// of operator, birth events, rejected answers and retries, the deck, the blind prompt, cleaning and guards against the
+    /// prototype's cases (<c>Tests/Golden/mutation_cleaning.json</c>), the answer cache, Gaussian clamping, redraw rounds and
+    /// hatching that waits for late answers.
+    /// </summary>
+    /// <remarks>
+    /// The LLM mutation runs against a <see cref="FakeMutator"/> (<see cref="Lab.FakeMutation"/>): by default it appends
+    /// "quickly" to the sentence, records every prompt and batch, and can answer late or fail. No model is called. Some
+    /// tests call <see cref="BreedPhase.DrawMutations"/> on hand-made eggs to count mutations without breeding.
+    /// </remarks>
     public class MutationTests : WorldFixture
     {
-        /// <summary>A species with five number genes and a Gaussian operator (no model needed).</summary>
+        /// <summary>
+        /// A built world with one species holding five number genes on <c>stamina.max</c> (range 20–120, founder 60) and a
+        /// Gaussian operator: no model needed.
+        /// </summary>
+        /// <param name="rate">The chance that one locus of one baby mutates, 0 to 1.</param>
+        /// <param name="sigma">The standard deviation of a Gaussian step, in the trait's unit.</param>
         World NumberWorld(float rate, float sigma = 5f)
         {
             return New().Flat(20, 20).Food(0f, 0f).Service<EggSystem>("Eggs")
@@ -22,6 +37,7 @@ namespace EvoSim.Tests
                 }).Build();
         }
 
+        /// <summary>A hand-made egg of a species whose every locus carries the gene's first founder allele.</summary>
         static Egg EggOf(Species s, World w) => new Egg { Species = s, Alleles = s.Genes.Select(g => w.Alleles.Register(g, g.FounderPool[0].Value, "founder")).ToArray() };
 
         [Test, Description("T-MUT-01 (MUT-01, CTRL-01): rate 0.03 over 100 000 baby-loci → 3 % attempts (± 4 s.e.); rate 0 → no new allele")]
@@ -103,6 +119,7 @@ namespace EvoSim.Tests
         public void RejectedEverywhere()
         {
             var tries = new List<(long seed, string prompt)>();
+            // The fake answers every prompt with the parent sentence unchanged, which the guards reject.
             var w = New().Flat(20, 20).Food(0f, 0f).Service<EggSystem>("Eggs").FakeMutation(f => f.Answer = (sentence, seed, prompt) => { lock (tries) tries.Add((seed, prompt)); return sentence; })
                 .Phase<BreedPhase>().Phase<HatchPhase>()
                 .Species("prey", s => s.PreyBody().Action<MateAction>("mate", founders: new[] { "Mate often." }).LifeRules(100, 0).LlmMutation(1f))
@@ -233,6 +250,7 @@ namespace EvoSim.Tests
         public void MutationRounds()
         {
             int calls = 0;
+            // Four asexual parents with litters of exactly 3: 12 babies; the first 3 answers equal the parent and are rejected.
             var w = New().Flat(20, 20).Food(0f, 0f).Service<EggSystem>("Eggs")
                 .FakeMutation(f => f.Answer = (sentence, seed, prompt) => ++calls <= 3 ? sentence : sentence.TrimEnd('.') + " quickly.")
                 .Configure(x => x.Asexual = true).Phase<BreedPhase>().Phase<HatchPhase>()

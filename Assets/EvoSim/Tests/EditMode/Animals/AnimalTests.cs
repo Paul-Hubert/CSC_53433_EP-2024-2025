@@ -5,9 +5,24 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Animals, stats, traits, metabolism, busy states and death (05).</summary>
+    /// <summary>
+    /// Checks animals, stats, traits, metabolism, busy states, age and death (05; T-ANIM-02…10, rule family ANIM): stats
+    /// are declared by modules and clamped, number genes set traits, every row of the energy table of 05 §4 holds exactly,
+    /// and killed animals leave the tick at once.
+    /// </summary>
+    /// <remarks>
+    /// Most tests use <see cref="ActWorld"/>: no decision phase, so each animal keeps the action given with
+    /// <see cref="Lab.Choose"/>. <see cref="ProbeAction"/> and <see cref="TraitProbe"/> are test probes of
+    /// <c>EvoSim.Testing</c>: an action that counts its calls, and a module that declares one stat and one trait.
+    /// </remarks>
     public class AnimalTests : WorldFixture
     {
+        /// <summary>
+        /// A flat 40 m world with an empty food layer, carcasses, and only the act and death phases, holding the reference
+        /// prey and a predator that always kills, each with its action set plus a <c>goto</c> action (<see cref="GoToAction"/>).
+        /// </summary>
+        /// <param name="more">Extra set-up on the builder before it builds, or null.</param>
+        /// <returns>The built, initialised world.</returns>
         World ActWorld(System.Action<WorldBuilder> more = null)
         {
             var b = New().Flat(40, 40).Food(0f, 0f).Carcasses()
@@ -80,6 +95,8 @@ namespace EvoSim.Tests
             }
             GoToAction Goto(Animal a) => (GoToAction)a.Species.FindAction("goto");
 
+            // Reference values: 0.7 points per tick for an action (0.2 when resting or busy), 0.5 per meter moved, 0.3 while
+            // stamina recovers (2 points per tick when still); 1 stamina point per meter; grass +25, a kill +60, a portion +30.
             Case("walk 1 m", "prey", "goto", 50, 60, 50 - 0.7f - 0.5f, 59, (w, a) => Goto(a).Target = Place.At(15.5f, 10.5f));
             Case("run 2 m", "predator", "goto", 50, 30, 50 - 0.7f - 1.0f, 28, (w, a) => { Goto(a).Target = Place.At(15, 10); Goto(a).Run = true; });
             Case("rest", "prey", "rest", 50, 60, 50 - 0.2f, 60);
@@ -179,7 +196,7 @@ namespace EvoSim.Tests
         public void CausesOfDeath()
         {
             var w = ActWorld();
-            w.Events.Lines = new System.Collections.Generic.List<string>();
+            w.Events.Lines = new System.Collections.Generic.List<string>();   // keep the event lines in memory to read them
             var prey = w.FindSpecies("prey");
             var starving = Place.Animal(prey, Place.At(5, 5)); starving.Choose("rest"); starving.SetStat("energy", 0.1f);
             var old = Place.Animal(prey, Place.At(15, 15)); old.Choose("rest"); old.Age = 1500;
@@ -212,7 +229,8 @@ namespace EvoSim.Tests
                     .Build();
                 var prey = w.FindSpecies("prey");
                 var victim = Place.Animal(prey, Place.At(10, 10));
-                victim.Choose("probe");
+                victim.Choose("probe");                                     // the probe action counts the victim's turns
+                // Two hunters that always kill, on each side of the victim: the first to act kills it.
                 var h1 = Place.Animal(w.FindSpecies("predator"), Place.At(10.5f, 10)); h1.Choose("hunt");
                 var h2 = Place.Animal(w.FindSpecies("predator"), Place.At(9.5f, 10)); h2.Choose("hunt");
                 var probe = (ProbeAction)prey.FindAction("probe");

@@ -11,16 +11,32 @@ using Debug = UnityEngine.Debug;
 namespace EvoSim
 {
     /// <summary>
-    /// Brain and mutator integrity checks against the real servers (32 §2): B-01 smoke and B-11 blindness so far; the
-    /// gates come with M11. Command line: -executeMethod EvoSim.Integrity.RunIntegrity [-checks B-01,B-11]
+    /// Brain and mutator integrity checks against the real servers (32 §2): B-01 smoke and B-11 blindness here, the gates
+    /// B-02 to B-10 in <see cref="IntegrityGates"/>. Command line: -executeMethod EvoSim.Integrity.RunIntegrity [-checks B-01,B-11]
     /// [-scene path] [-brain JEV]; in the open editor: Integrity.RunNamed through the unity CLI's eval.
     /// </summary>
+    /// <remarks>
+    /// <para>The checks need the model servers running (JEV for the brain; Ollama for B-07, B-10 and the mutator of B-11).
+    /// Each check opens the scene additively (<see cref="Batch.WithScene"/>), so the scene must not be open in the editor,
+    /// and writes one JSON and one Markdown report under <c>Logs/EvoSim/Reports</c> (<see cref="IntegrityReport"/>).</para>
+    /// <para>Only B-01 is blocking: the others are gates, tracked as trends (32 §2).</para>
+    /// </remarks>
     public static class Integrity
     {
+        /// <summary>The scene the checks run on unless <c>-scene</c> says otherwise: Lab1_Small.</summary>
         public const string DefaultScene = "Assets/EvoSim/Scenes/Lab1_Small.unity";
+        /// <summary>The only fields a mutator request may hold (B-11): anything else could leak the simulation to the model.</summary>
         static readonly string[] MutatorFields = { "chat_template_kwargs", "max_tokens", "messages", "model", "options", "seed", "stream", "temperature", "think" };
 
         /// <summary>Command-line entry point; exits 1 when a blocking check fails.</summary>
+        /// <remarks>
+        /// <c>Unity.exe -batchmode -nographics -projectPath . -executeMethod EvoSim.Integrity.RunIntegrity [-checks B-02,B-03]
+        /// [-scene Assets/EvoSim/Scenes/Lab1_Small.unity] [-brain JEV] [-cpu] [-judge gemma4:12b]</c>. Without <c>-checks</c>
+        /// it runs B-01 to B-06, B-08, B-09 and B-11 (B-07 and B-10 only on request). <c>-brain</c> names the brain under test
+        /// (GameObject name or id); <c>-cpu</c> runs the Ollama points brain on the CPU; <c>-judge</c> is the judge model of
+        /// B-10. Each check logs one line, <c>EvoSim integrity: …</c>. Exit code: 0, 1 when a blocking check failed, 2 on
+        /// an exception.
+        /// </remarks>
         public static void RunIntegrity()
         {
             int code = 0;
@@ -43,9 +59,16 @@ namespace EvoSim
         }
 
         /// <summary>The same from the open editor: one line per check.</summary>
+        /// <remarks>For example <c>unity command --result-only eval --code 'return EvoSim.Integrity.RunNamed("B-01,B-02");'</c>.</remarks>
+        /// <param name="checks">Comma-separated check ids, <c>B-01</c> to <c>B-11</c>.</param>
+        /// <param name="scene">The scene to run them on, relative to the project.</param>
+        /// <param name="brain">The brain under test: a GameObject name or a brain id.</param>
+        /// <param name="cpuOnly">True to run the Ollama points brain on the CPU (B-01, B-07).</param>
+        /// <returns>One line per check: id, title, PASS or FAIL with the first problem, rows, report path.</returns>
         public static string RunNamed(string checks = "B-01,B-11", string scene = DefaultScene, string brain = "JEV", bool cpuOnly = false) =>
             string.Join("\n", Run(checks, scene, brain, cpuOnly).Select(r => r.Line));
 
+        /// <summary>Runs the listed checks in order; an unknown id gives a failed, non-blocking report.</summary>
         static List<IntegrityReport> Run(string checks, string scene, string brain, bool cpuOnly)
         {
             var reports = new List<IntegrityReport>();
@@ -77,6 +100,10 @@ namespace EvoSim
         /// B-01 smoke: one query per species with founder genes and three situations (every sense at its first, middle and
         /// last token), through the scene's real prompt and brain; every row valid; latency recorded. Blocking.
         /// </summary>
+        /// <param name="scenePath">The scene, relative to the project; it must not be open in the editor.</param>
+        /// <param name="brainName">The brain under test: a GameObject name or a brain id.</param>
+        /// <param name="cpuOnly">True to run an Ollama points brain on the CPU.</param>
+        /// <returns>The written report: one row per species and situation, with the probability row and its validity.</returns>
         public static IntegrityReport Smoke(string scenePath, string brainName, bool cpuOnly = false)
         {
             var report = new IntegrityReport("B-01", "Smoke", true);
@@ -138,6 +165,13 @@ namespace EvoSim
         /// B-11 blindness: the prompts the mutator model actually receives during a run (every text gene mutating, cache
         /// off) hold only the context line, one deck instruction, the sentence and the reply line (MUT-11, CORE-07).
         /// </summary>
+        /// <remarks>The run uses the random brain and records every HTTP request of the mutator client; each request must
+        /// hold only the allowed fields and one user message in the MUT-11 layout, with a deck instruction and a sentence of
+        /// at most 12 words.</remarks>
+        /// <param name="scenePath">The scene, relative to the project; it needs an HTTP mutator client and a mutator service.</param>
+        /// <param name="requests">The number of mutator requests to check before stopping.</param>
+        /// <param name="maxTicks">The most ticks to run while waiting for those requests.</param>
+        /// <returns>The written report: one row per request, with its instruction, sentence, answer and verdict.</returns>
         public static IntegrityReport Blindness(string scenePath, int requests = 12, int maxTicks = 400)
         {
             var report = new IntegrityReport("B-11", "Blindness", false);
@@ -199,6 +233,7 @@ namespace EvoSim
             return report;
         }
 
+        /// <summary>The model's reply text in a raw answer (Ollama or OpenAI form), or the raw answer when it isn't JSON.</summary>
         static string Content(string answer)
         {
             try
@@ -209,6 +244,7 @@ namespace EvoSim
             catch (Exception) { return answer; }
         }
 
+        /// <summary>Sets a world up for a check: the brain as default (unless null), Freeze mode, seed 1234, no run files.</summary>
         static void Prepare(World world, Brain brain)
         {
             if (brain != null) world.DefaultBrain = brain;
@@ -218,6 +254,7 @@ namespace EvoSim
             foreach (var r in world.GetComponentsInChildren<RunRecorder>(true)) r.WriteFiles = false;
         }
 
+        /// <summary>The world's brain whose GameObject name or id is <paramref name="name"/>, or null.</summary>
         static Brain FindBrain(World world, string name)
         {
             foreach (var b in world.GetComponentsInChildren<Brain>(true))
@@ -237,6 +274,7 @@ namespace EvoSim
             return new Observation(tokens);
         }
 
+        /// <summary>The value after a command-line option, or null when it is absent.</summary>
         static string Arg(string name)
         {
             var args = Environment.GetCommandLineArgs();

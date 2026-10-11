@@ -1,11 +1,18 @@
 # 50 — Implementation status
-Updated: 2026-10-10, M13 real-time visual test (`Docs/prompts/07-real-time-visual-test.md`) ⏸
+Updated: 2026-10-11, M14 documentation for students ⏸ (before it: M13 real-time visual test, `Docs/prompts/07-real-time-visual-test.md`)
 
 The single source of truth between implementation sessions of
 [`Docs/prompts/06-implement-unity-system.md`](../prompts/06-implement-unity-system.md).
 
 ## Next step
-M13 waits at its checkpoint ⏸: the owner watches HideVsFlee (Play mode, or `Builds/EvoSim/2026-10-10/EvoSim.exe`) and
+M14 (2026-10-11, owner: document the whole code base for students, inline and as a website) waits for the owner ⏸:
+every type and member of `Assets/EvoSim` has a doc comment (DocAudit 0 issues; comments only, proven by Roslyn syntax
+equivalence with d5769e0), and `Docs/Site` builds the students' website with DocFX 2.81: 19 guide pages, 21 extending pages
+(the extension map, one per mechanism, a generated page of every extension point), the API reference grouped by folder, and
+this specification with rule ids linked (`powershell -File Docs\Site\build.ps1 -Serve`; setup in `Docs/Site/README.md`).
+The pass found about 90 bugs and stale statements, none fixed (code untouched): 51 §M14 lists them for the owner.
+
+Before M14, M13 waited at its checkpoint ⏸: the owner watches HideVsFlee (Play mode, or `Builds/EvoSim/2026-10-10/EvoSim.exe`) and
 reads `Logs/EvoSim/Reports/RT-2026-10-10.md`. The owner's three M13 decisions are done (M13.4–M13.6): cache hits join the
 memo, the course's scripts build for a player, the reference scenes stagger decisions (R-01 re-pinned). The reference
 decision period was tried at 20 (M13.8) and 10 (M13.9, a 10-minute live L2 build run:
@@ -31,6 +38,7 @@ EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh
 | M10 Editor tooling | done | c61f043 | a world from the menus validates and runs; T-EDIT-01 for every catalogue code; windows not checked by eye |
 | M11 Samples, scenarios, verification, CI | done | e5f402d…cde9e9c, M11.5 | samples, conformance, CI, scenarios S00–S27, R-01…R-08, coverage test; EditMode 319 + T3, PlayMode 17/17; gates B-01…B-11 (Machine) |
 | M12 Teaching path and final audit | review | bb6b46a, 1eaa571, 66a81e5, 83019ce, M12.5 | 14 stubs, Exercises menu, README (no grading, hooks); P1 phases 1–2; EditMode 433/433 (with soak and pinned hashes), PlayMode 19/19 ⏸ |
+| M14 Documentation for students | review | M14.1 | `///` on every type and member (347 files, +10 149 lines, code token-identical); Docs/Site: 41 pages, 50 compiled examples, strict build 0 warnings; EditMode 438/438, PlayMode 23/23 (batch, -nographics) ⏸ |
 | M13 Real-time visual test | review | ed16db5, d155e72, 29838b3, 9140625, c9d9e0a, e735804, 5efefe4, 6f3b302, 2328091, M13.10 | scenes watchable (ground, food, cover, markers, overlay, camera, capture); L0 and L2 hashes equal headless = Play = build; then memo of cache hits, player build of the project, staggered reference; EditMode 438/438, PlayMode 23/23; report RT-2026-10-10 ⏸ |
 
 ## Machine
@@ -176,6 +184,8 @@ seven states (Idle, Running, Waiting, Blocked, Paused, Stepping, Stopped), now `
   in `Assets/02 - Scripts/`, `Docs/Interface/design.md`, `design.pdf`.
 - M13: in the editor a capture needs a drawn Game view (hidden, captures are given up after 5 s); Unity warns on Play that
   the Input Manager is deprecated (`activeInputHandler: 0`, the owner's setting).
+- M14: `ViewPlayTests.ViewsNeverChangeTheRun` fails in batch mode with a graphics device (start and end captures 1 < 2: the
+  test skips its capture checks only without a device). It passes in the editor (M13) and in batch with `-nographics`.
 - M13: a `BuildPipeline.BuildPlayer` inside the project made Unity rewrite `ProjectSettings/UnityConnectSettings.asset`
   (format upgrade, `m_Enabled: 1`); restored from git. Build players from the copy only.
 

@@ -7,7 +7,14 @@ using UnityEngine;
 
 namespace EvoSim.Tests
 {
-    /// <summary>Eggs, from conception to birth (11 §2–§4): what an egg holds, the hatch order, what a birth records.</summary>
+    /// <summary>
+    /// Checks eggs from conception to birth (11 §2–§4; REPRO-20, REPRO-22, REPRO-24, GENE-32): what an egg holds, the hatch
+    /// order, what a birth event records, and one crossover per baby.
+    /// </summary>
+    /// <remarks>
+    /// Two pairs of ready adults mate in a Lab ecology with an incubation of 3 ticks. The species' crossover is replaced by
+    /// <see cref="CountingCrossover"/>, a test probe that counts its calls.
+    /// </remarks>
     public class EggTests : WorldFixture
     {
         [Test, Description("REPRO-20, REPRO-22, REPRO-24, GENE-32: an egg holds its parents, generation and ticks, at its first parent's place; eggs hatch in conception order; each birth records its litter and its laid tick; one crossover per baby")]
