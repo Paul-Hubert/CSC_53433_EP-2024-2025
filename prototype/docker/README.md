@@ -1,5 +1,11 @@
 # Model servers
 
+> **For EvoSim (Unity): follow [Getting started › Model servers](../../Docs/Site/guides/getting-started.md#model-servers-for-l1-and-l2), not this page.**
+> This page is for the Python prototype. In EvoSim the mutator is **`gemma4:26b`** in Ollama (not `qwen3.5:0.8b`), the
+> commands run from the **repository root** (`docker compose -f prototype/docker/compose.yaml up -d`, not
+> `docker/compose.yaml`), and the weights are downloaded with `py -3`, not the prototype's `.venv`. The JEV service
+> itself is the same.
+
 | what | where | model | used by | config |
 |---|---|---|---|---|
 | `jev` (vLLM, Docker, GPU) | :8000 | autotrust/JEV-9B in FP8, System 1 LoRA `jev-decision` | `--backend jev` (decisions) | `jev.host` |

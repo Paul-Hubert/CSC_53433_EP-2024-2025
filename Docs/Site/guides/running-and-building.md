@@ -50,8 +50,16 @@ Three levels name the usual combinations of brain and mutation:
 | L1 | the scene's brain (JEV) | off | JEV |
 | L2 | the scene's brain (JEV) | the LLM mutator | JEV and Ollama |
 
-`EvoSim.Editor.RealTimeRuns.SetLevel(world, "L0")` sets a world to a level; the batch and player commands below take a
-level or the equivalent arguments.
+`EvoSim.Editor.RealTimeRuns.SetLevel(world, "L0")` sets a world to a level. In batch mode, `-level` exists only for
+`RealTimeRuns.FromCommandLine` (below). The player has **no** `-level` argument, and it ignores an argument it doesn't
+know without a word: `EvoSim.exe -level L0` runs the scene as it is, which is L2, calling JEV and Ollama. Give the player
+the equivalent arguments instead (`RealTimeRuns.LevelArgs`):
+
+| Level | Player arguments |
+|---|---|
+| L0 | `-brain Random -noMutation` |
+| L1 | `-noMutation` |
+| L2 | none |
 
 ## Headless, from the editor
 
@@ -100,6 +108,7 @@ pass `-quit`. Its exit code is then 0 whatever happened, so read its result line
 
 ## Player builds
 
+The player is not in the repository: `Builds/` is ignored by git, so build it yourself the first time.
 *EvoSim ▸ Build ▸ Visual Player* builds a Windows 64-bit player of the six reference scenes, HideVsFlee first, into
 `Builds/EvoSim/<yyyy-MM-dd>/EvoSim.exe`, and shows the result in a dialog. The build never edits the project's Build
 Settings: it passes its own scene list. It needs the Mono scripting backend for Standalone, and stops with a message
@@ -129,4 +138,5 @@ EvoSim.exe -scene HideVsFlee -seed 1234 -ticks 600 -speed 20 -capture 10 -run de
 | `-quitAtEnd` | quit when the run stops, and log the events hash |
 
 Run files, captures and the answer cache land next to the exe: `Logs/EvoSim/…` and `Library/EvoSim/AnswerCache`. To
-replay a live run without calling the model again, give the player the cache the live run wrote (`-cache`).
+replay a live run without calling the model again, give the player the cache the live run wrote (`-cache`). To replay
+a player run headless in the editor, see [Replay a player run in the editor](determinism.md#replay-a-player-run-in-the-editor).

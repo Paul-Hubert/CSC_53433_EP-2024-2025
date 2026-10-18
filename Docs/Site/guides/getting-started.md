@@ -15,8 +15,79 @@ about ten minutes.
 
 | Server | Address | What it does | Start it with |
 |---|---|---|---|
-| **JEV** (vLLM in Docker, GPU) | `localhost:8000` | the brain: reads genes and situations, gives a probability per action | `docker compose -f prototype/docker/compose.yaml up -d` (5–8 minutes until healthy) |
-| **Ollama** with `gemma4:26b` (CPU) | `localhost:11434` | the mutator: rewrites a gene sentence when it mutates | `ollama serve`, then `ollama pull gemma4:26b` once |
+| **JEV** (vLLM in Docker, GPU) | `localhost:8000` | the brain: reads genes and situations, gives a probability per action | `docker compose -f prototype/docker/compose.yaml up -d` (5–8 minutes until healthy), after a one-time download: see [Model servers](#model-servers-for-l1-and-l2) |
+| **Ollama** with `gemma4:26b` (CPU) | `localhost:11434` | the mutator: rewrites a gene sentence when it mutates | `ollama serve` with two settings, then `ollama pull gemma4:26b` once: see [Model servers](#model-servers-for-l1-and-l2) |
+
+Run level **L0** (the random brain, no mutation) needs neither server. **L1** needs JEV, **L2** needs JEV and Ollama
+(see [Run levels](running-and-building.md#run-levels)).
+
+> [!NOTE]
+> The Windows player build is **not** in the repository: `Builds/` is ignored by git. To watch runs outside the editor,
+> build it yourself once with *EvoSim ▸ Build ▸ Visual Player* (see [Player builds](running-and-building.md#player-builds)).
+> Everything on this page works in the editor without it.
+
+## Model servers (for L1 and L2)
+
+Skip this section if you only run L0. All commands run in PowerShell from the repository root.
+
+### What the machine needs
+
+- **Docker Desktop** with the **WSL 2** backend and GPU support (an up-to-date NVIDIA driver on Windows; nothing to install
+  inside WSL).
+- An **NVIDIA GPU with about 16 GB** of memory: JEV in FP8 fills an RTX 5080 (14.4 GB in use).
+- About **17 GB of free disk** for the JEV weights, in your Hugging Face cache (`%USERPROFILE%\.cache\huggingface`).
+- For Ollama: about **20 GB of free RAM**, since `gemma4:26b` runs on the CPU.
+- Python 3 from python.org, started with the **`py -3`** launcher. Don't type bare `python`: on these machines it can
+  open the Windows Store stub instead of Python.
+
+### JEV: download the weights once
+
+The JEV container runs **offline** (`HF_HUB_OFFLINE=1` in `prototype/docker/compose.yaml`): it reads the weights from your
+Hugging Face cache and never downloads them. Download them once, at the revision the container is pinned to:
+
+```powershell
+py -3 -m pip install --user huggingface_hub
+py -3 -c "from huggingface_hub import snapshot_download as d; d('autotrust/JEV-9B', revision='b63f651ce8ed64481d3f5e73ecdb05f740042f01', allow_patterns=['*.json', '*.jinja', 'model-*.safetensors', 'head.safetensors', 'adapter/*', 'adapter_vllm/*'])"
+```
+
+The download is about 17 GB. It must include the `adapter_vllm/` folder: the container loads JEV's decision adapter from
+it. If the download stops with a 401 or 403 error, the model needs a Hugging Face token: ask the course staff.
+
+### JEV: start it and check it
+
+```powershell
+docker compose -f prototype/docker/compose.yaml up -d
+docker compose -f prototype/docker/compose.yaml ps
+```
+
+Start-up takes 5–8 minutes. Run the `ps` command again until the `jev` service shows **(healthy)**, then check that it
+answers:
+
+```powershell
+curl.exe http://localhost:8000/v1/models
+```
+
+The answer lists `autotrust/JEV-9B` and `jev-decision`. Finally, in Unity, open *Window ▸ EvoSim ▸ Brain Health* and
+press **Test connection** next to JEV. If the service never becomes healthy, read its log with
+`docker compose -f prototype/docker/compose.yaml logs jev`; a "not found" or "offline" error means the weights are
+missing or at another revision. Stop it with `docker compose -f prototype/docker/compose.yaml down`.
+
+### Ollama: the mutator
+
+Quit the Ollama tray app if it is running (it starts its own server with other settings), then start the server with one
+model loaded at a time, kept in memory for four hours:
+
+```powershell
+$env:OLLAMA_MAX_LOADED_MODELS = "1"; $env:OLLAMA_KEEP_ALIVE = "4h"; ollama serve
+```
+
+In a second window, once: `ollama pull gemma4:26b`. Without `OLLAMA_KEEP_ALIVE`, Ollama unloads the model after a few
+idle minutes, and reloading 26 B parameters from disk can take longer than the mutator's 60 s time-out: that mutation then
+fails and the gene is copied unchanged. Check it in *Brain Health* with **Test connection** next to the mutator.
+
+> [!NOTE]
+> `prototype/docker/README.md` describes the servers for the Python prototype, whose mutator is a different model. For
+> EvoSim, follow this page.
 
 ## 1. Open a scene
 
