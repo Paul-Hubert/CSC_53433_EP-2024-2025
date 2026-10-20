@@ -357,6 +357,23 @@ namespace EvoSim.Testing
             a.Action = action.Index;
         }
 
+        /// <summary>
+        /// Gives an animal a carrier and an overlay by name, as a decision that drew the overlay would (ACT-07): the overlay
+        /// acts for its <see cref="AnimalAction.OverlayTicks"/>, counting the next tick.
+        /// </summary>
+        /// <param name="a">The animal.</param>
+        /// <param name="carrier">The name of the action that moves it ("flee", "eat"…).</param>
+        /// <param name="overlay">The name of an overlay of its species ("alarm").</param>
+        /// <exception cref="ArgumentException">The species has no action of one of those names, or the second is no overlay.</exception>
+        public static void Choose(this Animal a, string carrier, string overlay)
+        {
+            a.Choose(carrier);
+            var o = a.Species.FindAction(overlay) ?? throw new ArgumentException($"{a.Species.Id} has no action {overlay}");
+            if (!o.Overlay) throw new ArgumentException($"{overlay} is not an overlay (ACT-07)");
+            a.Overlay = o.Index;
+            a.OverlayLeft = Math.Max(0, o.OverlayTicks);
+        }
+
         /// <summary>Reads one of an animal's stats by name.</summary>
         /// <param name="a">The animal.</param>
         /// <param name="stat">The stat's name, as its module declares it ("energy", "stamina", "thirst"…).</param>

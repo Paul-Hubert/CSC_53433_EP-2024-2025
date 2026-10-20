@@ -97,6 +97,14 @@ namespace EvoSim.Tests
             ["V-16"] = l => l.Under(l.World.transform, "inner world").AddComponent<World>(),
             ["V-17"] = l => l.Under(l.Prey, "energy again").AddComponent<LevelSense>().Configure("energy", 30f, 70f),
             ["V-18"] = l => l.Under(l.World.GetComponentInChildren<FoodGrid>(true).transform.parent, "Grass").AddComponent<FoodGrid>(),
+            ["V-19"] = l =>
+            {
+                var s = l.Under(l.World.transform, "marks");
+                var sp = s.AddComponent<Species>();
+                sp.SetNames("marks", "marks");
+                s.AddComponent<KinematicLocomotion>();
+                l.Under(sp, "mark").AddComponent<OverlayProbeAction>();
+            },
             ["V-20"] = l => l.Of<Diet>(l.Prey).Set("Nothing"),
             ["V-21"] = l => Object.DestroyImmediate(l.Predator.gameObject),
             ["V-22"] = l => l.Of<Diet>(l.Prey).Set(new Diet.Entry[0]),
@@ -104,6 +112,7 @@ namespace EvoSim.Tests
             ["V-24"] = l => Object.DestroyImmediate(l.Prey.GetComponent<Edible>()),
             ["V-25"] = l => l.Predator.gameObject.AddComponent<Edible>(),
             ["V-26"] = l => Object.DestroyImmediate(l.Of<Litter>(l.Prey)),
+            ["V-27"] = l => l.Under(l.Prey, "mark").AddComponent<OverlayProbeAction>().ClaimsToHunt = true,
             ["V-30"] = l => l.Prey.GetComponentInChildren<NearestResourceSense>(true).SetBands(new[] { 10f, 4f }, 20f),
             ["V-31"] = l => l.Prey.GetComponentInChildren<LevelSense>(true).Configure("energy", 70f, 30f),
             ["V-32"] = l => l.Of<CapRule>(l.Prey).Configure(1),
@@ -157,7 +166,7 @@ namespace EvoSim.Tests
         /// <summary>The codes whose catalogue row offers a fix that runs without the editor (V-20, V-36 and V-62 need a person's choice).</summary>
         static readonly string[] FixCodes =
         {
-            "V-01", "V-03", "V-04", "V-05", "V-06", "V-07", "V-08", "V-09", "V-10", "V-12", "V-13", "V-24", "V-26", "V-30", "V-31",
+            "V-01", "V-03", "V-04", "V-05", "V-06", "V-07", "V-08", "V-09", "V-10", "V-12", "V-13", "V-19", "V-24", "V-26", "V-30", "V-31",
             "V-35", "V-37", "V-41", "V-42", "V-43", "V-46", "V-48", "V-49", "V-61",
         };
 

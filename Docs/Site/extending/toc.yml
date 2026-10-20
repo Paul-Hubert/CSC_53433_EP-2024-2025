@@ -46,6 +46,8 @@
     href: exercises.md
   - name: The samples
     href: samples.md
+  - name: "Worked example: alarm calls"
+    href: worked-example-alarm-calls.md
   - name: Documenting your code
     href: documenting-your-code.md
 - name: Every extension point

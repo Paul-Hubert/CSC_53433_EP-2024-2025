@@ -45,6 +45,10 @@
 - **DEC-20 (MUST)** The action is drawn from the vector with the sampling stream.
   With a sampling temperature τ ≠ 1 the vector is first replaced by p^(1/τ),
   renormalised (τ < 1 sharpens, τ > 1 flattens). Reference τ = 1.
+  When the drawn action is an overlay (ACT-07), a second draw from the same stream
+  picks the carrier from the same tempered vector with every overlay set to 0,
+  renormalised; with nothing left, no second draw and no carrier. A species without
+  overlays draws exactly once per decision.
 - **DEC-21 (SHOULD)** The animal keeps its last observation, situation text and
   vector, for the inspector and the logs.
 
@@ -181,6 +185,9 @@ order changes. Measured: about 12 decisions per second.
 - **PROMPT-03 (MUST)** Numbers in rule lines come from the configuration
   (placeholders filled from the modules' settings), so the prompt never
   contradicts the world. The prototype's prompts hard-code them.
+  A species with overlay actions (ACT-07) gets one engine rule line, first of the
+  rules: `Some actions are done in passing (alarm): the animal also does its next
+  most likely choice.`
 - **PROMPT-04 (MAY)** A species may use a **frozen** prompt text with the
   placeholders `{genes}`, `{situation}` and `{ask}` instead of the assembled one,
   for example the prototype's prompts below.

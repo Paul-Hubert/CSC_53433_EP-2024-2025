@@ -26,6 +26,7 @@ namespace EvoSim
         {
             if (a.IsGone) return;
             a.IsGone = true;
+            a.EndOverlay();                                                    // ACT-07
             var s = a.Species;
             s.Counters.CountDeath(cause, a.Age);
             var e = new SimEvent("death", Tick, a.Id, s.Id)

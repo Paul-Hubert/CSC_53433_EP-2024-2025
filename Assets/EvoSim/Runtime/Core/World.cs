@@ -591,17 +591,25 @@ namespace EvoSim
         void ValidateSpecies(Species s, ValidationReport report)
         {
             var sp = s;
+            ValidationFix AddRest() => new ValidationFix("Add Rest", () =>
+            {
+                var go = new GameObject(nameof(RestAction).Replace("Action", "").ToLowerInvariant());
+                go.transform.SetParent(sp.transform, false);
+                go.AddComponent<RestAction>();
+            });
             if (s.Actions.Count == 0)
-                report.Error("V-04", s, $"Species '{s.DisplayName}' has no action (CORE-04).", new ValidationFix("Add Rest", () =>
-                {
-                    var go = new GameObject(nameof(RestAction).Replace("Action", "").ToLowerInvariant());
-                    go.transform.SetParent(sp.transform, false);
-                    go.AddComponent<RestAction>();
-                }));
+                report.Error("V-04", s, $"Species '{s.DisplayName}' has no action (CORE-04).", AddRest());
             var seen = new HashSet<string>();
+            int overlays = 0;
             foreach (var a in s.Actions)
             {
                 var action = a;
+                if (a.Overlay)
+                {
+                    overlays++;
+                    if (a.Mates || a.Hunts)
+                        report.Error("V-27", a, $"Action '{a.Name}' of '{s.DisplayName}' is done in passing and {(a.Mates ? "mates" : "hunts")}: an overlay adds an interaction only, it can't seek a partner or chase (ACT-07).");
+                }
                 if (!seen.Add(a.Name))
                     report.Error("V-03", a, $"Two actions of '{s.DisplayName}' are named '{a.Name}' (ACT-01).",
                                  new ValidationFix("Rename", () => action.gameObject.name = action.Name + " 2"));
@@ -609,6 +617,8 @@ namespace EvoSim
                     report.Warning("V-05", a, $"Action '{a.Name}' has no text gene: the brain can't be steered for it.",
                                    new ValidationFix("Add a text gene", () => action.gameObject.AddComponent<TextGene>()));   // its pool: the neutral allele
             }
+            if (overlays > 0 && overlays == s.Actions.Count)
+                report.Error("V-19", s, $"Every action of '{s.DisplayName}' is done in passing: an overlay needs another action to move the animal (ACT-07).", AddRest());
             var labels = new HashSet<string>();
             foreach (var g in s.Genes)
                 if (!labels.Add(g.Label)) report.Error("V-14", g, $"Two genes of '{s.DisplayName}' have the label '{g.Label}': locus ids must be unique (GENE-01).");

@@ -1394,3 +1394,34 @@ inherits from Unity. Strict build: 0 warnings; 50 complete examples compile; eve
 Corrected in passing (comments only): about twenty wrong or stale comments (DeathPhase's rule order, DecisionSchedule
 staggering, MutatorClient.ModelIdentity, Batch.WithScene, the exercise stubs' rule ids…), each named in the agents'
 reports.
+
+## M15 (2026-10-21): overlay actions, done in passing
+Owner's choice of option A in `Logs/EvoSim/Reports/SHORT-ACTIONS-DESIGN.md`: a short action (a call, a mark) didn't fit
+ACT-02, since an action runs every tick until the next decision; the first alarm call stood still next to the predator
+for up to 4 ticks and was caught. New rule ACT-07; ACT-02, ACT-03, DEC-20, PROMPT-03 extended; 20 §3.6, 21 (inspector,
+V-19, V-27) and 30 (T-ACT-11) updated.
+
+- **API.** `AnimalAction.Overlay` (default false) and `OverlayTicks` (default 1; 0 = until the next decision).
+  `Animal.Overlay` (an action index or -1), `OverlayLeft`, `CurrentOverlay`, `EndOverlay()`, `ActionLabel`
+  ("flee + alarm"). `Animal.Action` is the carrier; the overlay itself when the row left none (the animal stays).
+- **Choose actions.** After the draw, an overlay is kept and the carrier drawn from the same tempered row with every
+  overlay set to 0, with the species' `sampling` stream; only then a second draw, none when nothing is left.
+  `ActionCounts` counts the overlay and its carrier.
+- **Act.** The carrier plans as before; then the overlay's `ActAll` in the same context, of which only the interaction
+  and the point its intent named (its reach is measured from there) are kept. `Interact` applies the carrier's then the
+  overlay's, in the sequential orders and in the simultaneous one (adjacent in the shuffled order). `Settle` counts
+  `OverlayLeft` down; a busy animal ends its overlay (in planning and in settle), and so does `RecordDeath`.
+- **Validation.** V-19 E every action of a species is an overlay (fix: add Rest, shared with V-04); V-27 E an overlay
+  that mates or hunts. **Prompt.** `PromptWriter.OverlayRule`: first rule line, "Some actions are done in passing
+  (alarm): the animal also does its next most likely choice." **Views.** Inspector and run overlay show `ActionLabel`.
+- **Tests.** `OverlayTests` (T-ACT-11, 13 cases): carrier probabilities over 6 000+ decisions (P(overlay) 0.3, carrier
+  0.2/0.7 with and without the overlay, 4 s.e.), no carrier, both interactions in the three act orders, ticks 0/1/3,
+  reach, busy and death, a mate carrier breeding once per period with the same pairing, the prompt line, same seed same
+  hash. Probe `OverlayProbeAction`, helper `Lab.Choose(a, carrier, overlay)`. The conformance suites give an overlay a
+  rest carrier and check it doesn't search. EditMode 466/466 in batch (448 before); R-01 pinned hashes unchanged.
+- **Student example.** `AlarmCallAction` is an overlay: `Act` only adds the call (unlimited reach, pays its cost once).
+  The old version's `WritePromptRules` override dropped the action's own prompt line; it now calls the base. Tests
+  rewritten (call while fleeing, false alarm, prompt lines). Scene rebuilt with `AlarmCallsScene.BuildFromCommandLine`;
+  headless L0 seed 1234, 400 ticks, twice: 3 204 prey decisions, 438 alarm draws, 438 calls, 2 333 decisions heard a
+  call (800 fled or hid), same hash `ed746ccc…`. Site: "Actions done in passing" in `extending/action.md`; the worked
+  example's section 2 explains the overlay. Strict site build: 0 issues, 56 examples compile, 0 warnings.

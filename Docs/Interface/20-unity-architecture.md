@@ -379,9 +379,19 @@ public abstract class AnimalAction : SpeciesModule
     /// Directed tests: is this observation relevant for this action (CTRL-10)?
     public virtual bool IsRelevant(ObservationView o) => true;
 
+    /// Done in passing (ACT-07): when drawn, a carrier is drawn from the rest of the row;
+    /// this action's intent is ignored and its interaction added, for OverlayTicks ticks.
+    public virtual bool Overlay => false;
+    public virtual int OverlayTicks => 1;                       // 0 = until the next decision
+
     public override void WritePromptRules(PromptWriter w) => w.Action(Name, description);
 }
 ```
+
+`Animal.Overlay` (an action index, or -1) and `Animal.OverlayLeft` (ticks) hold an overlay; `Animal.Action` is then
+the carrier. `ChooseActionsPhase` draws the carrier with the same `sampling` stream (DEC-20); `ActPhase` plans the
+carrier, then the overlay in the same `ActContext`, keeps the overlay's interaction only and resolves both, carrier
+first, in every act order. `Animal.ActionLabel` ("flee + alarm") is what the inspector and the run overlay show.
 
 The whole eat behaviour:
 

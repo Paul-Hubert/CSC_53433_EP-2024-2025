@@ -188,11 +188,19 @@ namespace EvoSim.Tests
                     var holder = Child(s.GameObject, "under test");
                     alone = (AnimalAction)holder.AddComponent(type);
                     holder.AddComponent<TextGene>().Configure(new[] { "Do it now." });
+                    if (alone.Overlay) s.Action<RestAction>("rest");                                   // an overlay needs a carrier (V-19)
                 }).Build();
             var solo = Place.Animal(empty.FindSpecies("prey"), Place.At(20, 20));
             var ctx = new ActContext(empty);
             ctx.Begin(solo);
             alone.Act(solo, ctx);
+            if (alone.Overlay)
+            {
+                // An overlay plans no move: its intent is ignored, and its interaction alone is fine (ACT-07).
+                Assert.IsFalse(solo.Searching, "an overlay doesn't search: its intent is thrown away (ACT-07)");
+                Assert.IsFalse(alone.Mates || alone.Hunts, "an overlay neither mates nor hunts (V-27)");
+                return;
+            }
             Assert.IsTrue(solo.Searching || ctx.Intent.IsStay, "alone with nothing in sight it searches (ACT-04), or stays");
         }
 

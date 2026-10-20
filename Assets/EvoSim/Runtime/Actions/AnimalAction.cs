@@ -14,7 +14,8 @@ namespace EvoSim
     /// species' actions is their order in the prompt and in the brain's answer (SPEC-03). A <see cref="TextGene"/> on the
     /// same GameObject, or on a child of it, is bound to it (GENE-05).</para>
     /// <para>Once the brain chose it, <see cref="Act"/> runs every tick until the next decision, or until the animal
-    /// becomes busy or dies (ACT-02). What <see cref="Act"/> must keep:</para>
+    /// becomes busy or dies (ACT-02). An action done in passing (a call) is an <see cref="Overlay"/>: it runs beside a
+    /// second, moving action (ACT-07). What <see cref="Act"/> must keep:</para>
     /// <list type="bullet">
     /// <item><description>Plan only through the <see cref="ActContext"/>: never set the position, stats or flags of any
     /// animal (ACT-06). Effects on others go through interactions, which check the reach and the diet.</description></item>
@@ -137,6 +138,40 @@ namespace EvoSim
 
         /// <summary>True for actions that seek a partner: the breed phase breeds animals that chose one (REPRO-02).</summary>
         public virtual bool Mates => false;
+
+        /// <summary>
+        /// True for an action done in passing (a call, a scent mark): when the brain's draw picks it, the animal also does a
+        /// second action, the carrier, drawn from the rest of the row; this one adds its interaction only (ACT-07).
+        /// </summary>
+        /// <remarks>
+        /// <para>The carrier is drawn from the same probabilities with every overlay set to 0, so it is what the animal
+        /// would have done without the overlay (DEC-20). Each tick the carrier plans the intent and its interaction as
+        /// usual; then the overlay's <see cref="Act"/> runs in the same context: its intent is ignored (the carrier moves
+        /// the animal) and its interaction applies after the carrier's, measured from the point its own intent names
+        /// (07 §3). It acts for <see cref="OverlayTicks"/> ticks, and ends when the animal becomes busy or dies.</para>
+        /// <para>An overlay must not call <see cref="ActContext.Search"/> or <see cref="ActContext.Wander"/>: its intent
+        /// is thrown away. It may not mate or hunt (V-27), and a species needs at least one action that is not an overlay
+        /// (V-19).</para>
+        /// </remarks>
+        /// <example>
+        /// A scent mark left in passing:
+        /// <code>
+        /// public class MarkAction : AnimalAction
+        /// {
+        ///     public override bool Overlay =&gt; true;
+        ///     protected override string DefaultDescription =&gt; "leave a scent mark; you also do your next choice";
+        ///
+        ///     public override void Act(Animal a, ActContext c) =&gt; c.OnArrival(new Mark());   // no intent: the carrier moves
+        /// }
+        /// </code>
+        /// </example>
+        public virtual bool Overlay => false;
+
+        /// <summary>
+        /// How many ticks an overlay acts, counting the tick of its decision; 0 = until the next decision. Default 1: once.
+        /// Ignored unless <see cref="Overlay"/> is true (ACT-07).
+        /// </summary>
+        public virtual int OverlayTicks => 1;
 
         /// <summary>Adds the action's line to the prompt's action list: <c>- name: description</c> (PROMPT-01).</summary>
         /// <inheritdoc/>

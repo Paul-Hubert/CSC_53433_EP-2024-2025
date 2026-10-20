@@ -22,6 +22,7 @@ Derive from <xref:EvoSim.AnimalAction>, itself a [species module](species-module
 | [Rests](xref:EvoSim.AnimalAction.Rests) | may override | True for a resting action: a still tick costs the rest cost, not the base cost. |
 | [Mates](xref:EvoSim.AnimalAction.Mates) | may override | True for an action that seeks a partner: the breed phase breeds animals that chose it. |
 | [Hunts](xref:EvoSim.AnimalAction.Hunts) | may override | True for an action that chases and strikes; senses such as the sample <xref:EvoSim.Samples.ChasedSense> read it. |
+| [Overlay](xref:EvoSim.AnimalAction.Overlay), [OverlayTicks](xref:EvoSim.AnimalAction.OverlayTicks) | may override | True for an action done in passing, beside a second action drawn from the rest of the row; for how many ticks. See [Actions done in passing](#actions-done-in-passing). |
 | [IsRelevant](xref:EvoSim.AnimalAction.IsRelevant(EvoSim.ObservationView)) | may override | Declares when a situation is relevant to this action, for the specification's directed tests (CTRL-10). The simulation never calls it. |
 | [ActAll](xref:EvoSim.AnimalAction.ActAll(System.Collections.Generic.IReadOnlyList{EvoSim.Animal},EvoSim.ActContext,System.Span{EvoSim.ActPlan})) | may override | Plans a group of animals at once (20 §10). It must give exactly the plans `Act` gives. |
 | `Name`, `Description`, `Gene`, `Index` | read | The GameObject's name; the prompt line; the bound text gene; the place in the action order. |
@@ -161,6 +162,48 @@ public class FeedAction : AnimalAction
 `Reach` may be `float.PositiveInfinity`: the sample <xref:EvoSim.Samples.DragAction> uses it to move a carcass along
 with the animal, wherever it ends up.
 
+## Actions done in passing
+
+An action normally runs every tick until the next decision (ACT-02), and decides the intent: where the animal goes.
+That doesn't suit something done in a moment, such as a call, a scent mark or a look around: an animal that stood
+still to call would stand still for a whole decision period, next to the predator it warns about. Such an action is an
+**overlay** (ACT-07): override `Overlay` to return true.
+
+- When the brain's draw picks an overlay, the engine draws a second action, the **carrier**, from the same row with
+  every overlay set to 0 (DEC-20). That is what the animal would have done had it not drawn the overlay: flee, hide,
+  eat. A row with nothing else leaves no carrier, and the animal stays.
+- Each tick the carrier plans as usual. Then the overlay's `Act` runs in the same context: its intent is ignored, its
+  interaction applies after the carrier's, measured from the point its own intent names (none: where the animal stood).
+  Use `float.PositiveInfinity` as the reach for an effect that happens wherever the carrier took the animal.
+- It acts for `OverlayTicks` ticks (1 by default: once, on the tick of the decision; 0: until the next decision), and
+  ends early when the animal becomes busy or dies. The brain is asked nothing more; a species without overlays draws
+  exactly as before.
+- The prompt keeps the action's line, and the engine adds one rule: *Some actions are done in passing (mark): the
+  animal also does its next most likely choice.*
+- A species needs at least one action that is not an overlay (V-19), and an overlay may not mate or hunt (V-27).
+- The inspector shows both, "flee + mark"; the decision counts count the overlay and its carrier.
+
+```csharp
+public class MarkAction : AnimalAction
+{
+    public override bool Overlay => true;                    // done in passing (ACT-07)
+
+    protected override string DefaultDescription => "leave a scent mark";
+
+    public override void Act(Animal a, ActContext c) => c.OnArrival(new Mark());   // no intent: the carrier moves it
+
+    sealed class Mark : IInteraction
+    {
+        public float Reach => float.PositiveInfinity;        // wherever the carrier took the animal
+        public void Apply(Animal actor, InteractionContext c) =>
+            actor.Species.Module<Energy>()?.Pay(actor, 0.2f);   // a mark costs a little energy
+    }
+}
+```
+
+The worked example [Alarm calls](worked-example-alarm-calls.md) builds a complete overlay, with a world service that
+keeps the calls and a sense that hears them.
+
 ## Rules
 
 1. **Search when there is nothing to act on** (ACT-04). Call `c.Search()`, not `c.Wander()`, so the choice is counted.
@@ -182,7 +225,8 @@ gene and the modules it requires, under the prey of a small world and checks tha
 
 - the action has a description and a bound gene;
 - calling `Act` on every prey changes no animal anywhere (ACT-06);
-- alone in an empty world, the action searches or stays (ACT-04); resting actions are exempt.
+- alone in an empty world, the action searches or stays (ACT-04); resting actions are exempt; an overlay plans no
+  move and must not search (ACT-07), and gets a rest action beside it as its carrier.
 
 A test to copy, from `Assets/EvoSim/Tests/EditMode/Samples/SampleTests.cs` (its class derives from
 <xref:EvoSim.Testing.WorldFixture>, which provides `New()`):

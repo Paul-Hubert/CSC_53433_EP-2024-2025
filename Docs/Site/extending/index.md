@@ -76,3 +76,5 @@ generated from the code.
 > [!TIP]
 > The fastest way in is to rewrite a reference module from its stub: [the teaching path](exercises.md). The
 > [samples](samples.md) (thirst, water, seasons, slopes…) show complete extensions working together.
+> [Worked example: alarm calls](worked-example-alarm-calls.md) follows one student change, a sense, an action, a gene
+> and a world service, from the idea to a tested scene.

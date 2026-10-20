@@ -170,7 +170,7 @@ namespace EvoSim
             var s = a.Species;
             sb.Clear();
             sb.Append(s.DisplayName).Append(" #").Append(a.Id).Append(", age ").Append(a.Age).Append(", generation ").Append(a.Generation).AppendLine();
-            sb.Append("Action: ").Append(a.CurrentAction != null ? a.CurrentAction.Name : "none").Append(a.Searching ? " (searching)" : "");
+            sb.Append("Action: ").Append(a.ActionLabel).Append(a.Searching ? " (searching)" : "");   // "carrier + overlay" (ACT-07)
             if (a.IsBusy) sb.Append(", busy ").Append(a.BusyTicks).Append(" (").Append(a.BusyReason).Append(')');
             sb.AppendLine();
             foreach (var d in s.Declarations.Stats) sb.Append(d.Id.Name).Append(' ').Append(a[d.Id].ToString("0.#")).Append("   ");

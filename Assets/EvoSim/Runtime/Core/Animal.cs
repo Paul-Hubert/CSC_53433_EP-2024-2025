@@ -43,8 +43,18 @@ namespace EvoSim
         /// <summary>"founder", "immigrant" or "birth".</summary>
         public string Origin;
 
-        /// <summary>The current action: an index into <see cref="EvoSim.Species.Actions"/>, or -1 before its first decision.</summary>
+        /// <summary>
+        /// The current action: an index into <see cref="EvoSim.Species.Actions"/>, or -1 before its first decision. Under
+        /// an overlay it is the carrier; the overlay itself when the row left no carrier, and the animal then stays (ACT-07).
+        /// </summary>
         public int Action = -1;                        // index into Species.Actions; -1 = none
+        /// <summary>
+        /// The overlay drawn at its last decision (ACT-07), an index into <see cref="EvoSim.Species.Actions"/>, or -1: none,
+        /// or it has ended (its ticks ran out, or the animal became busy).
+        /// </summary>
+        public int Overlay = -1;
+        /// <summary>Ticks the overlay still acts, this one included; 0 = until the next decision. Meaningless when <see cref="Overlay"/> is -1.</summary>
+        public int OverlayLeft;
         /// <summary>
         /// Searching: its action found nothing to act on since the last decision, so it wanders (ACT-04).
         /// BredThisPeriod: it bred since its last decision. Killed: struck dead this tick; the death phase records it.
@@ -129,6 +139,31 @@ namespace EvoSim
         public bool IsAlive => !IsGone && !Killed;
         /// <summary>The action it is doing, or null before its first decision.</summary>
         public AnimalAction CurrentAction => Action >= 0 && Action < Species.Actions.Count ? Species.Actions[Action] : null;
+        /// <summary>The overlay it is doing beside its action (ACT-07), or null.</summary>
+        public AnimalAction CurrentOverlay => Overlay >= 0 && Overlay < Species.Actions.Count ? Species.Actions[Overlay] : null;
+
+        /// <summary>
+        /// What it is doing, for the inspector and the run overlay: "none", the action's name ("flee"), or the carrier and
+        /// the overlay ("flee + alarm"; "stay + alarm" when the row left no carrier; ACT-07).
+        /// </summary>
+        public string ActionLabel
+        {
+            get
+            {
+                var action = CurrentAction;
+                if (action == null) return "none";
+                string carrier = action.Overlay ? "stay" : action.Name;
+                var overlay = CurrentOverlay;
+                return overlay != null ? carrier + " + " + overlay.Name : carrier;
+            }
+        }
+
+        /// <summary>Ends the overlay, if any (at a decision, when the animal becomes busy, at death; ACT-07).</summary>
+        public void EndOverlay()
+        {
+            Overlay = -1;
+            OverlayLeft = 0;
+        }
 
         /// <summary>The stat values, by index, without clamping (the species fills them at creation).</summary>
         internal float[] RawStats => stats;

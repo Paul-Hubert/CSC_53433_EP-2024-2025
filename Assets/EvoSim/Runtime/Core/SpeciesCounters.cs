@@ -30,7 +30,10 @@ namespace EvoSim
         public long LifespanSum;
         /// <summary>The highest generation hatched so far (0 while only founders and newcomers lived).</summary>
         public int MaxGeneration;
-        /// <summary>Decisions per action, in action order.</summary>
+        /// <summary>
+        /// Decisions per action, in action order. A drawn overlay counts for itself and for its carrier (ACT-07), so with
+        /// overlays the counts add up to more than the decisions.
+        /// </summary>
         public int[] ActionCounts = Array.Empty<int>();
         /// <summary>Deaths by cause, in cause order (sorted).</summary>
         public readonly SortedDictionary<string, int> Deaths = new SortedDictionary<string, int>(StringComparer.Ordinal);

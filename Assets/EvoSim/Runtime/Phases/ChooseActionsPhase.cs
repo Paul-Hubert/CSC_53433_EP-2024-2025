@@ -12,10 +12,13 @@ namespace EvoSim
     /// <para>An animal that shares another's key (DEC-32) takes that animal's row. Every deciding animal gets a new action,
     /// its searching and bred-this-period flags are cleared (DEC-03), and its observation, situation and probabilities are
     /// kept for the inspector (DEC-21).</para>
+    /// <para>When the draw picks an overlay (ACT-07), a second draw from the same stream picks the carrier among the other
+    /// actions, in proportion to their probabilities (DEC-20). Species without overlays draw exactly once.</para>
     /// </remarks>
     public class ChooseActionsPhase : TickPhase
     {
         AnswerCache cache;      // the World's answer cache, or null: fresh answers are then kept in the memo only
+        float[] rest = new float[0];   // the tempered row with the overlays set to 0: the carrier's weights (ACT-07)
 
         /// <summary>Finds the World's answer cache, if any.</summary>
         /// <inheritdoc/>
@@ -72,15 +75,44 @@ namespace EvoSim
                     species.Counters.Failures++;
                 }
                 var p = Sampling.Temper(d.Row, World.SamplingTemperature);                         // DEC-20
-                a.Action = t.Stream(species, "sampling").Choose(p);                                // RAND-03
+                var sampling = t.Stream(species, "sampling");
+                a.Action = sampling.Choose(p);                                                     // RAND-03
+                a.EndOverlay();
+                if (a.CurrentAction != null && a.CurrentAction.Overlay) DrawCarrier(a, p, sampling);   // ACT-07
                 a.Searching = false;                                                                // DEC-03
                 a.BredThisPeriod = false;
                 a.LastObservation = d.Observation;                                                  // DEC-21
                 a.LastSituation = d.Situation;
                 a.LastProbabilities = d.Row;
                 a.LastDecisionTick = t.Tick;
-                if (a.Action >= 0 && a.Action < species.Counters.ActionCounts.Length) species.Counters.ActionCounts[a.Action]++;
+                var counts = species.Counters.ActionCounts;
+                if (a.Action >= 0 && a.Action < counts.Length) counts[a.Action]++;
+                if (a.Overlay >= 0 && a.Overlay != a.Action && a.Overlay < counts.Length) counts[a.Overlay]++;   // the overlay and its carrier
             }
+        }
+
+        /// <summary>
+        /// The drawn action is an overlay (ACT-07): keeps it as the animal's overlay and draws the carrier from the same
+        /// tempered row with every overlay set to 0, with the same stream (DEC-20). A row with nothing but overlays
+        /// leaves no carrier: no second draw, and the action stays the overlay, so the animal stays.
+        /// </summary>
+        /// <param name="a">The deciding animal; its action is the overlay just drawn.</param>
+        /// <param name="p">The tempered row the overlay was drawn from (never changed).</param>
+        /// <param name="sampling">The species' sampling stream.</param>
+        void DrawCarrier(Animal a, float[] p, RandomStream sampling)
+        {
+            var actions = a.Species.Actions;
+            a.Overlay = a.Action;
+            int ticks = a.CurrentAction.OverlayTicks;
+            a.OverlayLeft = ticks > 0 ? ticks : 0;
+            if (rest.Length != p.Length) rest = new float[p.Length];
+            double total = 0;
+            for (int i = 0; i < p.Length; i++)
+            {
+                rest[i] = i < actions.Count && actions[i].Overlay ? 0f : System.Math.Max(0f, p[i]);
+                total += rest[i];
+            }
+            if (total > 0) a.Action = sampling.Choose(rest);   // Choose renormalises the weights
         }
 
         /// <summary>Reports this phase placed before Ask brains, or without it (V-08).</summary>

@@ -9,7 +9,8 @@ namespace EvoSim
     /// <remarks>
     /// <para>The act phase makes one at initialization, with the reaches of its Inspector, and calls <see cref="Apply"/>
     /// for every animal that planned an interaction, right after that animal moved: in the act order for the sequential
-    /// orders, in a fresh random order for the simultaneous one (ACT-30). Tests make their own.</para>
+    /// orders, in a fresh random order for the simultaneous one (ACT-30). An animal with an overlay (ACT-07) has two calls
+    /// in a row, its action's interaction then its overlay's; each is checked on its own. Tests make their own.</para>
     /// <para>Every meal goes through the same steps: the eater's <see cref="Energy.Gain"/> (after
     /// <see cref="Diet.EnergyFrom"/>), one more meal on the animal and its species, and, after a kill or a carcass
     /// portion, <see cref="Digestion.AfterMeal"/>. A strike's kill chance is drawn from the hunter species'

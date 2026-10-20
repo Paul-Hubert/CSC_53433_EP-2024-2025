@@ -39,6 +39,8 @@ Severity: **E** error (blocks Play), **W** warning, **I** information.
 | V-11 | E | a brain's limits exceeded: more than 16 actions for JEV, prompt estimate above its token limit (DEC-14) | — |
 | V-12 | W | the species' signature changed since it was last accepted (SPEC-03): results and caches change | accept |
 | V-13 | E | a species without exactly one locomotion component (MOVE-01) | add `KinematicLocomotion` |
+| V-19 | E | every action of a species is an overlay: nothing can carry the animal (ACT-07) | add Rest |
+| V-27 | E | an overlay that mates or hunts (ACT-07) | — |
 | **References** |
 | V-20 | E | a module names a layer, entity kind or species that doesn't exist | pick from a list |
 | V-21 | W | an animal set resolves to nothing (flee with no threat, hunt with no prey) | — |
@@ -113,7 +115,7 @@ or *random*), switch V1/V2, see the full prompt with its token estimate, copy it
 |---|---|---|
 | **Ecology monitor** | population per species over time, deaths by cause, births, mean energy and stamina, action shares, memo hit rate, brain time, ticks per second | A, B |
 | **Gene pool** | per locus: allele frequencies over time (stacked), current top alleles with their text and origin, the lineage of a selected allele as a chain of text diffs; number genes as histograms over time | D, E |
-| **Animal inspector** | the selected animal: stats, traits, genome sentences, last situation text, last probabilities as bars, current action and target, busy reason, parents and children | C |
+| **Animal inspector** | the selected animal: stats, traits, genome sentences, last situation text, last probabilities as bars, current action ("carrier + overlay" under an overlay, ACT-07) and target, busy reason, parents and children | C |
 | **Ask the brain** | build a genome (founders, edited sentences, contrast pro/anti, random text), pick a situation, query several brains side by side; one click for a directed test (pro vs anti ΔP) and a random-text comparison | C, I |
 | **Food web** | species and layers as a graph with graze, strike and scavenge edges; threats; warnings | — |
 | **Event log** | events filtered by kind, species and animal; follow a lineage | D |

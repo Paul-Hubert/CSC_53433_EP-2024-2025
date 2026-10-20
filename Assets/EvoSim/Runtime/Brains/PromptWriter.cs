@@ -181,6 +181,21 @@ namespace EvoSim
         }
 
         /// <summary>
+        /// The engine's rule line for a species with overlays (ACT-07, PROMPT-03): "Some actions are done in passing
+        /// (alarm): the animal also does its next most likely choice."; null when the species has none.
+        /// </summary>
+        /// <param name="s">The species, its actions found.</param>
+        /// <returns>The line, the overlays named in action order, or null.</returns>
+        public static string OverlayRule(Species s)
+        {
+            List<string> names = null;
+            foreach (var a in s.Actions)
+                if (a.Overlay) (names ??= new List<string>()).Add(a.Name);
+            return names == null ? null
+                 : $"Some actions are done in passing ({string.Join(", ", names)}): the animal also does its next most likely choice.";
+        }
+
+        /// <summary>
         /// The species' prompt template (PROMPT-01): header, actions, rules from its modules and from world services,
         /// the genes intro and {genes}, the situation and {ask}; or its frozen prompt (PROMPT-04).
         /// </summary>
@@ -204,6 +219,8 @@ namespace EvoSim
                     svc.WritePromptRules(s, w);
                 }
             w.Current = null;
+            string passing = OverlayRule(s);
+            if (passing != null) w.rules.Insert(0, passing);                    // ACT-07, PROMPT-03: first rule, below the actions
 
             if (s.FrozenPrompt != null)
             {

@@ -1,0 +1,5 @@
+{
+    "name": "Student",
+    "references": ["EvoSim.Runtime", "EvoSim.Http", "EvoSim.Samples"],
+    "autoReferenced": true
+}

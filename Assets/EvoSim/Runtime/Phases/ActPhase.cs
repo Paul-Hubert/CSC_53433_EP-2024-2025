@@ -15,6 +15,9 @@ namespace EvoSim
     /// and animals without an action stay), move (its species' <see cref="Locomotion.MoveAll"/>), interact (the
     /// <see cref="InteractionResolver"/> applies graze, strike, scavenge, egg eating or a custom interaction within reach,
     /// diet-checked), settle (metabolism and stamina, then the busy countdown).</para>
+    /// <para>An animal with an overlay (ACT-07) is planned twice: its action (the carrier) as above, then its overlay in
+    /// the same context, of which only the interaction is kept. Both interactions apply after the move, the carrier's
+    /// first; the overlay's countdown drops in settle, and the overlay ends when the animal becomes busy.</para>
     /// <para>The order (ACT-30): in <see cref="ActOrder.SpeciesInTurn"/> and <see cref="ActOrder.AllMixed"/> each animal
     /// does all four steps before the next one, on the state left by those before it (ACT-31); in
     /// <see cref="ActOrder.Simultaneous"/> every animal plans from the same state, all move, then interactions apply in a
@@ -39,6 +42,8 @@ namespace EvoSim
         readonly List<Animal> actors = new List<Animal>();      // the animals acting now: one species, or all, in act order
         Intent[] intents = new Intent[16];                      // each actor's planned intent (where to go)
         Interaction[] interactions = new Interaction[16];       // each actor's planned interaction (what to do on arrival)
+        Interaction[] overlays = new Interaction[16];           // each actor's overlay interaction, applied after the carrier's (ACT-07)
+        Vector3[] overlayTargets = new Vector3[16];             // where the overlay's ignored intent pointed: its reach is measured from there
         bool[] busyAtStart = new bool[16];                      // busy when the tick began: the busy countdown applies
         float[] moved = new float[16];                          // meters moved this tick
         Vector3[] from = new Vector3[16];                       // position before the move
@@ -120,7 +125,7 @@ namespace EvoSim
                 Ensure(1);
                 Plan(a, 0);
                 Move(a, 0);
-                if (!interactions[0].IsNone) resolver.Apply(a, interactions[0], intents[0].Target);
+                Interact(a, 0);
                 Settle(a, 0);
             }
         }
@@ -137,11 +142,7 @@ namespace EvoSim
             MoveTogether(n);
             for (int i = 0; i < n; i++) order2[i] = i;
             for (int i = n - 1; i > 0; i--) { int j = rng.Range(0, i + 1); (order2[i], order2[j]) = (order2[j], order2[i]); }
-            for (int k = 0; k < n; k++)
-            {
-                int i = order2[k];
-                if (!interactions[i].IsNone) resolver.Apply(actors[i], interactions[i], intents[i].Target);
-            }
+            for (int k = 0; k < n; k++) Interact(actors[order2[k]], order2[k]);
             for (int i = 0; i < n; i++)
                 if (!actors[i].Killed) Settle(actors[i], i);
         }
@@ -158,18 +159,33 @@ namespace EvoSim
         Intent[] groupIntents = new Intent[16];                 // the intents of the group being moved
         float[] groupMoved = new float[16];                     // meters moved by each animal of that group
 
-        /// <summary>The animal's action gives an intent and an interaction; busy animals and animals without an action stay.</summary>
+        /// <summary>
+        /// The animal's action gives an intent and an interaction, then its overlay adds an interaction (ACT-07); busy
+        /// animals and animals without an action stay.
+        /// </summary>
         void Plan(Animal a, int i)
         {
             Count(a, i);
-            var action = a.CurrentAction;
-            if (a.IsBusy || action == null) { act.Begin(a); Apply(a, i, ActPlan.Stay(a)); return; }   // ANIM-30: busy animals don't act
+            overlays[i] = default;
+            var action = Carrier(a);
+            if (action == null) { act.Begin(a); Apply(a, i, ActPlan.Stay(a)); }   // ANIM-30: busy animals don't act
+            else
+            {
+                one[0] = a;
+                action.ActAll(one, act, onePlan);
+                Apply(a, i, onePlan[0]);
+            }
+            var overlay = a.CurrentOverlay;
+            if (overlay == null) return;
             one[0] = a;
-            action.ActAll(one, act, onePlan);
-            Apply(a, i, onePlan[0]);
+            overlay.ActAll(one, act, onePlan);
+            ApplyOverlay(i, onePlan[0]);
         }
 
-        /// <summary>Simultaneous: plans every actor from the same state, one call per action for all the animals that chose it.</summary>
+        /// <summary>
+        /// Simultaneous: plans every actor from the same state, one call per action for all the animals that chose it, then
+        /// one call per overlay for all the animals doing it (ACT-07).
+        /// </summary>
         void PlanTogether(int n)
         {
             ClearGroups();
@@ -177,17 +193,60 @@ namespace EvoSim
             {
                 var a = actors[i];
                 Count(a, i);
-                var action = a.CurrentAction;
-                if (a.IsBusy || action == null) Apply(a, i, ActPlan.Stay(a));
+                overlays[i] = default;
+                var action = Carrier(a);
+                if (action == null) Apply(a, i, ActPlan.Stay(a));
                 else GroupOf(action).Add(i);
             }
+            PlanGroups(overlay: false);
+            ClearGroups();
+            for (int i = 0; i < n; i++)
+            {
+                var overlay = actors[i].CurrentOverlay;
+                if (overlay != null) GroupOf(overlay).Add(i);
+            }
+            PlanGroups(overlay: true);
+        }
+
+        /// <summary>Simultaneous: each group's action plans its animals; the plans are stored as actions' or as overlays'.</summary>
+        void PlanGroups(bool overlay)
+        {
             for (int g = 0; g < groupOwners.Count; g++)
             {
                 var members = Gather(g);
                 if (groupPlans.Length < members.Count) groupPlans = new ActPlan[Math.Max(members.Count, groupPlans.Length * 2)];
                 ((AnimalAction)groupOwners[g]).ActAll(groupAnimals, act, new Span<ActPlan>(groupPlans, 0, members.Count));
-                for (int k = 0; k < members.Count; k++) Apply(actors[members[k]], members[k], groupPlans[k]);
+                for (int k = 0; k < members.Count; k++)
+                {
+                    if (overlay) ApplyOverlay(members[k], groupPlans[k]);
+                    else Apply(actors[members[k]], members[k], groupPlans[k]);
+                }
             }
+        }
+
+        /// <summary>
+        /// The action that plans the animal's intent this tick, or null to stay: busy (ANIM-30; its overlay ends), no
+        /// action yet, or an overlay with no carrier (ACT-07).
+        /// </summary>
+        static AnimalAction Carrier(Animal a)
+        {
+            if (a.IsBusy) { a.EndOverlay(); return null; }
+            var action = a.CurrentAction;
+            return action == null || action.Overlay ? null : action;
+        }
+
+        /// <summary>Keeps an overlay's interaction and the point its intent named; the intent itself is ignored (ACT-07).</summary>
+        void ApplyOverlay(int i, ActPlan plan)
+        {
+            overlays[i] = plan.Interaction;
+            overlayTargets[i] = plan.Intent.Target;
+        }
+
+        /// <summary>After the move: the action's interaction, then the overlay's (ACT-07), each within its reach (ACT-10).</summary>
+        void Interact(Animal a, int i)
+        {
+            if (!interactions[i].IsNone) resolver.Apply(a, interactions[i], intents[i].Target);
+            if (!overlays[i].IsNone) resolver.Apply(a, overlays[i], overlayTargets[i]);
         }
 
         /// <summary>Counts an animal-tick, and an exhausted one when it starts without stamina (13 §4 <c>exhausted</c>); notes whether it is busy.</summary>
@@ -300,9 +359,13 @@ namespace EvoSim
             }
         }
 
-        /// <summary>Metabolism and stamina (ANIM-20, ANIM-21), then the busy countdown (ANIM-30).</summary>
+        /// <summary>
+        /// Metabolism and stamina (ANIM-20, ANIM-21), then the overlay's countdown (it ends when its ticks run out or the
+        /// animal became busy, ACT-07), then the busy countdown (ANIM-30).
+        /// </summary>
         void Settle(Animal a, int i)
         {
+            if (a.Overlay >= 0 && (a.IsBusy || (a.OverlayLeft > 0 && --a.OverlayLeft == 0))) a.EndOverlay();
             var loco = a.Species.Module<Locomotion>();
             float extra = loco != null && moved[i] > Units.Epsilon ? loco.ExtraCost(a, from[i], a.Position) : 0f;
             var metabolism = a.Species.Module<Metabolism>();
@@ -337,6 +400,8 @@ namespace EvoSim
             int size = Math.Max(n, intents.Length * 2);
             Array.Resize(ref intents, size);
             Array.Resize(ref interactions, size);
+            Array.Resize(ref overlays, size);
+            Array.Resize(ref overlayTargets, size);
             Array.Resize(ref busyAtStart, size);
             Array.Resize(ref moved, size);
             Array.Resize(ref from, size);

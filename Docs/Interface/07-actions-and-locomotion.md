@@ -12,10 +12,12 @@ intent into movement over the ground, and contacts trigger **interactions**
   description for the prompt, and usually one text gene ([09](09-genes-alleles-and-genomes.md)).
 - **ACT-02 (MUST)** The chosen action runs every tick from the decision until the
   next decision (or until the animal becomes busy or dies). It looks for its
-  target again each tick, so it follows a moving target.
+  target again each tick, so it follows a moving target. Under an overlay (ACT-07)
+  this holds for the carrier.
 - **ACT-03 (MUST)** Each tick an action produces at most one intent and at most
-  one interaction. An intent is a direction (or none: stay), whether the animal
-  walks or runs, and optionally the farthest it should go this tick (to stop at a
+  one interaction; an animal with an overlay (ACT-07) has one intent, its carrier's,
+  and up to two interactions, the carrier's and the overlay's. An intent is a
+  direction (or none: stay), whether the animal walks or runs, and optionally the farthest it should go this tick (to stop at a
   target). Helpers build the usual intents: toward a point stopping at a
   distance, away from a point, wander.
 - **ACT-04 (MUST)** **Nothing to act on → search.** When the action has no target
@@ -28,6 +30,18 @@ intent into movement over the ground, and contacts trigger **interactions**
 - **ACT-06 (MUST)** An action never changes another animal's stats or position
   directly. Effects on others go through interactions, which check the diet and
   the reach.
+- **ACT-07 (MAY)** **Overlay actions, done in passing.** An action may declare
+  itself an overlay (a call, a scent mark): it adds an interaction but no
+  movement. When the draw picks an overlay, the carrier is drawn from the same
+  vector with every overlay set to 0 (DEC-20); a vector with nothing else leaves no
+  carrier and the animal stays. Each tick the carrier plans the intent and its
+  interaction; the overlay plans in the same way, its intent is ignored, and its
+  interaction applies after the carrier's, its reach measured from the point its
+  own intent names. The overlay acts for its number of ticks (1 by default, 0 =
+  until the next decision) and ends at the next decision, when the animal becomes
+  busy, or when it dies. A species needs at least one action that is not an overlay
+  (V-19), and an overlay neither mates nor hunts (V-27). Decision timing, breeding
+  (REPRO-03) and the memo are unchanged: the vector is the same.
 
 ## 2. Locomotion
 

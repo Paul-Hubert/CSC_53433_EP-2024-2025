@@ -57,8 +57,9 @@ namespace EvoSim.Tests
                     s.Get<Diet>().Set("Grass", "prey", "carcass:prey");
                     var go = new GameObject(type.Name.ToLowerInvariant());
                     go.transform.SetParent(s.GameObject.transform, false);
-                    go.AddComponent(type);
+                    var added = (AnimalAction)go.AddComponent(type);
                     go.AddComponent<TextGene>();
+                    if (added.Overlay) s.Action<RestAction>("rest");                                    // an overlay needs a carrier (V-19)
                     foreach (RequiresModuleAttribute need in type.GetCustomAttributes(typeof(RequiresModuleAttribute), true))
                         if (typeof(SpeciesModule).IsAssignableFrom(need.Module)) s.GameObject.AddComponent(need.Module);   // what it needs beside it (V-26)
                 });

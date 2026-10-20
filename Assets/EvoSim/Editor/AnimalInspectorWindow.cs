@@ -52,7 +52,7 @@ namespace EvoSim.Editor
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Decision", EditorStyles.boldLabel);
-            EditorGUILayout.LabelField("Action", a.CurrentAction != null ? a.CurrentAction.Name + (a.Searching ? " (searching)" : "") : "none");
+            EditorGUILayout.LabelField("Action", a.ActionLabel + (a.CurrentAction != null && a.Searching ? " (searching)" : ""));   // "carrier + overlay" (ACT-07)
             if (a.IsBusy) EditorGUILayout.LabelField("Busy", $"{a.BusyTicks} ticks: {a.BusyReason}");
             if (a.TargetId >= 0) EditorGUILayout.LabelField("Target", "#" + a.TargetId);
             EditorGUILayout.LabelField("Last situation (tick " + a.LastDecisionTick + ")", a.LastSituation ?? "—", EditorStyles.wordWrappedLabel);
