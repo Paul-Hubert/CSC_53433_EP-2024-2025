@@ -64,6 +64,38 @@ run writes every answer to it, and running the same command again replays from i
 T-RAND-06). To replay in a player build, give it the cache folder with `-cache`. A brain with a memory of its own is
 neither memoised nor cached: its runs repeat only if the brain itself does.
 
+## Replay a player run in the editor
+
+A run watched in the player can be replayed headless in batch mode, to check its hash or to probe it, without calling the
+models again. Two things make this go wrong silently: the player writes its answer cache next to the exe by default,
+and `FromCommandLine` has no `-cache` option and no replay-only mode. It reads the project's
+`Library/EvoSim/AnswerCache`, and **any answer missing there becomes a real model call, with no warning**. So:
+
+1. **Run the player on the project's cache.** Pass `-cache` with the absolute path of the project's cache (a relative
+   path is taken from the build's folder), and the level's arguments ([Run levels](running-and-building.md#run-levels)):
+
+   ```powershell
+   EvoSim.exe -scene HideVsFlee -seed 1234 -minutes 30 -run my-live -cache "C:\path\to\project\Library\EvoSim\AnswerCache" -quitAtEnd
+   ```
+
+2. **Read the run's length.** Open `Logs/EvoSim/runs/my-live/summary.json` next to the exe and note `ticks` and
+   `events_hash`.
+3. **Close the editor**, then replay exactly that many ticks, at the same level, from the repository root:
+
+   ```powershell
+   & $U -batchmode -nographics -projectPath . -executeMethod EvoSim.Editor.RealTimeRuns.FromCommandLine -do headless -scene HideVsFlee -seed 1234 -ticks 9000 -level L2 -run my-live-replay -quit
+   ```
+
+   (`$U` is the Unity.exe path, as in [Batch mode](running-and-building.md#batch-mode); `9000` stands for the `ticks`
+   of step 2.)
+4. **Read the result line**, the last line of `Logs/EvoSim/realtime-batch.txt`. Its `hash` must equal the live run's
+   `events_hash`, and it must say **`brain calls 0`** and **`mutator calls 0`**: any other number means answers were
+   missing from the cache and the models were asked again, so the replay is not a replay. Don't trust the exit code:
+   `FromCommandLine` exits with 0 whatever happened, a failure included (the line then starts with `FAILED`).
+
+A model server that was down when the live run started records the model as `@unknown`; the replay then misses the cache.
+Start the servers and check them in *Brain Health* before a live run you want to replay.
+
 ## The same run everywhere
 
 The World makes the run independent of how it is driven:
