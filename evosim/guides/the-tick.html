@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>A tick, phase by phase | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="A tick, phase by phase | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/the-tick.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="guide-the-tick">
+<h1 id="a-tick-phase-by-phase">A tick, phase by phase</h1>
+
+<p>Simulation time is counted in <strong>ticks</strong>, not seconds (SPACE-10). A tick runs every <a class="xref" href="../api/EvoSim.TickPhase.html">TickPhase</a> of the World
+once, in hierarchy order (TICK-01). Unity's frame loop only decides how many ticks run per frame: what happens in a tick,
+and the result of a run, never depend on it. This page follows one tick, then explains how the World waits for the brain,
+when a run stops, and how births and deaths happen inside a tick.</p>
+<h2 id="the-reference-phases">The reference phases</h2>
+<p>The reference scenes have eleven phases under the World's <code>Phases</code> object (TICK-04):</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Phase</th>
+<th>What it does</th>
+<th>Waits for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><a class="xref" href="../api/EvoSim.SensePhase.html">SensePhase</a></td>
+<td>picks who decides (living, not busy animals on their decision tick or without an action); rebuilds the spatial index; reads every sense of each deciding animal</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2</td>
+<td><a class="xref" href="../api/EvoSim.AskBrainsPhase.html">AskBrainsPhase</a></td>
+<td>builds each decision's query; answers it from the memo, from another animal of this tick with the same key, or from the answer cache; sends the rest, one batch per brain</td>
+<td>—</td>
+</tr>
+<tr>
+<td>3</td>
+<td><a class="xref" href="../api/EvoSim.ChooseActionsPhase.html">ChooseActionsPhase</a></td>
+<td>stores the answers in the memo and the cache, then draws each deciding animal's action from its species' <code>sampling</code> stream, after the temperature</td>
+<td>the brains</td>
+</tr>
+<tr>
+<td>4</td>
+<td><a class="xref" href="../api/EvoSim.ActPhase.html">ActPhase</a></td>
+<td>in the act order, each animal's action gives an intent and maybe an interaction; the locomotion moves the animal; interactions within reach apply (graze, strike, scavenge); metabolism is paid; busy counters drop</td>
+<td>—</td>
+</tr>
+<tr>
+<td>5</td>
+<td><a class="xref" href="../api/EvoSim.BreedPhase.html">BreedPhase</a></td>
+<td>each ready animal that chose <em>mate</em> breeds with the nearest ready partner within reach: one egg per baby, crossover and mutation choices drawn now, mutation requests sent</td>
+<td>—</td>
+</tr>
+<tr>
+<td>6</td>
+<td><a class="xref" href="../api/EvoSim.HatchPhase.html">HatchPhase</a></td>
+<td>eggs due this tick become animals (births)</td>
+<td>the mutator, when an egg's mutations are not back</td>
+</tr>
+<tr>
+<td>7</td>
+<td><a class="xref" href="../api/EvoSim.DeathPhase.html">DeathPhase</a></td>
+<td>killed animals are recorded; every living animal ages by one tick; the death rules run (starvation, old age)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>8</td>
+<td><a class="xref" href="../api/EvoSim.MigrationPhase.html">MigrationPhase</a></td>
+<td>a species above its cap loses animals chosen at random (cause <code>migrated</code>)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>9</td>
+<td><a class="xref" href="../api/EvoSim.EnvironmentPhase.html">EnvironmentPhase</a></td>
+<td>food layers regrow, each with its own stream; carcasses and other entities rot, move or vanish</td>
+<td>—</td>
+</tr>
+<tr>
+<td>10</td>
+<td><a class="xref" href="../api/EvoSim.FloorPhase.html">FloorPhase</a></td>
+<td>a species below its floor gets newcomers</td>
+<td>—</td>
+</tr>
+<tr>
+<td>11</td>
+<td><a class="xref" href="../api/EvoSim.RecordPhase.html">RecordPhase</a></td>
+<td>a statistics row every 100 ticks, file flushes every 500; events are written as they happen, not here</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>Each phase changes only what it is responsible for, and what it changes is visible to the phases after it (TICK-02).
+The decisions of a tick read the state the previous tick left, after its Floor phase (TICK-05). In the reference the
+incubation is 0 ticks, so a baby conceived in Breed hatches in the Hatch phase of the same tick.</p>
+<h2 id="advance-and-the-tick-boundary">Advance and the tick boundary</h2>
+<p><a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Advance_System_Int32_">Advance(maxTicks)</a> runs ticks and returns how many it completed. Play mode
+calls it from <code>FixedUpdate</code> or <code>Update</code>; tests and headless runs call it directly.</p>
+<ol>
+<li><strong>At the tick boundary</strong> (between two ticks) the World checks the stop conditions, then copies each animal's position
+to <code>PreviousPosition</code>, which the views interpolate from.</li>
+<li><strong>Each phase in turn</strong>: the World asks the phase what it waits for, waits if needed, then calls its <code>Run</code>. An
+exception in a phase stops the run, with the phase's name in <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_StopReason">StopReason</a>, and is
+thrown again.</li>
+<li><strong>After the last phase</strong> <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Tick">Tick</a> grows by one and the stop conditions are checked again.</li>
+</ol>
+<p><code>World.Tick</code> counts the ticks completed. During the first tick it is 0, so the events of that tick, like the founders',
+have <code>t = 0</code>. <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_NextPhaseIndex">NextPhaseIndex</a> is the phase that runs next (0 between ticks).</p>
+<h2 id="waiting-for-the-brain">Waiting for the brain</h2>
+<p>A phase that needs answers from a service returns them from
+<a class="xref" href="../api/EvoSim.TickPhase.html#EvoSim_TickPhase_WaitsFor_EvoSim_TickContext_">WaitsFor</a> as a <a class="xref" href="../api/EvoSim.Pending.html">Pending</a> (TICK-03). The World never runs
+the phase before the work is done. What it does meanwhile is the World's <strong>Wait Mode</strong> (SPACE-14):</p>
+<pre><code class="lang-mermaid">flowchart LR
+    A[Advance] --&gt; W{phase.WaitsFor done?}
+    W --&gt;|yes| R[phase.Run]
+    W --&gt;|no, Responsive| X[return, Unity keeps drawing] --&gt; A
+    W --&gt;|no, Freeze| B[block on Pending.Wait] --&gt; R
+</code></pre>
+<ul>
+<li><strong>Responsive</strong> (the editor default): <code>Advance</code> returns at once and the tick stays at that phase. The next call asks
+again, and runs the phase once the answers are in. The editor keeps drawing; <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_State">State</a> is
+<em>Waiting</em>.</li>
+<li><strong>Freeze</strong>: the main thread blocks until the answers are in; <em>State</em> is <em>Blocked</em>. Batch runs and most tests use it.</li>
+</ul>
+<p>Both modes give the same run and the same events hash (RAND-11): a decision is never made on old observations, and
+every random draw happens at the same point of the tick. <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_WaitCount">WaitCount</a> counts the waits, and
+<a class="xref" href="../api/EvoSim.World.html#EvoSim_World_WaitingFor">WaitingFor</a> names the phase being waited for. The World inspector's state line shows the
+wait, for example <em>Waiting — tick 812 — waiting for jev: 23 queries, 1.4 s</em>. In the reference, two phases wait: Choose
+actions (the brains) and Hatch (the mutator).</p>
+<h2 id="stop-conditions">Stop conditions</h2>
+<p>A run stops cleanly at a tick boundary, with every file written (RAND-20). The conditions are fields of the World:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Stops when</th>
+<th>Reason given</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tick Limit</strong></td>
+<td>that many ticks are done (0 = never)</td>
+<td><code>tick limit</code></td>
+</tr>
+<tr>
+<td><strong>Wall Clock Minutes</strong></td>
+<td>that many minutes of real time passed since <code>Initialize</code> (0 = never)</td>
+<td><code>wall-clock limit</code></td>
+</tr>
+<tr>
+<td><strong>Stop File</strong></td>
+<td>the file exists (empty = never)</td>
+<td><code>stop file</code></td>
+</tr>
+<tr>
+<td><strong>Stop On Extinction</strong></td>
+<td>a species has no animal left</td>
+<td><code>extinction of &lt;species&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<p><a class="xref" href="../api/EvoSim.World.html#EvoSim_World_RequestStop_System_String_">RequestStop</a> (the inspector's <em>Stop</em> button) also waits for the next
+boundary. Two stops happen inside a tick: a strict brain's failure, in Choose actions before any action is drawn, and an
+exception in a phase. Whatever the reason, every world module hears
+<a class="xref" href="../api/EvoSim.WorldModule.html#EvoSim_WorldModule_OnRunStopped_System_String_">OnRunStopped</a> once; the recorder closes its files there.</p>
+<h2 id="run-speeds">Run speeds</h2>
+<p>The <strong>Run Speed</strong> only says how many ticks run per frame. <em>PerFixedUpdate</em> runs <strong>Ticks Per Fixed Update</strong> ticks per
+physics step; <em>Fast</em> runs as many ticks as fit in <strong>Fast Budget Ms</strong> per frame; <em>RealTime</em> runs <strong>Real Time Ticks Per
+Second</strong>. A wait for the brain pauses all three the same way, and the run is the same at any speed (SPACE-11). The
+settings are in <a href="running-and-building.html#the-worlds-run-settings">Running and building</a>.</p>
+<h2 id="births-and-deaths-during-a-tick">Births and deaths during a tick</h2>
+<p>Animals join the living in four places: the founders at <code>Initialize</code>, babies in the Hatch phase, newcomers in the Floor
+phase, and founders of a species added during the run. Each time,
+<a class="xref" href="../api/EvoSim.Species.html#EvoSim_Species_Add_EvoSim_Animal_">Species.Add</a> appends the animal to
+<a class="xref" href="../api/EvoSim.Species.html#EvoSim_Species_Animals">Animals</a>, puts it in the spatial index, and calls <code>OnBorn</code> on the species, then on each of
+its modules, then on each world module, in hierarchy order.</p>
+<p>A death has two steps:</p>
+<ol>
+<li><a class="xref" href="../api/EvoSim.World.html#EvoSim_World_RecordDeath_EvoSim_Animal_System_String_">World.RecordDeath(a, cause)</a> marks the animal gone, counts
+it, records one <code>death</code> event with its cause, age, generation, meals, offspring and killer (ANIM-42), then calls
+<code>OnDied</code> on the species, its modules and every world module. An animal already gone is ignored.</li>
+<li>At the end of its work, the phase calls <a class="xref" href="../api/EvoSim.Species.html#EvoSim_Species_RemoveGone">RemoveGone</a> on the species: the dead leave
+the list, which keeps its creation order.</li>
+</ol>
+<p>Until <code>RemoveGone</code> runs, a dead animal is still in <code>Animals</code>, marked <a class="xref" href="../api/EvoSim.Animal.html#EvoSim_Animal_IsGone">IsGone</a>: every loop over
+animals skips gone ones. A strike in the Act phase only marks its victim <a class="xref" href="../api/EvoSim.Animal.html#EvoSim_Animal_Killed">Killed</a>; the animal
+acts no more, and the Deaths phase records it. A phase of your own can kill too:</p>
+<pre><code class="lang-csharp">public class LightningPhase : TickPhase
+{
+    [SerializeField, Range(0f, 0.01f)] float chance = 0.0005f;   // per animal per tick
+
+    public override void Run(TickContext t)
+    {
+        foreach (var s in World.AllSpecies)
+        {
+            var rng = t.Stream(s, &quot;lightning&quot;);                     // &quot;&lt;species&gt;/lightning&quot;
+            foreach (var a in s.Animals)
+                if (!a.IsGone &amp;&amp; rng.Chance(chance)) World.RecordDeath(a, &quot;lightning&quot;);
+            s.RemoveGone();
+        }
+    }
+}
+</code></pre>
+<p>The cause gets its own column in <code>stats.csv</code> (<code>prey_deaths_lightning</code>).</p>
+<h2 id="the-tick-context">The tick context</h2>
+<p>Every phase gets the same <a class="xref" href="../api/EvoSim.TickContext.html">TickContext</a> in <code>WaitsFor</code> and <code>Run</code>. It is small on purpose:</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>What it gives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.TickContext.html#EvoSim_TickContext_World">World</a></td>
+<td>the World: its species, services, queries, decisions</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.TickContext.html#EvoSim_TickContext_Tick">Tick</a></td>
+<td>the current tick</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.TickContext.html#EvoSim_TickContext_Random">Random</a></td>
+<td>the World's named random streams</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.TickContext.html#EvoSim_TickContext_Stream_EvoSim_Species_System_String_">Stream(species, purpose)</a></td>
+<td>a species' stream, <code>&lt;species id&gt;/&lt;purpose&gt;</code> (RAND-03)</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.TickContext.html#EvoSim_TickContext_Stream_System_String_">Stream(name)</a></td>
+<td>a world stream, such as <code>act-order</code></td>
+</tr>
+</tbody>
+</table>
+<p>Everything else a phase reaches through the World: <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Decisions">Decisions</a>,
+<a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Space">Space</a>, <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Queries">Queries</a>, <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Events">Events</a>, and the
+services with <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Service_"><code>World.Service&lt;T&gt;()</code></a>.</p>
+<h2 id="go-further">Go further</h2>
+<ul>
+<li><a href="world-and-modules.html">The world and its modules</a>: how the phase list is found and set up.</li>
+<li><a href="../extending/world-modules.html">Phases, services and world hooks</a>: write a phase, wait for asynchronous work.</li>
+<li><a href="brains-and-decisions.html">Decisions and brains</a>, <a href="actions-and-movement.html">Actions and movement</a>,
+<a href="reproduction-and-population.html">Reproduction and population</a>: what the phases do in detail.</li>
+<li><a href="determinism.html">Determinism and replay</a>: why the speed and the wait mode never change a run.</li>
+<li>Specification: <a href="../spec/12-tick-order-and-determinism.html">12 — Tick order and determinism</a>,
+<a href="../spec/02-space-and-time.html">02 — Space and time</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

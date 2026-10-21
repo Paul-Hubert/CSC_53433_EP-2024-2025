@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>04 — Species and the food web | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="04 — Species and the food web | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/04-species-and-food-web.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="04--species-and-the-food-web">04 — Species and the food web</h1>
+
+<p>The prototype has exactly two species, prey and predators, and their
+relations are written into its code. Here a species is a configuration of
+modules, any number of species can live in one world, and who eats whom is data:
+the <strong>food web</strong>.</p>
+<h2 id="1-what-a-species-is">1. What a species is</h2>
+<ul>
+<li><strong>SPEC-01 (MUST)</strong> A species has a unique, stable <strong>id</strong> and a <strong>display name</strong>.
+The display name is what the brain reads in situation texts and prompts, and
+what genes may mention (&quot;Run from any wolf you see.&quot;).</li>
+<li><strong>SPEC-02 (MUST)</strong> A species defines, in a fixed order: its actions (at least
+one), its genes (loci), its senses; and, unordered: its stats, traits, diet,
+metabolism, reproduction, mutation, death and population rules, and which
+brain decides for it.</li>
+<li><strong>SPEC-03 (MUST)</strong> The order of actions, genes and senses is part of the
+species' identity. It fixes the order of the probability vector, the action
+list in the prompt, the option letters of a multiple-choice brain, the locus
+order of the genome and the order of the situation text. A change of the
+order or of the set is reported (the species' <strong>signature</strong> changes), because
+it changes results and invalidates cached answers.</li>
+<li><strong>SPEC-04 (MUST)</strong> Genomes never cross species: no crossover between species,
+and allele ids are unique within a species' locus.</li>
+<li><strong>SPEC-05 (MUST)</strong> A species never contains another species. A configuration
+that nests one species inside another is an error found before the run.</li>
+<li><strong>SPEC-06 (SHOULD)</strong> Two species may share module <em>definitions</em> (the same flee
+action, the same stamina stat, the same founder sentences) while keeping their
+own parameter values.</li>
+</ul>
+<h2 id="2-the-food-web">2. The food web</h2>
+<ul>
+<li><p><strong>SPEC-10 (MUST)</strong> Whether something can be eaten is decided by components
+(owner decision). The eaten thing carries an <strong>edible</strong> component: on a
+resource layer (its items), on a species (its living animals), on an entity
+kind (carcasses, eggs, fruit…). The edible component says how it is eaten and
+how much energy it holds:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Typical edible</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>graze</td>
+<td>a resource layer's items</td>
+<td>consume an item within reach, gain its energy</td>
+</tr>
+<tr>
+<td>strike</td>
+<td>a species' animals</td>
+<td>try to kill an animal within reach; on success gain its energy and maybe leave a carcass</td>
+</tr>
+<tr>
+<td>scavenge</td>
+<td>carcasses (or any entity with portions)</td>
+<td>eat one portion within reach</td>
+</tr>
+</tbody>
+</table>
+<p>Without an edible component, nothing can eat that thing, whatever the diets say.</p>
+</li>
+<li><p><strong>SPEC-15 (MUST)</strong> The eater's <strong>diet</strong> component lists its preferences: which
+edible things it eats (by layer, species or entity kind), each MAY scale the
+energy gained (default × 1). A species with no diet eats nothing.</p>
+</li>
+<li><p><strong>SPEC-11 (MUST)</strong> A species may hunt any species, including its own
+(cannibalism). An animal never targets itself. A cannibal species is among
+its own threats, so its animals flee from their own kind like from any
+threat. Knowing whether a threat is <em>chasing</em> you is not a reference sense; it
+is a student exercise (<a href="22-extending-recipes.html">22</a>).</p>
+</li>
+<li><p><strong>SPEC-12 (MUST)</strong> The <strong>threats</strong> of a species are the species whose diet
+strikes it. They are derived from the food web, not configured twice. Senses
+and actions that refer to &quot;threats&quot;, &quot;prey&quot; or &quot;kin&quot; resolve these sets from
+the food web; each MAY override the set explicitly (e.g. flee only from wolves).</p>
+</li>
+<li><p><strong>SPEC-13 (MUST)</strong> An interaction happens only if both sides allow it: the
+target is edible (SPEC-10) and the eater's diet lists it (SPEC-15).</p>
+</li>
+<li><p><strong>SPEC-14 (SHOULD)</strong> The editor shows the food web and warns about: a species
+with no food source; a hunter whose prey doesn't exist; a flee action with no
+threat to flee from; a cycle where every species hunts every other.</p>
+</li>
+</ul>
+<h2 id="3-names-in-texts">3. Names in texts</h2>
+<ul>
+<li><strong>SPEC-20 (MUST)</strong> Situation texts and prompts name species by their display
+names, and a sense that targets a set of species uses a label (e.g. the set
+of threats labelled &quot;Predator&quot;). Renaming a species or a label changes what
+the brain reads, and therefore its answers and cache keys.</li>
+<li><strong>SPEC-21 (SHOULD)</strong> When a species is renamed, the editor lists the alleles
+(founder sentences) that mention the old name.</li>
+</ul>
+<h2 id="4-species-created-during-a-run">4. Species created during a run</h2>
+<ul>
+<li><strong>SPEC-30 (MUST)</strong> Species can be added while a run goes on, from a template
+species or by a speciation rule. A new species gets a new id and name, its own
+population, its own allele namespace, caps and floors, and its own random
+streams.</li>
+<li><strong>SPEC-31 (MUST)</strong> By default a new species born from a parent species
+inherits the parent's relations in both directions: it eats what the parent
+eats, and species that hunted the parent hunt it. A speciation rule MAY change
+this.</li>
+<li><strong>SPEC-32 (MUST)</strong> Species ids are never reused within a run. An extinct
+species keeps its id and its records.</li>
+<li><strong>SPEC-33 (MAY)</strong> A speciation rule splits part of a species into a new one,
+for example when a group's genomes drift far from the rest, or when a group is
+cut off by terrain. The prototype has no speciation.</li>
+</ul>
+<h2 id="5-reference-the-lab-1-ecology">5. Reference: the Lab 1 ecology</h2>
+<p>Two species with the ids and names <code>prey</code> and <code>predator</code> (owner decision), the
+prototype's parameters, and one change: hiding in cover is the prey's own
+action, sense and gene.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>prey</code></th>
+<th><code>predator</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Actions, in order</td>
+<td>eat, flee, hide, follow, rest, mate</td>
+<td>hunt, follow, rest, mate</td>
+</tr>
+<tr>
+<td>Text genes</td>
+<td>one per action, same order</td>
+<td>one per action, same order</td>
+</tr>
+<tr>
+<td>Number genes</td>
+<td>none</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Senses, in situation-text order</td>
+<td>energy level, stamina level, food, nearest threat (&quot;Predator&quot;), nearest cover (&quot;Cover&quot;), nearest kin with readiness (&quot;Animal&quot;), age</td>
+<td>energy level, stamina level, nearest prey (&quot;Prey&quot;), nearest edible carcass (&quot;Carcass&quot;), nearest kin with readiness (&quot;Other predator&quot;), age</td>
+</tr>
+<tr>
+<td>Edible</td>
+<td>yes: struck, 60 energy per kill, leaves a carcass of 2 portions × 30 that rots in 100 ticks</td>
+<td>no</td>
+</tr>
+<tr>
+<td>Diet</td>
+<td>the food layer (grazed, 25 per item)</td>
+<td>prey (strike, kill chance 0.5 as a trait of the hunter), prey carcasses (scavenge)</td>
+</tr>
+<tr>
+<td>Eggs</td>
+<td>not edible (no edible component)</td>
+<td>not edible</td>
+</tr>
+<tr>
+<td>Threats (derived)</td>
+<td>predator</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Hidden from threats in cover</td>
+<td>yes</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>The prototype's prey has no hide action and no cover sense: its flee action runs
+into cover instead. That variant is kept for comparison (scenario S06). The
+scenarios of <a href="31-scenarios.html">31</a> use up to six species.</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

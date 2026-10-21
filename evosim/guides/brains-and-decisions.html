@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Decisions and brains | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Decisions and brains | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/brains-and-decisions.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="guide-brains-and-decisions">
+<h1 id="decisions-and-brains">Decisions and brains</h1>
+
+<p>An animal does not choose every tick. Every few ticks it <strong>decides</strong>: its senses describe its situation, a <strong>brain</strong>
+reads that situation with the animal's genes and gives one probability per action, and the animal draws its next
+action from those probabilities. The brain is usually a language model, so it is the slow part of a run. Most of this
+page is about asking it as little as possible: answers are remembered, shared and cached, and the run still repeats
+exactly with its seed (<a href="../spec/08-decisions-brains-and-prompts.html">08 — Decisions, brains and prompts</a>).</p>
+<h2 id="who-decides-and-when">Who decides, and when</h2>
+<ul>
+<li>Every <strong>Decision Period</strong> ticks (World setting, 4 in the reference) a living animal decides (DEC-01).</li>
+<li>The reference scenes <strong>stagger</strong> decisions: each species has a <a class="xref" href="../api/EvoSim.DecisionSchedule.html">DecisionSchedule</a> with <strong>Staggered</strong> on,
+so an animal decides when <code>(tick + id) % 4 == 0</code>. About a quarter of the animals decide on each tick, instead of all
+of them every fourth tick (DEC-04). A species without a schedule decides all together on ticks 0, 4, 8…, as the
+Python prototype did.</li>
+<li>An animal without an action decides on the next tick, whatever the schedule says: a baby, a newcomer, or an animal
+whose busy state ended on the previous tick.</li>
+<li>A <strong>busy</strong> animal never decides, for example one that is digesting a meal (DEC-02).</li>
+<li>At a decision, the animal's <em>searching</em> and <em>bred this period</em> flags are cleared (DEC-03).</li>
+</ul>
+<p>All the animals that decide in a tick sense the same state: the state at the start of the tick (SENSE-04).</p>
+<h2 id="a-decisions-path">A decision's path</h2>
+<p>Three phases at the start of every tick carry each decision.</p>
+<pre><code class="lang-mermaid">flowchart TD
+    S[Sense phase: observation and situation text] --&gt; Q[Ask brains: build the query]
+    Q --&gt; M{In the memo?}
+    M --&gt;|yes| R[Row]
+    M --&gt;|no| D{Same key earlier this tick?}
+    D --&gt;|yes| R
+    D --&gt;|no| C{In the answer cache?}
+    C --&gt;|yes| R
+    C --&gt;|no| B[One batch per brain: Brain.Ask]
+    B --&gt; W[Choose actions: wait, check the row]
+    W --&gt; R
+    R --&gt; T[Temper with τ, draw with the sampling stream]
+</code></pre>
+<ol>
+<li><strong>Sense</strong> (<a class="xref" href="../api/EvoSim.SensePhase.html">SensePhase</a>) picks who decides, reads their senses and writes their situation texts
+(<a href="senses-and-prompts.html">Senses and prompts</a>). Each decision is a <a class="xref" href="../api/EvoSim.Decision.html">Decision</a> in
+<a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Decisions">Decisions</a>.</li>
+<li><strong>Ask brains</strong> (<a class="xref" href="../api/EvoSim.AskBrainsPhase.html">AskBrainsPhase</a>) builds each animal's query, answers what it can from the memo and the
+cache, and sends the rest to the brains. Nothing in the world changes here.</li>
+<li><strong>Choose actions</strong> (<a class="xref" href="../api/EvoSim.ChooseActionsPhase.html">ChooseActionsPhase</a>) waits for the brains, checks each row, stores good rows, and
+draws each animal's action.</li>
+</ol>
+<h2 id="the-query">The query</h2>
+<p>A <a class="xref" href="../api/EvoSim.DecisionQuery.html">DecisionQuery</a> is everything a brain receives for one animal (DEC-10):</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>What it holds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Species">Species</a></td>
+<td>the species: its actions give the row's length and order</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Genes">Genes</a></td>
+<td>the genes the brain reads, as (label, sentence) pairs, in locus order</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Observation">Observation</a>, <a class="xref" href="../api/EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Situation">Situation</a></td>
+<td>the tokens, and the text in the world's style</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_GenomeKey">GenomeKey</a></td>
+<td>a hash of the species id and the alleles the brain reads (DEC-31)</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Attachments">Attachments</a></td>
+<td>images or other attachments from senses, usually none</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_AnimalId">AnimalId</a></td>
+<td>the deciding animal, for brains with memory</td>
+</tr>
+</tbody>
+</table>
+<p>A text brain builds its prompt with <a class="xref" href="../api/EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Prompt_EvoSim_Brain_">Prompt</a>. Number genes the brain
+doesn't read are not in the genome key, so they don't make the same situation look new.</p>
+<h2 id="the-memo">The memo</h2>
+<p>Within a run, the answer for a key <em>(species, brain, genome key, observation)</em> is computed once and reused (DEC-30). A
+hit gives exactly what the brain answered. Since animals of one species share many genes and few situations, the memo
+answers 52–80 % of prey decisions in the reference runs. The World's <strong>Memo Capacity</strong> (262 144 keys, about 10 MB)
+bounds it: beyond it, new situations go to the brain and its cache again. A failed answer is never stored (DEC-34).</p>
+<p><strong>Duplicates in a tick.</strong> When two animals of one tick have the same key, the query is sent once and the second animal
+shares the answer (DEC-32).</p>
+<h2 id="the-answer-cache">The answer cache</h2>
+<p>The memo forgets everything when the run stops. The <a class="xref" href="../api/EvoSim.AnswerCache.html">AnswerCache</a> keeps answers across runs (DEC-33). It is
+a service under the World's <code>Brains</code> object, and a brain uses it when its <strong>Use Cache</strong> is on (on for the HTTP
+brains). Answers go to <code>Library/EvoSim/AnswerCache</code>, one <code>.jsonl</code> file per brain id. A key covers everything that can
+change an answer: the brain and its model (with its revision or digest), the prompt id, the brain's mode, the text
+style, the genome key and the situation text. A run repeated with the same seed replays from the cache without any
+model call, bit for bit. Delete the folder to ask the models again. The mutator caches its answers in the same folder.</p>
+<h2 id="batches-and-brains">Batches and brains</h2>
+<p>Each species is decided by one brain: its own <strong>Brain</strong> field, or else the World's <strong>Default Brain</strong> (DEC-13). A brain is
+a component under the World's <code>Brains</code> object; validation refuses a species without one, or a brain that is disabled or
+under a species (V-10). It also checks each brain's limits against the species that use it: the number of actions and
+the prompt length (DEC-14, V-11).</p>
+<p>All the queries of a tick that go to one brain are sent in one call to
+<a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_Ask_System_Collections_Generic_IReadOnlyList_EvoSim_DecisionQuery__">Ask</a> (DEC-15). A brain that
+can't mix species gets one batch per species. The brain returns a <a class="xref" href="../api/EvoSim.BrainAnswer.html">BrainAnswer</a>:</p>
+<ul>
+<li><strong>now</strong>, with every row filled, for brains that compute in C# (the random brain);</li>
+<li><strong>later</strong>, for brains behind a server: requests leave from another thread and the rows arrive while the editor goes
+on drawing.</li>
+</ul>
+<h2 id="waiting-for-the-brain">Waiting for the brain</h2>
+<p>The choose-actions phase waits until every answer of the tick is in (TICK-03). The World's <strong>Wait Mode</strong> says how:</p>
+<table>
+<thead>
+<tr>
+<th>Wait Mode</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Responsive</td>
+<td>the tick pauses at that phase and Unity keeps drawing; the panel says <em>waiting for JEV: 6 queries</em>. The editor default.</td>
+</tr>
+<tr>
+<td>Freeze</td>
+<td>the main thread blocks until the answers are in. Tests and batch runs use it.</td>
+</tr>
+</tbody>
+</table>
+<p>Both modes give the same run and the same events hash (SPACE-14). A decision never uses an old observation.</p>
+<h2 id="checking-rows-and-failures">Checking rows and failures</h2>
+<p>Every row is checked (DEC-11): one entry per action of the species, in action order, each ≥ 0, summing to 1 ± 10⁻⁶. A
+query that failed after its retries, or a row that fails the check, is a <strong>failure</strong>:</p>
+<ul>
+<li>With the brain's <strong>Strict</strong> setting on (the reference for HTTP brains), the run stops cleanly, before anything in the
+world changed in that tick, and every output is written (DEC-40, RAND-20). Run it again: the answers already received
+come back from the answer cache.</li>
+<li>With <strong>Strict</strong> off, the animal draws from a uniform row, and the failure is counted (<code>failures</code> in <code>summary.json</code>).</li>
+</ul>
+<p>A failure is never stored in the memo or the cache (DEC-34), so the next run asks again. Retries, time-outs and
+connection tests are on <a href="../extending/http-brains.html">An HTTP brain or mutator server</a>.</p>
+<h2 id="drawing-the-action">Drawing the action</h2>
+<p>Before the draw, the row is tempered with the World's <strong>Sampling Temperature</strong> τ: each p becomes p^(1/τ), then the row
+is renormalised (DEC-20, <a class="xref" href="../api/EvoSim.Sampling.html">Sampling</a>). τ &lt; 1 sharpens towards the likeliest action, τ &gt; 1 flattens towards
+uniform. The reference is τ = 1, which changes nothing.</p>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>τ = 0.5</th>
+<th>τ = 1</th>
+<th>τ = 2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>eat 0.6, flee 0.3, rest 0.1</td>
+<td>0.78, 0.20, 0.02</td>
+<td>0.6, 0.3, 0.1</td>
+<td>0.47, 0.33, 0.19</td>
+</tr>
+</tbody>
+</table>
+<p>The draw uses the species' <code>sampling</code> random stream, so the seed decides it (RAND-03). The memo and the cache keep the
+brain's own rows, untempered. The animal keeps its last observation, situation text and row for the inspector
+(DEC-21).</p>
+<h2 id="the-reference-brains">The reference brains</h2>
+<table>
+<thead>
+<tr>
+<th>Brain</th>
+<th>Class</th>
+<th>Needs</th>
+<th>How it answers</th>
+<th>Limits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Random</td>
+<td><a class="xref" href="../api/EvoSim.RandomBrain.html">RandomBrain</a></td>
+<td>nothing</td>
+<td>at once: a uniform row, whatever the genes and the situation</td>
+<td>none</td>
+</tr>
+<tr>
+<td>JEV</td>
+<td><a class="xref" href="../api/EvoSim.JevBrain.html">JevBrain</a></td>
+<td>vLLM on <code>localhost:8000</code> serving <code>autotrust/JEV-9B</code> with its LoRA <code>jev-decision</code>, plus the decision head and calibration files in <code>Assets/EvoSim/Data/Models/JEV-9B</code></td>
+<td>later: one forward pass per query; the actions are lettered options, and a probability comes from each letter's log-probability</td>
+<td>16 actions; prompts of 1 024 tokens, its training length</td>
+</tr>
+<tr>
+<td>Ollama points</td>
+<td><a class="xref" href="../api/EvoSim.OllamaPointsBrain.html">OllamaPointsBrain</a></td>
+<td>Ollama on <code>localhost:11434</code> with <code>gemma4:12b</code></td>
+<td>later: one chat call per query; the model shares 100 points between the actions, and the points become a row (DEC-41)</td>
+<td>prompts up to the <strong>Context Length</strong>, 4 096 tokens</td>
+</tr>
+<tr>
+<td>Scripted</td>
+<td><a class="xref" href="../api/EvoSim.Testing.ScriptedBrain.html">ScriptedBrain</a></td>
+<td>tests only</td>
+<td>rows from a policy written in the test, or given rows per situation; can answer late, fail, or refuse to mix species</td>
+<td>set by the test</td>
+</tr>
+</tbody>
+</table>
+<p>The random brain is the <strong>null model</strong>: random hunters can't feed themselves, which shows that the brain matters. It is
+also the default brain of a new world, so a world runs without any server. The full reference scenes use JEV by
+default; their <code>Brains</code> object also holds a Random and an Ollama points brain to switch to. JEV and Ollama points are
+strict and use the answer cache by default.</p>
+<h2 id="settings">Settings</h2>
+<table>
+<thead>
+<tr>
+<th>Where</th>
+<th>Field</th>
+<th>Reference</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>World</td>
+<td><strong>Decision Period</strong></td>
+<td>4 ticks</td>
+<td>ticks between two decisions</td>
+</tr>
+<tr>
+<td>World</td>
+<td><strong>Sampling Temperature</strong></td>
+<td>1</td>
+<td>τ, at least 0.01</td>
+</tr>
+<tr>
+<td>World</td>
+<td><strong>Memo Capacity</strong></td>
+<td>262 144</td>
+<td>most keys the memo keeps; 0 = no limit</td>
+</tr>
+<tr>
+<td>World</td>
+<td><strong>Default Brain</strong></td>
+<td>JEV (Random in a new world)</td>
+<td>the brain of species that name none</td>
+</tr>
+<tr>
+<td>World</td>
+<td><strong>Wait Mode</strong></td>
+<td>Responsive</td>
+<td>how a tick waits for answers</td>
+</tr>
+<tr>
+<td>Species</td>
+<td><strong>Brain</strong></td>
+<td>empty</td>
+<td>this species' own brain</td>
+</tr>
+<tr>
+<td>Decision Schedule</td>
+<td><strong>Period</strong>, <strong>Staggered</strong></td>
+<td>0 (the World's), on</td>
+<td>this species' own period, and staggering</td>
+</tr>
+<tr>
+<td>Any brain</td>
+<td><strong>Strict</strong>, <strong>Use Cache</strong></td>
+<td>off / on for HTTP brains</td>
+<td>stop on failure; use the answer cache</td>
+</tr>
+<tr>
+<td>Answer Cache</td>
+<td><strong>Folder</strong>, <strong>Read</strong>, <strong>Write</strong></td>
+<td><code>Library/EvoSim/AnswerCache</code>, on, on</td>
+<td>where the cache lives; answer from it; store new answers</td>
+</tr>
+</tbody>
+</table>
+<h2 id="in-the-editor">In the editor</h2>
+<ul>
+<li><em>Window ▸ EvoSim ▸ Animal Inspector</em>: in Play mode, pause and click an animal to see its last situation and the
+brain's probabilities as bars.</li>
+<li><em>Window ▸ EvoSim ▸ Ask the Brain</em>: build a genome, pick a situation, and ask several brains side by side. <strong>Directed
+test</strong> asks with a gene's pro sentence, then with its anti sentence.</li>
+<li><em>Window ▸ EvoSim ▸ Brain Health</em>: each brain's host, a <strong>Test connection</strong> button, its model, latency and failures,
+and the answer cache's size and hits.</li>
+<li>The species inspector's <strong>Prompt preview</strong> shows the exact text a brain receives
+(<a href="senses-and-prompts.html#in-the-editor">Senses and prompts</a>).</li>
+<li><code>summary.json</code> reports, per species, <code>memo_hit_rate</code> and <code>backend_s</code> (time spent waiting for the brain), and for the
+run <code>llm_calls</code>, <code>cache_hits</code> and <code>failures</code> (<a href="recording-and-outputs.html">Recording and outputs</a>).</li>
+</ul>
+<h2 id="go-further">Go further</h2>
+<ul>
+<li><a href="../extending/brain.html">A brain</a>: write a brain, and change when animals decide
+(<a href="../extending/brain.html#decision-timing">Decision timing</a>).</li>
+<li><a href="../extending/http-brains.html">An HTTP brain or mutator server</a>: JEV, Ollama, and brains behind your own server.</li>
+<li><a href="the-tick.html">A tick, phase by phase</a> and <a href="determinism.html">Determinism and replay</a>: waiting, streams and replay.</li>
+<li>API: <a class="xref" href="../api/EvoSim.Brain.html">Brain</a>, <a class="xref" href="../api/EvoSim.BrainAnswer.html">BrainAnswer</a>, <a class="xref" href="../api/EvoSim.DecisionQuery.html">DecisionQuery</a>, <a class="xref" href="../api/EvoSim.DecisionMemo.html">DecisionMemo</a>,
+<a class="xref" href="../api/EvoSim.AnswerCache.html">AnswerCache</a>, <a class="xref" href="../api/EvoSim.DecisionState.html">DecisionState</a>, <a class="xref" href="../api/EvoSim.Sampling.html">Sampling</a>.</li>
+<li>Specification: <a href="../spec/08-decisions-brains-and-prompts.html">08 — Decisions, brains and prompts</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

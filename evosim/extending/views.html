@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Views | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Views | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/views.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-views">
+<h1 id="views">Views</h1>
+
+<p>A view shows an animal; it never changes it. Write an <a class="xref" href="../api/EvoSim.AnimalView.html">AnimalView</a> subclass to colour, scale or animate the
+animals from their state, put it on a body prefab, and give the prefab to the species' <a class="xref" href="../api/EvoSim.Body.html">Body</a>. This page
+also shows how to make your own entities visible and how to add a panel of your own. If what you want must change the
+run (an animal that reacts to something), it is not a view: write a module instead (<a href="index.html">Extending EvoSim</a>).
+How the views work at run time is in <a href="../guides/views-and-real-time.html">Views and real time</a>.</p>
+<h2 id="the-base-class">The base class</h2>
+<p>The World places every view in its <code>LateUpdate</code>, then calls <code>OnShow</code>. A view has nothing else to do.</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>You</th>
+<th>What it does, when it is called</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.AnimalView.html#EvoSim_AnimalView_OnShow_EvoSim_Animal_">OnShow(Animal)</a></td>
+<td>override</td>
+<td>Every frame the view is shown, on the main thread, right after the World placed it. Its argument is the view's animal, as the last tick left it. Also called while the run is paused, or waits for a brain in the <em>Responsive</em> mode. The base does nothing</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.AnimalView.html#EvoSim_AnimalView_AnimalId">AnimalId</a></td>
+<td>read</td>
+<td>the id of the animal shown, or -1 while the view waits in its pool</td>
+</tr>
+<tr>
+<td><code>Awake</code></td>
+<td>may write</td>
+<td>Unity's, called once when the pool makes the view: create your <code>MaterialPropertyBlock</code>, find child renderers</td>
+</tr>
+</tbody>
+</table>
+<p>What a view usually reads from its animal (every member of <a class="xref" href="../api/EvoSim.Animal.html">Animal</a> is readable):</p>
+<table>
+<thead>
+<tr>
+<th>Read</th>
+<th>Gives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>a.CurrentAction</code>, <code>a.Searching</code></td>
+<td>the current action (<code>.Name</code> is its name, e.g. <em>flee</em>), or null; true while it searches</td>
+</tr>
+<tr>
+<td><code>a.Generation</code>, <code>a.Age</code></td>
+<td>its generation (founders are 0) and its age in ticks</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Animal.html#EvoSim_Animal_Item_EvoSim_StatId_">a[stat]</a></td>
+<td>a stat's value; the id comes from its module, e.g. <code>a.Species.Module&lt;Energy&gt;().Value</code></td>
+</tr>
+<tr>
+<td><code>a.IsBusy</code>, <code>a.BusyReason</code></td>
+<td>true while it can't act, and why (<em>digesting</em> after a meal)</td>
+</tr>
+<tr>
+<td><code>a.LastProbabilities</code></td>
+<td>the probabilities of its last decision, in action order</td>
+</tr>
+<tr>
+<td><code>a.Species</code>, <code>a.Genome</code></td>
+<td>its species and its genes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="example-colour-by-generation">Example: colour by generation</h2>
+<p>A view that paints the body blue for the founders, shading to red at generation 20 and later.</p>
+<pre><code class="lang-csharp">using EvoSim;
+using UnityEngine;
+
+/// &lt;summary&gt;Colours the body by generation: founders blue, generation 20 and later red.&lt;/summary&gt;
+public class GenerationView : AnimalView
+{
+    static readonly int ColorId = Shader.PropertyToID(&quot;_Color&quot;);
+
+    [SerializeField, Tooltip(&quot;The body's renderer.&quot;)]
+    Renderer body;
+    [SerializeField, Min(1), Tooltip(&quot;The generation shown fully red.&quot;)]
+    int reddest = 20;
+
+    MaterialPropertyBlock block;      // sets the colour without copying the material
+    int shown = -1;                   // the generation the body shows now
+
+    void Awake() =&gt; block = new MaterialPropertyBlock();
+
+    public override void OnShow(Animal a)
+    {
+        if (body == null || a.Generation == shown) return;   // nothing changed: no update
+        shown = a.Generation;
+        block.SetColor(ColorId, Color.Lerp(Color.blue, Color.red, Mathf.Clamp01(a.Generation / (float)reddest)));
+        body.SetPropertyBlock(block);
+    }
+}
+</code></pre>
+<p>Put the class in <code>Assets/Student</code> (there is no script template for views; a new C# script file will do). Compare with
+what is shown rather than remembering the animal: a pooled view is reused for another animal when its own dies.
+<a class="xref" href="../api/EvoSim.ActionView.html">ActionView</a> is the reference view to read next: it updates two renderers, each only when its colour changed.</p>
+<h2 id="make-a-body-prefab">Make a body prefab</h2>
+<ol>
+<li>Duplicate <code>Assets/EvoSim/Modules/Bodies/PreyBody.prefab</code> into <code>Assets/Student</code>, or build your own. The root's pivot is
+the animal's feet: the World sets the root at the ground's height. The reference body is 1 m high and looks along
++z, with a dark nose at the front, because the World turns the view toward where the animal moves.</li>
+<li>Put your view on the <strong>root</strong>. A root holds one <a class="xref" href="../api/EvoSim.AnimalView.html">AnimalView</a> only: remove the <a class="xref" href="../api/EvoSim.ActionView.html">ActionView</a> of
+the copy first. Fill your view's fields (the body's renderer above).</li>
+<li>Leave out colliders. The pool disables every collider and moves every part to layer 2 anyway.</li>
+<li>Select the species, and on its <strong>Body</strong> set <strong>Prefab</strong> to your prefab and <strong>Size</strong> in meters: the prefab's scale is
+multiplied by it (prey 0.6, predator 0.9). <strong>Prewarm</strong> is the number of views made when the run starts (0 = the
+initial population). With no prefab, the species shows capsules of the <strong>Color</strong> field.</li>
+</ol>
+<p>A prefab with no <a class="xref" href="../api/EvoSim.AnimalView.html">AnimalView</a> on its root gets a plain one: it follows its animal and shows nothing more.</p>
+<h2 id="rules-your-view-must-keep">Rules your view must keep</h2>
+<ol>
+<li><strong>Read only</strong> (SPACE-12). Never write a stat, an action, a position or a genome, and call nothing that changes the
+World. The run must give the same events hash with <strong>Show Views</strong> on or off (RAND-11).</li>
+<li><strong>No simulation random streams</strong> (RAND-01). Drawing from the World's streams would shift every later draw of the
+run. A visual effect that needs chance (a wobble, a blink) uses <code>Time</code> or Unity's own <code>Random</code>, which the simulation
+never reads.</li>
+<li><strong>Main thread, every frame, every animal.</strong> Keep <code>OnShow</code> cheap: find components in <code>Awake</code>, change a renderer only
+when its value changed, and use a <code>MaterialPropertyBlock</code>; <code>renderer.material</code> copies the material for each view.</li>
+<li><strong>Layer 2 and no colliders.</strong> The pool puts the view on <em>Ignore Raycast</em>
+(<a class="xref" href="../api/EvoSim.ViewPool.html#EvoSim_ViewPool_IgnoreRaycastLayer">IgnoreRaycastLayer</a>), which every sense ray leaves out, and disables its colliders. Don't
+change a layer or enable a collider at run time: a sense could then hit your view.</li>
+<li><strong>Don't move the root.</strong> The World sets its position and rotation every frame, and the pool scaled it by <strong>Size</strong>.
+Animate child objects instead.</li>
+</ol>
+<h2 id="make-your-entities-visible">Make your entities visible</h2>
+<p><a class="xref" href="../api/EvoSim.EntityMarkers.html">EntityMarkers</a> draws one marker per entity of every <a class="xref" href="../api/EvoSim.EntityKind.html">EntityKind</a> under the World. It reads
+them through <a class="xref" href="../api/EvoSim.EntityKind.html#EvoSim_EntityKind_EntityCount">EntityCount</a> and <a class="xref" href="../api/EvoSim.EntityKind.html#EvoSim_EntityKind_EntityAt_System_Int32_">EntityAt</a>.</p>
+<ul>
+<li>A system derived from <a class="xref" href="../api/EvoSim.EntitySystem-1.html">EntitySystem&lt;T&gt;</a> implements both: your entities appear with no code, as grey
+0.3 m cubes (the <strong>Other</strong> colour of EntityMarkers). Carcasses and eggs have their own shapes.</li>
+<li>A class derived from <a class="xref" href="../api/EvoSim.EntityKind.html">EntityKind</a> directly must override <code>EntityAt</code>. Its default returns null, and an
+entity it doesn't return is not drawn.</li>
+<li>For a look of your own, write a run view like EntityMarkers: a component outside the World that, in <code>LateUpdate</code>,
+reads <code>World.Service&lt;FruitSystem&gt;().Entities</code> and places pooled objects without colliders, on
+<a class="xref" href="../api/EvoSim.ViewPool.html#EvoSim_ViewPool_IgnoreRaycastLayer">IgnoreRaycastLayer</a>.</li>
+</ul>
+<h2 id="a-panel-of-your-own">A panel of your own</h2>
+<p><a class="xref" href="../api/EvoSim.RunNumbers.html">RunNumbers</a> reads everything the overlay shows from the World's counters. A panel of your own can read it
+too. Give the camera a <a class="xref" href="../api/EvoSim.WorldCamera.html#EvoSim_WorldCamera_Blocks">Blocks</a> test so that clicks on your panel don't pick an animal; keep the
+overlay's test in it.</p>
+<pre><code class="lang-csharp">using EvoSim;
+using UnityEngine;
+
+/// &lt;summary&gt;A panel at the bottom left: living animals and highest generation per species.&lt;/summary&gt;
+public class PopulationPanel : MonoBehaviour
+{
+    readonly RunNumbers numbers = new RunNumbers();
+    World world;
+    WorldCamera cam;
+    RunOverlay overlay;
+    Rect panel = new Rect(8f, 0f, 260f, 0f);       // in GUI coordinates: origin at the top left
+
+    void Update()
+    {
+        if (world == null) world = FindAnyObjectByType&lt;World&gt;();
+        if (overlay == null) overlay = FindAnyObjectByType&lt;RunOverlay&gt;();
+        if (cam == null &amp;&amp; (cam = FindAnyObjectByType&lt;WorldCamera&gt;()) != null) cam.Blocks = Covers;
+        if (world != null &amp;&amp; world.IsInitialized) numbers.Read(world);
+    }
+
+    // Screen points have their origin at the bottom left.
+    bool Covers(Vector2 p) =&gt;
+        panel.Contains(new Vector2(p.x, Screen.height - p.y)) || (overlay != null &amp;&amp; overlay.Covers(p));
+
+    void OnGUI()
+    {
+        if (world == null || !world.IsInitialized) return;
+        panel.height = 10f + 22f * numbers.Species.Count;
+        panel.y = Screen.height - panel.height - 8f;
+        GUILayout.BeginArea(panel, GUI.skin.box);
+        foreach (var s in numbers.Species) GUILayout.Label($&quot;{s.Name}: {s.Living} living, generation {s.MaxGeneration}&quot;);
+        GUILayout.EndArea();
+    }
+}
+</code></pre>
+<p>Put it on the scene's <em>Run views</em> object. It only reads, like every run view.</p>
+<h2 id="test-it">Test it</h2>
+<p>A view needs frames, so check it in Play mode:</p>
+<ol>
+<li>Run the scene with your body and note the events hash (see <a href="../guides/determinism.html">Determinism and replay</a>).</li>
+<li>Run it again with the same seed and <strong>Show Views</strong> off on the World. The hash must be the same.</li>
+</ol>
+<p>EvoSim's own play-mode tests do this in <code>Assets/EvoSim/Tests/PlayMode/ViewPlayTests.cs</code>: <code>ViewsNeverChangeTheRun</code>
+(T-SPACE-06) compares hashes with views on, off and uninterpolated, and <code>ViewsHearTheirAnimal</code> checks that a view of one's
+own (<a class="xref" href="../api/EvoSim.Testing.ShowProbeView.html">ShowProbeView</a>) hears <code>OnShow</code> with its own animal every frame.</p>
+<h2 id="read-next">Read next</h2>
+<ul>
+<li><a class="xref" href="../api/EvoSim.ActionView.html">ActionView</a>: the reference view. <a class="xref" href="../api/EvoSim.ActionColors.html">ActionColors</a>: the action colours, to reuse.</li>
+<li><a class="xref" href="../api/EvoSim.EntityMarkers.html">EntityMarkers</a>, <a class="xref" href="../api/EvoSim.GroundView.html">GroundView</a>, <a class="xref" href="../api/EvoSim.RunOverlay.html">RunOverlay</a>: the run views, all read-only.</li>
+<li><a href="environment.html">Food, cover, entities and ground</a>: entity systems of your own.</li>
+<li>Specification: <a href="../spec/02-space-and-time.html">02 — Space and time</a> (SPACE-12).</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

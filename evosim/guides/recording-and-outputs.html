@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Recording and outputs | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Recording and outputs | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/recording-and-outputs.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="guide-recording-and-outputs">
+<h1 id="recording-and-outputs">Recording and outputs</h1>
+
+<p>A run writes enough to rebuild its whole gene history afterwards: every founder, birth and death with its genome and
+cause, statistics over time, every allele ever seen, and what was configured. The files follow the Python prototype's
+formats, so its analysis tools can read Unity runs (13 — Outputs and recording). Each run also ends with an <strong>events
+hash</strong>, a fingerprint that tells you whether two runs were identical.</p>
+<h2 id="how-it-works">How it works</h2>
+<pre><code class="lang-mermaid">flowchart LR
+    M[Phases and modules] --&gt;|SimEvent| L[EventLog]
+    L --&gt;|canonical line| H[events hash]
+    L --&gt; R[RunRecorder]
+    L --&gt; W[Event Log window]
+    RP[Record phase] --&gt;|every 100 ticks| R
+    RP --&gt; LS[LiveStatistics]
+    R --&gt; F[(run folder)]
+</code></pre>
+<ol>
+<li>Code that changes the world records what happened as a <a class="xref" href="../api/EvoSim.SimEvent.html">SimEvent</a>: a kind, the tick, the animal's id,
+its species and more fields. It goes to the World's <a class="xref" href="../api/EvoSim.EventLog.html">EventLog</a> (<code>World.Events</code>).</li>
+<li>The event log writes the event as <strong>canonical JSON</strong>: keys sorted, numbers rounded to at most 6 decimals, separators
+as Python writes them (<a class="xref" href="../api/EvoSim.CanonicalJson.html">CanonicalJson</a>). It adds that line to the running hash, then passes the event to
+every listener (an <a class="xref" href="../api/EvoSim.IEventSink.html">IEventSink</a>): the <a class="xref" href="../api/EvoSim.RunRecorder.html">RunRecorder</a>, the Event Log window, tests.</li>
+<li>The <strong>record phase</strong>, last in the tick, asks the recorder for a statistics row every <code>Stats Every</code> ticks and lets it
+flush its files. It also samples the <a class="xref" href="../api/EvoSim.LiveStatistics.html">LiveStatistics</a> for the editor's graphs.</li>
+<li>When the run stops, for any reason (tick limit, stop button, leaving Play mode, a brain failure), the recorder writes
+its final files. A stopped run always has complete files (RAND-20).</li>
+</ol>
+<h2 id="the-events-hash">The events hash</h2>
+<p>The hash is a chain of SHA-256 digests. It starts from a hash of the run seed and the world seed, so two seeds never
+share a hash. Then each event's canonical line is hashed together with the previous hash (RAND-10). The hash can be read
+after any event: <code>World.Events.Hash</code> (64 hex digits) or <code>World.Events.ShortHash</code> (the first 16).</p>
+<p>The same scene, seeds and answer caches give the same hash, whatever the wait mode, frame rate, run speed or views
+(RAND-11). A different hash means something in the run changed. Compare hashes on one machine only: floating-point
+results may differ between machines (RAND-12). See <a href="determinism.html">Determinism and replay</a>.</p>
+<h2 id="the-run-folder">The run folder</h2>
+<p>The recorder writes each run into its own folder (OUT-01): <code>&lt;Output Root&gt;/&lt;Run Name&gt;</code>. By default
+<code>Logs/EvoSim/runs/&lt;world&gt;-s&lt;seed&gt;-&lt;date&gt;-&lt;time&gt;</code>, for example <code>Logs/EvoSim/runs/Lab1_World-s1234-20261011-143005</code>.
+Characters other than letters, digits, <code>-</code>, <code>_</code> and <code>.</code> become <code>_</code>. If the folder exists already, a suffix <code>-2</code>, <code>-3</code>…
+is added. Paths are relative to the project folder in the editor, and to the build's folder in a player.</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Written</th>
+<th>What you find there</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>events.jsonl</code></td>
+<td>as events happen, flushed every 500 ticks</td>
+<td>one event per line, in tick order (<a href="#events">Events</a>)</td>
+</tr>
+<tr>
+<td><code>stats.csv</code></td>
+<td>a row every 100 ticks, flushed every 500</td>
+<td>populations, means and cumulative counters per species</td>
+</tr>
+<tr>
+<td><code>alleles.jsonl</code></td>
+<td>rewritten every 5 000 ticks and at the end</td>
+<td>every allele seen: <code>id</code>, <code>locus</code>, <code>text</code> (or <code>value</code>), <code>origin</code> (<code>founder</code>, <code>neutral</code>, <code>mutant</code>), <code>parent_id</code>, <code>operator</code>, <code>model</code>, <code>seed</code></td>
+</tr>
+<tr>
+<td><code>final_population.json</code></td>
+<td>at the end</td>
+<td>the living animals: <code>id</code>, <code>gen</code>, <code>genome</code> (allele ids), <code>species</code></td>
+</tr>
+<tr>
+<td><code>summary.json</code></td>
+<td>at the end</td>
+<td>totals per species and for the run (<a href="#summary">Summary</a>)</td>
+</tr>
+<tr>
+<td><code>run_info.json</code></td>
+<td>at the start, again at the end</td>
+<td>what ran: scene, seeds, settings, brains, git commit (<a href="#run-information">Run information</a>)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="events">Events</h3>
+<p>Every event has <code>kind</code>, <code>t</code> (the tick) and <code>species</code>, and <code>id</code> when it is about an animal (OUT-02):</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>founder</code></td>
+<td><code>genome</code>: the animal's allele ids, in locus order</td>
+</tr>
+<tr>
+<td><code>immigrant</code></td>
+<td><code>genome</code>: a newcomer added below the species' floor</td>
+</tr>
+<tr>
+<td><code>birth</code></td>
+<td><code>parents</code>, <code>gen</code>, <code>genome</code>, <code>litter</code> (its litter's size), <code>mutations</code> (a list of <code>locus</code>, <code>parent</code>, <code>child</code>, <code>prompt</code> or <code>operator</code>, <code>text</code> or <code>value</code>); <code>laid</code> (the conception tick) when it hatched from an incubated egg</td>
+</tr>
+<tr>
+<td><code>death</code></td>
+<td><code>cause</code> (<code>killed</code>, <code>starvation</code>, <code>old_age</code>, <code>migrated</code>, or a module's own), <code>age</code>, <code>gen</code>, <code>food</code> (meals eaten), <code>offspring</code>, and <code>killer</code> for a kill</td>
+</tr>
+<tr>
+<td><code>egg_lost</code></td>
+<td><code>id</code> of the egg, <code>parents</code>, <code>reason</code> (<code>eaten</code>)</td>
+</tr>
+<tr>
+<td><code>species_created</code></td>
+<td><code>name</code>, <code>parent_species</code>: a species added during the run</td>
+</tr>
+</tbody>
+</table>
+<p>For example, a death line looks like this:</p>
+<pre><code class="lang-json">{&quot;age&quot;: 412, &quot;cause&quot;: &quot;killed&quot;, &quot;food&quot;: 9, &quot;gen&quot;: 2, &quot;id&quot;: 1873, &quot;killer&quot;: 1702, &quot;kind&quot;: &quot;death&quot;, &quot;offspring&quot;: 3, &quot;species&quot;: &quot;prey&quot;, &quot;t&quot;: 5120}
+</code></pre>
+<p>Allele ids read <code>&lt;locus&gt;:&lt;n&gt;</code>, and a locus is <code>&lt;species&gt;.&lt;gene label&gt;</code>: <code>prey.eat:3</code> is the fourth allele of the prey's
+<code>eat</code> gene.</p>
+<h3 id="statistics">Statistics</h3>
+<p><code>stats.csv</code> has one row every <code>Stats Every</code> ticks (100), labelled with the number of ticks done: rows <code>t = 100, 200…</code>.
+After <code>t</code>, each species has a block of columns prefixed with its id (<code>prey_pop</code>, <code>predator_pop</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pop</code></td>
+<td>living animals</td>
+</tr>
+<tr>
+<td><code>mean_energy</code>, <code>mean_stamina</code>, <code>mean_gen</code></td>
+<td>means over the living animals</td>
+</tr>
+<tr>
+<td><code>max_gen</code></td>
+<td>the highest generation alive</td>
+</tr>
+<tr>
+<td><code>exhausted</code></td>
+<td>animal-ticks that began without stamina to move</td>
+</tr>
+<tr>
+<td><code>births</code>, <code>immigrants</code></td>
+<td>cumulative</td>
+</tr>
+<tr>
+<td><code>deaths_starve</code>, <code>deaths_pred</code>, <code>deaths_age</code>, <code>deaths_migrated</code></td>
+<td>cumulative deaths by cause (<code>deaths_pred</code> counts kills)</td>
+</tr>
+<tr>
+<td><code>deaths_&lt;cause&gt;</code></td>
+<td>one more column per other cause: a death rule's, or any recorded by a module</td>
+</tr>
+<tr>
+<td><code>decisions</code>, <code>backend_queries</code>, <code>invalid</code></td>
+<td>cumulative decisions, decisions the memo could not answer, searching choices</td>
+</tr>
+<tr>
+<td><code>portions</code></td>
+<td>carcass portions eaten</td>
+</tr>
+<tr>
+<td><code>act_&lt;action&gt;</code></td>
+<td>cumulative decisions per action</td>
+</tr>
+</tbody>
+</table>
+<p>Modules add their own columns after the species' block (<a href="../extending/recording.html">Recording and statistics</a>). A
+column <code>alleles</code> (all alleles registered) follows the first species, and world modules' columns end the row. Counters
+are cumulative from the start of the run. If a column appears during the run (a species added, a new cause of death),
+the file is rewritten with the new header, and older rows get empty cells in it.</p>
+<h3 id="summary">Summary</h3>
+<p><code>summary.json</code> has, for the run: <code>ticks</code>, <code>seed</code>, <code>world_seed</code>, <code>backend</code> (the default brain), <code>brains</code>, <code>mutations</code>
+(tried, ok, calls, failed, rejected by reason), <code>alleles</code>, <code>events</code> (how many), <code>events_hash</code> and <code>events_sha</code> (its first
+16 digits), <code>stopped</code> (why the run stopped), <code>minutes</code>, <code>llm_calls</code>, <code>cache_hits</code>, <code>failures</code>, <code>mutation_calls</code>. Under
+<code>species</code>, each species has its final population, births, newcomers, hatched eggs, deaths by cause, mean lifespan,
+maximum generation, decisions, brain queries, memo hit rate, brain time (<code>backend_s</code>), searching rate (<code>invalid_rate</code>),
+share of exhausted animal-ticks, share of each action, founders, lost eggs, failures, and for hunters kills and
+portions (13 §5).</p>
+<h3 id="run-information">Run information</h3>
+<p><code>run_info.json</code> says what ran (CFG-03): the World's name, <code>scene</code>, Unity version, <code>git</code> commit, <code>seed</code> and
+<code>world_seed</code>, wait mode, act order, decision period, sampling temperature, text style, the default brain, the command
+line, the start time, the controls (<code>no_mutation</code>, <code>shuffled</code>…), each brain's model, the mutator's model and
+temperature, and <code>settings</code>: every serialized setting of every enabled module under the World, by path, for example
+<code>&quot;Environment/Grass/FoodGrid/regrowP&quot;: 0.0015</code>. A scenario run adds <code>scenario</code>, <code>variant</code> and <code>overrides</code>. No API key
+or other secret is ever written: options that name a key are masked in the command line (OUT-04).</p>
+<h2 id="settings">Settings</h2>
+<p>On the World's <code>Recording</code> object:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Setting</th>
+<th>Reference</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RunRecorder</td>
+<td>Output Root</td>
+<td><code>Logs/EvoSim/runs</code></td>
+<td>the folder that receives one folder per run</td>
+</tr>
+<tr>
+<td></td>
+<td>Run Name</td>
+<td>empty</td>
+<td>the run folder's name; empty = world, seed, date; <code>{world}</code> and <code>{seed}</code> are replaced</td>
+</tr>
+<tr>
+<td></td>
+<td>Stats Every</td>
+<td>100 ticks</td>
+<td>a statistics row every this many ticks</td>
+</tr>
+<tr>
+<td></td>
+<td>Flush Every</td>
+<td>500 ticks</td>
+<td>events and statistics reach the disk at least this often</td>
+</tr>
+<tr>
+<td></td>
+<td>Alleles Every</td>
+<td>5 000 ticks</td>
+<td><code>alleles.jsonl</code> is rewritten this often</td>
+</tr>
+<tr>
+<td></td>
+<td>Compatibility</td>
+<td>off</td>
+<td>write a two-species world as the prototype did (below)</td>
+</tr>
+<tr>
+<td></td>
+<td>Write Files</td>
+<td>on</td>
+<td>off: no files, only the hash and the counters (tests)</td>
+</tr>
+<tr>
+<td>LiveStatistics</td>
+<td>Every</td>
+<td>10 ticks</td>
+<td>a sample for the editor's graphs this often</td>
+</tr>
+<tr>
+<td></td>
+<td>Capacity</td>
+<td>2 000</td>
+<td>samples kept per species; older ones are dropped</td>
+</tr>
+</tbody>
+</table>
+<p>A world without a recorder still computes its events hash. Validation warns when there is a recorder and no record
+phase (V-09).</p>
+<h3 id="compatibility-mode">Compatibility mode</h3>
+<p>With <code>Compatibility</code> on, a two-species world is written exactly as the prototype wrote it (OUT-05), so its tools
+(<code>gene_report</code>, <code>gene_timeline</code>, <code>mutation_list</code>) read it: the first species' events have no <code>species</code> field and its
+allele and locus ids no prefix (<code>eat:3</code>); its statistics columns have no prefix and the second species' have <code>pred_</code>;
+a kill's cause is <code>predator</code>; the summary puts the first species' totals at the top level and the second species' under
+<code>&lt;id&gt;s</code> (<code>predators</code>). Only the files change: the events hash is the same in both modes.</p>
+<h2 id="scenarios-and-field-paths">Scenarios and field paths</h2>
+<p>A <strong>scenario</strong> runs a scene with changed settings, without editing the scene (CFG-02, 31 — Scenarios). It is a
+<a class="xref" href="../api/EvoSim.ScenarioAsset.html">ScenarioAsset</a> (<em>Assets ▸ Create ▸ EvoSim ▸ Scenario</em>), kept in <code>Assets/EvoSim/Scenarios</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Title</td>
+<td>its id and title, e.g. &quot;S07 No cover&quot;</td>
+</tr>
+<tr>
+<td>Scene</td>
+<td>the scene, e.g. <code>Assets/EvoSim/Scenes/Lab1_Full.unity</code></td>
+</tr>
+<tr>
+<td>Set</td>
+<td>overrides applied to every variant: a path and a value</td>
+</tr>
+<tr>
+<td>Variants</td>
+<td>each with a <code>Name</code>, its own <code>Brain</code> and <code>Tier</code>, more overrides (<code>Set</code>, applied after the scenario's) and GameObjects to switch off (<code>Remove</code>)</td>
+</tr>
+<tr>
+<td>Seeds</td>
+<td>one run per seed</td>
+</tr>
+<tr>
+<td>Ticks</td>
+<td>the run length</td>
+</tr>
+<tr>
+<td>Brain</td>
+<td>the default brain, by GameObject name or brain id; empty = the scene's</td>
+</tr>
+<tr>
+<td>Expect</td>
+<td>what the scenario should show, as notes for the reader</td>
+</tr>
+<tr>
+<td>Tier</td>
+<td>T2 (fast), T3 (regression), T4 (real models)</td>
+</tr>
+</tbody>
+</table>
+<p>An override names a setting by its <strong>field path</strong>, relative to the World:
+<code>&lt;GameObject path&gt;/&lt;Component&gt;/&lt;field&gt;</code> (<a class="xref" href="../api/EvoSim.FieldPath.html">FieldPath</a>). Names are matched in any case, a species also by its
+id or display name, and the component is found on the GameObject or anywhere below it, so <code>Prey/Litter/max</code> works
+although the Litter sits under <code>Prey/Life</code>. <code>World/&lt;field&gt;</code> is the World's own setting, such as <code>World/decisionPeriod</code>.
+Values are text: <code>2</code>, <code>0.5</code>, <code>true</code>, an enum name such as <code>Block</code>, <code>[8, 4]</code> for a list of numbers. Only fields the
+Inspector shows can be set. The keys of <code>run_info.json</code>'s <code>settings</code> are valid paths: copy one to override it.</p>
+<p>Two real examples: S20 sets <code>Prey/CapRule/mode</code> to <code>Migrate</code> in one variant and <code>Block</code> in the other. S07 removes
+<code>Environment/Thickets</code>, <code>Prey/Actions/hide</code> and <code>Prey/Senses/Cover</code> to run the reference world without cover.</p>
+<p>Run a scenario from <em>Window ▸ EvoSim ▸ Scenario Runner</em>, in Edit mode with the scenario's scene closed: pick a variant,
+seeds and a length, and press <code>Run</code>. <em>Run each seed twice and compare the hashes</em> checks that the scenario is
+deterministic. In batch mode:</p>
+<pre><code>Unity.exe -batchmode -nographics -projectPath . -executeMethod EvoSim.Batch.RunScenario -scenario S03 [-variant name] [-seed n] [-ticks n]
+</code></pre>
+<p>A scenario run's folder is named <code>&lt;scenario&gt;-&lt;variant&gt;-s&lt;seed&gt;-&lt;time&gt;</code>. A path or value that can't be applied stops the
+run before it starts, with a message naming it. Overrides skip the Inspector's limits; validation still reports values
+out of range (V-35).</p>
+<h2 id="in-the-editor">In the editor</h2>
+<ul>
+<li><em>Window ▸ EvoSim ▸ Event Log</em> lists the running world's events as they are recorded, filtered by kind, species or
+animal.</li>
+<li><em>Window ▸ EvoSim ▸ Ecology Monitor</em> draws each species' population over time from the LiveStatistics, with the
+ticks per second, and lists each species' counters: births, deaths by cause, decisions, memo hits, action shares.</li>
+<li>The run views' overlay shows the tick, the pace, and each species' population, births and deaths on screen, in the
+editor and in a build (<a href="views-and-real-time.html">Views and real time</a>).</li>
+</ul>
+<h2 id="go-further">Go further</h2>
+<ul>
+<li><a href="../extending/recording.html">Recording and statistics</a>: add statistics columns, causes of death, events of your own.</li>
+<li><a href="determinism.html">Determinism and replay</a>: random streams, the answer cache and resuming a run.</li>
+<li><a href="running-and-building.html">Running and building</a>: headless runs and the player's command line.</li>
+<li>Specification: <a href="../spec/13-outputs-and-recording.html">13 — Outputs and recording</a>,
+<a href="../spec/14-configuration-reference.html">14 — Configuration reference</a>, <a href="../spec/31-scenarios.html">31 — Scenarios</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

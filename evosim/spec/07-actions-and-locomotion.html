@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>07 — Actions and locomotion | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="07 — Actions and locomotion | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/07-actions-and-locomotion.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="07--actions-and-locomotion">07 — Actions and locomotion</h1>
+
+<p>The brain chooses an action; the action does the work, every tick until the
+next decision. An action picks a target and produces an <strong>intent</strong> (a
+direction, walk or run, how far at most), the species' <strong>locomotion</strong> turns the
+intent into movement over the ground, and contacts trigger <strong>interactions</strong>
+(graze, strike, scavenge).</p>
+<h2 id="1-actions">1. Actions</h2>
+<ul>
+<li><strong>ACT-01 (MUST)</strong> An action has a name (unique in its species), a short
+description for the prompt, and usually one text gene (<a href="09-genes-alleles-and-genomes.html">09</a>).</li>
+<li><strong>ACT-02 (MUST)</strong> The chosen action runs every tick from the decision until the
+next decision (or until the animal becomes busy or dies). It looks for its
+target again each tick, so it follows a moving target. Under an overlay (ACT-07)
+this holds for the carrier.</li>
+<li><strong>ACT-03 (MUST)</strong> Each tick an action produces at most one intent and at most
+one interaction; an animal with an overlay (ACT-07) has one intent, its carrier's,
+and up to two interactions, the carrier's and the overlay's. An intent is a
+direction (or none: stay), whether the animal walks or runs, and optionally the farthest it should go this tick (to stop at a
+target). Helpers build the usual intents: toward a point stopping at a
+distance, away from a point, wander.</li>
+<li><strong>ACT-04 (MUST)</strong> <strong>Nothing to act on → search.</strong> When the action has no target
+in sight (no food, threat, kin, prey, carcass, ready partner, cover within the
+animal's vision), the animal wanders instead and the choice is counted as
+<em>searching</em> (the prototype's &quot;invalid&quot;), once per decision. Eating with no food
+in sight means searching for food.</li>
+<li><strong>ACT-05 (MUST)</strong> Actions only target what the animal's senses could report:
+within its vision, not hidden from it, not killed, not itself.</li>
+<li><strong>ACT-06 (MUST)</strong> An action never changes another animal's stats or position
+directly. Effects on others go through interactions, which check the diet and
+the reach.</li>
+<li><strong>ACT-07 (MAY)</strong> <strong>Overlay actions, done in passing.</strong> An action may declare
+itself an overlay (a call, a scent mark): it adds an interaction but no
+movement. When the draw picks an overlay, the carrier is drawn from the same
+vector with every overlay set to 0 (DEC-20); a vector with nothing else leaves no
+carrier and the animal stays. Each tick the carrier plans the intent and its
+interaction; the overlay plans in the same way, its intent is ignored, and its
+interaction applies after the carrier's, its reach measured from the point its
+own intent names. The overlay acts for its number of ticks (1 by default, 0 =
+until the next decision) and ends at the next decision, when the animal becomes
+busy, or when it dies. A species needs at least one action that is not an overlay
+(V-19), and an overlay neither mates nor hunts (V-27). Decision timing, breeding
+(REPRO-03) and the memo are unchanged: the vector is the same.</li>
+</ul>
+<h2 id="2-locomotion">2. Locomotion</h2>
+<p>Each species has one <strong>locomotion</strong> component. An action only says where it
+wants to go; the locomotion decides what actually happens, and whatever it does
+is the tick's result (owner decision). The reference locomotion is kinematic: no
+rigid bodies, no physics.</p>
+<ul>
+<li><strong>MOVE-01 (MUST)</strong> Each species has exactly one locomotion component. It
+receives each animal's intent and moves the animal. Whatever it does (exactly
+along the direction, sliding along an obstacle, or something else for a
+physics locomotion) is the result of the tick; no other module assumes the
+intent was followed exactly.</li>
+<li><strong>MOVE-02 (MUST)</strong> Whatever the locomotion, an animal never ends a tick on
+non-walkable ground or outside the world (SPACE-03, SPACE-04).</li>
+<li><strong>MOVE-03 (MUST)</strong> Speeds belong to the species: its walking and running
+speeds are traits of its locomotion (reference: prey walk 1 and run 1 m per
+tick, predators walk 1 and run 2). Movement is also limited by stamina
+(ANIM-21).</li>
+<li><strong>MOVE-04 (MUST)</strong> The reference <strong>kinematic</strong> locomotion moves in a straight
+line along the intended direction, by the smallest of the speed, the stamina
+and the intent's maximum distance, so moving toward a target never overshoots
+its stop distance. Blocked by a border or an obstacle, it slides along it; if
+that makes no progress, the animal takes a random sidestep (its own random
+stream) rather than staying stuck.</li>
+<li><strong>MOVE-05 (MUST)</strong> Wandering is a persistent random walk: the animal keeps its
+heading, and with probability <code>wanderTurnP</code> (reference 0.25) per tick turns by
+one of ±45° or ±90°; blocked, it picks a new random heading. It walks.</li>
+<li><strong>MOVE-06 (MUST)</strong> The locomotion reports the meters actually moved;
+metabolism and stamina use that number. A locomotion MAY add costs of its own
+(slopes, mud, water).</li>
+<li><strong>MOVE-07 (SHOULD)</strong> Locomotion is a base class meant to be inherited:
+terrain-aware movement with slope costs, NavMesh paths around obstacles,
+physics with rigid bodies, later a learned controller. Each species can have
+its own (owner decision: these come later; the reference is kinematic).</li>
+</ul>
+<p><strong>Reference (prototype, grid).</strong> Steps went to one of 8 neighbour cells, the one
+that most reduces (or increases) the straight-line distance, with random
+tie-breaks. The Unity reference replaces this with straight lines; the behaviour
+to keep is the same: approach, stop next to it, run away, wander.</p>
+<h2 id="3-interactions">3. Interactions</h2>
+<ul>
+<li><p><strong>ACT-10 (MUST)</strong> An interaction happens when the animal is within <strong>reach</strong> of
+its target after moving, in the same tick. Reference reaches: graze = the item
+is in the animal's cell (within 0.5 m of the item); strike, scavenge, mate =
+within 1 m.</p>
+</li>
+<li><p><strong>ACT-11 (MUST)</strong> Interactions follow the diet (SPEC-13). Results:</p>
+<table>
+<thead>
+<tr>
+<th>Interaction</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>graze</td>
+<td>the item is consumed; the animal gains the item's energy (edible component × diet scale)</td>
+</tr>
+<tr>
+<td>strike</td>
+<td>with probability <code>killP</code> (a trait of the hunter; reference 0.5) the target is killed (ANIM-41); the hunter gains the target's energy (its species' edible component × diet scale), becomes busy (digestion) and, if the edible component says so, a carcass appears at the target's position</td>
+</tr>
+<tr>
+<td>scavenge</td>
+<td>one portion of the carcass is eaten; the eater is recorded as having eaten from it; it gains the portion's energy and becomes busy</td>
+</tr>
+<tr>
+<td>hide</td>
+<td>none: being in cover is a state of the position, not an interaction</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p><strong>ACT-12 (MUST)</strong> A hunter strikes at most once per tick. A struck animal that
+survives can be struck again by another hunter in the same tick.</p>
+</li>
+<li><p><strong>ACT-13 (MUST)</strong> Breeding is not an interaction of the mate action: the mate
+action only brings the animal to a partner; breeding happens in its own phase
+(<a href="11-reproduction-and-population.html">11</a>).</p>
+</li>
+</ul>
+<h2 id="4-reference-actions">4. Reference actions</h2>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Target</th>
+<th>Intent</th>
+<th>On contact</th>
+<th>Searches when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>eat</strong></td>
+<td>nearest item of a grazed layer</td>
+<td>walk to it (stop 0); stay if already on it</td>
+<td>graze (on the tick of arrival too)</td>
+<td>no item within vision</td>
+</tr>
+<tr>
+<td><strong>flee</strong></td>
+<td>nearest threat</td>
+<td>run away from it</td>
+<td>—</td>
+<td>no threat within vision</td>
+</tr>
+<tr>
+<td><strong>follow</strong></td>
+<td>nearest kin</td>
+<td>walk toward it, stop at 1 m</td>
+<td>—</td>
+<td>no kin within vision</td>
+</tr>
+<tr>
+<td><strong>rest</strong></td>
+<td>—</td>
+<td>stay</td>
+<td>—</td>
+<td>never</td>
+</tr>
+<tr>
+<td><strong>mate</strong></td>
+<td>nearest kin that is ready to mate</td>
+<td>walk toward it, stop at 1 m</td>
+<td>(breeding phase)</td>
+<td>no ready partner within vision</td>
+</tr>
+<tr>
+<td><strong>hunt</strong></td>
+<td>the nearer of: nearest huntable animal (not killed, not hidden) and nearest edible carcass; a carcass wins a tie</td>
+<td>run toward it, stop at 1 m</td>
+<td>strike an animal, or scavenge a carcass</td>
+<td>neither within vision</td>
+</tr>
+<tr>
+<td><strong>hide</strong> (Unity)</td>
+<td>nearest cover</td>
+<td>walk (or run) into it, stop 0; stay once inside</td>
+<td>—</td>
+<td>no cover within vision</td>
+</tr>
+</tbody>
+</table>
+<p>Options recorded from the prototype:</p>
+<ul>
+<li><strong>Flee into cover</strong> (prototype behaviour, an option of flee): a fleeing animal
+already in cover stays put; with cover within <code>coverSeek</code> (6 m) it runs into
+it instead of running away. Off in the Unity reference, where hide is its own
+action, sense and gene (owner decision); on, it reproduces the prototype for
+comparison (scenario S06).</li>
+<li><strong>Predator interference</strong> (off, rejected): a strike succeeds with
+<code>killP / (1 + c × n)</code>, n = other hunters within r m of the target.</li>
+</ul>
+<p>Why speeds and stamina matter (reference): a hunter runs 2 m per tick for 15
+ticks, a fleeing prey 1 m per tick for 60. The hunter wins short chases, the prey
+long ones; a prey animal gets caught when the hunter starts close, or when it
+stops (to eat, rest, mate), runs out of stamina, runs toward the hunter or hits
+a border. Decisions come only every 4 ticks, so a hunter can close in between
+two decisions; a strike happens in the tick the hunter arrives, so fleeing has to
+start before it is adjacent.</p>
+<h2 id="5-the-brain-does-not-move-animals">5. The brain does not move animals</h2>
+<ul>
+<li><strong>ACT-20 (MUST)</strong> Actions are ordinary code. The brain's output is only which
+action runs (CORE-06). An action reads the animal's genes only through its
+traits (number genes); it never interprets gene sentences, which is the
+brain's job.</li>
+</ul>
+<h2 id="6-act-order">6. Act order</h2>
+<p>Animals act one after another or together; the order changes who reaches food
+first and whether a prey animal moves before a hunter strikes.</p>
+<ul>
+<li><p><strong>ACT-30 (MUST)</strong> The act order is a setting of the world, one of:</p>
+<table>
+<thead>
+<tr>
+<th>Policy</th>
+<th>Order</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Species in turn</strong> (default, owner decision; the prototype's order)</td>
+<td>species in the world's species order; within a species, animals one by one in a fresh random order each tick</td>
+<td>prey move before predators strike</td>
+</tr>
+<tr>
+<td><strong>All mixed</strong></td>
+<td>every animal of every species one by one, in one fresh random order each tick</td>
+<td>owner's alternative: no species goes first</td>
+</tr>
+<tr>
+<td><strong>Simultaneous</strong></td>
+<td>every animal computes its intent from the same state; all move; then interactions resolve in a fresh random order</td>
+<td>easiest to batch; contested items go to a random winner (owner decision)</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p><strong>ACT-31 (MUST)</strong> In the sequential policies an animal acts on the state left
+by those before it (positions, eaten items, kills). In the simultaneous policy
+intents use the state at the start of the act phase.</p>
+</li>
+<li><p><strong>ACT-32 (MUST)</strong> The random order comes from a named stream, so the same seed
+gives the same order.</p>
+</li>
+<li><p><strong>ACT-33 (SHOULD)</strong> Reference numbers (populations, kills) are measured with
+&quot;species in turn&quot;; other policies need their own measurements.</p>
+</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

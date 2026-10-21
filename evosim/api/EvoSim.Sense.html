@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class Sense | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class Sense | EvoSim ">
+      
+      <meta name="description" content="Reads one animal and the world and returns one token from a fixed list (SENSE-01): what the brain is told about one aspect of the situation, such as the nearest food or the energy level.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_Sense.md&amp;value=---%0Auid%3A%20EvoSim.Sense%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.Sense">
+
+
+
+  <h1 id="EvoSim_Sense" data-uid="EvoSim.Sense" class="text-break">
+Class Sense  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/Sense.cs/#L50"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Runtime.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Reads one animal and the world and returns one token from a fixed list (SENSE-01): what the brain is told about one
+aspect of the situation, such as the nearest food or the energy level.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract class Sense : SpeciesModule</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">Object</span></div>
+      <div><span class="xref">Component</span></div>
+      <div><span class="xref">Behaviour</span></div>
+      <div><span class="xref">MonoBehaviour</span></div>
+      <div><a class="xref" href="EvoSim.SpeciesModule.html">SpeciesModule</a></div>
+      <div><span class="xref">Sense</span></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist derived">
+    <dt>Derived</dt>
+    <dd>
+      <div><a class="xref" href="EvoSim.AgeSense.html">AgeSense</a></div>
+      <div><a class="xref" href="EvoSim.BandedSense.html">BandedSense</a></div>
+      <div><a class="xref" href="EvoSim.BatchedSense.html">BatchedSense</a></div>
+      <div><a class="xref" href="EvoSim.LevelSense.html">LevelSense</a></div>
+      <div><a class="xref" href="EvoSim.Samples.ChasedSense.html">ChasedSense</a></div>
+      <div><a class="xref" href="EvoSim.Testing.CameraProbeSense.html">CameraProbeSense</a></div>
+      <div><a class="xref" href="EvoSim.Testing.ProbeSense.html">ProbeSense</a></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_Species">SpeciesModule.Species</a>
+    </div>
+    <div>
+      <a class="xref" href="EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_World">SpeciesModule.World</a>
+    </div>
+    <div>
+      <a class="xref" href="EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_Declare_EvoSim_SpeciesBuilder_">SpeciesModule.Declare(SpeciesBuilder)</a>
+    </div>
+    <div>
+      <a class="xref" href="EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_Initialize">SpeciesModule.Initialize()</a>
+    </div>
+    <div>
+      <a class="xref" href="EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_Validate_EvoSim_ValidationReport_">SpeciesModule.Validate(ValidationReport)</a>
+    </div>
+    <div>
+      <a class="xref" href="EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_WritePromptRules_EvoSim_PromptWriter_">SpeciesModule.WritePromptRules(PromptWriter)</a>
+    </div>
+    <div>
+      <a class="xref" href="EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_OnBorn_EvoSim_Animal_">SpeciesModule.OnBorn(Animal)</a>
+    </div>
+    <div>
+      <a class="xref" href="EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_OnDied_EvoSim_Animal_System_String_">SpeciesModule.OnDied(Animal, string)</a>
+    </div>
+    <div>
+      <span class="xref">MonoBehaviour.IsInvoking()</span>
+    </div>
+    <div>
+      <span class="xref">MonoBehaviour.CancelInvoke()</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">MonoBehaviour.Invoke(string, float)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">MonoBehaviour.InvokeRepeating(string, float, float)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">MonoBehaviour.CancelInvoke(string)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">MonoBehaviour.IsInvoking(string)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">MonoBehaviour.StartCoroutine(string)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">MonoBehaviour.StartCoroutine(string, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ienumerator">MonoBehaviour.StartCoroutine(IEnumerator)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ienumerator">MonoBehaviour.StartCoroutine_Auto(IEnumerator)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ienumerator">MonoBehaviour.StopCoroutine(IEnumerator)</a>
+    </div>
+    <div>
+      <span class="xref">MonoBehaviour.StopCoroutine(Coroutine)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">MonoBehaviour.StopCoroutine(string)</a>
+    </div>
+    <div>
+      <span class="xref">MonoBehaviour.StopAllCoroutines()</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">MonoBehaviour.print(object)</a>
+    </div>
+    <div>
+      <span class="xref">MonoBehaviour.destroyCancellationToken</span>
+    </div>
+    <div>
+      <span class="xref">MonoBehaviour.useGUILayout</span>
+    </div>
+    <div>
+      <span class="xref">MonoBehaviour.didStart</span>
+    </div>
+    <div>
+      <span class="xref">MonoBehaviour.didAwake</span>
+    </div>
+    <div>
+      <span class="xref">MonoBehaviour.runInEditMode</span>
+    </div>
+    <div>
+      <span class="xref">Behaviour.enabled</span>
+    </div>
+    <div>
+      <span class="xref">Behaviour.isActiveAndEnabled</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Component.GetComponent(Type)</a>
+    </div>
+    <div>
+      <span class="xref">Component.GetComponent&lt;T&gt;()</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Component.TryGetComponent(Type, out Component)</a>
+    </div>
+    <div>
+      <span class="xref">Component.TryGetComponent&lt;T&gt;(out T)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">Component.GetComponent(string)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Component.GetComponentInChildren(Type, bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Component.GetComponentInChildren(Type)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Component.GetComponentInChildren&lt;T&gt;(bool)</a>
+    </div>
+    <div>
+      <span class="xref">Component.GetComponentInChildren&lt;T&gt;()</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Component.GetComponentsInChildren(Type, bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Component.GetComponentsInChildren(Type)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Component.GetComponentsInChildren&lt;T&gt;(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Component.GetComponentsInChildren&lt;T&gt;(bool, List&lt;T&gt;)</a>
+    </div>
+    <div>
+      <span class="xref">Component.GetComponentsInChildren&lt;T&gt;()</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">Component.GetComponentsInChildren&lt;T&gt;(List&lt;T&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Component.GetComponentInParent(Type, bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Component.GetComponentInParent(Type)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Component.GetComponentInParent&lt;T&gt;(bool)</a>
+    </div>
+    <div>
+      <span class="xref">Component.GetComponentInParent&lt;T&gt;()</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Component.GetComponentsInParent(Type, bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Component.GetComponentsInParent(Type)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Component.GetComponentsInParent&lt;T&gt;(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Component.GetComponentsInParent&lt;T&gt;(bool, List&lt;T&gt;)</a>
+    </div>
+    <div>
+      <span class="xref">Component.GetComponentsInParent&lt;T&gt;()</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Component.GetComponents(Type)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Component.GetComponents(Type, List&lt;Component&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">Component.GetComponents&lt;T&gt;(List&lt;T&gt;)</a>
+    </div>
+    <div>
+      <span class="xref">Component.GetComponents&lt;T&gt;()</span>
+    </div>
+    <div>
+      <span class="xref">Component.GetComponentIndex()</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">Component.CompareTag(string)</a>
+    </div>
+    <div>
+      <span class="xref">Component.CompareTag(TagHandle)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">Component.SendMessageUpwards(string, object, SendMessageOptions)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">Component.SendMessageUpwards(string, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">Component.SendMessageUpwards(string)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">Component.SendMessageUpwards(string, SendMessageOptions)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">Component.SendMessage(string, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">Component.SendMessage(string)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">Component.SendMessage(string, object, SendMessageOptions)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">Component.SendMessage(string, SendMessageOptions)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">Component.BroadcastMessage(string, object, SendMessageOptions)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">Component.BroadcastMessage(string, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">Component.BroadcastMessage(string)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">Component.BroadcastMessage(string, SendMessageOptions)</a>
+    </div>
+    <div>
+      <span class="xref">Component.transform</span>
+    </div>
+    <div>
+      <span class="xref">Component.transformHandle</span>
+    </div>
+    <div>
+      <span class="xref">Component.gameObject</span>
+    </div>
+    <div>
+      <span class="xref">Component.tag</span>
+    </div>
+    <div>
+      <span class="xref">Object.GetEntityId()</span>
+    </div>
+    <div>
+      <span class="xref">Object.GetInstanceID()</span>
+    </div>
+    <div>
+      <span class="xref">Object.GetHashCode()</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">Object.Equals(object)</a>
+    </div>
+    <div>
+      <span class="xref">Object.InstantiateAsync&lt;T&gt;(T)</span>
+    </div>
+    <div>
+      <span class="xref">Object.InstantiateAsync&lt;T&gt;(T, Transform)</span>
+    </div>
+    <div>
+      <span class="xref">Object.InstantiateAsync&lt;T&gt;(T, Vector3, Quaternion)</span>
+    </div>
+    <div>
+      <span class="xref">Object.InstantiateAsync&lt;T&gt;(T, Transform, Vector3, Quaternion)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Object.InstantiateAsync&lt;T&gt;(T, int)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Object.InstantiateAsync&lt;T&gt;(T, int, Transform)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Object.InstantiateAsync&lt;T&gt;(T, int, Vector3, Quaternion)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Object.InstantiateAsync&lt;T&gt;(T, int, ReadOnlySpan&lt;Vector3&gt;, ReadOnlySpan&lt;Quaternion&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Object.InstantiateAsync&lt;T&gt;(T, int, Transform, Vector3, Quaternion)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Object.InstantiateAsync&lt;T&gt;(T, int, Transform, Vector3, Quaternion, CancellationToken)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Object.InstantiateAsync&lt;T&gt;(T, int, Transform, ReadOnlySpan&lt;Vector3&gt;, ReadOnlySpan&lt;Quaternion&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Object.InstantiateAsync&lt;T&gt;(T, int, Transform, ReadOnlySpan&lt;Vector3&gt;, ReadOnlySpan&lt;Quaternion&gt;, CancellationToken)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">Object.InstantiateAsync&lt;T&gt;(T, InstantiateParameters, CancellationToken)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Object.InstantiateAsync&lt;T&gt;(T, int, InstantiateParameters, CancellationToken)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">Object.InstantiateAsync&lt;T&gt;(T, Vector3, Quaternion, InstantiateParameters, CancellationToken)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Object.InstantiateAsync&lt;T&gt;(T, int, Vector3, Quaternion, InstantiateParameters, CancellationToken)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Object.InstantiateAsync&lt;T&gt;(T, int, ReadOnlySpan&lt;Vector3&gt;, ReadOnlySpan&lt;Quaternion&gt;, InstantiateParameters, CancellationToken)</a>
+    </div>
+    <div>
+      <span class="xref">Object.Instantiate(Object, Vector3, Quaternion)</span>
+    </div>
+    <div>
+      <span class="xref">Object.Instantiate(Object, Vector3, Quaternion, Transform)</span>
+    </div>
+    <div>
+      <span class="xref">Object.Instantiate(Object)</span>
+    </div>
+    <div>
+      <span class="xref">Object.Instantiate(Object, Scene)</span>
+    </div>
+    <div>
+      <span class="xref">Object.Instantiate&lt;T&gt;(T, InstantiateParameters)</span>
+    </div>
+    <div>
+      <span class="xref">Object.Instantiate&lt;T&gt;(T, Vector3, Quaternion, InstantiateParameters)</span>
+    </div>
+    <div>
+      <span class="xref">Object.Instantiate(Object, Transform)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Object.Instantiate(Object, Transform, bool)</a>
+    </div>
+    <div>
+      <span class="xref">Object.Instantiate&lt;T&gt;(T)</span>
+    </div>
+    <div>
+      <span class="xref">Object.Instantiate&lt;T&gt;(T, Vector3, Quaternion)</span>
+    </div>
+    <div>
+      <span class="xref">Object.Instantiate&lt;T&gt;(T, Vector3, Quaternion, Transform)</span>
+    </div>
+    <div>
+      <span class="xref">Object.Instantiate&lt;T&gt;(T, Transform)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Object.Instantiate&lt;T&gt;(T, Transform, bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">Object.Destroy(Object, float)</a>
+    </div>
+    <div>
+      <span class="xref">Object.Destroy(Object)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Object.DestroyImmediate(Object, bool)</a>
+    </div>
+    <div>
+      <span class="xref">Object.DestroyImmediate(Object)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Object.FindObjectsOfType(Type)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Object.FindObjectsOfType(Type, bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Object.FindObjectsByType(Type, FindObjectsSortMode)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Object.FindObjectsByType(Type, FindObjectsInactive, FindObjectsSortMode)</a>
+    </div>
+    <div>
+      <span class="xref">Object.DontDestroyOnLoad(Object)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">Object.DestroyObject(Object, float)</a>
+    </div>
+    <div>
+      <span class="xref">Object.DestroyObject(Object)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Object.FindSceneObjectsOfType(Type)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Object.FindObjectsOfTypeIncludingAssets(Type)</a>
+    </div>
+    <div>
+      <span class="xref">Object.FindObjectsOfType&lt;T&gt;()</span>
+    </div>
+    <div>
+      <span class="xref">Object.FindObjectsByType&lt;T&gt;(FindObjectsSortMode)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Object.FindObjectsOfType&lt;T&gt;(bool)</a>
+    </div>
+    <div>
+      <span class="xref">Object.FindObjectsByType&lt;T&gt;(FindObjectsInactive, FindObjectsSortMode)</span>
+    </div>
+    <div>
+      <span class="xref">Object.FindObjectOfType&lt;T&gt;()</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Object.FindObjectOfType&lt;T&gt;(bool)</a>
+    </div>
+    <div>
+      <span class="xref">Object.FindFirstObjectByType&lt;T&gt;()</span>
+    </div>
+    <div>
+      <span class="xref">Object.FindAnyObjectByType&lt;T&gt;()</span>
+    </div>
+    <div>
+      <span class="xref">Object.FindFirstObjectByType&lt;T&gt;(FindObjectsInactive)</span>
+    </div>
+    <div>
+      <span class="xref">Object.FindAnyObjectByType&lt;T&gt;(FindObjectsInactive)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Object.FindObjectsOfTypeAll(Type)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Object.FindObjectOfType(Type)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Object.FindFirstObjectByType(Type)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Object.FindAnyObjectByType(Type)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Object.FindObjectOfType(Type, bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Object.FindFirstObjectByType(Type, FindObjectsInactive)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Object.FindAnyObjectByType(Type, FindObjectsInactive)</a>
+    </div>
+    <div>
+      <span class="xref">Object.ToString()</span>
+    </div>
+    <div>
+      <span class="xref">Object.name</span>
+    </div>
+    <div>
+      <span class="xref">Object.hideFlags</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+  </dd></dl>
+
+
+
+  <h2 id="EvoSim_Sense_examples">Examples</h2>
+  <p>The sample <code>ChasedSense</code> (22 §13): whether the nearest threat is hunting this animal.</p>
+<pre><code class="lang-csharp">public class ChasedSense : Sense
+{
+    static readonly IReadOnlyList&lt;string&gt; tokens = System.Array.AsReadOnly(new[] { "no", "yes" });
+
+    public override IReadOnlyList&lt;string&gt; Tokens =&gt; tokens;
+    protected override string DefaultLabel =&gt; "Chased";
+
+    public override int Read(Animal a, SenseContext s)
+    {
+        var threat = s.NearestAnimal(a, AnimalSet.Threats, s.Vision(a));
+        if (threat == null) return 0;
+        var t = threat.Value.Animal;
+        bool hunting = t.CurrentAction != null &amp;&amp; t.CurrentAction.Hunts;
+        return hunting &amp;&amp; s.CurrentTarget(t) == a ? 1 : 0;
+    }
+
+    public override string Write(int token, TextStyle style) =&gt;
+        style == TextStyle.V2 ? (token == 1 ? "Something is chasing me." : "Nothing is chasing me.")
+                              : $"{Label}: {tokens[token]}.";
+}</code></pre>
+
+
+  <h2 id="EvoSim_Sense_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Derive from it, list every token in <a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_Tokens">Tokens</a>, implement <a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_Read_EvoSim_Animal_EvoSim_SenseContext_">Read(Animal, SenseContext)</a>, and place the component
+under a species. The species collects its senses depth-first in its hierarchy: that order (<a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_Index">Index</a>) is the
+order of the tokens in the <a class="xref" href="EvoSim.Observation.html">Observation</a> and of the fragments in the situation text (SENSE-02, SENSE-10).</p>
+<p>Lifecycle: <a class="xref" href="EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_Declare_EvoSim_SpeciesBuilder_">Declare(SpeciesBuilder)</a> declares the traits the sense reads (such as "vision");
+<a class="xref" href="EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_Initialize">Initialize()</a> finds stats and other modules and builds the token list; then, on every tick
+with decisions, the sense phase calls <a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_ReadAll_System_Collections_Generic_IReadOnlyList_EvoSim_Animal__EvoSim_SenseContext_System_Span_System_Int32__">ReadAll(IReadOnlyList&lt;Animal&gt;, SenseContext, Span&lt;int&gt;)</a> for the deciding animals of the species, and the species
+calls <a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_Write_System_Int32_EvoSim_TextStyle_">Write(int, TextStyle)</a> to turn each token into text.</p>
+<p>A sense only reads. It sees the world as it was at the start of the tick (SENSE-04), asks through
+<a class="xref" href="EvoSim.SenseContext.html">SenseContext</a> so hidden and killed animals are never reported (SENSE-06), and draws no random number:
+the same state gives the same token (SENSE-03). It keeps settings only, nothing per animal.</p>
+<p>Each sense multiplies the species' number of possible observations by its token count (SENSE-05): few tokens
+keep the memo and the answer cache useful.</p>
+</div>
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="EvoSim_Sense_label" data-uid="EvoSim.Sense.label">
+  label
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/Sense.cs/#L56"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The label typed in the Inspector, or empty for <a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_DefaultLabel">DefaultLabel</a>. Read it through <a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_Label">Label</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[SerializeField]
+[Tooltip(&quot;The sense&#39;s label in the situation text (SENSE-10, SPEC-20). Empty = the sense&#39;s default.&quot;)]
+protected string label</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="EvoSim_Sense_DefaultLabel_" data-uid="EvoSim.Sense.DefaultLabel*"></a>
+
+  <h3 id="EvoSim_Sense_DefaultLabel" data-uid="EvoSim.Sense.DefaultLabel">
+  DefaultLabel
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/Sense.cs/#L68"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The label when the Inspector leaves it empty: by default the class name without &quot;Sense&quot; (&quot;AgeSense&quot; gives &quot;Age&quot;).
+Reference senses override it with their reference label (&quot;Food&quot;, &quot;Predator&quot;, &quot;Carcass&quot;…).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual string DefaultLabel { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Sense_HasAttachments_" data-uid="EvoSim.Sense.HasAttachments*"></a>
+
+  <h3 id="EvoSim_Sense_HasAttachments" data-uid="EvoSim.Sense.HasAttachments">
+  HasAttachments
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/Sense.cs/#L139"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True when this sense can give attachments (SENSE-41): the ask-brains phase then calls <a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_Attachment_EvoSim_Animal_EvoSim_SenseContext_">Attachment(Animal, SenseContext)</a>,
+and validation checks that the species' brain accepts them (V-51). False by default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool HasAttachments { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Sense_Index_" data-uid="EvoSim.Sense.Index*"></a>
+
+  <h3 id="EvoSim_Sense_Index" data-uid="EvoSim.Sense.Index">
+  Index
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/Sense.cs/#L74"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>This sense's place in the species' sense order (0 for the first), which is its place in every observation; -1
+until the species collects its modules at set-up.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Index { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Sense_Label_" data-uid="EvoSim.Sense.Label*"></a>
+
+  <h3 id="EvoSim_Sense_Label" data-uid="EvoSim.Sense.Label">
+  Label
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/Sense.cs/#L62"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The sense's name in the situation text (&quot;Food: here.&quot;) and in <a class="xref" href="EvoSim.ObservationView.html#EvoSim_ObservationView_Token_System_String_">Token(string)</a>: the Inspector's
+label, or <a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_DefaultLabel">DefaultLabel</a> when it is empty (SENSE-10, SPEC-20).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Label { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Sense_Tokens_" data-uid="EvoSim.Sense.Tokens*"></a>
+
+  <h3 id="EvoSim_Sense_Tokens" data-uid="EvoSim.Sense.Tokens">
+  Tokens
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/Sense.cs/#L82"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Every token this sense can return, &quot;none&quot; included, in a fixed order: <a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_Read_EvoSim_Animal_EvoSim_SenseContext_">Read(Animal, SenseContext)</a> returns an index into this
+list. Fixed before the run (SENSE-01); its length is the sense's factor in the observation space (SENSE-05).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract IReadOnlyList&lt;string&gt; Tokens { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="EvoSim_Sense_Tokens_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Build it in a field or in <a class="xref" href="EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_Initialize">Initialize()</a>, never during a run. A static list shared
+by every instance should be read-only.</p>
+</div>
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_Sense_Attachment_" data-uid="EvoSim.Sense.Attachment*"></a>
+
+  <h3 id="EvoSim_Sense_Attachment_EvoSim_Animal_EvoSim_SenseContext_" data-uid="EvoSim.Sense.Attachment(EvoSim.Animal,EvoSim.SenseContext)">
+  Attachment(Animal, SenseContext)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/Sense.cs/#L133"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gives an attachment for this animal at this decision, such as a small camera image (SENSE-40).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual object Attachment(Animal a, SenseContext s)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that decides.</p>
+</dd>
+    <dt><code>s</code> <a class="xref" href="EvoSim.SenseContext.html">SenseContext</a></dt>
+    <dd><p>This tick's sense context.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>The attachment, or null for none (the default).</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_Sense_Attachment_EvoSim_Animal_EvoSim_SenseContext__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Called by the ask-brains phase while it builds the query, only when <a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_HasAttachments">HasAttachments</a> is true. The
+attachment travels in <a class="xref" href="EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Attachments">Attachments</a>; only a brain whose
+<a class="xref" href="EvoSim.Brain.html#EvoSim_Brain_AcceptsAttachments">AcceptsAttachments</a> is true may read it (V-51).</p>
+</div>
+
+
+
+
+  <a id="EvoSim_Sense_AttachmentKey_" data-uid="EvoSim.Sense.AttachmentKey*"></a>
+
+  <h3 id="EvoSim_Sense_AttachmentKey_System_Object_" data-uid="EvoSim.Sense.AttachmentKey(System.Object)">
+  AttachmentKey(object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/Sense.cs/#L146"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gives a short text that stands for an attachment in the memo and cache keys, such as a coarse summary (SENSE-41).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual string AttachmentKey(object attachment)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>attachment</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>An attachment this sense gave.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The key, or null (the default): then a query carrying this attachment is never memoised, shared or cached.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Sense_Read_" data-uid="EvoSim.Sense.Read*"></a>
+
+  <h3 id="EvoSim_Sense_Read_EvoSim_Animal_EvoSim_SenseContext_" data-uid="EvoSim.Sense.Read(EvoSim.Animal,EvoSim.SenseContext)">
+  Read(Animal, SenseContext)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/Sense.cs/#L94"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads one animal at a decision and returns its token (SENSE-03).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract int Read(Animal a, SenseContext s)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that decides.</p>
+</dd>
+    <dt><code>s</code> <a class="xref" href="EvoSim.SenseContext.html">SenseContext</a></dt>
+    <dd><p>The world as it was at the start of the tick: nearest animals, food, cover, distances, rays.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>An index into <a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_Tokens">Tokens</a>.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_Sense_Read_EvoSim_Animal_EvoSim_SenseContext__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Called by the sense phase, through <a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_ReadAll_System_Collections_Generic_IReadOnlyList_EvoSim_Animal__EvoSim_SenseContext_System_Span_System_Int32__">ReadAll(IReadOnlyList&lt;Animal&gt;, SenseContext, Span&lt;int&gt;)</a>, for every animal that decides this tick, and by tools
+(<a class="xref" href="EvoSim.Species.html#EvoSim_Species_Observe_EvoSim_Animal_EvoSim_SenseContext_">Observe(Animal, SenseContext)</a>). It must give the same token for the same state, draw no random number, change
+nothing in the world, and learn about other animals only through <code class="paramref">s</code>, which leaves out hidden
+and killed ones (SENSE-03, SENSE-06).</p>
+</div>
+
+
+
+
+  <a id="EvoSim_Sense_ReadAll_" data-uid="EvoSim.Sense.ReadAll*"></a>
+
+  <h3 id="EvoSim_Sense_ReadAll_System_Collections_Generic_IReadOnlyList_EvoSim_Animal__EvoSim_SenseContext_System_Span_System_Int32__" data-uid="EvoSim.Sense.ReadAll(System.Collections.Generic.IReadOnlyList{EvoSim.Animal},EvoSim.SenseContext,System.Span{System.Int32})">
+  ReadAll(IReadOnlyList&lt;Animal&gt;, SenseContext, Span&lt;int&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/Sense.cs/#L107"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads every deciding animal of the species in one call: the batch entry point the sense phase uses (20 §10,
+ARCH-12). The default calls <a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_Read_EvoSim_Animal_EvoSim_SenseContext_">Read(Animal, SenseContext)</a> for each animal.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void ReadAll(IReadOnlyList&lt;Animal&gt; group, SenseContext s, Span&lt;int&gt; tokens)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>group</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="EvoSim.Animal.html">Animal</a>&gt;</dt>
+    <dd><p>The deciding animals of this species this tick, in id order.</p>
+</dd>
+    <dt><code>s</code> <a class="xref" href="EvoSim.SenseContext.html">SenseContext</a></dt>
+    <dd><p>This tick's sense context, its rays already cast.</p>
+</dd>
+    <dt><code>tokens</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.span-1">Span</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>&gt;</dt>
+    <dd><p>Where to write the tokens: <code>tokens[i]</code> for <code>group[i]</code>; exactly as long as the group.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_Sense_ReadAll_System_Collections_Generic_IReadOnlyList_EvoSim_Animal__EvoSim_SenseContext_System_Span_System_Int32___remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Override it only to go faster (a Burst job…). The override must write exactly the tokens <a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_Read_EvoSim_Animal_EvoSim_SenseContext_">Read(Animal, SenseContext)</a>
+would give, animal by animal (SENSE-31); <a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_Read_EvoSim_Animal_EvoSim_SenseContext_">Read(Animal, SenseContext)</a> stays the readable reference and the test oracle.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_Sense_SetLabel_" data-uid="EvoSim.Sense.SetLabel*"></a>
+
+  <h3 id="EvoSim_Sense_SetLabel_System_String_" data-uid="EvoSim.Sense.SetLabel(System.String)">
+  SetLabel(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/Sense.cs/#L150"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets the label from code (WorldBuilder, tests), as the Inspector field does.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetLabel(string text)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>text</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The new label; empty for <a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_DefaultLabel">DefaultLabel</a>.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Sense_Write_" data-uid="EvoSim.Sense.Write*"></a>
+
+  <h3 id="EvoSim_Sense_Write_System_Int32_EvoSim_TextStyle_" data-uid="EvoSim.Sense.Write(System.Int32,EvoSim.TextStyle)">
+  Write(int, TextStyle)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/Sense.cs/#L122"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Writes a token as the text the brain reads: one fragment of the situation text (SENSE-10).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual string Write(int token, TextStyle style)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>token</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>An index into <a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_Tokens">Tokens</a>.</p>
+</dd>
+    <dt><code>style</code> <a class="xref" href="EvoSim.TextStyle.html">TextStyle</a></dt>
+    <dd><p>The world's text style: <a class="xref" href="EvoSim.TextStyle.html#EvoSim_TextStyle_V1">V1</a> terse (&quot;Energy: low.&quot;), or
+<a class="xref" href="EvoSim.TextStyle.html#EvoSim_TextStyle_V2">V2</a> first person (&quot;I am hungry and weak.&quot;) (SENSE-11).</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>A sentence ending with a period. The default writes &quot;Label: token.&quot; in both styles.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_Sense_Write_System_Int32_EvoSim_TextStyle__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>The species joins the fragments of its senses with spaces (<a class="xref" href="EvoSim.Species.html#EvoSim_Species_Describe_EvoSim_Observation_EvoSim_TextStyle_">Describe(Observation, TextStyle)</a>). The text depends on
+the token only, never on the animal, so the same observation always gives the same text: the answer cache keys
+on it. Override it for V2 sentences or to state a range in meters (SENSE-12, SENSE-13).</p>
+</div>
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

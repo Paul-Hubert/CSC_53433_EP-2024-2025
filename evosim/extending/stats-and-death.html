@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Stats, costs and death rules | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Stats, costs and death rules | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/stats-and-death.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-stats-and-death">
+<h1 id="stats-costs-and-death-rules">Stats, costs and death rules</h1>
+
+<p>Four things can be added or changed here: a <strong>stat</strong> every animal of a species carries (thirst, fear, temperature),
+<strong>what living costs</strong> per tick, the reference <strong>energy, stamina and digestion</strong> modules, and a <strong>cause of death</strong>.
+Stats and traits, energy, stamina, metabolism and death are explained in
+<a href="../guides/animals-and-stats.html">Animals, stats and death</a>. If the cost depends on how an animal moves (slopes,
+mud), a <a href="locomotion.html#a-complete-example">locomotion</a>'s <code>ExtraCost</code> is the simpler place.</p>
+<h2 id="a-stat-module">A stat module</h2>
+<p>A stat is declared by a <a class="xref" href="../api/EvoSim.SpeciesModule.html">SpeciesModule</a>, in <code>Declare</code>, before any animal exists. Keep the id you get
+back: it is how every module reads and writes the stat.</p>
+<table>
+<thead>
+<tr>
+<th>Call on the <a class="xref" href="../api/EvoSim.SpeciesBuilder.html">SpeciesBuilder</a></th>
+<th>Parameters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.SpeciesBuilder.html#EvoSim_SpeciesBuilder_DeclareStat_System_String_EvoSim_StatStart_System_Single_System_Single_EvoSim_TraitId_">DeclareStat</a></td>
+<td>a name; a start, <a class="xref" href="../api/EvoSim.StatStart.html#EvoSim_StatStart_Fixed_System_Single_">Fixed(float)</a> or full at a trait's value (<a class="xref" href="../api/EvoSim.StatStart.html#EvoSim_StatStart_FullTrait_EvoSim_TraitId_">FullTrait(TraitId)</a>); a minimum and a maximum (default: none); optionally a trait that caps it for each animal</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.SpeciesBuilder.html#EvoSim_SpeciesBuilder_DeclareTrait_System_String_System_Single_System_Single_System_Single_System_Boolean_">DeclareTrait</a></td>
+<td>a name; its default, your Inspector setting; a minimum and a maximum; whether it may change during life (default: no)</td>
+</tr>
+</tbody>
+</table>
+<p>The sample <a class="xref" href="../api/EvoSim.Samples.Thirst.html">Thirst</a> (<code>Assets/EvoSim/Samples/Thirst.cs</code>, recipe 22 §1) declares a stat and
+describes it in the prompt:</p>
+<pre><code class="lang-csharp">public class Thirst : SpeciesModule
+{
+    [SerializeField, Min(0f), Tooltip(&quot;Thirst added every tick (reference 0.5).&quot;)]
+    float perTick = 0.5f;
+    [SerializeField, Min(1f), Tooltip(&quot;Thirst at which an animal dies (reference 100).&quot;)]
+    float deadly = 100f;
+
+    public StatId Value { get; private set; }
+    public float PerTick =&gt; perTick;
+    public float Deadly =&gt; deadly;
+
+    public override void Declare(SpeciesBuilder b) =&gt;
+        Value = b.DeclareStat(&quot;thirst&quot;, StatStart.Fixed(0f), 0f, deadly);
+
+    public override void WritePromptRules(PromptWriter w) =&gt;
+        w.Rule($&quot;Thirst grows every step; an animal dies of thirst at {Bands.Number(deadly)}. Drinking resets it.&quot;);
+}
+</code></pre>
+<p>Other modules find it with <code>Species.Module&lt;Thirst&gt;()</code> in their <code>Initialize</code>, then read and write <code>a[thirst.Value]</code>.
+Every write is clamped to the stat's range (ANIM-22). A trait is read with <code>a.Trait(id)</code>. To let the brain sense the
+stat, add a <a class="xref" href="../api/EvoSim.LevelSense.html">LevelSense</a> with the stat <code>thirst</code>: no code (<a href="sense.html">A sense</a>).</p>
+<p><em>Assets ▸ Create ▸ EvoSim ▸ Script ▸ Stat</em> writes such a module, with a start and a maximum, into <code>Assets/Student</code>.
+Put the component on a child GameObject of the species, next to its other stats (<code>Stats</code> in the reference scenes).</p>
+<h2 id="changing-what-a-tick-costs">Changing what a tick costs</h2>
+<p><a class="xref" href="../api/EvoSim.Metabolism.html">Metabolism</a> charges each living animal once per tick, after it acted (ANIM-20). Its settings cover most
+changes:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Reference</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Base Cost</td>
+<td>0.7</td>
+<td>energy per tick when moving, or when still with an action that doesn't rest</td>
+</tr>
+<tr>
+<td>Move Cost</td>
+<td>0.5</td>
+<td>energy per meter moved</td>
+</tr>
+<tr>
+<td>Rest Cost</td>
+<td>0.2</td>
+<td>energy per tick when still and busy, or still with a resting action</td>
+</tr>
+<tr>
+<td>Cost Trait</td>
+<td>empty</td>
+<td>a trait the tick's cost grows with, e.g. <code>stamina.max</code> (09 §5)</td>
+</tr>
+<tr>
+<td>Cost Per Unit</td>
+<td>0.005</td>
+<td>extra energy per tick per unit of that trait: 60 stamina costs 0.3 a tick</td>
+</tr>
+</tbody>
+</table>
+<p>A cost trait gives a number gene a price, so evolution can't push the trait up for free. Validation reports a cost
+trait that no module declares (V-45), and reminds you when a number gene's trait has no cost (V-47).</p>
+<p>For a rule the settings can't express, derive from <a class="xref" href="../api/EvoSim.Metabolism.html">Metabolism</a> and override
+<a class="xref" href="../api/EvoSim.Metabolism.html#EvoSim_Metabolism_Settle_EvoSim_Animal_System_Single_System_Single_System_Boolean_">Settle</a>. It receives the
+animal, the meters it moved, the locomotion's extra cost, and whether it was busy at the start of the tick. The
+reference does this:</p>
+<pre><code class="lang-csharp">public virtual void Settle(Animal a, float metersMoved, float extraCost, bool wasBusy)
+{
+    if (energy != null)
+    {
+        float cost;
+        if (metersMoved &gt; Units.Epsilon) cost = baseCost + moveCost * metersMoved;    // less than 1 mm counts as still
+        else if (wasBusy) cost = restCost;
+        else cost = a.CurrentAction != null &amp;&amp; a.CurrentAction.Rests ? restCost : baseCost;
+        if (costId.IsValid) cost += costPerUnit * a.Trait(costId);                    // the cost trait (09 §5)
+        energy.Pay(a, cost + Mathf.Max(0f, extraCost));
+    }
+    stamina?.Settle(a, metersMoved, energy);                                         // pays the meters or recovers
+}
+</code></pre>
+<p>An override must still pay through <code>Energy.Pay</code> and let the stamina settle, or stamina never recovers.</p>
+<h2 id="replacing-energy-stamina-or-digestion">Replacing energy, stamina or digestion</h2>
+<p>Other modules find these by type: <code>Species.Module&lt;Energy&gt;()</code>, <code>Module&lt;Stamina&gt;()</code>, <code>Module&lt;Digestion&gt;()</code>,
+<code>Module&lt;Metabolism&gt;()</code>. That call also returns a subclass, so <strong>a replacement must derive from the reference</strong> and
+take its place (one of each per species). Override the virtual members:</p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Virtual members</th>
+<th>Called by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Energy.html">Energy</a></td>
+<td><code>Gain(a, amount)</code>, <code>Pay(a, amount)</code></td>
+<td>every meal; the metabolism, stamina recovery, litters</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Stamina.html">Stamina</a></td>
+<td><code>Budget(a)</code>, <code>Settle(a, metersMoved, energy)</code></td>
+<td>the act phase, before moving; the metabolism, after</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Digestion.html">Digestion</a></td>
+<td><code>AfterMeal(a, gain)</code></td>
+<td>the interactions, after a kill or a carcass portion</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Metabolism.html">Metabolism</a></td>
+<td><code>Settle(a, metersMoved, extraCost, wasBusy)</code></td>
+<td>the act phase, once per animal per tick</td>
+</tr>
+</tbody>
+</table>
+<p>The stub of exercise 8, <em>EvoSim ▸ Exercises ▸ Replace with stub ▸ 8 Stamina</em>, is such a subclass: it keeps the
+reference's declarations and asks you to write <code>Budget</code> and <code>Settle</code>.</p>
+<h2 id="a-death-rule">A death rule</h2>
+<p>Derive from <a class="xref" href="../api/EvoSim.DeathRule.html">DeathRule</a> to add a cause of death.</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>You</th>
+<th>What it does, when it is called</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.DeathRule.html#EvoSim_DeathRule_CauseOfDeath_EvoSim_Animal_">CauseOfDeath</a></td>
+<td>must implement</td>
+<td>Returns the cause's name for this animal now, or <code>null</code> to live on. Called in the death phase, once per tick for every living animal, after it aged.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.DeathRule.html#EvoSim_DeathRule_Causes">Causes</a></td>
+<td>should override</td>
+<td>Lists every cause the rule can return, so its <code>&lt;species&gt;_deaths_&lt;cause&gt;</code> column is in <code>stats.csv</code> from the first row.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.DeathRule.html#EvoSim_DeathRule_CheckAll_System_Collections_Generic_IReadOnlyList_EvoSim_Animal__System_String___">CheckAll</a></td>
+<td>may override</td>
+<td>Checks all living animals at once (20 §10). The default calls <code>CauseOfDeath</code> for each animal that has no cause yet.</td>
+</tr>
+</tbody>
+</table>
+<p>The sample <a class="xref" href="../api/EvoSim.Samples.DiesOfThirst.html">DiesOfThirst</a> (<code>Assets/EvoSim/Samples/DiesOfThirst.cs</code>) makes thirst grow with the
+animal and kills at the deadly level:</p>
+<pre><code class="lang-csharp">[RequiresModule(typeof(Thirst))]
+public class DiesOfThirst : DeathRule
+{
+    static readonly IReadOnlyList&lt;string&gt; causes = System.Array.AsReadOnly(new[] { &quot;thirst&quot; });
+    Thirst thirst;
+
+    public override IEnumerable&lt;string&gt; Causes =&gt; causes;
+
+    public override void Initialize() =&gt; thirst = Species.Module&lt;Thirst&gt;();
+
+    public override string CauseOfDeath(Animal a)
+    {
+        if (thirst == null) return null;
+        a[thirst.Value] += thirst.PerTick;                       // ages with the animal, in the death phase
+        return a[thirst.Value] &gt;= thirst.Deadly ? &quot;thirst&quot; : null;
+    }
+}
+</code></pre>
+<p>Place it under the species, next to the other death rules (<code>Life</code> in the reference scenes). The species' rules run in
+module order, and the first one that names a cause decides: later rules are not asked about that animal. The death
+phase records the death (cause, age, generation, meals, offspring) and removes the animal; the rule only names the
+cause. To remove animals at another moment, call <code>World.RecordDeath</code> from a phase of your own: see
+<a href="world-modules.html">Phases, services and world hooks</a>.</p>
+<h2 id="rules">Rules</h2>
+<ol>
+<li><strong>Settings in the module, state in the animal</strong> (ANIM-01). One module serves every animal of its species: what
+belongs to one animal goes in a stat it declared, never in a field of the module.</li>
+<li><strong>Declare in <code>Declare</code>, look up in <code>Initialize</code>.</strong> Read and write only through the ids (ANIM-10).</li>
+<li><strong>Read traits, not settings</strong> (ANIM-16): a number gene may have changed the animal's value.</li>
+<li><strong>Stats stay in range</strong> (ANIM-22): writes are clamped, so a gain never passes the maximum.</li>
+<li><strong>A death rule only names causes.</strong> It may update a stat that grows with age, as thirst does, but never removes
+an animal itself.</li>
+<li><strong>Draw random numbers only from the species' streams</strong> (RAND-03), <code>World.Random.For(Species, purpose)</code>.</li>
+</ol>
+<h2 id="test-it">Test it</h2>
+<p>The stat suite runs every species module with a public <a class="xref" href="../api/EvoSim.StatId.html">StatId</a> property: <em>Window ▸ General ▸ Test
+Runner</em>, EditMode, <code>ConformanceTests</code> ▸ <code>StatConformance</code> (the T-ANIM stat template). It puts the module under the
+prey of a small world and checks that every founder starts as declared, and that the stat stays in its range for
+1 000 ticks (ANIM-10, ANIM-22).</p>
+<p>There is no suite for death rules. A test to copy, from <code>Assets/EvoSim/Tests/EditMode/Samples/SampleTests.cs</code> (its
+class derives from <a class="xref" href="../api/EvoSim.Testing.WorldFixture.html">WorldFixture</a>):</p>
+<pre><code class="lang-csharp">[Test]
+public void ThirstKills()
+{
+    var w = New().Flat(20, 20).Food(0f, 0f).Phase&lt;DeathPhase&gt;()
+        .Species(&quot;prey&quot;, s =&gt; s.PreyBody().Action&lt;RestAction&gt;(&quot;rest&quot;).Module&lt;Thirst&gt;(t =&gt; t.Configure(10f, 30f)).Module&lt;DiesOfThirst&gt;())
+        .Build();
+    var sp = w.FindSpecies(&quot;prey&quot;);
+    var a = Place.Animal(sp, Place.At(5, 5));
+    a.Choose(&quot;rest&quot;);
+    w.Advance(3);
+    Assert.IsTrue(a.IsGone, &quot;dies at 30&quot;);
+    Assert.AreEqual(1, sp.Counters.Deaths[&quot;thirst&quot;]);
+}
+</code></pre>
+<p>See <a href="testing-your-module.html">Testing your module</a>.</p>
+<h2 id="read-next">Read next</h2>
+<ul>
+<li>The reference modules: <a class="xref" href="../api/EvoSim.Energy.html">Energy</a>, <a class="xref" href="../api/EvoSim.Stamina.html">Stamina</a>, <a class="xref" href="../api/EvoSim.Metabolism.html">Metabolism</a>,
+<a class="xref" href="../api/EvoSim.Digestion.html">Digestion</a>, <a class="xref" href="../api/EvoSim.Starvation.html">Starvation</a> (exercise 3) and <a class="xref" href="../api/EvoSim.OldAge.html">OldAge</a>.</li>
+<li>The samples <a class="xref" href="../api/EvoSim.Samples.Thirst.html">Thirst</a>, <a class="xref" href="../api/EvoSim.Samples.DiesOfThirst.html">DiesOfThirst</a> and the action that resets thirst,
+<a class="xref" href="../api/EvoSim.Samples.DrinkAction.html">DrinkAction</a>: <a href="action.html">An action or an interaction</a>, <a href="samples.html">the samples</a>.</li>
+<li><a href="genes.html">Genes</a>: number genes that set your traits.</li>
+<li>Specification: <a href="../spec/05-animals-stats-and-life-cycle.html">05 — Animals, stats and life cycle</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

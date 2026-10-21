@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>01 — Concepts and glossary | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="01 — Concepts and glossary | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/01-concepts-and-glossary.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="01--concepts-and-glossary">01 — Concepts and glossary</h1>
+
+<h2 id="1-the-loop-in-one-picture">1. The loop in one picture</h2>
+<pre><code>                ┌────────────────────────── one tick ──────────────────────────┐
+ genes ──┐      │                                                              │
+ (text,  │      │  senses ──► observation ──► brain ──► probabilities ──► draw │
+ numbers)│      │  (discrete)  (+ situation    (batched,   over the       an   │
+         │      │               text)          cached)     species'     action │
+         │      │                                          actions             │
+         │      │  action ──► intent ──► locomotion ──► interactions           │
+         │      │  (repeated every tick until the next decision)               │
+         │      │                                                              │
+         │      │  metabolism ─► deaths ─► mating ─► (mutation) ─► births      │
+         │      │  environment: food regrows, carcasses rot, ...               │
+         │      └──────────────────────────────────────────────────────────────┘
+         └──── number genes set traits at birth (e.g. stamina) ─────────────────
+</code></pre>
+<ul>
+<li>Nobody programs which behaviour is good. Animals that eat, escape and mate
+leave more children, and their genes spread. There is <strong>no fitness function</strong>.</li>
+<li>Genes are <strong>readable</strong>: most of them are short English sentences (&quot;Rest when
+you are tired.&quot;). A brain (an LLM in the reference) turns the
+sentences and the animal's situation into probabilities over its actions.</li>
+<li>Ordinary code does everything physical: moving, eating, striking, breeding.
+The brain only chooses among actions.</li>
+<li>Mutation is <strong>blind</strong>: it changes a gene at random (an LLM making a small edit
+to a sentence, or a numeric rule changing a number) without knowing what
+helps. Selection decides what stays.</li>
+</ul>
+<h2 id="2-core-rules">2. Core rules</h2>
+<ul>
+<li><strong>CORE-01 (MUST)</strong> No fitness function exists anywhere. Survival and
+reproduction follow only from the world rules and the animals' behaviour.</li>
+<li><strong>CORE-02 (MUST)</strong> Every behaviour-relevant feature (a sense, an action, a
+gene, a stat, a resource, a population rule, a mutation operator, a brain, a
+tick phase, a locomotion) is a module behind a documented interface. Adding,
+removing or replacing one needs no change to core code.</li>
+<li><strong>CORE-03 (MUST)</strong> No species, action, sense or gene name is special in core
+code. The prey/predator ecology of the prototype is a <em>configuration</em> of
+reference modules.</li>
+<li><strong>CORE-04 (MUST)</strong> The system runs with any number of species (≥ 1), actions
+per species (≥ 1), genes (≥ 0) and senses (≥ 0). Limits imposed by a module
+(e.g. at most 16 options for the JEV brain) are checked before the run.</li>
+<li><strong>CORE-05 (MUST)</strong> Per-animal state lives in the animal's record. Modules hold
+settings and logic; they never keep hidden per-animal state of their own
+(a module needing per-animal data declares a stat or a trait, <a href="05-animals-stats-and-life-cycle.html">05</a>).</li>
+<li><strong>CORE-06 (MUST)</strong> The brain never moves an animal or changes the world. It
+returns probabilities over the actions of the animal's species; everything
+else is done by actions, the locomotion and the tick phases.</li>
+<li><strong>CORE-07 (MUST)</strong> Mutation is blind: a mutation operator sees the gene it
+changes (and, for text genes, at most one fixed context line), never the
+animal, its fitness, the world or the other genes.</li>
+<li><strong>CORE-08 (SHOULD)</strong> Configuration errors are found before the first tick
+(validation in the editor and at start), not in the middle of a run.</li>
+<li><strong>CORE-09 (MUST)</strong> A run is reproducible from its configuration, its seed and
+its answer caches (<a href="12-tick-order-and-determinism.html">12</a>).</li>
+</ul>
+<h2 id="3-glossary">3. Glossary</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>World</strong></td>
+<td>The root of a simulation: space, environment, species, tick phases, services, random streams. One world per run; several worlds may exist side by side (tests).</td>
+</tr>
+<tr>
+<td><strong>Tick</strong></td>
+<td>One simulation step. All rules are written per tick. Unity time only drives the visuals.</td>
+</tr>
+<tr>
+<td><strong>Phase</strong></td>
+<td>One step of a tick (decide, act, breed, …). A world holds an ordered list of phases (<a href="12-tick-order-and-determinism.html">12</a>).</td>
+</tr>
+<tr>
+<td><strong>Run</strong></td>
+<td>Ticks from 0 to a stop condition, with a seed, writing outputs (<a href="13-outputs-and-recording.html">13</a>).</td>
+</tr>
+<tr>
+<td><strong>Species</strong></td>
+<td>A kind of animal: its genes, senses, actions, stats, diet, reproduction, mutation and population rules.</td>
+</tr>
+<tr>
+<td><strong>Animal</strong></td>
+<td>One individual: position, heading, stats, genome, traits, current action, counters. Data, not a GameObject.</td>
+</tr>
+<tr>
+<td><strong>Kin</strong></td>
+<td>Other animals of the same species.</td>
+</tr>
+<tr>
+<td><strong>Edible</strong></td>
+<td>A component that makes the thing it sits on edible (a resource layer's items, a species' animals, carcasses, eggs…): how it is eaten (graze, strike, scavenge) and how much energy it holds. Without it, nothing can eat that thing.</td>
+</tr>
+<tr>
+<td><strong>Food web, diet</strong></td>
+<td>Who eats what. A species' diet component lists the edible things it eats (resource layers, species, carcasses, …), optionally scaling their energy.</td>
+</tr>
+<tr>
+<td><strong>Threat</strong></td>
+<td>A species that has the animal's species in its diet. Derived from the food web.</td>
+</tr>
+<tr>
+<td><strong>Resource layer</strong></td>
+<td>Something edible spread over the ground, e.g. food items on a grid of cells that regrow.</td>
+</tr>
+<tr>
+<td><strong>Entity</strong></td>
+<td>A world object with a position that is not an animal: a carcass, an egg, a water hole. May move.</td>
+</tr>
+<tr>
+<td><strong>Carcass</strong></td>
+<td>What a kill leaves: portions that other hunters may eat, rotting after a while.</td>
+</tr>
+<tr>
+<td><strong>Cover</strong></td>
+<td>Places where an animal is hidden from the species that hunt it.</td>
+</tr>
+<tr>
+<td><strong>Stat</strong></td>
+<td>A per-animal number that changes during life: energy, stamina, age, thirst.</td>
+</tr>
+<tr>
+<td><strong>Trait</strong></td>
+<td>A per-animal number fixed at birth, with a default from the species' settings, that number genes can set: maximum stamina, speed, vision.</td>
+</tr>
+<tr>
+<td><strong>Metabolism</strong></td>
+<td>The rules that charge and refill stats each tick.</td>
+</tr>
+<tr>
+<td><strong>Busy</strong></td>
+<td>A state in which an animal neither decides nor moves for a number of ticks (e.g. digesting a meal).</td>
+</tr>
+<tr>
+<td><strong>Gene, locus</strong></td>
+<td>A slot of the genome with a fixed meaning, e.g. &quot;the eat gene&quot;. Identified by a locus id.</td>
+</tr>
+<tr>
+<td><strong>Text gene</strong></td>
+<td>A gene whose value is a sentence, read by the brain through the prompt.</td>
+</tr>
+<tr>
+<td><strong>Number gene</strong></td>
+<td>A gene whose value is a number, expressed into a trait.</td>
+</tr>
+<tr>
+<td><strong>Allele</strong></td>
+<td>One value a gene can take (a sentence or a number), with an id and a lineage.</td>
+</tr>
+<tr>
+<td><strong>Genome</strong></td>
+<td>One allele per locus of the animal's species, in the species' locus order.</td>
+</tr>
+<tr>
+<td><strong>Expression</strong></td>
+<td>Turning a genome into what acts at run time: sentences into the prompt, numbers into traits.</td>
+</tr>
+<tr>
+<td><strong>Founder pool</strong></td>
+<td>The alleles from which the first animals and newcomers are drawn, per locus, including a <strong>neutral</strong> allele (&quot;No preference.&quot;).</td>
+</tr>
+<tr>
+<td><strong>Contrast alleles</strong></td>
+<td>A &quot;pro&quot; and an &quot;anti&quot; sentence per locus, used only in tests of the brain.</td>
+</tr>
+<tr>
+<td><strong>Control alleles</strong></td>
+<td>Meaningless or irrelevant sentences, used in controls and tests.</td>
+</tr>
+<tr>
+<td><strong>Crossover</strong></td>
+<td>Building a child's genome from its parents', locus by locus.</td>
+</tr>
+<tr>
+<td><strong>Mutation operator</strong></td>
+<td>A rule that changes one allele: an LLM instruction deck for sentences, a numeric rule for numbers.</td>
+</tr>
+<tr>
+<td><strong>Mutator</strong></td>
+<td>The service that runs LLM mutations (a small model, batched).</td>
+</tr>
+<tr>
+<td><strong>Guard, redraw</strong></td>
+<td>A check on a mutated sentence; a rejected answer is drawn again with a new instruction and seed.</td>
+</tr>
+<tr>
+<td><strong>Mating, litter</strong></td>
+<td>Two ready animals in contact produce a litter of several babies, each with its own crossover and mutations.</td>
+</tr>
+<tr>
+<td><strong>Egg, incubation</strong></td>
+<td>A conceived baby waiting to hatch. Incubation gives the mutator time to answer.</td>
+</tr>
+<tr>
+<td><strong>Generation</strong></td>
+<td>The larger parent generation + 1; founders are generation 0.</td>
+</tr>
+<tr>
+<td><strong>Cap, migration</strong></td>
+<td>The maximum population of a species. Above it, random older animals leave the world (&quot;migrated&quot;).</td>
+</tr>
+<tr>
+<td><strong>Floor, newcomer</strong></td>
+<td>The minimum population. Below it, newcomers with founder genomes are added.</td>
+</tr>
+<tr>
+<td><strong>Sense</strong></td>
+<td>A module that reads the world for one animal and returns a discrete <strong>token</strong> (e.g. food &quot;2-4 m away&quot;).</td>
+</tr>
+<tr>
+<td><strong>Observation</strong></td>
+<td>The tuple of tokens of all the species' senses for one animal at one decision.</td>
+</tr>
+<tr>
+<td><strong>Band</strong></td>
+<td>A distance range with a name: adjacent, close, medium, far, none.</td>
+</tr>
+<tr>
+<td><strong>Situation text</strong></td>
+<td>The observation written as text for the brain.</td>
+</tr>
+<tr>
+<td><strong>Action</strong></td>
+<td>A behaviour the brain can choose (eat, flee, hide, hunt, …). It chooses a target, produces an <strong>intent</strong> (a direction, walk or run, how far at most) and may trigger an <strong>interaction</strong>.</td>
+</tr>
+<tr>
+<td><strong>Search</strong></td>
+<td>What an action does when it has nothing to act on in sight: a random walk. Counted as an invalid choice.</td>
+</tr>
+<tr>
+<td><strong>Locomotion</strong></td>
+<td>The species' module that turns an intent into movement over the ground: kinematic straight lines in the reference; terrain, NavMesh or physics subclasses later.</td>
+</tr>
+<tr>
+<td><strong>Interaction</strong></td>
+<td>A contact effect: graze, strike, eat a carcass portion, enter cover.</td>
+</tr>
+<tr>
+<td><strong>Act order</strong></td>
+<td>The order in which animals act within a tick (species in turn, all mixed, or simultaneous).</td>
+</tr>
+<tr>
+<td><strong>Decision period</strong></td>
+<td>Ticks between two decisions (4 in the reference).</td>
+</tr>
+<tr>
+<td><strong>Brain</strong></td>
+<td>A module that maps a batch of queries to probability rows over actions.</td>
+</tr>
+<tr>
+<td><strong>Query</strong></td>
+<td>What the brain receives for one animal: species, brain-visible genes, observation, situation text.</td>
+</tr>
+<tr>
+<td><strong>Sampling temperature</strong></td>
+<td>τ applied to the brain's probabilities before drawing: p^(1/τ), renormalised.</td>
+</tr>
+<tr>
+<td><strong>Memo</strong></td>
+<td>Within a run, the answer for each (species, brain, brain-visible genome, observation) is computed once.</td>
+</tr>
+<tr>
+<td><strong>Answer cache</strong></td>
+<td>A persistent store of brain and mutator answers, so a repeated run replays without model calls.</td>
+</tr>
+<tr>
+<td><strong>Prompt</strong></td>
+<td>The full text sent to an LLM brain: rules, actions, genes, situation, answer instruction.</td>
+</tr>
+<tr>
+<td><strong>Gate</strong></td>
+<td>A pass/fail test of a brain or of evolution, fixed in advance (<a href="15-controls-metrics-and-gates.html">15</a>).</td>
+</tr>
+<tr>
+<td><strong>Control</strong></td>
+<td>A run setting that removes one ingredient (mutation, gene expression, meaningful founders) to compare against.</td>
+</tr>
+<tr>
+<td><strong>Event, events hash</strong></td>
+<td>One logged fact (birth, death, …); a running hash of all events identifies a run exactly.</td>
+</tr>
+</tbody>
+</table>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

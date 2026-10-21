@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Testing your module | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Testing your module | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/testing-your-module.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-testing-your-module">
+<h1 id="testing-your-module">Testing your module</h1>
+
+<p>Every module you write gets two kinds of test. The <strong>conformance suite</strong> of its kind finds your class on its own and
+checks that it fits the system: a sense returns declared tokens, an action only sets intents, a locomotion never ends a
+tick on water. Your <strong>unit tests</strong> check that it does what you meant: the drink action resets thirst, your sense says
+<em>near</em> at 3 m. A green suite means your module fits; only your own tests say it is right.</p>
+<p>All tests use the Unity Test Framework (NUnit) and run in <em>Window ▸ General ▸ Test Runner</em>, without any language
+model: brains and mutators are fakes. Their helpers live in the <code>EvoSim.Testing</code> assembly (<a href="../guides/testing.html">Testing</a>).</p>
+<h2 id="step-by-step">Step by step</h2>
+<ol>
+<li><strong>Create the class with its test.</strong> In the Project window, <em>Assets ▸ Create ▸ EvoSim ▸ Script ▸</em> <strong>Sense</strong>,
+<strong>Action</strong>, <strong>Gene kind</strong>, <strong>Stat</strong>, <strong>Phase</strong>, <strong>Brain</strong> or <strong>Mutation operator</strong> asks for a class name and writes
+two files: <code>Assets/Student/&lt;Name&gt;.cs</code> (assembly <code>Student</code>) and <code>Assets/Student/Tests/&lt;Name&gt;Tests.cs</code> (assembly
+<code>Student.Tests</code>, editor only, which sees <code>EvoSim.Testing</code>). The test class derives from
+<a class="xref" href="../api/EvoSim.Testing.WorldFixture.html">WorldFixture</a> and has one test, <code>Works</code>, that builds a small world with your class and runs it.
+For a kind with no template (a locomotion, a resource layer), derive from the base class yourself in <code>Assets/Student</code>.</li>
+<li><strong>Write the module.</strong> If it needs another module to work, say so with <code>[RequiresModule(typeof(…))]</code> (see
+<a href="species-modules.html#dependencies">Species modules</a>).</li>
+<li><strong>Run the conformance suite of its kind.</strong> Open <em>Window ▸ General ▸ Test Runner</em>, tab <strong>EditMode</strong>, and expand
+<code>EvoSim.Tests.EditMode</code> ▸ <code>EvoSim.Tests</code> ▸ <code>ConformanceTests</code>. Each suite lists one case per class, named after it.
+Select the cases of your class and choose <em>Run Selected</em>. A failure message names the rule broken.</li>
+<li><strong>Write your unit tests</strong> in the generated file: they appear under <code>Student.Tests</code> in the same tab. Start from the
+example below, or copy a test of a reference module of the same kind (see <a href="#tests-to-copy">Tests to copy</a>).</li>
+<li><strong>Before you share your work,</strong> run every EditMode test (<em>Run All</em>), then the PlayMode tab. Before a merge into the
+main branch, also run the slow tests of category <code>T3</code> (<a href="#the-slow-tests-t3">below</a>).</li>
+</ol>
+<h2 id="the-conformance-suites">The conformance suites</h2>
+<p><code>ConformanceTests</code> (<code>Assets/EvoSim/Tests/EditMode/Conformance/ConformanceTests.cs</code>) holds one parameterised test per
+kind of module. Each builds a small world, puts your module in it (under the prey species, or under the World for a
+phase or a layer), runs it and checks the rules every module of that kind must keep.</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Base class</th>
+<th>The suite checks</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sense</td>
+<td><a class="xref" href="../api/EvoSim.Sense.html">Sense</a></td>
+<td>tokens are declared and none is empty; <code>Write</code> gives the same non-empty text every time, for every token, in both text styles; over 60 ticks every observation holds a declared token (SENSE-01, SENSE-10)</td>
+<td><code>SenseConformance</code></td>
+</tr>
+<tr>
+<td>action</td>
+<td><a class="xref" href="../api/EvoSim.AnimalAction.html">AnimalAction</a></td>
+<td>it has a description for the prompt; a text gene placed beside it binds to it; <code>Act</code> changes no animal, it only sets an intent; alone in an empty world it searches or stays, unless it rests (ACT-04, ACT-06)</td>
+<td><code>ActionConformance</code></td>
+</tr>
+<tr>
+<td>stat</td>
+<td>a <a class="xref" href="../api/EvoSim.SpeciesModule.html">SpeciesModule</a> with a public <a class="xref" href="../api/EvoSim.StatId.html">StatId</a> property</td>
+<td>founders start at the declared value; the stat stays in its range for 1 000 ticks, with every other invariant (ANIM-10, ANIM-22)</td>
+<td><code>StatConformance</code></td>
+</tr>
+<tr>
+<td>food or other item layer</td>
+<td><a class="xref" href="../api/EvoSim.ResourceLayer.html">ResourceLayer</a></td>
+<td>the layer starts with items; the nearest item is found within a radius (for grids, the same one as a brute-force search); an item can be consumed only once (ENV-01, ENV-02)</td>
+<td><code>LayerConformance</code></td>
+</tr>
+<tr>
+<td>mutation operator</td>
+<td><a class="xref" href="../api/EvoSim.MutationOperator.html">MutationOperator</a></td>
+<td>it accepts a text or a number gene; the same parent and seed give the same result; a result passes the gene's own checks (MUT-20, MUT-30)</td>
+<td><code>MutationOperatorConformance</code></td>
+</tr>
+<tr>
+<td>tick phase</td>
+<td><a class="xref" href="../api/EvoSim.TickPhase.html">TickPhase</a></td>
+<td>it runs 20 ticks in a world without animals; disabling and re-enabling it leaves the events hash of a populated world unchanged (TICK-01)</td>
+<td><code>PhaseConformance</code></td>
+</tr>
+<tr>
+<td>locomotion</td>
+<td><a class="xref" href="../api/EvoSim.Locomotion.html">Locomotion</a></td>
+<td>eight walkers head into a pond: none ever ends a tick on water or outside the world; the meters reported are the meters moved; the extra cost is never negative; none stands still more than 3 ticks away from the shore (MOVE-02, MOVE-03, SPACE-04, SPACE-05)</td>
+<td><code>LocomotionConformance</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="how-a-class-enters-a-suite">How a class enters a suite</h3>
+<p>You do nothing: no registration, no class to derive from. Each suite finds its classes by reflection, so a new class
+appears in the Test Runner as soon as Unity has compiled it:</p>
+<ul>
+<li>every class deriving from the suite's base class that is <strong>concrete</strong>, <strong>not generic</strong> and has a <strong>parameterless
+constructor</strong> (every MonoBehaviour without a constructor of its own has one);</li>
+<li>in the assemblies <code>EvoSim.Runtime</code>, <code>EvoSim.Http</code> and <code>EvoSim.Samples</code>, in <code>Student</code> (everything under
+<code>Assets/Student</code>), and in <code>Assembly-CSharp</code> (scripts outside any assembly). The test probes of <code>EvoSim.Testing</code> and the
+editor code are left out;</li>
+<li>the modules your class names with <a class="xref" href="../api/EvoSim.RequiresModuleAttribute.html">RequiresModuleAttribute</a> are added beside it first: a species module
+on the species under test, a world module under the World. A drink action is tested with its thirst.</li>
+</ul>
+<h2 id="testing-a-brain">Testing a brain</h2>
+<p>The brain suite is <code>DecisionTests.BrainConformance</code> (<code>Assets/EvoSim/Tests/EditMode/Decisions/DecisionTests.cs</code>). It
+checks DEC-11 and DEC-12: one valid row per query, of the species' length, in query order, and the same row for the
+same query. It only looks at brains of the EvoSim assemblies, so it does not run yours. Copy it into your test file
+with your class:</p>
+<pre><code class="lang-csharp">[Test, Description(&quot;DEC-11, DEC-12: one valid row per query, in order; the same query twice gives the same row&quot;)]
+public void MyBrainConforms()
+{
+    var w = New().Ecology(48f).ReferencePhases().DefaultBrain&lt;MyBrain&gt;().Build();
+    var rng = new RandomStream(3, &quot;queries&quot;);
+    var queries = new List&lt;DecisionQuery&gt;();
+    for (int i = 0; i &lt; 20; i++)
+    {
+        var s = w.FindSpecies(i % 2 == 0 ? &quot;prey&quot; : &quot;predator&quot;);
+        var a = Place.Animal(s, Place.At(rng.Range(0f, 48f), rng.Range(0f, 48f)));
+        w.Space.Rebuild();
+        var o = s.Observe(a, new SenseContext(w));
+        queries.Add(new DecisionQuery(s, new List&lt;KeyValuePair&lt;string, string&gt;&gt;(), o,
+                                      s.Describe(o, TextStyle.V1), TextStyle.V1, a.Genome.BrainKey));
+    }
+    var answer = w.DefaultBrain.Ask(queries); answer.Pending.Wait();
+    var again = w.DefaultBrain.Ask(queries); again.Pending.Wait();
+    for (int i = 0; i &lt; queries.Count; i++)
+    {
+        Assert.IsNull(BrainAnswer.Check(answer.Row(i), queries[i].Species.Actions.Count), $&quot;row {i}&quot;);
+        CollectionAssert.AreEqual(answer.Row(i), again.Row(i), &quot;deterministic&quot;);
+    }
+}
+</code></pre>
+<p>It needs <code>using System.Collections.Generic;</code> beside the usings of the generated file. A brain that calls a server (an
+<a class="xref" href="../api/EvoSim.HttpBrain.html">HttpBrain</a>) is tested against a fake server: set its <code>Transport</code> to a
+<a class="xref" href="../api/EvoSim.Testing.FakeHttpTransport.html">FakeHttpTransport</a> before <code>Build()</code> (see <a href="http-brains.html">An HTTP brain or mutator server</a>).</p>
+<h2 id="a-complete-unit-test">A complete unit test</h2>
+<p>This test checks the sample <a class="xref" href="../api/EvoSim.Samples.DrinkAction.html">DrinkAction</a>: an animal 2 m from a pond walks to the shore and
+drinks. Your own tests have the same shape: build a world in code, place animals, give them an action, advance, assert.</p>
+<pre><code class="lang-csharp">using EvoSim;
+using EvoSim.Samples;
+using EvoSim.Testing;
+using NUnit.Framework;
+
+public class DrinkActionTests : WorldFixture
+{
+    [Test, Description(&quot;ACT-10 (22 §3): drink walks to the shore and resets thirst on arrival&quot;)]
+    public void DrinkResetsThirst()
+    {
+        var w = New().Ground&lt;PondGround&gt;(20, 20).Food(0f, 0f).Phase&lt;ActPhase&gt;()
+            .Species(&quot;prey&quot;, s =&gt; s.PreyBody().Action&lt;DrinkAction&gt;(&quot;drink&quot;).Module&lt;Thirst&gt;()).Build();
+        var sp = w.FindSpecies(&quot;prey&quot;);
+        var a = Place.Animal(sp, Place.At(10f, 15f));          // 2 m from the pond's shore
+        var thirst = sp.Module&lt;Thirst&gt;().Value;
+        a[thirst] = 50f;
+        a.Choose(&quot;drink&quot;);                                     // no decision phase: it keeps this action
+        w.Advance(3);
+        Assert.AreEqual(0f, a[thirst], &quot;drank&quot;);
+        Assert.IsFalse(w.Ground.IsWater(a.Position), &quot;on the shore, not in the water&quot;);
+    }
+}
+</code></pre>
+<p><a class="xref" href="../api/EvoSim.Testing.WorldFixture.html#EvoSim_Testing_WorldFixture_New_System_Int32_EvoSim_WaitMode_System_String_">New</a> starts a
+<a class="xref" href="../api/EvoSim.Testing.WorldBuilder.html">WorldBuilder</a> with seed 1234, and the fixture destroys the world after the test. The world has only
+the phases the test adds: here the act phase, so no brain is asked and the animal keeps the action given by
+<a class="xref" href="../api/EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_Choose_EvoSim_Animal_System_String_">Choose</a>.
+<a class="xref" href="../api/EvoSim.Testing.Place.html#EvoSim_Testing_Place_Animal_EvoSim_Species_UnityEngine_Vector3_EvoSim_Genome_System_Single_System_String_System_Action_EvoSim_Animal__">Place.Animal</a>
+puts an animal exactly where the test needs it, and <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Advance_System_Int32_">Advance</a> runs ticks. The
+<code>Description</code> is the test's documentation: say what it checks and name the rules it keeps. The reference set-ups
+(<code>PreyBody</code>, <code>Ecology</code>, <code>Lab1</code>, <code>ReferencePhases</code>) are in <a class="xref" href="../api/EvoSim.Testing.Lab.html">Lab</a>; see <a href="../guides/testing.html">Testing</a>.</p>
+<h2 id="fakes-and-helpers">Fakes and helpers</h2>
+<table>
+<thead>
+<tr>
+<th>Helper</th>
+<th>Use it to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Testing.ScriptedBrain.html">ScriptedBrain</a></td>
+<td>decide without a model. Its <a class="xref" href="../api/EvoSim.Testing.ScriptedBrain.html#EvoSim_Testing_ScriptedBrain_Policy">Policy</a> maps a query to a row; <code>ScriptedBrain.Prefer(species, &quot;flee&quot;)</code> builds a row that prefers one action and <code>ScriptedBrain.Token(query, &quot;Predator&quot;)</code> reads one sense. It counts <code>Calls</code> and <code>Batches</code>, keeps every query in <code>Seen</code>, can answer <code>DelayCalls</code> calls late and fail on demand (<code>FailWhen</code>). Without a policy it answers uniformly.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Testing.FakeMutator.html">FakeMutator</a></td>
+<td>mutate without a model. Add it with <a class="xref" href="../api/EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_FakeMutation_EvoSim_Testing_WorldBuilder_System_Action_EvoSim_Testing_FakeMutator__">FakeMutation</a>. By default it appends <em>quickly</em> to the sentence; set <code>Answer</code> for another rule. It records every prompt in <code>Prompts</code> and can answer late or fail.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Testing.FakeHttpTransport.html">FakeHttpTransport</a></td>
+<td>play a server for an HTTP brain or mutator client: <code>FakeHttpTransport.Jev()</code>, <code>FakeHttpTransport.OllamaPoints()</code>, or your own <code>Respond</code>. It records every request (<code>Requests</code>) and can fail (<code>FailWith</code>), hang or answer slowly.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Testing.Stat.html">Stat</a></td>
+<td>check a statistic over many draws with a fixed seed: <code>Stat.Binomial(successes, trials, p)</code> within 4 standard errors, <code>Stat.Mean</code>, <code>Stat.Uniform</code> (a χ² test).</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_CheckInvariants_EvoSim_Testing_WorldBuilder_">CheckInvariants</a></td>
+<td>called after the other phases, add a phase that fails the test at the first broken invariant of 30 §5: an animal outside or on water, a NaN, a stat out of range, a duplicate id, a dead animal still listed, a bad probability row… <a class="xref" href="../api/EvoSim.Testing.Invariants.html">Invariants</a> runs the same checks at any moment.</td>
+</tr>
+</tbody>
+</table>
+<p>Draw every random number in a test from a fixed seed, the world's (<code>New(seed)</code>) or a <a class="xref" href="../api/EvoSim.RandomStream.html">RandomStream</a> of
+your own (<code>new RandomStream(7, &quot;my-test&quot;)</code>), so that a failing test fails the same way every time.</p>
+<h2 id="tests-to-copy">Tests to copy</h2>
+<p>The tests of the reference modules are the best models. They are in <code>Assets/EvoSim/Tests/EditMode</code>:</p>
+<table>
+<thead>
+<tr>
+<th>To test</th>
+<th>Copy from</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>any module, in the simplest form</td>
+<td><code>Samples/SampleTests.cs</code>: one short test per sample (thirst, water sense, drink, seasons, slopes)</td>
+</tr>
+<tr>
+<td>a sense</td>
+<td><code>Senses/SenseTests.cs</code> (tokens one by one, distance bands, situation texts)</td>
+</tr>
+<tr>
+<td>an action or an interaction</td>
+<td><code>Actions/ActionTests.cs</code> (intents, reach, contested items)</td>
+</tr>
+<tr>
+<td>a locomotion</td>
+<td><code>Actions/MovementTests.cs</code> (speeds, stop distances, corners, slopes)</td>
+</tr>
+<tr>
+<td>a stat or a death rule</td>
+<td><code>Animals/AnimalTests.cs</code> (the energy table, causes of death)</td>
+</tr>
+<tr>
+<td>a mutation operator</td>
+<td><code>Mutation/MutationTests.cs</code> (rates, same seed same result, clamping)</td>
+</tr>
+<tr>
+<td>a phase</td>
+<td><code>Core/TickLoopTests.cs</code> (order, what later phases see)</td>
+</tr>
+<tr>
+<td>a brain</td>
+<td><code>Decisions/DecisionTests.cs</code>; over HTTP, <code>Http/HttpBrainTests.cs</code></td>
+</tr>
+<tr>
+<td>a food layer or cover</td>
+<td><code>Environment/EnvironmentTests.cs</code> (queries against brute force)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-teaching-path">The teaching path</h2>
+<p><em>EvoSim ▸ Exercises ▸ Replace with stub ▸ …</em> writes <code>Assets/Student/Exercises/My&lt;Reference&gt;.cs</code> and swaps the reference
+module for it in the open scenes (<a href="exercises.html">The teaching path</a>). The stub is in the <code>Student</code> assembly, so the
+conformance suite of its kind runs it at once; it fails until you write the methods that throw. The reference
+module's own unit tests do <strong>not</strong> grade your stub: they build their worlds with the reference class by type
+(<code>Action&lt;RestAction&gt;(&quot;rest&quot;)</code>). To hold your version to the same expectations, copy such a test into your test file
+and put your class in the builder call (<code>Action&lt;MyRestAction&gt;(&quot;rest&quot;)</code>).</p>
+<h2 id="golden-files">Golden files</h2>
+<p>Some tests compare an output with a file pinned from an accepted run, in <code>Assets/EvoSim/Tests/Golden</code>
+(<a class="xref" href="../api/EvoSim.Testing.Golden.html">Golden</a>):</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Pinned by</th>
+<th>Holds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hashes.json</code></td>
+<td><code>RegressionTests.PinnedHashes</code> (R-01)</td>
+<td>the events hash of 12 runs: two reference scenes × seeds 1234, 7, 42 × the random brain or a scripted prey, 2 000 ticks</td>
+</tr>
+<tr>
+<td><code>prompts.txt</code></td>
+<td><code>PromptTests</code> (T-PROMPT-03)</td>
+<td>the assembled prompts of both reference species</td>
+</tr>
+<tr>
+<td><code>situations.tsv</code></td>
+<td><code>SenseTests</code> (T-SENSE-08)</td>
+<td>the situation texts of 48 situations per species</td>
+</tr>
+<tr>
+<td><code>jev_text.txt</code></td>
+<td><code>HttpBrainTests</code></td>
+<td>the text the JEV brain sends for the example of 08 §7</td>
+</tr>
+</tbody>
+</table>
+<p>A missing file is written from the current run; an existing one must match exactly, and the failure shows the first
+line that differs. To <strong>re-pin</strong>, delete the file, run its test once, and commit the new file with a message that says
+why. Re-pin only when the change was meant: a rule changed, a reference value changed, a prompt text was rewritten. Do
+not re-pin after a change that should not alter any run (a refactoring, comments): find what changed the behaviour.
+Hashes are compared on one machine only (RAND-12).</p>
+<p>Your modules in <code>Assets/Student</code> change no golden file unless you put them in a reference scene or change a reference
+module: try them in a copy of a scene, and restore any exercise stub (<em>EvoSim ▸ Exercises ▸ Restore reference</em>) before
+you run the regression tests.</p>
+<h2 id="the-slow-tests-t3">The slow tests (T3)</h2>
+<p>Eleven tests carry the NUnit category <code>T3</code>: the regression tests of 30 §6 (pinned hashes, equivalences, soak,
+performance, the prototype's analysis tools) and the long scenarios (S01, S06, S10, S16, S17, S23). They run whole
+scenes for thousands of ticks: minutes each, the soak up to 30 minutes. Run them before a merge, from the Test Runner
+with the category filter set to <code>T3</code>, or headless:</p>
+<pre><code>Unity.exe -batchmode -nographics -projectPath . -executeMethod EvoSim.Batch.RunRegression
+</code></pre>
+<p><a class="xref" href="../api/EvoSim.Batch.html#EvoSim_Batch_RunRegression">RunRegression</a> writes its totals to <code>Logs/EvoSim/Reports/regression-&lt;date-time&gt;.txt</code>
+and exits with code 1 when a test failed (<a href="../guides/running-and-building.html">Running and building</a>).</p>
+<div class="WARNING">
+<h5>Warning</h5>
+<p>Tests that use a reference scene open it beside the current one and close it unsaved
+(<a class="xref" href="../api/EvoSim.Batch.html#EvoSim_Batch_WithScene_System_String_System_Func_EvoSim_World_System_String__">WithScene(string, Func&lt;World, string&gt;)</a>). If that scene is open in the
+editor, the test fails with <em>&quot;… is open in the editor: open another scene first&quot;</em>: do that and run it again.</p>
+</div>
+<h2 id="read-next">Read next</h2>
+<ul>
+<li><a href="../guides/testing.html">Testing</a>: the <code>EvoSim.Testing</code> assembly in depth: the builder, the fixture, the test probes.</li>
+<li><a href="../spec/30-tests.html">30 — Tests</a>: every test id, the tiers, the conformance suites and the regression tests.</li>
+<li><a href="exercises.html">The teaching path</a> and <a href="samples.html">the samples</a>: modules to rewrite, and tested extensions to read.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

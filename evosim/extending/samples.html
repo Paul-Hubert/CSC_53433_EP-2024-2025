@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>The samples | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="The samples | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/samples.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-samples">
+<h1 id="the-samples">The samples</h1>
+
+<p>The samples are the recipes of <a href="../spec/22-extending-recipes.html">22 — Extending</a> written out as working modules: thirst,
+water, drinking, seasons, slopes, a mutation operator without a model, a sense that tells a hunter from a neighbour, and
+a carcass that can be dragged away. Read them as complete examples of each mechanism, and add them to a scene to try
+them. They live in <code>Assets/EvoSim/Samples</code>, assembly <code>EvoSim.Samples</code>, namespace <code>EvoSim.Samples</code>. No reference scene
+uses them, so they change nothing until you put one in a world. Most are tested in
+<code>Assets/EvoSim/Tests/EditMode/Samples/SampleTests.cs</code>, and the senses, actions, stat, operator, phase and locomotion
+also go through the conformance suite of their kind.</p>
+<table>
+<thead>
+<tr>
+<th>Sample</th>
+<th>Adds</th>
+<th>Mechanism</th>
+<th>Recipe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Samples.Thirst.html">Thirst</a></td>
+<td>a <code>thirst</code> stat and its prompt rule</td>
+<td>a stat module</td>
+<td>22 §1</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Samples.DiesOfThirst.html">DiesOfThirst</a></td>
+<td>thirst that grows, and death by thirst</td>
+<td>a death rule</td>
+<td>22 §1</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Samples.NearestWaterSense.html">NearestWaterSense</a></td>
+<td>&quot;Water: 1-4 meters away.&quot;</td>
+<td>a banded sense</td>
+<td>22 §2</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Samples.DrinkAction.html">DrinkAction</a></td>
+<td>an action that walks to the shore and drinks</td>
+<td>an action and an interaction</td>
+<td>22 §3</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Samples.IntensityLadder.html">IntensityLadder</a></td>
+<td><em>often</em> becomes <em>always</em> or <em>sometimes</em></td>
+<td>a mutation operator</td>
+<td>22 §8</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Samples.SeasonsPhase.html">SeasonsPhase</a></td>
+<td>winters in which grass regrows slowly</td>
+<td>a tick phase</td>
+<td>22 §9</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Samples.ChasedSense.html">ChasedSense</a></td>
+<td>&quot;Something is chasing me.&quot;</td>
+<td>a plain sense</td>
+<td>22 §13</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Samples.SlopeLocomotion.html">SlopeLocomotion</a></td>
+<td>steep slopes refused, climbing paid in energy</td>
+<td>a locomotion subclass</td>
+<td>22 §14</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Samples.DragAction.html">DragAction</a></td>
+<td>a carcass dragged into cover</td>
+<td>an interaction that moves an entity</td>
+<td>scenario S18</td>
+</tr>
+</tbody>
+</table>
+<p>To add a sample, select the GameObject named below, choose <strong>Add Component</strong> in the Inspector and type the class name.
+To change a sample, copy its file into <code>Assets/Student</code> and rename the class: the <code>Student</code> assembly sees the samples,
+so your class can also derive from one.</p>
+<h2 id="thirst">Thirst</h2>
+<p><a class="xref" href="../api/EvoSim.Samples.Thirst.html">Thirst</a> declares a stat, <code>thirst</code>, on every animal of the species: 0 at birth, kept between 0 and
+<em>Deadly</em> (100). It adds a rule line to the prompt: <em>&quot;Thirst grows every step; an animal dies of thirst at 100. Drinking
+resets it.&quot;</em> It does not change the stat itself: <a class="xref" href="../api/EvoSim.Samples.DiesOfThirst.html">DiesOfThirst</a> makes it grow and
+<a class="xref" href="../api/EvoSim.Samples.DrinkAction.html">DrinkAction</a> resets it.</p>
+<ul>
+<li><strong>Mechanism.</strong> A <a class="xref" href="../api/EvoSim.SpeciesModule.html">SpeciesModule</a> that declares a stat in
+<a class="xref" href="../api/EvoSim.Samples.Thirst.html#EvoSim_Samples_Thirst_Declare_EvoSim_SpeciesBuilder_">Declare</a> and writes a rule in
+<a class="xref" href="../api/EvoSim.Samples.Thirst.html#EvoSim_Samples_Thirst_WritePromptRules_EvoSim_PromptWriter_">WritePromptRules</a>. Other modules read it through
+<a class="xref" href="../api/EvoSim.Samples.Thirst.html#EvoSim_Samples_Thirst_Value">Value</a>: <code>a[thirst.Value]</code>. See <a href="stats-and-death.html">Stats, costs and death rules</a>.</li>
+<li><strong>In a scene.</strong> On a child of the species, next to its other stats. Settings: <em>Per Tick</em> (0.5), <em>Deadly</em> (100).</li>
+<li>To let the brain feel thirst, add a <a class="xref" href="../api/EvoSim.LevelSense.html">LevelSense</a> with <em>Stat</em> <code>thirst</code>: no code needed.</li>
+</ul>
+<h2 id="diesofthirst">DiesOfThirst</h2>
+<p><a class="xref" href="../api/EvoSim.Samples.DiesOfThirst.html">DiesOfThirst</a> runs in the death phase, once per animal per tick. It adds <em>Per Tick</em> to the
+animal's thirst, then returns the cause &quot;thirst&quot; when thirst has reached <em>Deadly</em>. At the reference values, an animal
+that never drinks dies after 200 ticks. The cause gets its own column in <code>stats.csv</code> (<code>deaths_thirst</code>, prefixed with the
+species id).</p>
+<ul>
+<li><strong>Mechanism.</strong> A <a class="xref" href="../api/EvoSim.DeathRule.html">DeathRule</a>: <a class="xref" href="../api/EvoSim.Samples.DiesOfThirst.html#EvoSim_Samples_DiesOfThirst_Causes">Causes</a> names its causes and
+<a class="xref" href="../api/EvoSim.Samples.DiesOfThirst.html#EvoSim_Samples_DiesOfThirst_CauseOfDeath_EvoSim_Animal_">CauseOfDeath</a> returns one, or null to live on.
+<code>[RequiresModule(typeof(Thirst))]</code> (<a class="xref" href="../api/EvoSim.RequiresModuleAttribute.html">RequiresModuleAttribute</a>) names the module it needs.</li>
+<li><strong>In a scene.</strong> On a child of the species (its <code>Life</code> object, beside <code>Starvation</code>). It needs a <code>Thirst</code>.</li>
+</ul>
+<h2 id="nearestwatersense">NearestWaterSense</h2>
+<p><a class="xref" href="../api/EvoSim.Samples.NearestWaterSense.html">NearestWaterSense</a> tells the brain how far the nearest water is: <em>here</em> within 0.5 m (V2: <em>&quot;I am at
+the water's edge.&quot;</em>), one token per distance band, or <em>none</em>. It asks the ground with
+<a class="xref" href="../api/EvoSim.Ground.html#EvoSim_Ground_NearestWater_UnityEngine_Vector3_System_Single_">NearestWater</a>.</p>
+<ul>
+<li><strong>Mechanism.</strong> A <a class="xref" href="../api/EvoSim.BandedSense.html">BandedSense</a>: the base class builds the tokens and writes the texts; the sample turns on
+the <em>here</em> token (<a class="xref" href="../api/EvoSim.Samples.NearestWaterSense.html#EvoSim_Samples_NearestWaterSense_HasHere">HasHere</a>) and maps a distance to a token in
+<a class="xref" href="../api/EvoSim.Samples.NearestWaterSense.html#EvoSim_Samples_NearestWaterSense_Read_EvoSim_Animal_EvoSim_SenseContext_">Read</a>. See <a href="sense.html">A sense</a>.</li>
+<li><strong>In a scene.</strong> On a new child of the species' <code>Senses</code> object: its place among the senses is its place in the
+situation text. It needs a ground that knows water: the <a class="xref" href="../api/EvoSim.TerrainGround.html">TerrainGround</a> (ground below its <em>Water Level</em> is
+water). On a flat ground it always says <em>none</em>. It multiplies the species' number of possible observations by 6.</li>
+</ul>
+<h2 id="drinkaction">DrinkAction</h2>
+<p><a class="xref" href="../api/EvoSim.Samples.DrinkAction.html">DrinkAction</a> gives the brain a new choice, <em>drink</em>: walk to the shore of the nearest water in sight,
+and reset thirst to 0 on arrival. With no water in sight the animal searches (ACT-04).</p>
+<ul>
+<li><strong>Mechanism.</strong> An <a class="xref" href="../api/EvoSim.AnimalAction.html">AnimalAction</a> that only states an intent and an interaction: the act phase moves the
+animal, then applies a small <a class="xref" href="../api/EvoSim.IInteraction.html">IInteraction</a> (reach 0.5 m) that sets thirst to 0. Its
+<a class="xref" href="../api/EvoSim.Samples.DrinkAction.html#EvoSim_Samples_DrinkAction_IsRelevant_EvoSim_ObservationView_">IsRelevant</a> reads the <em>Water</em> sense. See
+<a href="action.html">An action or an interaction</a>.</li>
+<li><strong>In a scene.</strong> On a new GameObject under the species' <code>Actions</code>, named <code>drink</code> (the action's name in the prompt and
+its gene's label), with a <a class="xref" href="../api/EvoSim.TextGene.html">TextGene</a> on the same GameObject. It needs a <code>Thirst</code> on the species and a
+ground with water.</li>
+</ul>
+<h2 id="intensityladder">IntensityLadder</h2>
+<p><a class="xref" href="../api/EvoSim.Samples.IntensityLadder.html">IntensityLadder</a> mutates a text gene without a model: it finds the first of <em>never, rarely,
+sometimes, often, always</em> in the sentence and moves it one step up or down, keeping its capital and punctuation. <em>&quot;Rest
+often when tired.&quot;</em> becomes <em>&quot;Rest always when tired.&quot;</em> or <em>&quot;Rest sometimes when tired.&quot;</em>. A sentence without such a
+word fails the job, and the gene stays as it was.</p>
+<ul>
+<li><strong>Mechanism.</strong> A <a class="xref" href="../api/EvoSim.MutationOperator.html">MutationOperator</a>:
+<a class="xref" href="../api/EvoSim.Samples.IntensityLadder.html#EvoSim_Samples_IntensityLadder_Accepts_EvoSim_Gene_">Accepts</a> takes text genes, and
+<a class="xref" href="../api/EvoSim.Samples.IntensityLadder.html#EvoSim_Samples_IntensityLadder_StartMutation_EvoSim_Gene_EvoSim_Allele_EvoSim_RandomStream_">StartMutation</a>
+draws its one coin from the stream it is given (MUT-30). It sees nothing but the gene (CORE-07). See
+<a href="mutation.html">Mutation</a>.</li>
+<li><strong>In a scene.</strong> On the species' <code>Mutation</code> object, beside the <code>LlmMutation</code>. Drag the genes it should handle into its
+<em>Only These</em> list. A gene goes to the operator that lists it; the other genes go to the first operator whose list is
+empty (MUT-02).</li>
+</ul>
+<h2 id="seasonsphase">SeasonsPhase</h2>
+<p><a class="xref" href="../api/EvoSim.Samples.SeasonsPhase.html">SeasonsPhase</a> splits time into years of <em>Year Length</em> ticks (2 000). In the second half of each year,
+winter, the food layer named in <em>Layer</em> (&quot;Grass&quot;) regrows at <em>Winter Regrow Factor</em> (0.2) times its normal rate.</p>
+<ul>
+<li><strong>Mechanism.</strong> A <a class="xref" href="../api/EvoSim.TickPhase.html">TickPhase</a>: <a class="xref" href="../api/EvoSim.Samples.SeasonsPhase.html#EvoSim_Samples_SeasonsPhase_Initialize">Initialize</a> finds the layer,
+<a class="xref" href="../api/EvoSim.Samples.SeasonsPhase.html#EvoSim_Samples_SeasonsPhase_Run_EvoSim_TickContext_">Run</a> sets its regrowth factor every tick, and the
+environment phase, later in the same tick, uses it (TICK-02).
+<a class="xref" href="../api/EvoSim.Samples.SeasonsPhase.html#EvoSim_Samples_SeasonsPhase_Validate_EvoSim_ValidationReport_">Validate</a> reports a missing layer (V-20) and a
+wrong place (V-08). See <a href="world-modules.html">Phases, services and world hooks</a>.</li>
+<li><strong>In a scene.</strong> On a new GameObject under the World's <code>Phases</code>, above <code>Environment</code>: phases run in hierarchy order.</li>
+</ul>
+<h2 id="chasedsense">ChasedSense</h2>
+<p><a class="xref" href="../api/EvoSim.Samples.ChasedSense.html">ChasedSense</a> answers <em>yes</em> when the nearest threat in sight is doing an action that hunts and its
+target is this animal, <em>no</em> otherwise. A cannibal, which flees its own kind, can then tell a hungry neighbour from a
+peaceful one.</p>
+<ul>
+<li><strong>Mechanism.</strong> A plain <a class="xref" href="../api/EvoSim.Sense.html">Sense</a> with two tokens. It reads the hunter's action through
+<a class="xref" href="../api/EvoSim.AnimalAction.html#EvoSim_AnimalAction_Hunts">Hunts</a> and its target through
+<a class="xref" href="../api/EvoSim.SenseContext.html#EvoSim_SenseContext_CurrentTarget_EvoSim_Animal_">CurrentTarget</a>, both as they were at the start of the tick
+(SENSE-04), and writes its own V2 sentences.</li>
+<li><strong>In a scene.</strong> On a new child of the species' <code>Senses</code>. It only says <em>yes</em> in a species that has threats. It doubles
+the number of possible observations.</li>
+</ul>
+<h2 id="slopelocomotion">SlopeLocomotion</h2>
+<p><a class="xref" href="../api/EvoSim.Samples.SlopeLocomotion.html">SlopeLocomotion</a> moves like the kinematic locomotion, but refuses a step onto ground steeper than
+<em>Max Slope Degrees</em> (35) and charges <em>Energy Per Meter Climbed</em> (0.3 points) for every meter of height gained. Going
+down costs nothing extra.</p>
+<ul>
+<li><strong>Mechanism.</strong> A subclass of a reference module (MOVE-07): it overrides
+<a class="xref" href="../api/EvoSim.Samples.SlopeLocomotion.html#EvoSim_Samples_SlopeLocomotion_Move_EvoSim_Animal_EvoSim_Intent_System_Single_EvoSim_MoveContext_">Move</a> to
+change the intent before calling the base, and
+<a class="xref" href="../api/EvoSim.Samples.SlopeLocomotion.html#EvoSim_Samples_SlopeLocomotion_ExtraCost_EvoSim_Animal_UnityEngine_Vector3_UnityEngine_Vector3_">ExtraCost</a>,
+which the metabolism adds to the cost of the move. See <a href="locomotion.html">A locomotion</a>.</li>
+<li><strong>In a scene.</strong> It replaces the species' <code>KinematicLocomotion</code> on its <code>Locomotion</code> object: a species has exactly one
+locomotion (V-13). Copy <em>Walk Speed</em>, <em>Run Speed</em> and <em>Prompt Rule</em> from the old one. It matters only on a ground with
+heights.</li>
+</ul>
+<h2 id="dragaction">DragAction</h2>
+<p><a class="xref" href="../api/EvoSim.Samples.DragAction.html">DragAction</a> walks to the nearest carcass in sight; within <em>Grab Reach</em> (1 m) it walks toward the
+nearest cover and drags the carcass along, at walking speed, until both are hidden. It is not a recipe of 22: it writes
+out scenario S18 of <a href="../spec/31-scenarios.html">31 — Scenarios</a>, an entity that moves (ENV-21).</p>
+<ul>
+<li><strong>Mechanism.</strong> An action whose interaction moves an entity: the carcass changes position in the act phase, never from
+the views. Its interaction's reach is unlimited, so it applies wherever the animal ends its move.</li>
+<li><strong>In a scene.</strong> On a new GameObject <code>drag</code> under the actions of a species whose diet eats carcasses (the predator),
+with a <a class="xref" href="../api/EvoSim.TextGene.html">TextGene</a>. It needs a cover layer, and reads the <em>Carcass</em> sense.</li>
+</ul>
+<h2 id="worked-example-thirst-on-the-terrain">Worked example: thirst on the terrain</h2>
+<p>The <code>Terrain_Locomotion</code> scene has a 96 m terrain whose lowest ground, about 15 %, is water. Four samples together make
+its prey thirsty. Do this in a copy of the scene.</p>
+<ol>
+<li>Open <code>Assets/EvoSim/Scenes/Terrain_Locomotion.unity</code> and save it as <code>Assets/Student/ThirstyTerrain.unity</code>.</li>
+<li>Select <code>Terrain World</code>. Unless the JEV server runs, set <strong>Default Brain</strong> to <code>Brains/Random</code>.</li>
+<li>Select <code>Terrain World/Prey/Stats</code> (it holds <code>Energy</code>, <code>Stamina</code> and <code>Metabolism</code>) and add a <strong>Thirst</strong>. Keep <em>Per
+Tick</em> 0.5 and <em>Deadly</em> 100.</li>
+<li>Select <code>Prey/Life</code> and add a <strong>Dies Of Thirst</strong>.</li>
+<li>Under <code>Prey/Senses</code>, create an empty child named <code>Water</code>, below <code>Food</code>, and add a <strong>Nearest Water Sense</strong>.</li>
+<li>Optionally, create a <code>Thirst</code> child below it with a <strong>Level Sense</strong>: <em>Stat</em> <code>thirst</code>, <em>Low</em> 30, <em>High</em> 70, and
+<em>Words</em> &quot;I am not thirsty.&quot;, &quot;I am thirsty.&quot;, &quot;I am parched.&quot; (low thirst comes first).</li>
+<li>Under <code>Prey/Actions</code>, create a child named <code>drink</code> and add a <strong>Drink Action</strong> and a <strong>Text Gene</strong>. In the gene's
+<em>Founders</em>, write &quot;Drink whenever you pass water.&quot; and &quot;Drink only when very thirsty.&quot;; keep <em>Has Neutral</em> on.
+<em>Contrast Pro</em> and <em>Contrast Anti</em> (&quot;Always drink, whatever happens.&quot; / &quot;Never drink unless parched.&quot;) are optional:
+only brain tests use them.</li>
+<li>Press <strong>Play</strong>. The validation panel may warn that the prey's signature changed (V-12; <em>Accept</em> it) and that its
+observation space is large (V-50). Warnings don't stop the run.</li>
+<li>Open <em>Window ▸ EvoSim ▸ Event Log</em>: deaths with the cause <em>thirst</em> appear from about tick 200, for prey that
+found no water. In the run's <code>stats.csv</code> the column <code>prey_deaths_thirst</code> counts them.</li>
+<li>To see what drinking is worth, disable the <code>drink</code> GameObject and run the same seed again, then compare the deaths by
+thirst.
+Scenario S16 makes the same comparison with a scripted brain.</li>
+</ol>
+<p>Then try the others on the same scene: a <strong>Seasons Phase</strong> above <code>Phases/Environment</code>, or a <strong>Slope Locomotion</strong> for the
+predator only, with a <em>Max Slope Degrees</em> below the ground's 35°, so the two species cross the hills differently.</p>
+<h2 id="test-it">Test it</h2>
+<p>The same combination, in a test world with a pond (<a class="xref" href="../api/EvoSim.Testing.PondGround.html">PondGround</a>): a thirsty prey 2 m from the shore
+drinks within three ticks. See <a href="../guides/testing.html">Testing</a> for the helpers.</p>
+<pre><code class="lang-csharp">public class ThirstyPondTests : WorldFixture
+{
+    [Test, Description(&quot;22 §3: drink walks to the shore and resets thirst on arrival&quot;)]
+    public void DrinkResetsThirst()
+    {
+        var w = New().Ground&lt;PondGround&gt;(20, 20).Food(0f, 0f).Phase&lt;ActPhase&gt;()
+            .Species(&quot;prey&quot;, s =&gt; s.PreyBody().Action&lt;DrinkAction&gt;(&quot;drink&quot;).Module&lt;Thirst&gt;()).Build();
+        var sp = w.FindSpecies(&quot;prey&quot;);
+        var a = Place.Animal(sp, Place.At(10f, 15f));
+        var thirst = sp.Module&lt;Thirst&gt;().Value;
+        a[thirst] = 50f;
+        a.Choose(&quot;drink&quot;);
+        w.Advance(3);
+        Assert.AreEqual(0f, a[thirst], &quot;drank&quot;);
+        Assert.IsFalse(w.Ground.IsWater(a.Position), &quot;on the shore, not in the water&quot;);
+    }
+}
+</code></pre>
+<h2 id="read-next">Read next</h2>
+<ul>
+<li><a href="index.html">Extending EvoSim</a>: every mechanism the samples use, and the others.</li>
+<li><a href="exercises.html">The teaching path</a>: rewrite the reference modules the samples build on.</li>
+<li><a href="../spec/31-scenarios.html">31 — Scenarios</a>: S16 (water and thirst), S17 (terrain and locomotion), S18 (moving carcasses).</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

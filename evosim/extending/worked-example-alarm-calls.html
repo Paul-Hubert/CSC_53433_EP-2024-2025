@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Worked example: alarm calls | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Worked example: alarm calls | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/worked-example-alarm-calls.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-worked-example-alarm-calls">
+<h1 id="worked-example-alarm-calls">Worked example: alarm calls</h1>
+
+<p>This page follows one change from idea to tested scene, written the way you would write yours: in <code>Assets/Student</code>,
+without touching <code>Assets/EvoSim</code>. The idea: a prey can <strong>call</strong> in passing, as it runs away or hides, at a cost in energy;
+its kin nearby <strong>hear</strong> the call and can flee or hide before they see the danger themselves. Evolution decides whether
+calling pays.</p>
+<p>The change touches the four kinds of extension:</p>
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>Class</th>
+<th>Kind</th>
+<th>Page</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the world remembers calls</td>
+<td><code>AlarmCalls</code> and <code>FadeAlarmCalls</code></td>
+<td>a <a class="xref" href="../api/EvoSim.WorldService.html">WorldService</a> and a <a class="xref" href="../api/EvoSim.TickPhase.html">TickPhase</a></td>
+<td><a href="world-modules.html">Phases, services and world hooks</a></td>
+</tr>
+<tr>
+<td>an animal calls</td>
+<td><code>AlarmCallAction</code></td>
+<td>an <a class="xref" href="../api/EvoSim.AnimalAction.html">AnimalAction</a> done in passing (an overlay) with an interaction</td>
+<td><a href="action.html">An action</a></td>
+</tr>
+<tr>
+<td>evolution tunes calling</td>
+<td>a <a class="xref" href="../api/EvoSim.TextGene.html">TextGene</a> on the action</td>
+<td>a gene, no code</td>
+<td><a href="genes.html">Genes</a></td>
+</tr>
+<tr>
+<td>kin hear the call</td>
+<td><code>AlarmSense</code></td>
+<td>a <a class="xref" href="../api/EvoSim.Sense.html">Sense</a></td>
+<td><a href="sense.html">A sense</a></td>
+</tr>
+</tbody>
+</table>
+<p>The files are <code>Assets/Student/AlarmCalls.cs</code>, <code>FadeAlarmCalls.cs</code>, <code>AlarmCallAction.cs</code>, <code>AlarmSense.cs</code>, the tests in
+<code>Assets/Student/Tests/AlarmCallsTests.cs</code>, and the scene builder in <code>Assets/Student/Editor/AlarmCallsScene.cs</code>. The code
+below is that code, with its <code>///</code> comments left out.</p>
+<h2 id="1-the-world-a-list-of-calls">1. The world: a list of calls</h2>
+<p>Several modules share the calls, so they live in a service under the World. A call is a small struct: who, where, when,
+how far. The calls are kept in a <code>List</code>, in the order they were made, so every query gives the same answer in every run
+(RAND-05). The service draws no random number.</p>
+<pre><code class="lang-csharp">public readonly struct AlarmCall
+{
+    public readonly Species Species; public readonly int CallerId; public readonly Vector3 Position;
+    public readonly int Tick; public readonly float Range;
+    public AlarmCall(Species s, int id, Vector3 p, int tick, float range) { Species = s; CallerId = id; Position = p; Tick = tick; Range = range; }
+}
+
+public class AlarmCalls : WorldService
+{
+    [SerializeField, Min(1)] int memory = 4;               // ticks a call stays audible: one decision period
+    readonly List&lt;AlarmCall&gt; calls = new List&lt;AlarmCall&gt;();
+    public int CallsMade { get; private set; }
+
+    public override void Initialize() { calls.Clear(); CallsMade = 0; }
+    public void Register(Animal caller, int tick, float range)
+    {
+        calls.Add(new AlarmCall(caller.Species, caller.Id, caller.Position, tick, range));
+        CallsMade++;
+    }
+    public bool IsAudible(AlarmCall c, int now) =&gt; now - c.Tick &lt;= memory;
+    public float? NearestHeard(Animal listener, int now)
+    {
+        float? best = null;
+        foreach (var c in calls)                           // a list: the same order in every run
+        {
+            if (c.Species != listener.Species || c.CallerId == listener.Id || !IsAudible(c, now)) continue;
+            float d = new Vector2(c.Position.x - listener.Position.x, c.Position.z - listener.Position.z).magnitude;
+            if (d &lt;= c.Range &amp;&amp; (best == null || d &lt; best.Value)) best = d;
+        }
+        return best;
+    }
+    public int Forget(int now) =&gt; calls.RemoveAll(c =&gt; !IsAudible(c, now));
+}
+</code></pre>
+<p>Old calls are already ignored by <code>NearestHeard</code>. A phase forgets them so the list stays short. It does nothing in a world
+without the service (TICK-07):</p>
+<pre><code class="lang-csharp">public class FadeAlarmCalls : TickPhase
+{
+    AlarmCalls calls;
+    public override void Initialize() =&gt; calls = World.Service&lt;AlarmCalls&gt;();
+    public override void Run(TickContext t) { if (calls != null) calls.Forget(t.Tick); }
+}
+</code></pre>
+<h2 id="2-the-action-a-call-done-in-passing">2. The action: a call done in passing</h2>
+<p>A chosen action runs every tick until the next decision (ACT-02), up to a whole decision period. A first version stood
+still to call: next to a predator, for up to 4 ticks, the caller paid 4 times and was caught, and evolution would only
+have learnt to keep quiet. That was an artefact of timing, not a result. So the call is an <strong>overlay</strong>, an action done
+in passing (<a href="action.html#actions-done-in-passing">Actions done in passing</a>, ACT-07): <code>Overlay</code> returns true. When the
+brain's draw picks <code>alarm</code>, the engine draws a second action, the carrier, from the rest of the row (flee, hide, eat…),
+which moves the animal; the call itself happens once, on the tick of the decision.</p>
+<p><code>Act</code> only plans (ACT-06), and plans no move: it asks for an interaction, and the act phase ignores an overlay's intent.
+The interaction runs after the carrier's, once the animal moved. It is the only place that changes the caller (its
+energy, through <a class="xref" href="../api/EvoSim.Energy.html">Energy</a>) and the world (a new call). Its reach is unlimited, as in the sample
+<a class="xref" href="../api/EvoSim.Samples.DragAction.html">DragAction</a>: the call happens wherever the carrier took the animal. Nothing stops a call with no
+predator in sight, a false alarm: the gene and the brain decide whether that pays. The <code>[RequiresModule]</code> attribute
+makes validation warn when the World has no <code>AlarmCalls</code> (V-26), and makes the conformance suite add one.</p>
+<pre><code class="lang-csharp">[RequiresModule(typeof(AlarmCalls))]
+public class AlarmCallAction : AnimalAction
+{
+    [SerializeField, Min(1f)] float range = 20f;           // meters
+    [SerializeField, Min(0f)] float cost = 0.5f;           // energy per call
+    AlarmCalls calls;
+    Energy energy;
+
+    public override bool Overlay =&gt; true;                  // call, and do the next most likely choice (flee, hide…)
+    protected override string DefaultDescription =&gt; $&quot;give an alarm call that kin within {Bands.Number(range)} meters hear&quot;;
+    public override void Initialize() { calls = World.Service&lt;AlarmCalls&gt;(); energy = Species.Module&lt;Energy&gt;(); }
+    public override void Act(Animal a, ActContext c)
+    {
+        if (calls != null) c.OnArrival(new Call(this));    // no intent: the carrier moves the animal
+    }
+
+    sealed class Call : IInteraction
+    {
+        readonly AlarmCallAction action;
+        public Call(AlarmCallAction owner) { action = owner; }
+        public float Reach =&gt; float.PositiveInfinity;      // wherever the carrier took the caller
+        public void Apply(Animal a, InteractionContext c)
+        {
+            if (action.energy != null) action.energy.Pay(a, action.cost);
+            action.calls.Register(a, c.Tick, action.range);
+        }
+    }
+}
+</code></pre>
+<p>The real file also writes a prompt rule (<em>&quot;An alarm call costs 0.5 energy; kin within 20 meters hear it.&quot;</em>) and declares
+the action relevant when the <code>Predator</code> sense sees one (CTRL-10). The engine adds its own rule for the species, <em>&quot;Some
+actions are done in passing (alarm): the animal also does its next most likely choice.&quot;</em> The species needs another
+action beside the overlay to carry the animal (V-19), which the prey of HideVsFlee has six times over.</p>
+<h2 id="3-the-gene-how-often-to-call">3. The gene: how often to call</h2>
+<p>An action needs a <a class="xref" href="../api/EvoSim.TextGene.html">TextGene</a> on its GameObject (V-05). No code: set its <strong>Founders</strong> to
+<em>&quot;Call out whenever you see a predator.&quot;</em>, <em>&quot;Stay silent, save your energy.&quot;</em>, <em>&quot;Warn your kin when danger is near.&quot;</em> and
+<em>&quot;Call only when you are safe in cover.&quot;</em>, keep <strong>Has Neutral</strong> (<em>&quot;No preference.&quot;</em>), and set <strong>Contrast Pro</strong> to
+<em>&quot;Always give an alarm call.&quot;</em> and <strong>Contrast Anti</strong> to <em>&quot;Never give an alarm call.&quot;</em> for the brain tests (GENE-23). The
+species' <code>LlmMutation</code> then rewrites these sentences, and selection keeps the ones that pay.</p>
+<h2 id="4-the-sense-did-kin-call">4. The sense: did kin call?</h2>
+<p>Three tokens, a V2 sentence per token with the distance in meters (SENSE-12), and no change to the world (SENSE-03):</p>
+<pre><code class="lang-csharp">[RequiresModule(typeof(AlarmCalls))]
+public class AlarmSense : Sense
+{
+    static readonly IReadOnlyList&lt;string&gt; tokens = System.Array.AsReadOnly(new[] { &quot;none&quot;, &quot;close&quot;, &quot;far&quot; });
+    [SerializeField, Min(0.5f)] float closeDistance = 10f;
+    AlarmCalls calls;
+
+    public override IReadOnlyList&lt;string&gt; Tokens =&gt; tokens;
+    protected override string DefaultLabel =&gt; &quot;Alarm&quot;;
+    public override void Initialize() =&gt; calls = World.Service&lt;AlarmCalls&gt;();
+    public override int Read(Animal a, SenseContext s)
+    {
+        float? d = calls != null ? calls.NearestHeard(a, s.Tick) : null;
+        return d == null ? 0 : d.Value &lt;= closeDistance ? 1 : 2;
+    }
+    public override string Write(int token, TextStyle style)
+    {
+        if (style != TextStyle.V2) return $&quot;{Label}: {tokens[token]}.&quot;;
+        string near = Bands.Number(closeDistance);
+        return token == 1 ? $&quot;A kin gave an alarm call less than {near} meters away.&quot;
+             : token == 2 ? $&quot;A kin gave an alarm call {near} meters away or more.&quot; : &quot;No kin is giving an alarm call.&quot;;
+    }
+}
+</code></pre>
+<h2 id="5-the-scene">5. The scene</h2>
+<p><code>Assets/Student/Scenes/AlarmCalls.unity</code> is the reference HideVsFlee scene plus four objects:</p>
+<ol>
+<li>Under the World's <code>Environment</code>: <code>Alarm calls</code>, with <code>AlarmCalls</code>.</li>
+<li>Under the World's <code>Phases</code>, just after <code>Act</code>: <code>Fade alarm calls</code>, with <code>FadeAlarmCalls</code>.</li>
+<li>Under <code>Prey ▸ Actions</code>, last: <code>alarm</code>, with <code>AlarmCallAction</code> and its text gene.</li>
+<li>Under <code>Prey ▸ Senses</code>, last: <code>Alarm</code>, with <code>AlarmSense</code>.</li>
+</ol>
+<p>You can add them by hand. The example builds them with a short editor script instead, so the scene can be rebuilt
+identically: <em>EvoSim ▸ Student ▸ Build Alarm Calls Scene</em>, or from the command line with the editor closed:
+<code>Unity.exe -batchmode -nographics -projectPath . -executeMethod AlarmCallsScene.BuildFromCommandLine</code>.
+The script lives in <code>Assets/Student/Editor</code> with its own editor-only assembly, <code>Student.Editor</code>.</p>
+<h2 id="6-the-tests">6. The tests</h2>
+<p><code>AlarmCallsTests</code> derives from <a class="xref" href="../api/EvoSim.Testing.WorldFixture.html">WorldFixture</a>. It checks that a call is heard close or far by kin
+within range, and not by the caller, kin out of range or another species; that a call fades after <code>memory</code> ticks; that
+the call is made once while the carrier, flee, runs the animal away, and costs once; that a false alarm is possible; the
+prompt lines; the sense's texts; that nothing breaks without the service; and that the same seed gives the same events
+hash. A test gives an animal a carrier and an overlay with <code>Choose(carrier, overlay)</code>. How often the overlay and each
+carrier are drawn is the engine's business, tested in <code>OverlayTests</code>. The heart of the first test:</p>
+<pre><code class="lang-csharp">public class AlarmHearingTests : WorldFixture
+{
+    [Test]
+    public void KinWithinRangeHearTheCall()
+    {
+        var w = New().Flat(60, 60).Food(0f, 0f).Carcasses().Phase&lt;ActPhase&gt;().Service&lt;AlarmCalls&gt;(&quot;Alarm calls&quot;)
+            .Species(&quot;prey&quot;, s =&gt; s.PreyBody().Action&lt;AlarmCallAction&gt;(&quot;alarm&quot;).Action&lt;FleeAction&gt;(&quot;flee&quot;)
+                                   .Action&lt;RestAction&gt;(&quot;rest&quot;).Sense&lt;AlarmSense&gt;())
+            .Species(&quot;predator&quot;, s =&gt; s.PredatorBody().Action&lt;RestAction&gt;(&quot;rest&quot;)).Build();
+        var prey = w.FindSpecies(&quot;prey&quot;);
+        Place.Animal(w.FindSpecies(&quot;predator&quot;), Place.At(5, 10)).Choose(&quot;rest&quot;);
+        var caller = Place.Animal(prey, Place.At(10, 10));            // flees, and calls where the flight took it
+        var near = Place.Animal(prey, Place.At(15, 10));
+        caller.Choose(&quot;flee&quot;, &quot;alarm&quot;);                               // the carrier, then the overlay
+        near.Choose(&quot;rest&quot;);
+        w.Advance(1);
+        var sense = prey.Module&lt;AlarmSense&gt;();
+        Assert.AreEqual(&quot;close&quot;, sense.Tokens[sense.Read(near, new SenseContext(w))]);
+    }
+}
+</code></pre>
+<p>The four classes also go through the conformance suites: in the Test Runner, <code>ConformanceTests</code> ▸ <code>SenseConformance</code>
+▸ <code>AlarmSense</code>, <code>ActionConformance</code> ▸ <code>AlarmCallAction</code> and <code>PhaseConformance</code> ▸ <code>FadeAlarmCalls</code>.</p>
+<h2 id="7-a-run">7. A run</h2>
+<p><em>EvoSim ▸ Student ▸ Run Alarm Calls Headless (L0)</em> runs the scene for 400 ticks with the random brain, twice, and logs
+what the calls did. With seed 1234 the prey decided 3 204 times and drew
+<code>alarm</code> 438 times; 438 calls were made (one per draw, beside its carrier, predator in sight or not), and 2 333 decisions
+were taken while hearing a call, 800 of which fled or hid. The two runs give the same events hash. The random brain chooses <code>alarm</code>
+without looking; with a real brain (L1, L2) the gene and the sense start to matter, and you can compare how often the prey calls,
+and how many prey survive, with and without the <code>alarm</code> action.</p>
+<h2 id="read-next">Read next</h2>
+<ul>
+<li><a href="samples.html">The samples</a>: thirst, water, seasons and slopes, written the same way.</li>
+<li><a href="testing-your-module.html">Testing your module</a> and <a href="../guides/determinism.html">Determinism and replay</a>.</li>
+<li><a href="documenting-your-code.html">Documenting your code</a>: the <code>///</code> comments of the real files follow it.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Getting started | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Getting started | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/getting-started.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="guide-getting-started">
+<h1 id="getting-started">Getting started</h1>
+
+<p>This page takes you from opening the project to watching a run, inspecting it and finding its output files. It takes
+about ten minutes.</p>
+<h2 id="what-you-need">What you need</h2>
+<ul>
+<li><strong>Unity 6000.3.9f1</strong>, installed with the Unity Hub, on Windows (the course's machines).</li>
+<li>This repository, opened as a Unity project. The EvoSim code is under <code>Assets/EvoSim</code>.</li>
+<li><em>Optional:</em> the two model servers. Without them you can still run everything with the random brain.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Server</th>
+<th>Address</th>
+<th>What it does</th>
+<th>Start it with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>JEV</strong> (vLLM in Docker, GPU)</td>
+<td><code>localhost:8000</code></td>
+<td>the brain: reads genes and situations, gives a probability per action</td>
+<td><code>docker compose -f prototype/docker/compose.yaml up -d</code> (5–8 minutes until healthy), after a one-time download: see <a href="#model-servers-for-l1-and-l2">Model servers</a></td>
+</tr>
+<tr>
+<td><strong>Ollama</strong> with <code>gemma4:26b</code> (CPU)</td>
+<td><code>localhost:11434</code></td>
+<td>the mutator: rewrites a gene sentence when it mutates</td>
+<td><code>ollama serve</code> with two settings, then <code>ollama pull gemma4:26b</code> once: see <a href="#model-servers-for-l1-and-l2">Model servers</a></td>
+</tr>
+</tbody>
+</table>
+<p>Run level <strong>L0</strong> (the random brain, no mutation) needs neither server. <strong>L1</strong> needs JEV, <strong>L2</strong> needs JEV and Ollama
+(see <a href="running-and-building.html#run-levels">Run levels</a>).</p>
+<div class="NOTE">
+<h5>Note</h5>
+<p>The Windows player build is <strong>not</strong> in the repository: <code>Builds/</code> is ignored by git. To watch runs outside the editor,
+build it yourself once with <em>EvoSim ▸ Build ▸ Visual Player</em> (see <a href="running-and-building.html#player-builds">Player builds</a>).
+Everything on this page works in the editor without it.</p>
+</div>
+<h2 id="model-servers-for-l1-and-l2">Model servers (for L1 and L2)</h2>
+<p>Skip this section if you only run L0. All commands run in PowerShell from the repository root.</p>
+<h3 id="what-the-machine-needs">What the machine needs</h3>
+<ul>
+<li><strong>Docker Desktop</strong> with the <strong>WSL 2</strong> backend and GPU support (an up-to-date NVIDIA driver on Windows; nothing to install
+inside WSL).</li>
+<li>An <strong>NVIDIA GPU with about 16 GB</strong> of memory: JEV in FP8 fills an RTX 5080 (14.4 GB in use).</li>
+<li>About <strong>17 GB of free disk</strong> for the JEV weights, in your Hugging Face cache (<code>%USERPROFILE%\.cache\huggingface</code>).</li>
+<li>For Ollama: about <strong>20 GB of free RAM</strong>, since <code>gemma4:26b</code> runs on the CPU.</li>
+<li>Python 3 from python.org, started with the <strong><code>py -3</code></strong> launcher. Don't type bare <code>python</code>: on these machines it can
+open the Windows Store stub instead of Python.</li>
+</ul>
+<h3 id="jev-download-the-weights-once">JEV: download the weights once</h3>
+<p>The JEV container runs <strong>offline</strong> (<code>HF_HUB_OFFLINE=1</code> in <code>prototype/docker/compose.yaml</code>): it reads the weights from your
+Hugging Face cache and never downloads them. Download them once, at the revision the container is pinned to:</p>
+<pre><code class="lang-powershell">py -3 -m pip install --user huggingface_hub
+py -3 -c &quot;from huggingface_hub import snapshot_download as d; d('autotrust/JEV-9B', revision='b63f651ce8ed64481d3f5e73ecdb05f740042f01', allow_patterns=['*.json', '*.jinja', 'model-*.safetensors', 'head.safetensors', 'adapter/*', 'adapter_vllm/*'])&quot;
+</code></pre>
+<p>The download is about 17 GB. It must include the <code>adapter_vllm/</code> folder: the container loads JEV's decision adapter from
+it. If the download stops with a 401 or 403 error, the model needs a Hugging Face token: ask the course staff.</p>
+<h3 id="jev-start-it-and-check-it">JEV: start it and check it</h3>
+<pre><code class="lang-powershell">docker compose -f prototype/docker/compose.yaml up -d
+docker compose -f prototype/docker/compose.yaml ps
+</code></pre>
+<p>Start-up takes 5–8 minutes. Run the <code>ps</code> command again until the <code>jev</code> service shows <strong>(healthy)</strong>, then check that it
+answers:</p>
+<pre><code class="lang-powershell">curl.exe http://localhost:8000/v1/models
+</code></pre>
+<p>The answer lists <code>autotrust/JEV-9B</code> and <code>jev-decision</code>. Finally, in Unity, open <em>Window ▸ EvoSim ▸ Brain Health</em> and
+press <strong>Test connection</strong> next to JEV. If the service never becomes healthy, read its log with
+<code>docker compose -f prototype/docker/compose.yaml logs jev</code>; a &quot;not found&quot; or &quot;offline&quot; error means the weights are
+missing or at another revision. Stop it with <code>docker compose -f prototype/docker/compose.yaml down</code>.</p>
+<h3 id="ollama-the-mutator">Ollama: the mutator</h3>
+<p>Quit the Ollama tray app if it is running (it starts its own server with other settings), then start the server with one
+model loaded at a time, kept in memory for four hours:</p>
+<pre><code class="lang-powershell">$env:OLLAMA_MAX_LOADED_MODELS = &quot;1&quot;; $env:OLLAMA_KEEP_ALIVE = &quot;4h&quot;; ollama serve
+</code></pre>
+<p>In a second window, once: <code>ollama pull gemma4:26b</code>. Without <code>OLLAMA_KEEP_ALIVE</code>, Ollama unloads the model after a few
+idle minutes, and reloading 26 B parameters from disk can take longer than the mutator's 60 s time-out: that mutation then
+fails and the gene is copied unchanged. Check it in <em>Brain Health</em> with <strong>Test connection</strong> next to the mutator.</p>
+<div class="NOTE">
+<h5>Note</h5>
+<p><code>prototype/docker/README.md</code> describes the servers for the Python prototype, whose mutator is a different model. For
+EvoSim, follow this page.</p>
+</div>
+<h2 id="1-open-a-scene">1. Open a scene</h2>
+<p>The reference scenes are in <code>Assets/EvoSim/Scenes</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Scene</th>
+<th>What lives there</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Lab1_Small</code></td>
+<td>a 48 m world with prey and predators: the quickest to watch</td>
+</tr>
+<tr>
+<td><code>Lab1_Full</code></td>
+<td>the full Lab 1 ecology (164 animals at the start, up to about 340)</td>
+</tr>
+<tr>
+<td><code>HideVsFlee</code></td>
+<td>prey that can flee or hide in thickets, and the predators that hunt them</td>
+</tr>
+<tr>
+<td><code>ThreeSpecies</code></td>
+<td>three species in one food web</td>
+</tr>
+<tr>
+<td><code>Terrain_Locomotion</code></td>
+<td>a Unity Terrain with slopes, water and trees</td>
+</tr>
+<tr>
+<td><code>Sandbox</code></td>
+<td>grazers only, with the random brain: a place to try your own modules</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-choose-a-brain">2. Choose a brain</h2>
+<p>The scenes ask JEV by default. If JEV is not running, select the <code>World</code> object and set <strong>Default Brain</strong> to
+<code>Brains/Random</code>, the null model that picks actions uniformly at random. Everything else works the same, and the run
+still repeats exactly with its seed.</p>
+<p>Without Ollama, mutations fail quietly: the gene is copied unchanged (MUT-04). Tick <strong>No Mutation</strong> on the World to
+switch mutation off altogether.</p>
+<h2 id="3-press-play">3. Press Play</h2>
+<p>Before Play mode starts, the World's whole tree is checked. If something is wrong, the <strong>play-mode gate</strong> cancels Play
+and the Console shows one line per error, naming the object to fix (for example <em>V-04 … Species 'prey' has no action</em>).
+Click the line to select that object. Fix it by hand, or select the World, press <strong>Validate</strong> in its inspector and
+click the fix button next to the message, then press Play again. Warnings never block Play.</p>
+<p>While it runs:</p>
+<ul>
+<li>The <strong>panel</strong> at the top left shows the tick, the pace in ticks per second, and for each species its living animals,
+births, deaths and kills. It also counts mutations and model calls. <strong>Tab</strong> hides it.</li>
+<li>The <strong>ball above each animal</strong> shows its current action: green <em>eat</em>, yellow <em>flee</em>, blue <em>hide</em>, cyan <em>follow</em>,
+grey <em>rest</em>, pink <em>mate</em>, red <em>hunt</em>, white <em>searching</em> (nothing in sight).</li>
+<li><strong>Camera</strong>: WASD or the arrow keys pan, the mouse wheel zooms, a right-drag or Q/E orbits, a middle-drag pans, <strong>F</strong>
+frames the whole ground. <strong>Click an animal</strong> to follow it and see its stats; <strong>Esc</strong> stops following.</li>
+</ul>
+<p>When the brain is slow, the World waits for its answers before going on (a decision is never made on old observations).
+The panel then says what it waits for, for example <em>waiting for JEV: 6 queries</em>.</p>
+<h2 id="4-inspect">4. Inspect</h2>
+<ul>
+<li>Select the <strong>World</strong>: its state and tick, the run controls (Play, Pause, Step, Run N, Stop), its phases in order, its
+services, and <strong>Validate</strong> with the validation messages.</li>
+<li>Select a <strong>species</strong> and press <strong>Show the computed tables</strong>: its actions, senses, genes, stats and traits, food and
+population, and the <strong>Prompt preview</strong>, the exact text its animals send to the brain.</li>
+<li>Open the windows under <em>Window ▸ EvoSim</em>:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Window</th>
+<th>Shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Animal Inspector</td>
+<td>the animal you click: stats, genes, last situation and the brain's probabilities</td>
+</tr>
+<tr>
+<td>Ecology Monitor</td>
+<td>populations over time; births, deaths by cause and action shares per species</td>
+</tr>
+<tr>
+<td>Event Log</td>
+<td>the events of the run as they happen, filtered by kind, species or animal</td>
+</tr>
+<tr>
+<td>Food Web</td>
+<td>who eats whom, and the threats each species flees</td>
+</tr>
+<tr>
+<td>Gene Pool</td>
+<td>the alleles alive in each species, how common they are, and where each came from</td>
+</tr>
+<tr>
+<td>Brain Health</td>
+<td>each brain and mutator: host, <em>Test connection</em>, calls, failures, latency; the answer cache</td>
+</tr>
+<tr>
+<td>Ask the Brain</td>
+<td>genes and a situation of your choice, and the answers of the brains you pick</td>
+</tr>
+<tr>
+<td>Scenario Runner</td>
+<td>the scenario assets (S00–S27): run their seeds headless and compare the hashes</td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="editor-tooling.html">Editor tooling</a> for every inspector, window and menu.</p>
+<h2 id="5-find-the-runs-files">5. Find the run's files</h2>
+<p>Each run writes its files to <code>Logs/EvoSim/runs/&lt;run name&gt;/</code>:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>events.jsonl</code></td>
+<td>every event, one JSON object per line: births, deaths, kills, meals, mutations…</td>
+</tr>
+<tr>
+<td><code>stats.csv</code></td>
+<td>one row of statistics every few ticks: populations, deaths by cause, means</td>
+</tr>
+<tr>
+<td><code>alleles.jsonl</code></td>
+<td>every allele (gene variant) that appeared, with its text and parent</td>
+</tr>
+<tr>
+<td><code>final_population.json</code></td>
+<td>the animals alive at the end: id, generation, species and genome (allele ids)</td>
+</tr>
+<tr>
+<td><code>summary.json</code></td>
+<td>the run's totals, why it stopped, and the <strong>events hash</strong> that identifies it</td>
+</tr>
+<tr>
+<td><code>run_info.json</code></td>
+<td>the seed, the settings and the versions needed to replay it</td>
+</tr>
+</tbody>
+</table>
+<p>Two runs with the same seed, the same scene and the same brain answers have the same events hash. See
+<a href="recording-and-outputs.html">Recording and outputs</a> and <a href="determinism.html">Determinism and replay</a>.</p>
+<h2 id="next">Next</h2>
+<ul>
+<li><a href="overview.html">How EvoSim works</a>: the whole loop on one page.</li>
+<li><a href="../extending/index.html">Extending EvoSim</a>: add your own sense, action, gene, brain or phase.</li>
+<li><a href="../extending/exercises.html">The teaching path</a>: rewrite a reference module from a stub.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

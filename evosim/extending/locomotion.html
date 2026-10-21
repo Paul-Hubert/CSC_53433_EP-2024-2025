@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>A locomotion | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="A locomotion | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/locomotion.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-locomotion">
+<h1 id="a-locomotion">A locomotion</h1>
+
+<p>A locomotion decides how a species moves: an action only says where the animal wants to go (an
+<a class="xref" href="../api/EvoSim.Intent.html">Intent</a>), and the locomotion turns that into a movement over the ground (MOVE-01). Write one to make
+movement depend on the terrain (slopes, mud, water), to follow paths around obstacles, or to charge extra energy
+for some moves. To change <em>where</em> animals may stand at all, change the <a href="environment.html">ground</a> instead. How
+movement fits in the tick is explained in <a href="../guides/actions-and-movement.html#moving">Actions and movement</a>.</p>
+<h2 id="the-base-class">The base class</h2>
+<p>Derive from <a class="xref" href="../api/EvoSim.Locomotion.html">Locomotion</a>, or from the reference <a class="xref" href="../api/EvoSim.KinematicLocomotion.html">KinematicLocomotion</a> to keep its straight
+lines, sliding and side steps and change only part of them.</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>You</th>
+<th>What it does, when it is called</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Locomotion.html#EvoSim_Locomotion_Move_EvoSim_Animal_EvoSim_Intent_System_Single_EvoSim_MoveContext_">Move</a></td>
+<td>must implement</td>
+<td>Moves one animal for this tick, sets its <code>Position</code> and returns the meters actually moved (MOVE-06). Called in the act phase, after the action planned, for animals whose intent moves.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Locomotion.html#EvoSim_Locomotion_ExtraCost_EvoSim_Animal_UnityEngine_Vector3_UnityEngine_Vector3_">ExtraCost</a></td>
+<td>may override</td>
+<td>Extra energy for a move from one point to another (slopes, mud). Called after the animal moved more than 1 mm; the metabolism adds it to the tick's cost. 0 in the reference.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Locomotion.html#EvoSim_Locomotion_MoveAll_System_Collections_Generic_IReadOnlyList_EvoSim_Animal__System_Collections_Generic_IReadOnlyList_EvoSim_Intent__EvoSim_MoveContext_System_Span_System_Single__">MoveAll</a></td>
+<td>may override</td>
+<td>Moves a group of animals at once (20 §10). The default calls <code>Move</code> for each with its stamina budget.</td>
+</tr>
+<tr>
+<td><code>Declare(SpeciesBuilder)</code></td>
+<td>inherited</td>
+<td>Declares the traits <code>speed.walk</code> and <code>speed.run</code>. If you override it, call <code>base.Declare(b)</code>.</td>
+</tr>
+<tr>
+<td><code>WritePromptRules</code>, <code>Validate</code></td>
+<td>inherited</td>
+<td>Write the <strong>Prompt Rule</strong> line; check <strong>Wander Turn P</strong> (V-35).</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Locomotion.html#EvoSim_Locomotion_WalkSpeed">WalkSpeed</a>, <a class="xref" href="../api/EvoSim.Locomotion.html#EvoSim_Locomotion_RunSpeed">RunSpeed</a></td>
+<td>read</td>
+<td>The speed traits, in meters per tick: read them with <code>a.Trait(WalkSpeed)</code>.</td>
+</tr>
+<tr>
+<td><code>walkSpeed</code>, <code>runSpeed</code>, <code>wanderTurnP</code>, <code>promptRule</code></td>
+<td>protected</td>
+<td>The Inspector settings: <strong>Walk Speed</strong>, <strong>Run Speed</strong>, <strong>Wander Turn P</strong>, <strong>Prompt Rule</strong>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-move-receives">What Move receives</h2>
+<p><strong>The intent</strong> says what the action wants:</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Direction</code></td>
+<td>a unit vector on the horizontal plane; zero for a stay</td>
+</tr>
+<tr>
+<td><code>Run</code></td>
+<td>true to run (<code>RunSpeed</code>), false to walk (<code>WalkSpeed</code>)</td>
+</tr>
+<tr>
+<td><code>MaxDistance</code></td>
+<td>the farthest to go this tick, in meters, so a stop distance is never overshot; infinity for &quot;as far as you can&quot;</td>
+</tr>
+<tr>
+<td><code>Target</code></td>
+<td>the point the action is heading to (or running away from)</td>
+</tr>
+<tr>
+<td><code>Wandering</code></td>
+<td>true for a wandering intent</td>
+</tr>
+<tr>
+<td><code>IsStay</code>, <code>Stay()</code></td>
+<td>whether it moves at all; the same intent turned into a stay, to refuse a move</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The stamina budget</strong> is the most the animal may move this tick, in meters: its stamina, or infinity for a species
+without a stamina module (ANIM-21).</p>
+<p><strong>The move context</strong> (<a class="xref" href="../api/EvoSim.MoveContext.html">MoveContext</a>) gives <code>Ground</code> (heights, walkable points, <code>SlideTo</code>, <code>SideStep</code>,
+<code>SlopeDegrees</code>), <code>Distance(a, b)</code> (the world distance, SPACE-02), <code>Stream(species, purpose)</code> (a random stream),
+<code>StaminaBudget(a)</code>, <code>World</code> and <code>Tick</code>.</p>
+<h2 id="a-complete-example">A complete example</h2>
+<p>The sample <a class="xref" href="../api/EvoSim.Samples.SlopeLocomotion.html">SlopeLocomotion</a> (<code>Assets/EvoSim/Samples/SlopeLocomotion.cs</code>, recipe 22 §14) refuses
+ground steeper than a limit and charges energy for every meter climbed. It changes the intent, then lets the
+kinematic locomotion do the moving.</p>
+<pre><code class="lang-csharp">public class SlopeLocomotion : KinematicLocomotion
+{
+    [SerializeField, Range(0f, 90f), Tooltip(&quot;Steeper ground is refused, in degrees (reference 35).&quot;)]
+    float maxSlopeDegrees = 35f;
+    [SerializeField, Min(0f), Tooltip(&quot;Energy per meter climbed (reference 0.3).&quot;)]
+    float energyPerMeterClimbed = 0.3f;
+
+    public override float Move(Animal a, Intent intent, float staminaBudget, MoveContext c)
+    {
+        if (!intent.IsStay &amp;&amp; c.Ground != null)
+        {
+            Vector3 ahead = a.Position + intent.Direction;
+            if (c.Ground.SlopeDegrees(a.Position, ahead) &gt; maxSlopeDegrees) intent = intent.Stay();   // too steep: don't go
+        }
+        return base.Move(a, intent, staminaBudget, c);
+    }
+
+    public override float ExtraCost(Animal a, Vector3 from, Vector3 to) =&gt;
+        Mathf.Max(0f, to.y - from.y) * energyPerMeterClimbed;                                     // downhill is free
+}
+</code></pre>
+<p>The reference <a class="xref" href="../api/EvoSim.KinematicLocomotion.html">KinematicLocomotion</a> itself moves by the smallest of speed, stamina budget and
+<code>MaxDistance</code>; <code>Ground.SlideTo</code> slides along borders and obstacles; with no progress, <code>Ground.SideStep</code> takes a random
+step drawn from <code>c.Stream(Species, &quot;actions&quot;)</code>.</p>
+<h2 id="where-to-put-it">Where to put it</h2>
+<ol>
+<li>Write the class in <code>Assets/Student</code>. There is no script template for a locomotion: start from the example above,
+or from the stub of exercise 11 (<em>EvoSim ▸ Exercises ▸ Replace with stub ▸ 11 KinematicLocomotion</em>).</li>
+<li>On the species' <code>Locomotion</code> child, replace the <a class="xref" href="../api/EvoSim.KinematicLocomotion.html">KinematicLocomotion</a> component by yours and set its
+speeds. A species has exactly one locomotion (V-13); with none, validation offers to add a kinematic one.</li>
+<li>Each species can have its own: give the predator a slope locomotion and leave the prey kinematic, and they move
+differently over the same terrain. Slopes only matter on a ground with heights, such as the terrain ground.</li>
+</ol>
+<h2 id="rules">Rules</h2>
+<ol>
+<li><strong>Whatever <code>Move</code> does is the tick's result</strong> (MOVE-01). Change only the moved animal's <code>Position</code>; the act phase
+sets its heading afterwards.</li>
+<li><strong>Never end on non-walkable ground or outside the world</strong> (MOVE-02). Use <code>Ground.SlideTo</code>, or check
+<code>Ground.Clear</code> and <code>Ground.IsWalkable</code>. If you don't, the act phase moves the animal back and logs a warning.</li>
+<li><strong>Never move more than the stamina budget</strong> (ANIM-21), nor more than <code>MaxDistance</code> (MOVE-04).</li>
+<li><strong>Read speeds from the animal's traits</strong>, <code>a.Trait(WalkSpeed)</code>, never from the settings (MOVE-03, ANIM-16), so a
+number gene can change them.</li>
+<li><strong>Return the meters actually moved</strong>, measured with <code>c.Distance</code> (MOVE-06). The metabolism and the stamina charge
+exactly that. <code>ExtraCost</code> returns 0 or more.</li>
+<li><strong>Draw random numbers only from <code>c.Stream(Species, ...)</code></strong> (RAND-03), so a seed replays the run.</li>
+<li>An override of <code>MoveAll</code> must give the same result as calling <code>Move</code> for each animal in order.</li>
+</ol>
+<h2 id="test-it">Test it</h2>
+<p>The conformance suite runs every locomotion class in the project: <em>Window ▸ General ▸ Test Runner</em>, EditMode,
+<code>ConformanceTests</code> ▸ <code>LocomotionConformance</code>, one case per class (the T-MOVE template). Eight walkers on a 20 × 20 m
+ground start on a circle of 8 m around a pond of radius 3 m and walk toward its centre for 30 ticks. The suite checks
+that:</p>
+<ul>
+<li>no walker ever ends a tick on water or outside the world (MOVE-02);</li>
+<li>the meters reported are the distance actually moved (MOVE-06);</li>
+<li>no walker stays stuck for more than 3 ticks away from the shore (MOVE-04);</li>
+<li><code>ExtraCost</code> is never negative.</li>
+</ul>
+<p>A test to copy: <code>SlopeLocomotion</code> in <code>Assets/EvoSim/Tests/EditMode/Samples/SampleTests.cs</code>, which walks an animal up a
+ramp and checks where it stops and what climbing costs. See <a href="testing-your-module.html">Testing your module</a>.</p>
+<h2 id="read-next">Read next</h2>
+<ul>
+<li><a class="xref" href="../api/EvoSim.KinematicLocomotion.html">KinematicLocomotion</a> (exercise 11 of <a href="exercises.html">the teaching path</a>) and the sample
+<a class="xref" href="../api/EvoSim.Samples.SlopeLocomotion.html">SlopeLocomotion</a>.</li>
+<li><a class="xref" href="../api/EvoSim.Ground.html">Ground</a>: what is walkable, <code>SlideTo</code>, <code>SideStep</code>, <code>SlopeDegrees</code>; see
+<a href="environment.html">Food, cover, entities and ground</a>.</li>
+<li><a href="stats-and-death.html">Stats, costs and death rules</a>: how the meters you report are charged.</li>
+<li>Specification: 07 §2, in <a href="../spec/07-actions-and-locomotion.html">07 — Actions and locomotion</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

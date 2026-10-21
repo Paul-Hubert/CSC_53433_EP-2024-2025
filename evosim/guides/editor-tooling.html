@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Editor tooling | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Editor tooling | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/editor-tooling.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="guide-editor-tooling">
+<h1 id="editor-tooling">Editor tooling</h1>
+
+<p>The Unity editor is where you meet EvoSim. Its tools have three jobs: show the configuration (orders, prompts, food
+web), catch mistakes before Play, and make a running world readable (who does what, which genes spread). They all
+live in the <code>EvoSim.Editor</code> assembly, under <code>Assets/EvoSim/Editor</code>; the simulation never depends on them (EDIT-03).
+Most of them work on the configuration in Edit mode and on the running world in Play mode (EDIT-05). You find them in
+the inspectors of the World and its species, under <em>Window ▸ EvoSim</em>, in the Scene view's <strong>EvoSim</strong> overlay, and in
+the menus <em>GameObject ▸ EvoSim</em>, <em>Assets ▸ Create ▸ EvoSim</em> and <em>EvoSim</em>.</p>
+<h2 id="validation">Validation</h2>
+<p>One validation engine checks a world everywhere: in the inspectors, when you press Play, when the World initialises,
+and in the tests (EDIT-01). It is <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Prepare_EvoSim_ValidationReport_">Prepare(ValidationReport)</a>: the World finds its species and
+modules, sets them up, and asks every module to check itself in its <code>Validate</code> method. Each problem becomes a
+<a class="xref" href="../api/EvoSim.ValidationMessage.html">ValidationMessage</a> with:</p>
+<ul>
+<li>an <strong>id</strong> from the catalogue of 21 §2, such as V-04 (a species with no action) or V-30 (band edges out of order);</li>
+<li>a <strong>severity</strong>: <em>Error</em> stops the run from starting; <em>Warning</em> and <em>Info</em> never do;</li>
+<li>the <strong>object at fault</strong>, a module or a GameObject;</li>
+<li>a sentence that names the rule, and sometimes a <strong>fix</strong>.</li>
+</ul>
+<h3 id="in-the-inspectors">In the inspectors</h3>
+<p>The World and Species inspectors end with a validation list, drawn by <a class="xref" href="../api/EvoSim.Editor.ValidationPanel.html">ValidationPanel</a>. Each message
+is a box coloured by severity that reads <code>V-04  Species 'prey' has no action (CORE-04).</code> Next to it:</p>
+<ul>
+<li><strong>Select</strong> selects the object at fault in the Hierarchy and highlights it.</li>
+<li>A <strong>fix button</strong>, when the check offers one, labelled with what it does: <em>Add Rest</em>, <em>Rename</em>, <em>Move it up</em>,
+<em>Clamp</em>, <em>Add a text gene</em>, <em>Mark free</em>… Once the fix is applied, the list is checked again at once.</li>
+</ul>
+<p>An empty list says <em>Validation is green.</em></p>
+<h3 id="the-play-mode-gate">The play-mode gate</h3>
+<p>When you press Play, <a class="xref" href="../api/EvoSim.Editor.PlayModeGate.html">PlayModeGate</a> validates every enabled World of the open scenes before Play
+mode starts. If one has an error, Play is cancelled and the Console shows one line per error:</p>
+<pre><code class="lang-text">EvoSim: Play blocked — V-04 Error [Lab1 World/Prey]: Species 'prey' has no action (CORE-04).
+</code></pre>
+<p>Click the line to select the object at fault. To use a fix button, select the World and press <em>Validate</em>. Warnings
+and information never block Play: read them in the inspector.</p>
+<h2 id="the-world-inspector">The World inspector</h2>
+<p>Select the World. Above its fields, a line gives its state: <em>Not initialised</em> before Play, then the run state and the
+tick (<em>Running — tick 1204</em>). While the brains answer it adds what the world waits for, such as <em>waiting for jev: 12
+queries, 1.4 s</em>, and once the run has stopped, why.</p>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Play</strong>, <strong>Pause</strong>, <strong>Step</strong>, <strong>Run N</strong>, <strong>Stop</strong></td>
+<td>drive a running world (Play mode). <em>Step</em> runs one tick; <em>Run N</em> runs the number of ticks in the field next to it (100 by default)</td>
+</tr>
+<tr>
+<td>the World's fields</td>
+<td>seed, wait mode, run speed, decision period, default brain, stop conditions… (<a href="running-and-building.html">Running and building</a>)</td>
+</tr>
+<tr>
+<td><strong>Phases (in this order every tick)</strong></td>
+<td>the children of the <code>Phases</code> object, numbered. A toggle switches a phase on or off; ▲ moves it up one place. Both work in Edit mode only and can be undone</td>
+</tr>
+<tr>
+<td><strong>Services</strong></td>
+<td>every world service below the World, by service name and class; <em>(off)</em> marks a disabled one</td>
+</tr>
+<tr>
+<td><strong>Validation</strong></td>
+<td><em>Validate</em> in Edit mode; in Play mode <em>Show the last report</em>, the report of the World's initialisation</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-species-inspector">The Species inspector</h2>
+<p>Select a species. Below its own fields, press <strong>Show the computed tables</strong> (in Edit mode it validates the world to
+compute them; in Play mode they show the running world). Then you see the <strong>observation space</strong> (how many different
+situations the senses can describe), the <strong>signature</strong>, and these tables:</p>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>One line per…</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Actions</td>
+<td>action in order, with the gene that steers it, or <em>no gene (V-05)</em></td>
+</tr>
+<tr>
+<td>Senses, in situation-text order</td>
+<td>sense: its label, its tokens, and the V1 and V2 text of its first token</td>
+</tr>
+<tr>
+<td>Genes, in locus order</td>
+<td>gene: locus id, kind, number of founders, mutation operator and rate</td>
+</tr>
+<tr>
+<td>Stats and traits</td>
+<td>stat or trait, the module that declares it; for a trait its default, range and whether it has a cost</td>
+</tr>
+<tr>
+<td>Food</td>
+<td>what the species eats (method, energy), whether it is edible itself, and the threats derived from the food web</td>
+</tr>
+<tr>
+<td>Population</td>
+<td>initial size, floor, cap and its rule, and the living count in Play mode</td>
+</tr>
+</tbody>
+</table>
+<h3 id="prompt-preview">Prompt preview</h3>
+<p>The <strong>Prompt preview</strong> foldout shows the exact text a brain receives, built by the same code as the <em>Ask brains</em> phase
+(<a class="xref" href="../api/EvoSim.Editor.PromptPreview.html">PromptPreview</a>, T-PROMPT-05):</p>
+<ol>
+<li>Pick a <strong>Brain</strong> among the World's brains, a <strong>Founder genome</strong> (the n-th founder sentence of each gene) and a <strong>Text
+style</strong> (V1 or V2).</li>
+<li>Pick one token per sense, or press <strong>Random situation</strong>.</li>
+<li>Press <strong>Build</strong>. The prompt appears with <em>About N tokens</em> and the brain's limit; <strong>Copy</strong> puts it on the clipboard.</li>
+</ol>
+<p>For JEV the preview is its whole input text. The estimate counts about one token per four characters.</p>
+<h2 id="the-scene-view-overlay">The Scene view overlay</h2>
+<p>In Play mode, the Scene view draws over the running world. The <strong>EvoSim</strong> overlay (shown by default; the Scene view's
+<em>Overlays</em> menu hides it) has the toggles:</p>
+<table>
+<thead>
+<tr>
+<th>Toggle</th>
+<th>Draws</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Food items</td>
+<td>a green circle on each food cell that holds an item</td>
+</tr>
+<tr>
+<td>Cover</td>
+<td>an outline on each cover cell</td>
+</tr>
+<tr>
+<td>Carcasses, Eggs</td>
+<td>a brown circle under each carcass, a yellow one under each egg</td>
+</tr>
+<tr>
+<td>Action letters</td>
+<td>the first letter of each animal's action above it, in the action's colour</td>
+</tr>
+<tr>
+<td>Show <em>species</em></td>
+<td>one per species: hides or shows that species' letters</td>
+</tr>
+</tbody>
+</table>
+<p>Each action keeps the same colour in every window, set by its place in the species' action order. Select an animal's
+body to see its vision circle and a line to its target. The toggles are kept in your editor preferences.</p>
+<h2 id="windows">Windows</h2>
+<table>
+<thead>
+<tr>
+<th><em>Window ▸ EvoSim ▸</em></th>
+<th>Works in</th>
+<th>Shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Animal Inspector</strong></td>
+<td>Play</td>
+<td>the animal whose body you click in the Scene view: age, generation, parents, stats, traits, each gene's sentence, current action (<em>searching</em> when nothing is in sight), busy reason, target, last situation, last probabilities as bars</td>
+</tr>
+<tr>
+<td><strong>Ask the Brain</strong></td>
+<td>Edit, Play</td>
+<td>the brains' answers for a genome and a situation you choose</td>
+</tr>
+<tr>
+<td><strong>Brain Health</strong></td>
+<td>Edit, Play</td>
+<td>each brain and mutator client: host, <em>Test connection</em> (<em>reachable</em> or V-60), tries, failures, latency in seconds; the answer cache's size and hits</td>
+</tr>
+<tr>
+<td><strong>Ecology Monitor</strong></td>
+<td>Play</td>
+<td>population of each species over time; births, deaths by cause, decisions, memo hits, action shares</td>
+</tr>
+<tr>
+<td><strong>Event Log</strong></td>
+<td>Play</td>
+<td>the run's events as they are recorded, filtered by kind, species or animal</td>
+</tr>
+<tr>
+<td><strong>Food Web</strong></td>
+<td>Edit, Play</td>
+<td>who eats whom as a graph, the derived threats, the food-web messages (V-20, V-22, V-24, V-25)</td>
+</tr>
+<tr>
+<td><strong>Gene Pool</strong></td>
+<td>Play</td>
+<td>for each locus, the share of each allele over time, the most common alleles, the lineage of one</td>
+</tr>
+<tr>
+<td><strong>Scenario Runner</strong></td>
+<td>Edit</td>
+<td>the scenario assets: run their seeds headless and list the results</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ask-the-brain">Ask the Brain</h3>
+<p>The place to see what a sentence does to the brain (labs C and I). In Edit mode press <em>Prepare the world</em> first.</p>
+<ol>
+<li>Pick a species. Each text gene has a field: type a sentence, or press <strong>pro</strong>, <strong>anti</strong> or <strong>neutral</strong> to load the
+gene's contrast sentences. <strong>Founders</strong> puts back the first founders; <strong>Control sentences</strong> puts the World's
+control (random) sentences instead.</li>
+<li>Pick one token per sense: the situation text appears below.</li>
+<li>Tick one or more brains and press <strong>Ask</strong>. Each answer arrives as one line: the brain, a label, and P(action) for
+every action.</li>
+</ol>
+<p><strong>Directed test (pro, anti)</strong> asks twice, with the chosen gene's pro sentence and then its anti sentence: compare the
+two lines for that gene's action. This is what the integrity check B-02 measures on every gene. Asking registers
+nothing in the world, so it never changes a run.</p>
+<h3 id="gene-pool">Gene Pool</h3>
+<p>Keep it open while the world runs: it samples the living animals every 20 ticks, so its chart starts when you open it.
+A text gene shows its allele shares over time, the 12 most common alleles, and the lineage of the one you click back to
+its founder. A number gene shows a histogram of the living animals' values.</p>
+<h3 id="scenario-runner">Scenario Runner</h3>
+<p>Pick a scenario asset and a variant, edit the seeds and the length (<em>-1</em> = the scenario's), and press <strong>Run</strong>. Each seed
+runs headless, like <code>EvoSim.Batch.RunScenario</code> (<a href="running-and-building.html">Running and building</a>): one line per run with
+its ticks, events hash, model calls and run folder. <strong>Run each seed twice and compare the hashes</strong> checks that runs
+repeat. Close the scenario's scene first: a scene open in the editor cannot be run.</p>
+<h2 id="building-scenes">Building scenes</h2>
+<table>
+<thead>
+<tr>
+<th>Menu</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>GameObject ▸ EvoSim ▸ New World</em></td>
+<td>a world of 48 m with the full tree: <code>Ground</code>, <code>Environment</code> (grass, thickets, carcasses, eggs), <code>Brains</code> (JEV, Random, Ollama points, answer cache, mutator), <code>Recording</code> and the eleven <code>Phases</code>. The random brain is the default, so it runs without a server</td>
+</tr>
+<tr>
+<td><em>GameObject ▸ EvoSim ▸ New Species</em></td>
+<td>with a World selected: a species with locomotion, energy, stamina, metabolism, a diet of grass, mating, litter, crossover, starvation, old age, cap, floor and staggered decisions. It has no sense and no action yet: V-04 asks for one</td>
+</tr>
+<tr>
+<td><em>GameObject ▸ EvoSim ▸ Add Action ▸</em> Eat, Flee, Hide, Follow, Rest, Mate, Hunt</td>
+<td>with a species selected: the action with its text gene, under <code>Actions</code></td>
+</tr>
+<tr>
+<td><em>GameObject ▸ EvoSim ▸ Add Sense ▸</em> Energy, Stamina, Food, Predator, Prey, Cover, Animal, Carcass, Age</td>
+<td>the sense, under <code>Senses</code>; its object's name is its label</td>
+</tr>
+<tr>
+<td><em>GameObject ▸ EvoSim ▸ Add Gene ▸ Stamina gene</em></td>
+<td>a number gene for maximum stamina, under <code>Genes</code></td>
+</tr>
+</tbody>
+</table>
+<p>The <em>Add</em> menus copy prefabs from <code>Assets/EvoSim/Modules</code>. A new world has no run views, so Play mode shows little:
+copy the <code>Run views</code> object from a reference scene and add a <a class="xref" href="../api/EvoSim.WorldCamera.html">WorldCamera</a> to your camera, or start from a
+copy of <code>Sandbox</code>.</p>
+<p>Three menus are for course staff, when the reference itself changes:</p>
+<table>
+<thead>
+<tr>
+<th>Menu</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>EvoSim ▸ Build Reference Scenes</em></td>
+<td>rebuilds the six reference scenes, allele pools, module prefabs and scenario assets from code (<a class="xref" href="../api/EvoSim.Editor.ReferenceScenes.html">ReferenceScenes</a>), overwriting any edit made in them</td>
+</tr>
+<tr>
+<td><em>EvoSim ▸ Reference ▸ Update Reference Scenes</em></td>
+<td>brings the saved scenes to the reference decision period and staggered decisions, without rebuilding them</td>
+</tr>
+<tr>
+<td><em>EvoSim ▸ Views ▸ Add Run Views to Reference Scenes</em></td>
+<td>adds what is missing of the run views and rebuilds the two placeholder bodies (<a href="views-and-real-time.html">Views and real time</a>)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="script-templates">Script templates</h2>
+<p>In the Project window, <em>Assets ▸ Create ▸ EvoSim ▸ Script ▸</em> asks for a class name and writes two files:
+<code>Assets/Student/&lt;Name&gt;.cs</code> and its test <code>Assets/Student/Tests/&lt;Name&gt;Tests.cs</code>. Each compiles as it is.</p>
+<table>
+<thead>
+<tr>
+<th>Template</th>
+<th>Derives from</th>
+<th>The script starts with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sense</td>
+<td><a class="xref" href="../api/EvoSim.Sense.html">Sense</a></td>
+<td>three tokens (<em>none</em>, <em>near</em>, <em>far</em>), <code>Read</code> and <code>Write</code></td>
+</tr>
+<tr>
+<td>Action</td>
+<td><a class="xref" href="../api/EvoSim.AnimalAction.html">AnimalAction</a></td>
+<td>a description line and an <code>Act</code> that searches</td>
+</tr>
+<tr>
+<td>Gene kind</td>
+<td><a class="xref" href="../api/EvoSim.Gene.html">Gene</a></td>
+<td>a number gene that sets a trait from its founder values</td>
+</tr>
+<tr>
+<td>Stat</td>
+<td><a class="xref" href="../api/EvoSim.SpeciesModule.html">SpeciesModule</a></td>
+<td>a stat declared with a start and a maximum</td>
+</tr>
+<tr>
+<td>Phase</td>
+<td><a class="xref" href="../api/EvoSim.TickPhase.html">TickPhase</a></td>
+<td>an empty <code>Run</code></td>
+</tr>
+<tr>
+<td>Brain</td>
+<td><a class="xref" href="../api/EvoSim.Brain.html">Brain</a></td>
+<td>uniform probabilities</td>
+</tr>
+<tr>
+<td>Mutation operator</td>
+<td><a class="xref" href="../api/EvoSim.MutationOperator.html">MutationOperator</a></td>
+<td>a number mutation of ±1</td>
+</tr>
+</tbody>
+</table>
+<p>The test derives from <a class="xref" href="../api/EvoSim.Testing.WorldFixture.html">WorldFixture</a> and builds a small world in code that uses your class. The
+first template also creates two assemblies: <code>Student</code> (it sees EvoSim, its HTTP brains and the samples) and
+<code>Student.Tests</code> (editor only). <em>Assets ▸ Create ▸ EvoSim</em> also has <strong>Allele Pool</strong>, <strong>Scenario</strong> and <strong>Mutation Deck</strong>
+(a copy of the reference deck to edit).</p>
+<h2 id="exercises-and-the-player">Exercises and the player</h2>
+<p><em>EvoSim ▸ Exercises ▸ Replace with stub ▸ 1 RestAction … 14 LlmMutation</em> replaces a reference module, in every open
+scene, by an empty class of yours with the same settings; <em>EvoSim ▸ Exercises ▸ Restore reference</em> puts the reference
+back. See <a href="../extending/exercises.html">The teaching path</a>.</p>
+<p><em>EvoSim ▸ Build ▸ Visual Player</em> builds a Windows player that shows runs of the six reference scenes, into
+<code>Builds/EvoSim/&lt;yyyy-MM-dd&gt;/EvoSim.exe</code>. See <a href="running-and-building.html#player-builds">Running and building</a>.</p>
+<h2 id="the-main-types">The main types</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.WorldInspector.html">WorldInspector</a>, <a class="xref" href="../api/EvoSim.Editor.SpeciesInspector.html">SpeciesInspector</a></td>
+<td>the two custom inspectors</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.ValidationPanel.html">ValidationPanel</a></td>
+<td>the validation list with <em>Select</em> and the fix buttons</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.PlayModeGate.html">PlayModeGate</a></td>
+<td>validates the open worlds before Play</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.PromptPreview.html">PromptPreview</a></td>
+<td>the exact prompt for a genome and a situation</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.EvoSimOverlay.html">EvoSimOverlay</a>, <a class="xref" href="../api/EvoSim.Editor.SceneDrawing.html">SceneDrawing</a></td>
+<td>the Scene view overlay and what it draws</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.EditorWorlds.html">EditorWorlds</a></td>
+<td>the worlds of the open scenes, the selected world and animal, the action colours</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.WorldFactory.html">WorldFactory</a></td>
+<td><em>New World</em>, <em>New Species</em>, the <em>Add</em> menus</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.ScriptTemplates.html">ScriptTemplates</a>, <a class="xref" href="../api/EvoSim.Editor.Exercises.html">Exercises</a></td>
+<td>script templates, the teaching path</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.ReferenceScenes.html">ReferenceScenes</a>, <a class="xref" href="../api/EvoSim.Editor.RunViews.html">RunViews</a></td>
+<td>the reference content and its views</td>
+</tr>
+</tbody>
+</table>
+<h2 id="go-further">Go further</h2>
+<ul>
+<li><a href="../extending/editor.html">The editor</a>: your own window or inspector, validation messages with fixes, your own <em>Add</em>
+menu.</li>
+<li><a href="running-and-building.html">Running and building</a>: headless runs, batch mode, the player.</li>
+<li><a href="views-and-real-time.html">Views and real time</a>: the run views, the camera, captures.</li>
+<li><a href="../spec/21-editor-tooling.html">21 — Editor tooling</a>: the validation catalogue and the editor's rules.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

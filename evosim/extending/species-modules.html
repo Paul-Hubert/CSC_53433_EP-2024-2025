@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Species modules, the common base | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Species modules, the common base | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/species-modules.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-species-modules">
+<h1 id="species-modules-the-common-base">Species modules, the common base</h1>
+
+<p>Everything under a species is a <a class="xref" href="../api/EvoSim.SpeciesModule.html">SpeciesModule</a>: senses, actions, genes, stats, death rules, the diet, the
+locomotion, the mating rule. The specialised kinds have their own pages; this one covers what they all share: the
+lifecycle the World runs them through, declaring stats, depending on another module, and validation. Derive from
+<code>SpeciesModule</code> directly for a feature of one species that is none of those kinds: a stat, a setting other modules
+read, a rule line in the prompt. For something shared by every species, write a world module instead
+(<a href="world-modules.html">Phases, services and world hooks</a>).</p>
+<h2 id="the-lifecycle">The lifecycle</h2>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>You</th>
+<th>When the World calls it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_Species">Species</a>, <a class="xref" href="../api/EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_World">World</a></td>
+<td>read</td>
+<td>set before <code>Declare</code>: the owning species and its World</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_Declare_EvoSim_SpeciesBuilder_">Declare(b)</a></td>
+<td>may override</td>
+<td>once per set-up, before any module of the species initialises: declare your stats and traits, keep their ids</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_Initialize">Initialize()</a></td>
+<td>may override</td>
+<td>after every module of the species declared: look up other modules, services, traits; reset your own fields</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_WritePromptRules_EvoSim_PromptWriter_">WritePromptRules(w)</a></td>
+<td>may override</td>
+<td>while the species' prompt template is built, in module order: add rule lines with <code>w.Rule(…)</code></td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_Validate_EvoSim_ValidationReport_">Validate(report)</a></td>
+<td>may override</td>
+<td>after every <code>Initialize</code>, in the editor and at the start of a run: report configuration problems</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_OnBorn_EvoSim_Animal_">OnBorn(a)</a></td>
+<td>may override</td>
+<td>each time an animal of this species joins the living (founder, baby, newcomer), its stats set</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_OnDied_EvoSim_Animal_System_String_">OnDied(a, cause)</a></td>
+<td>may override</td>
+<td>each death of an animal of this species, once recorded; the animal is marked gone</td>
+</tr>
+</tbody>
+</table>
+<p><code>Declare</code>, <code>Initialize</code>, <code>WritePromptRules</code> and <code>Validate</code> also run in Edit mode, when the editor validates the scene.
+The whole set-up order is in <a href="../guides/world-and-modules.html#initialisation-step-by-step">The world and its modules</a>.</p>
+<h2 id="a-complete-example-a-stat">A complete example: a stat</h2>
+<p>Recipe 22 §1, the sample <code>Assets/EvoSim/Samples/Thirst.cs</code> (<a class="xref" href="../api/EvoSim.Samples.Thirst.html">Thirst</a>): every animal gets a thirst
+stat, and the prompt explains it.</p>
+<pre><code class="lang-csharp">/// &lt;summary&gt;A thirst stat that grows every tick (with DiesOfThirst) and kills at a threshold.&lt;/summary&gt;
+public class Thirst : SpeciesModule
+{
+    [SerializeField, Min(0f), Tooltip(&quot;Thirst added every tick (reference 0.5).&quot;)] float perTick = 0.5f;
+    [SerializeField, Min(1f), Tooltip(&quot;Thirst at which an animal dies (reference 100).&quot;)] float deadly = 100f;
+
+    public StatId Value { get; private set; }
+    public float PerTick =&gt; perTick;
+    public float Deadly =&gt; deadly;
+
+    public override void Declare(SpeciesBuilder b) =&gt;
+        Value = b.DeclareStat(&quot;thirst&quot;, StatStart.Fixed(0f), 0f, deadly);
+
+    public override void WritePromptRules(PromptWriter w) =&gt;
+        w.Rule($&quot;Thirst grows every step; an animal dies of thirst at {Bands.Number(deadly)}. Drinking resets it.&quot;);
+}
+</code></pre>
+<p>The module holds settings only. The value belongs to each animal: other modules read and write it with <code>a[thirst.Value]</code>,
+clamped to its range. Here the sample death rule <a class="xref" href="../api/EvoSim.Samples.DiesOfThirst.html">DiesOfThirst</a> raises it every tick, and
+<a class="xref" href="../api/EvoSim.Samples.DrinkAction.html">DrinkAction</a> resets it.</p>
+<p><strong>Where it goes.</strong> Put your class in <code>Assets/Student</code>: <em>Assets ▸ Create ▸ EvoSim ▸ Script ▸ Stat</em> writes a stat module
+there, with a test in <code>Assets/Student/Tests</code>. Add the component anywhere under the species, for example on its <code>Stats</code>
+object beside <a class="xref" href="../api/EvoSim.Energy.html">Energy</a> and <a class="xref" href="../api/EvoSim.Stamina.html">Stamina</a>. (The examples on this page leave out the usual
+<code>using EvoSim;</code> and <code>using UnityEngine;</code> lines.)</p>
+<h2 id="stats-traits-and-their-ids">Stats, traits and their ids</h2>
+<p>A <strong>stat</strong> changes during life (energy, stamina, thirst); a <strong>trait</strong> is fixed at birth (vision, <code>stamina.max</code>) and a
+number gene may set it. Declare both in <code>Declare</code> with the <a class="xref" href="../api/EvoSim.SpeciesBuilder.html">SpeciesBuilder</a>:</p>
+<table>
+<thead>
+<tr>
+<th>Call</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>b.DeclareStat(name, start, min, max, capTrait)</code></td>
+<td>a <a class="xref" href="../api/EvoSim.StatId.html">StatId</a>; <code>start</code> is <code>StatStart.Fixed(v)</code> or <code>StatStart.FullTrait(trait)</code></td>
+</tr>
+<tr>
+<td><code>b.DeclareTrait(name, default, min, max, changeable)</code></td>
+<td>a <a class="xref" href="../api/EvoSim.TraitId.html">TraitId</a></td>
+</tr>
+<tr>
+<td><code>Species.Declarations.FindStat(name)</code>, <code>FindTrait(name)</code></td>
+<td>the id another module declared, for <code>Initialize</code></td>
+</tr>
+</tbody>
+</table>
+<p>Two modules that declare the same name share one value; the first declaration counts (V-38 if they differ). Read and
+write with <code>a[statId]</code> and <code>a.Trait(traitId)</code>.</p>
+<div class="WARNING">
+<h5>Warning</h5>
+<p>An id is only good once resolved. <code>FindStat</code> and <code>FindTrait</code> return an invalid id when no module declared the name.
+Resolve every id in <code>Declare</code> or <code>Initialize</code>, check <code>IsValid</code>, and report a missing one in <code>Validate</code>. Never read or
+write an animal with an id you have not checked.</p>
+</div>
+<h2 id="rules-your-module-keeps">Rules your module keeps</h2>
+<ul>
+<li><strong>Settings in the module, state in the animal</strong> (CORE-05). One module serves every animal of its species: anything
+that belongs to one animal goes in a stat or a trait. A static check enforces it for the reference modules.</li>
+<li><strong>Set up in <code>Initialize</code></strong>, never in <code>Awake</code>, <code>Start</code> or <code>OnEnable</code> (ARCH-04), and reset your fields there: the same
+object starts every run.</li>
+<li><strong>Change nothing in the scene</strong> in <code>Declare</code>, <code>Initialize</code> or <code>Validate</code>: they also run in Edit mode.</li>
+<li><strong>Random numbers only from a named stream</strong>, such as <code>World.Random.For(Species, &quot;purpose&quot;)</code> (RAND-01, RAND-03).</li>
+<li><strong>Keep rule lines stable.</strong> They are part of the prompt, so changing one changes the prompt's id and the answers the
+cache can reuse.</li>
+</ul>
+<h2 id="species">Species</h2>
+<p>A new species is configuration, not code. Duplicate the prey in the Hierarchy and change, on its <a class="xref" href="../api/EvoSim.Species.html">Species</a>:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Id</strong></td>
+<td>the stable id of files, streams, locus ids and statistics columns (<code>deer</code>); empty = the display name; no <code>.</code>, not <code>world</code></td>
+</tr>
+<tr>
+<td><strong>Display Name</strong></td>
+<td>what the brain reads in prompts and situations</td>
+</tr>
+<tr>
+<td><strong>Brain</strong></td>
+<td>its own brain; empty = the World's <strong>Default Brain</strong></td>
+</tr>
+<tr>
+<td><strong>Initial Population</strong></td>
+<td>founders at tick 0</td>
+</tr>
+<tr>
+<td><strong>Prompt Header</strong>, <strong>Genes Intro</strong>, <strong>Frozen Prompt</strong></td>
+<td>the fixed parts of its prompt</td>
+</tr>
+</tbody>
+</table>
+<p>Ids and display names must be unique (V-07). Then change its modules and founder sentences, and give a hunter a diet
+entry for it (<code>deer</code>): the food web and the threats update by themselves. <em>GameObject ▸ EvoSim ▸ New Species</em> starts a
+species from scratch, and <em>Add Action</em> and <em>Add Sense</em> fill it. Adding, removing or moving an action, gene or sense
+changes the species' signature (SPEC-03). Once a signature has been accepted, validation warns when it changes (V-12),
+until you accept the new one.</p>
+<p><strong>Subclass <code>Species</code> only for its two hooks</strong>, <code>OnBorn</code> and <code>OnDied</code>. They run before the modules' hooks. They are
+<code>protected internal</code>, so from your own assembly the override is <code>protected</code>:</p>
+<pre><code class="lang-csharp">public class LoggedSpecies : Species
+{
+    protected override void OnBorn(Animal a) =&gt; Debug.Log($&quot;{a} joins ({a.Origin})&quot;);
+    protected override void OnDied(Animal a, string cause) =&gt; Debug.Log($&quot;{a} died: {cause}&quot;);
+}
+</code></pre>
+<p><strong>At run time</strong>, <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_AddSpecies_EvoSim_Species_System_String_EvoSim_Species_System_Int32_">World.AddSpecies</a>
+clones a species under the World with a new id (SPEC-30): <code>World.AddSpecies(prey, &quot;deer&quot;, parent: prey, founders: 6)</code>.
+The clone gets its own population, streams and allele ids, and inherits the parent's relations both ways: it eats what
+the parent eats, and whoever hunted the parent hunts it (SPEC-31). It is set up and validated like a species at
+<code>Initialize</code>; an error throws an <code>InvalidOperationException</code> and the clone is removed. An id is never reused: a second
+<code>deer</code> becomes <code>deer-2</code> (SPEC-32). Call it between ticks, or from a phase outside any loop over <code>World.AllSpecies</code>.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>A module that needs another one beside it says so with <a class="xref" href="../api/EvoSim.RequiresModuleAttribute.html">RequiresModuleAttribute</a>. The sample death rule
+needs a thirst:</p>
+<pre><code class="lang-csharp">[RequiresModule(typeof(Thirst))]
+public class DiesOfThirst : DeathRule
+{
+    static readonly IReadOnlyList&lt;string&gt; causes = System.Array.AsReadOnly(new[] { &quot;thirst&quot; });
+    Thirst thirst;
+
+    public override IEnumerable&lt;string&gt; Causes =&gt; causes;
+    public override void Initialize() =&gt; thirst = Species.Module&lt;Thirst&gt;();
+
+    public override string CauseOfDeath(Animal a)
+    {
+        if (thirst == null) return null;                         // no Thirst: nothing to do
+        a[thirst.Value] += thirst.PerTick;
+        return a[thirst.Value] &gt;= thirst.Deadly ? &quot;thirst&quot; : null;
+    }
+    // … (Validate)
+}
+</code></pre>
+<p>Put it on a species module's class, once per module needed; subclasses inherit it, and a subclass of the named type
+counts. The named module is looked for on the same species, or under the World for a world module. When it is missing,
+validation warns (V-26: <em>DiesOfThirst needs a Thirst on 'prey'</em>) with a fix that adds it on a new child named after it
+(no fix for an abstract type). It is only a warning, so the run still starts: look the companion up in <code>Initialize</code> and
+cope with null, as above. The conformance suites add the companions before they test your module.</p>
+<h2 id="validation">Validation</h2>
+<p>Override <code>Validate</code> to catch configuration mistakes before Play. Add one message per problem to the
+<a class="xref" href="../api/EvoSim.ValidationReport.html">ValidationReport</a>, naming the object at fault (usually <code>this</code>), with a validator id from the catalogue of
+21 §2 that fits (V-20 for a name that matches nothing, V-35 for a value out of range…):</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.ValidationReport.html#EvoSim_ValidationReport_Error_System_String_UnityEngine_Object_System_String_EvoSim_ValidationFix_">Error(id, obj, text, fix)</a></td>
+<td>blocks Play and the run</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.ValidationReport.html#EvoSim_ValidationReport_Warning_System_String_UnityEngine_Object_System_String_EvoSim_ValidationFix_">Warning(id, obj, text, fix)</a></td>
+<td>the run starts; something is probably wrong</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.ValidationReport.html#EvoSim_ValidationReport_Info_System_String_UnityEngine_Object_System_String_EvoSim_ValidationFix_">Info(id, obj, text, fix)</a></td>
+<td>worth knowing</td>
+</tr>
+</tbody>
+</table>
+<p>A <a class="xref" href="../api/EvoSim.ValidationFix.html">ValidationFix</a> is a button in the inspector's validation list: a label and the change to make; the
+editor records it for Undo, then validates again. Validation itself only reads: the change belongs in the fix. Write
+each message for a student who has never seen your code: what is wrong, and the rule it breaks.</p>
+<pre><code class="lang-csharp">public class PreferredFood : SpeciesModule
+{
+    [SerializeField, Tooltip(&quot;A food layer's name.&quot;)] string layer = &quot;Grass&quot;;
+    [SerializeField, Range(0f, 1f), Tooltip(&quot;How strongly it prefers that layer.&quot;)] float preference = 0.5f;
+    // …
+
+    public override void Validate(ValidationReport report)
+    {
+        if (World.Service&lt;ResourceLayer&gt;(layer) == null)
+        {
+            var first = World.Service&lt;ResourceLayer&gt;();
+            report.Error(&quot;V-20&quot;, this, $&quot;No food layer is named '{layer}'.&quot;,
+                         first == null ? null : new ValidationFix($&quot;Use {first.LayerName}&quot;, () =&gt; layer = first.LayerName));
+        }
+        if (!(preference &gt;= 0f &amp;&amp; preference &lt;= 1f))                   // also catches NaN
+            report.Error(&quot;V-35&quot;, this, $&quot;The preference {preference} is outside [0, 1].&quot;,
+                         new ValidationFix(&quot;Clamp&quot;, () =&gt; preference = Mathf.Clamp01(preference)));
+    }
+}
+</code></pre>
+<h2 id="test-it">Test it</h2>
+<ul>
+<li><strong>The stat suite</strong> (T-ANIM, <code>ConformanceTests.StatConformance</code>) runs every species module with a public <code>StatId</code>
+property: founders start as declared, and the stat stays in its range for 1 000 ticks.</li>
+<li><strong>Your own tests</strong> derive from <a class="xref" href="../api/EvoSim.Testing.WorldFixture.html">WorldFixture</a> and build a world in code
+(<a href="testing-your-module.html">Testing your module</a>). To test validation, build it without initialising and prepare it:</li>
+</ul>
+<pre><code class="lang-csharp">var w = New(name: &quot;no layer&quot;).Flat(20, 20)
+    .Species(&quot;prey&quot;, s =&gt; s.Population(0).Action&lt;RestAction&gt;(&quot;rest&quot;).Module&lt;PreferredFood&gt;())
+    .BuildUninitialized();
+var report = new ValidationReport();
+Assert.IsFalse(w.Prepare(report));
+Assert.IsTrue(report.Has(&quot;V-20&quot;), report.ToString());
+</code></pre>
+<h2 id="read-next">Read next</h2>
+<ul>
+<li>References: <a class="xref" href="../api/EvoSim.Energy.html">Energy</a>, <a class="xref" href="../api/EvoSim.Stamina.html">Stamina</a>, <a class="xref" href="../api/EvoSim.Metabolism.html">Metabolism</a>, <a class="xref" href="../api/EvoSim.DecisionSchedule.html">DecisionSchedule</a>; the
+samples <a class="xref" href="../api/EvoSim.Samples.Thirst.html">Thirst</a>, <a class="xref" href="../api/EvoSim.Samples.DiesOfThirst.html">DiesOfThirst</a>, <a class="xref" href="../api/EvoSim.Samples.DrinkAction.html">DrinkAction</a>.</li>
+<li>The specialised kinds: <a href="sense.html">A sense</a>, <a href="action.html">An action</a>, <a href="stats-and-death.html">Stats, costs and death rules</a>,
+<a href="genes.html">Genes</a>, <a href="locomotion.html">A locomotion</a>.</li>
+<li><a href="world-modules.html">Phases, services and world hooks</a>, for what all species share.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

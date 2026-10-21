@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class WorldBuilder | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class WorldBuilder | EvoSim ">
+      
+      <meta name="description" content="Builds a world in code, with no scene (30 &#167;2): ground, food, cover, services, phases and species, each added by one chained call, then .">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_Testing_WorldBuilder.md&amp;value=---%0Auid%3A%20EvoSim.Testing.WorldBuilder%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.Testing.WorldBuilder">
+
+
+
+  <h1 id="EvoSim_Testing_WorldBuilder" data-uid="EvoSim.Testing.WorldBuilder" class="text-break">
+Class WorldBuilder  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/WorldBuilder.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a>.<a class="xref" href="EvoSim.Testing.html">Testing</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Testing.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Builds a world in code, with no scene (30 §2): ground, food, cover, services, phases and species, each added by one
+chained call, then <a class="xref" href="EvoSim.Testing.WorldBuilder.html#EvoSim_Testing_WorldBuilder_Build">Build()</a>.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class WorldBuilder : IDisposable</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">WorldBuilder</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+  <dl class="typelist extensionMethods">
+    <dt>Extension Methods</dt>
+    <dd>
+  <div>
+      <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_CheckInvariants_EvoSim_Testing_WorldBuilder_">Lab.CheckInvariants(WorldBuilder)</a>
+  </div>
+  <div>
+      <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_Ecology_EvoSim_Testing_WorldBuilder_System_Single_System_Single_System_Single_System_Action_EvoSim_Testing_SpeciesSetup__System_Action_EvoSim_Testing_SpeciesSetup__System_Single_">Lab.Ecology(WorldBuilder, float, float, float, Action&lt;SpeciesSetup&gt;, Action&lt;SpeciesSetup&gt;, float)</a>
+  </div>
+  <div>
+      <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_FakeMutation_EvoSim_Testing_WorldBuilder_System_Action_EvoSim_Testing_FakeMutator__">Lab.FakeMutation(WorldBuilder, Action&lt;FakeMutator&gt;)</a>
+  </div>
+  <div>
+      <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_Lab1_EvoSim_Testing_WorldBuilder_System_Int32_System_Int32_System_Single_EvoSim_ActOrder_System_Boolean_System_Int32_System_Int32_System_Int32_">Lab.Lab1(WorldBuilder, int, int, float, ActOrder, bool, int, int, int)</a>
+  </div>
+  <div>
+      <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_Recorder_EvoSim_Testing_WorldBuilder_System_Boolean_System_String_System_String_System_Boolean_">Lab.Recorder(WorldBuilder, bool, string, string, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_ReferencePhases_EvoSim_Testing_WorldBuilder_EvoSim_ActOrder_">Lab.ReferencePhases(WorldBuilder, ActOrder)</a>
+  </div>
+  </dd></dl>
+
+
+  <h2 id="EvoSim_Testing_WorldBuilder_examples">Examples</h2>
+  <pre><code class="lang-csharp">var w = New().Flat(20, 20).Food(0.1f, 0.01f)
+    .Phase&lt;SeasonsPhase&gt;(p =&gt; p.Configure(10, 0.2f)).Phase&lt;EnvironmentPhase&gt;()
+    .Species("prey", s =&gt; s.PreyBody().Action&lt;RestAction&gt;("rest"))
+    .Build();
+var grass = w.Service&lt;FoodGrid&gt;();
+w.Advance(7);
+Assert.AreEqual(0.2f, grass.RegrowFactor, "winter");</code></pre>
+
+
+  <h2 id="EvoSim_Testing_WorldBuilder_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>The builder makes the same GameObject tree as a scene: a root with the <a class="xref" href="EvoSim.World.html">World</a>, then
+<code>Environment</code> (layers, entities), <code>Brains</code> (brains, caches, mutators), <code>Phases</code> and one object per
+species. The tree stays inactive until <a class="xref" href="EvoSim.Testing.WorldBuilder.html#EvoSim_Testing_WorldBuilder_Build">Build()</a>, so no module runs before the World initialises it.</p>
+<p>A world has only what you add: no phase runs unless you add it (<a class="xref" href="EvoSim.Testing.WorldBuilder.html#EvoSim_Testing_WorldBuilder_Phase__1_System_Action___0__">Phase&lt;T&gt;(Action&lt;T&gt;)</a>, or all of them with
+<a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_ReferencePhases_EvoSim_Testing_WorldBuilder_EvoSim_ActOrder_">ReferencePhases(WorldBuilder, ActOrder)</a>), and no species is populated unless you ask (<a class="xref" href="EvoSim.Testing.SpeciesSetup.html#EvoSim_Testing_SpeciesSetup_Population_System_Int32_">Population(int)</a>,
+or <a class="xref" href="EvoSim.Testing.Place.html#EvoSim_Testing_Place_Animal_EvoSim_Species_UnityEngine_Vector3_EvoSim_Genome_System_Single_System_String_System_Action_EvoSim_Animal__">Animal(Species, Vector3, Genome, float, string, Action&lt;Animal&gt;)</a> after Build). The <a class="xref" href="EvoSim.Testing.Lab.html">Lab</a> extension methods add the reference species and
+the Lab 1 world in one call.</p>
+<p>In a test, start builders with <a class="xref" href="EvoSim.Testing.WorldFixture.html#EvoSim_Testing_WorldFixture_New_System_Int32_EvoSim_WaitMode_System_String_">New(int, WaitMode, string)</a>, which destroys the world afterwards; a builder
+made with <code>new</code> must be disposed.</p>
+</div>
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="EvoSim_Testing_WorldBuilder__ctor_" data-uid="EvoSim.Testing.WorldBuilder.#ctor*"></a>
+
+  <h3 id="EvoSim_Testing_WorldBuilder__ctor_System_Int32_EvoSim_WaitMode_System_String_" data-uid="EvoSim.Testing.WorldBuilder.#ctor(System.Int32,EvoSim.WaitMode,System.String)">
+  WorldBuilder(int, WaitMode, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/WorldBuilder.cs/#L49"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Starts an empty world: a root with its World and the Environment, Brains and Phases objects.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public WorldBuilder(int seed = 1234, WaitMode waitMode = WaitMode.Freeze, string name = &quot;Test World&quot;)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>seed</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The world's seed: the same seed gives the same run (RAND-10).</p>
+</dd>
+    <dt><code>waitMode</code> <a class="xref" href="EvoSim.WaitMode.html">WaitMode</a></dt>
+    <dd><p>How a tick waits for late answers; Freeze (the default) blocks, as tests need.</p>
+</dd>
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The name of the root GameObject; give each world of a test its own.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_Testing_WorldBuilder__ctor_System_Int32_EvoSim_WaitMode_System_String__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>The World doesn't start on Play (<code>StartOnPlay</code> is off): the test drives it with <a class="xref" href="EvoSim.World.html#EvoSim_World_Advance_System_Int32_">Advance(int)</a>.</p>
+</div>
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="EvoSim_Testing_WorldBuilder_Root_" data-uid="EvoSim.Testing.WorldBuilder.Root*"></a>
+
+  <h3 id="EvoSim_Testing_WorldBuilder_Root" data-uid="EvoSim.Testing.WorldBuilder.Root">
+  Root
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/WorldBuilder.cs/#L37"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The root GameObject of the world being built (inactive until <a class="xref" href="EvoSim.Testing.WorldBuilder.html#EvoSim_Testing_WorldBuilder_Build">Build()</a>).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public GameObject Root { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">GameObject</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_WorldBuilder_World_" data-uid="EvoSim.Testing.WorldBuilder.World*"></a>
+
+  <h3 id="EvoSim_Testing_WorldBuilder_World" data-uid="EvoSim.Testing.WorldBuilder.World">
+  World
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/WorldBuilder.cs/#L40"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The World component on <a class="xref" href="EvoSim.Testing.WorldBuilder.html#EvoSim_Testing_WorldBuilder_Root">Root</a>: set its options here or with <a class="xref" href="EvoSim.Testing.WorldBuilder.html#EvoSim_Testing_WorldBuilder_Configure_System_Action_EvoSim_World__">Configure(Action&lt;World&gt;)</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public World World { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.World.html">World</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_Testing_WorldBuilder_Build_" data-uid="EvoSim.Testing.WorldBuilder.Build*"></a>
+
+  <h3 id="EvoSim_Testing_WorldBuilder_Build" data-uid="EvoSim.Testing.WorldBuilder.Build">
+  Build()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/WorldBuilder.cs/#L200"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Activates the tree and initialises the world: discovery, validation, founders.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public World Build()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.World.html">World</a></dt>
+    <dd><p>The initialised World, ready for <a class="xref" href="EvoSim.World.html#EvoSim_World_Advance_System_Int32_">Advance(int)</a>.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a></dt>
+    <dd><p>The world failed validation; the message holds the validation report.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="EvoSim_Testing_WorldBuilder_BuildUninitialized_" data-uid="EvoSim.Testing.WorldBuilder.BuildUninitialized*"></a>
+
+  <h3 id="EvoSim_Testing_WorldBuilder_BuildUninitialized" data-uid="EvoSim.Testing.WorldBuilder.BuildUninitialized">
+  BuildUninitialized()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/WorldBuilder.cs/#L210"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Activates the tree without initialising the world, to test validation or change the tree first.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public World BuildUninitialized()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.World.html">World</a></dt>
+    <dd><p>The World, not initialised: call <a class="xref" href="EvoSim.World.html#EvoSim_World_Initialize">Initialize()</a> or <code>Prepare</code> yourself.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_WorldBuilder_Carcasses_" data-uid="EvoSim.Testing.WorldBuilder.Carcasses*"></a>
+
+  <h3 id="EvoSim_Testing_WorldBuilder_Carcasses_System_String_" data-uid="EvoSim.Testing.WorldBuilder.Carcasses(System.String)">
+  Carcasses(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/WorldBuilder.cs/#L124"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds the carcass system: killed animals leave carcasses that hunters can scavenge (ENV-20).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public WorldBuilder Carcasses(string name = &quot;Carcasses&quot;)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The service's name.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>This builder, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_WorldBuilder_Configure_" data-uid="EvoSim.Testing.WorldBuilder.Configure*"></a>
+
+  <h3 id="EvoSim_Testing_WorldBuilder_Configure_System_Action_EvoSim_World__" data-uid="EvoSim.Testing.WorldBuilder.Configure(System.Action{EvoSim.World})">
+  Configure(Action&lt;World&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/WorldBuilder.cs/#L129"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Changes the World's settings now: text style, decision period, tick limit…</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public WorldBuilder Configure(Action&lt;World&gt; configure)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="EvoSim.World.html">World</a>&gt;</dt>
+    <dd><p>Called at once with the World, e.g. <code>w =&gt; w.TextStyle = TextStyle.V2</code>.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>This builder, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_WorldBuilder_Cover_" data-uid="EvoSim.Testing.WorldBuilder.Cover*"></a>
+
+  <h3 id="EvoSim_Testing_WorldBuilder_Cover_System_Single_System_String_" data-uid="EvoSim.Testing.WorldBuilder.Cover(System.Single,System.String)">
+  Cover(float, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/WorldBuilder.cs/#L118"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds a cover layer (a <a class="xref" href="EvoSim.CoverLayer.html">CoverLayer</a>, thickets that hide animals from their hunters, ENV-11).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public WorldBuilder Cover(float fraction = 0.2, string name = &quot;Thickets&quot;)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>fraction</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The share of walkable ground in cover, 0 to 1 (reference 0.2).</p>
+</dd>
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The layer's name.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>This builder, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_Testing_WorldBuilder_Cover_System_Single_System_String__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Put cover on an exact cell with <a class="xref" href="EvoSim.Testing.Place.html#EvoSim_Testing_Place_Cover_EvoSim_CoverLayer_UnityEngine_Vector3_">Cover(CoverLayer, Vector3)</a>.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_Testing_WorldBuilder_DefaultBrain_" data-uid="EvoSim.Testing.WorldBuilder.DefaultBrain*"></a>
+
+  <h3 id="EvoSim_Testing_WorldBuilder_DefaultBrain__1_System_Action___0__System_String_" data-uid="EvoSim.Testing.WorldBuilder.DefaultBrain``1(System.Action{``0},System.String)">
+  DefaultBrain&lt;T&gt;(Action&lt;T&gt;, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/WorldBuilder.cs/#L159"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds a brain under Brains and makes it the World's default brain (DEC-13).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public WorldBuilder DefaultBrain&lt;T&gt;(Action&lt;T&gt; configure = null, string name = null) where T : Brain</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;T&gt;</dt>
+    <dd><p>Called at once with the new brain, e.g. to set a <a class="xref" href="EvoSim.Testing.ScriptedBrain.html#EvoSim_Testing_ScriptedBrain_Policy">Policy</a> or keep a reference to it.</p>
+</dd>
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The GameObject's name; null = the class name.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>This builder, to chain more calls.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd><p>The brain class: <a class="xref" href="EvoSim.RandomBrain.html">RandomBrain</a>, <a class="xref" href="EvoSim.Testing.ScriptedBrain.html">ScriptedBrain</a>, an HTTP brain, yours.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_WorldBuilder_Dispose_" data-uid="EvoSim.Testing.WorldBuilder.Dispose*"></a>
+
+  <h3 id="EvoSim_Testing_WorldBuilder_Dispose" data-uid="EvoSim.Testing.WorldBuilder.Dispose">
+  Dispose()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/WorldBuilder.cs/#L217"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Destroys the world's GameObjects. <a class="xref" href="EvoSim.Testing.WorldFixture.html">WorldFixture</a> calls it after each test.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_WorldBuilder_Flat_" data-uid="EvoSim.Testing.WorldBuilder.Flat*"></a>
+
+  <h3 id="EvoSim_Testing_WorldBuilder_Flat_System_Single_System_Single_" data-uid="EvoSim.Testing.WorldBuilder.Flat(System.Single,System.Single)">
+  Flat(float, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/WorldBuilder.cs/#L66"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds a flat ground, a rectangle starting at the origin (x from 0 to width, z from 0 to depth).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public WorldBuilder Flat(float width, float depth)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>width</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The size along x, in meters (at least 1).</p>
+</dd>
+    <dt><code>depth</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The size along z, in meters (at least 1).</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>This builder, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_WorldBuilder_Food_" data-uid="EvoSim.Testing.WorldBuilder.Food*"></a>
+
+  <h3 id="EvoSim_Testing_WorldBuilder_Food_System_Single_System_Single_System_String_System_Single_System_Boolean_" data-uid="EvoSim.Testing.WorldBuilder.Food(System.Single,System.Single,System.String,System.Single,System.Boolean)">
+  Food(float, float, string, float, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/WorldBuilder.cs/#L103"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds a food layer (a <a class="xref" href="EvoSim.FoodGrid.html">FoodGrid</a> under Environment) whose items are grazed for <code class="paramref">energy</code>
+points each.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public WorldBuilder Food(float initialFraction = 0.1, float regrowP = 0.0015, string name = &quot;Grass&quot;, float energy = 25, bool hungryCover = true)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>initialFraction</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The share of eligible cells holding an item at the start, 0 to 1 (reference 0.1).</p>
+</dd>
+    <dt><code>regrowP</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The chance per empty eligible cell per tick of growing an item (reference 0.0015); 0 = no regrowth.</p>
+</dd>
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The layer's name, which diets and senses use (reference &quot;Grass&quot;).</p>
+</dd>
+    <dt><code>energy</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The energy one item gives, in points (reference 25).</p>
+</dd>
+    <dt><code>hungryCover</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True: no item in cover, at the start or later (ENV-04).</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>This builder, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_Testing_WorldBuilder_Food_System_Single_System_Single_System_String_System_Single_System_Boolean__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p><code>Food(0f, 0f)</code> makes an empty layer that never regrows: place items with <a class="xref" href="EvoSim.Testing.Place.html#EvoSim_Testing_Place_Food_EvoSim_FoodGrid_UnityEngine_Vector3_">Food(FoodGrid, Vector3)</a>.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_Testing_WorldBuilder_Get_" data-uid="EvoSim.Testing.WorldBuilder.Get*"></a>
+
+  <h3 id="EvoSim_Testing_WorldBuilder_Get__1" data-uid="EvoSim.Testing.WorldBuilder.Get``1">
+  Get&lt;T&gt;()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/WorldBuilder.cs/#L171"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Finds the first component of a type anywhere in the world being built, inactive objects included.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public T Get&lt;T&gt;() where T : Component</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">T</span></dt>
+    <dd><p>The first one in hierarchy order, or null.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd><p>The component class to find (a brain, a service, a module…).</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_WorldBuilder_Ground_" data-uid="EvoSim.Testing.WorldBuilder.Ground*"></a>
+
+  <h3 id="EvoSim_Testing_WorldBuilder_Ground__1_System_Single_System_Single_" data-uid="EvoSim.Testing.WorldBuilder.Ground``1(System.Single,System.Single)">
+  Ground&lt;T&gt;(float, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/WorldBuilder.cs/#L82"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds a flat ground of a subclass of your own: one that replaces the distance function, adds a pond or a ramp
+(<a class="xref" href="EvoSim.Testing.DoubleDistanceGround.html">DoubleDistanceGround</a>, <a class="xref" href="EvoSim.Testing.PondGround.html">PondGround</a>, <a class="xref" href="EvoSim.Testing.RampGround.html">RampGround</a>).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public WorldBuilder Ground&lt;T&gt;(float width, float depth) where T : FlatGround</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>width</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The size along x, in meters (at least 1).</p>
+</dd>
+    <dt><code>depth</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The size along z, in meters (at least 1).</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>This builder, to chain more calls.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd><p>The ground class to add.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_WorldBuilder_Phase_" data-uid="EvoSim.Testing.WorldBuilder.Phase*"></a>
+
+  <h3 id="EvoSim_Testing_WorldBuilder_Phase__1_System_Action___0__" data-uid="EvoSim.Testing.WorldBuilder.Phase``1(System.Action{``0})">
+  Phase&lt;T&gt;(Action&lt;T&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/WorldBuilder.cs/#L177"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds a phase under Phases, after the phases added so far: phases run in hierarchy order (TICK-01).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public WorldBuilder Phase&lt;T&gt;(Action&lt;T&gt; configure = null) where T : TickPhase</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;T&gt;</dt>
+    <dd><p>Called at once with the new phase, to set it up; null = defaults.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>This builder, to chain more calls.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd><p>The phase class to add.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_WorldBuilder_Service_" data-uid="EvoSim.Testing.WorldBuilder.Service*"></a>
+
+  <h3 id="EvoSim_Testing_WorldBuilder_Service__1_System_String_System_Action___0__" data-uid="EvoSim.Testing.WorldBuilder.Service``1(System.String,System.Action{``0})">
+  Service&lt;T&gt;(string, Action&lt;T&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/WorldBuilder.cs/#L143"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds a world service on its own GameObject: under Brains for brains, mutators and caches (by type name), under
+Environment for everything else (layers, entity systems, covers, recorders).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public WorldBuilder Service&lt;T&gt;(string name = null, Action&lt;T&gt; configure = null) where T : WorldService</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The GameObject's name, which is also the service's name; null = the class name.</p>
+</dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;T&gt;</dt>
+    <dd><p>Called at once with the new component, to set it up; null = defaults.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>This builder, to chain more calls.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd><p>The service class to add.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_WorldBuilder_Species_" data-uid="EvoSim.Testing.WorldBuilder.Species*"></a>
+
+  <h3 id="EvoSim_Testing_WorldBuilder_Species_System_String_System_Action_EvoSim_Testing_SpeciesSetup__System_String_" data-uid="EvoSim.Testing.WorldBuilder.Species(System.String,System.Action{EvoSim.Testing.SpeciesSetup},System.String)">
+  Species(string, Action&lt;SpeciesSetup&gt;, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/WorldBuilder.cs/#L190"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds a species, on its own GameObject under the root, with the modules <code class="paramref">configure</code> adds.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public WorldBuilder Species(string name, Action&lt;SpeciesSetup&gt; configure = null, string id = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The species' display name, and its id unless <code class="paramref">id</code> is given.</p>
+</dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a>&gt;</dt>
+    <dd><p>Adds the species' modules through a <a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a>; null = an empty species.</p>
+</dd>
+    <dt><code>id</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The species' id when it differs from its name; null = the name.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>This builder, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_Testing_WorldBuilder_Species_System_String_System_Action_EvoSim_Testing_SpeciesSetup__System_String__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>The species starts with no founders: set some with <a class="xref" href="EvoSim.Testing.SpeciesSetup.html#EvoSim_Testing_SpeciesSetup_Population_System_Int32_">Population(int)</a>.</p>
+</div>
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

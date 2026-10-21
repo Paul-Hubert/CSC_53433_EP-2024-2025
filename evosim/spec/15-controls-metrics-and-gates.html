@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>15 — Controls, metrics and gates | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="15 — Controls, metrics and gates | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/15-controls-metrics-and-gates.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="15--controls-metrics-and-gates">15 — Controls, metrics and gates</h1>
+
+<p>The system exists to show that behaviour <em>evolves</em> and that the genes <em>mean</em>
+something. Controls remove one ingredient at a time; metrics measure how much
+genes steer a brain; gates are pass/fail criteria fixed in advance. They are part
+of the contract because the tests (<a href="30-tests.html">30</a>) and the integrity checks
+(<a href="32-integrity-prompts-and-ci.html">32</a>) depend on them.</p>
+<h2 id="1-controls">1. Controls</h2>
+<ul>
+<li><p><strong>CTRL-01 (MUST)</strong> Each control is a setting that applies to every species and
+is recorded in <code>run_info.json</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Control</th>
+<th>Setting</th>
+<th>Question it answers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C1 FULL</td>
+<td>nothing changed</td>
+<td>the experiment</td>
+</tr>
+<tr>
+<td>C2 NO-MUT</td>
+<td>mutation rate 0 (or no mutator)</td>
+<td>how far does selection get with founder variation alone?</td>
+</tr>
+<tr>
+<td>C3 SHUFFLED</td>
+<td>at each decision the brain reads the genes of a random <em>other</em> living animal of the same species; number genes are expressed from a random other animal's genome at birth</td>
+<td>genes are inherited but don't affect their carrier, so any change is drift</td>
+</tr>
+<tr>
+<td>C4 RANDOM-FOUNDERS</td>
+<td>founders get control sentences (text genes) and uniform random values in range (number genes)</td>
+<td>can evolution climb out of nonsense?</td>
+</tr>
+<tr>
+<td>C5 KEYWORD</td>
+<td>the keyword brain instead of an LLM (prototype only: the Unity system has no keyword brain; a student's rule-based brain could fill this slot)</td>
+<td>the same experiment with a transparent brain</td>
+</tr>
+<tr>
+<td>NULL</td>
+<td>the random brain</td>
+<td>does behaviour matter at all?</td>
+</tr>
+<tr>
+<td>C7 ASEXUAL</td>
+<td>one parent, copy and mutation</td>
+<td>the previous lab's regime</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p><strong>CTRL-02 (MUST)</strong> The C3 draw uses the species' sampling stream, so a shuffled
+run is reproducible.</p>
+</li>
+</ul>
+<h2 id="2-sensitivity-metrics">2. Sensitivity metrics</h2>
+<p>P[g, o, a] is the probability of action a for genome g in observation o;
+information is in bits.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Definition</th>
+<th>Question</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Entropy H(p)</td>
+<td>−Σ p log₂ p</td>
+<td>how uncertain is a decision?</td>
+</tr>
+<tr>
+<td><strong>MI_G</strong></td>
+<td>mean over o of [H(mean over g of p) − mean over g of H(p)]</td>
+<td>how much does the genome decide the action?</td>
+</tr>
+<tr>
+<td><strong>MI_O</strong></td>
+<td>the same with genome and observation swapped</td>
+<td>how much does the situation decide the action?</td>
+</tr>
+<tr>
+<td>JSD(p, q)</td>
+<td>H((p+q)/2) − ½(H(p) + H(q)), in [0, 1]</td>
+<td>how different are two decisions?</td>
+</tr>
+<tr>
+<td>Behaviour distance d(g, g′)</td>
+<td>mean over o of JSD</td>
+<td>how differently do two genomes behave?</td>
+</tr>
+<tr>
+<td><strong>Directed ΔP</strong></td>
+<td>for a contrast pair at a locus: mean over the <em>relevant</em> observations of p(action | pro) − p(action | anti); <strong>sign accuracy</strong> = share with ΔP &gt; 0</td>
+<td>does a gene push its own action the way it says?</td>
+</tr>
+<tr>
+<td><strong>Locality ratio</strong></td>
+<td>median d(parent, child with one gene mutated) ÷ median d(two unrelated founders)</td>
+<td>are small edits small changes?</td>
+</tr>
+<tr>
+<td><strong>Spearman ρ</strong></td>
+<td>rank correlation between text distance (1 − similarity) and behaviour distance</td>
+<td>do more different texts behave more differently?</td>
+</tr>
+<tr>
+<td>Gibberish → neutral</td>
+<td>mean d(random-text genome, neutral genome), compared with founder → neutral</td>
+<td>does nonsense stay close to &quot;no preference&quot;?</td>
+</tr>
+<tr>
+<td>Shannon diversity</td>
+<td>entropy of a locus' allele frequencies</td>
+<td>how diverse is a gene?</td>
+</tr>
+<tr>
+<td>Bootstrap CI</td>
+<td>resampled confidence interval of a mean</td>
+<td>is a difference real?</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>CTRL-10 (SHOULD)</strong> Each action declares when an observation is <strong>relevant</strong>
+for its directed test: eat needs food in sight, flee a threat, follow kin,
+mate kin in the near bands, hunt prey in sight, hide cover in sight, rest any
+observation.</li>
+</ul>
+<p><strong>Test material.</strong> An observation set of 48 situations (32 adult combinations
+of energy × food × threat × kin, plus the 16 most frequent other situations of a
+reference run); founder genomes drawn from the pools; random-text genomes
+from the control sentences; the all-neutral genome; one contrast pair per locus;
+single edits (founders with one gene mutated by the mutator).</p>
+<h2 id="3-gates">3. Gates</h2>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Pass criterion</th>
+<th>Failure means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>G1 Semantics</strong></td>
+<td>directed sign accuracy ≥ 85 % and mean ΔP ≥ 0.25</td>
+<td>the brain ignores genes</td>
+</tr>
+<tr>
+<td><strong>G2 Information</strong></td>
+<td>MI_G ≥ 0.25 bits and MI_O ≥ 0.25 bits, and gibberish → neutral ≤ ½ × founder → neutral (quick form: MI_G(founders) ≥ 2 × MI_G(random text))</td>
+<td>behaviour follows any text, not meaning</td>
+</tr>
+<tr>
+<td><strong>G3 Locality</strong></td>
+<td>locality ratio ≤ 0.5 and Spearman ρ ≥ 0.3</td>
+<td>a chaotic map from text to behaviour</td>
+</tr>
+<tr>
+<td><strong>G4 Evolution</strong></td>
+<td>in a common garden, evolved genomes outlive the founders (bootstrap 95 % CI of the difference &gt; 0) in ≥ 4 of 5 seeds, and gain more than in the C3 control</td>
+<td>&quot;evolution&quot; that is only drift</td>
+</tr>
+<tr>
+<td><strong>G5 Throughput</strong></td>
+<td>≥ 50 effective decisions/s on a GPU and ≥ 10 on a CPU, at 40 animals, cache included</td>
+<td>a lab too slow to run</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Status in the prototype (2026-10-09).</strong> G1 passes (gemma4 12b and 26b, JEV-9B).
+G2 fails: gemma is moved by random text as much as by real genes; JEV ignores
+random text but genes move it too little (MI_G 0.14 &lt; 0.25). G2 stays a gate even
+though these models fail it (owner decision); it is tracked, not blocking
+(<a href="32-integrity-prompts-and-ci.html">32</a>). G3 passes on JEV
+(locality 0.10, ρ 0.39). G4 not measured; a 10-hour JEV run showed gene sweeps at
+the rate drift predicts. G5 fails (gemma ≈ 4, JEV ≈ 12 decisions/s). In the
+prototype the keyword brain passed G1 by construction and gave the reference
+numbers; in Unity the reference numbers come from the first accepted JEV runs.</p>
+<h2 id="4-the-evolution-experiment">4. The evolution experiment</h2>
+<p>The matrix the prototype planned and the Unity system should make easy to run:
+C1–C5 (and C7) × several seeds × one world, each run long enough for tens of
+generations, then a <strong>common garden</strong>: evolved genomes and founder genomes
+released together into a fresh world, comparing their survival and offspring
+(G4). The reference world for it is the 192 × 192 evolution-test world, where
+most deaths depend on behaviour (prey: 39 % killed, 38 % starved, 20–23 %
+migrated with JEV).</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Extending EvoSim | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Extending EvoSim | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/index.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-index">
+<h1 id="extending-evosim">Extending EvoSim</h1>
+
+<p>Everything in EvoSim is a component you can add, remove, replace or subclass: senses, actions, genes, stats, death rules,
+mutation operators, brains, tick phases, food layers, cover, ground. The reference modules are written exactly like
+yours: they derive from the same public base classes and use no hidden shortcut. Any of them is a working example of its
+kind, and any of them can be replaced by your own.</p>
+<h2 id="the-workflow">The workflow</h2>
+<ol>
+<li><strong>Write a class.</strong> <em>Assets ▸ Create ▸ EvoSim ▸ Script ▸</em> writes a template for a <strong>Sense</strong>, an <strong>Action</strong>, a <strong>Gene
+kind</strong>, a <strong>Stat</strong>, a <strong>Phase</strong>, a <strong>Brain</strong> or a <strong>Mutation operator</strong> into <code>Assets/Student</code>, together with a test
+in <code>Assets/Student/Tests</code>. For other kinds, derive from the base class named in the table below.</li>
+<li><strong>Place the component.</strong> A module under a species belongs to that species. A phase or a service sits under the World,
+outside any species. Order matters only among modules of the same kind: the n-th action found, depth first, is
+action n. See <a href="species-modules.html">Species modules</a> and <a href="world-modules.html">Phases, services and world hooks</a>.</li>
+<li><strong>Press Play.</strong> The World discovers your component, sets it up in its fixed order, and validates the tree. If
+something is missing, a message names the object to fix.</li>
+<li><strong>Test it.</strong> Your sense, action, stat, layer, mutation operator, phase or locomotion runs through the conformance
+suite of its kind: <em>Window ▸ General ▸ Test Runner</em>, EditMode. A brain gets a test to copy instead. See
+<a href="testing-your-module.html">Testing your module</a>.</li>
+</ol>
+<h2 id="i-want-to">I want to…</h2>
+<table>
+<thead>
+<tr>
+<th>I want to…</th>
+<th>Use</th>
+<th>Code?</th>
+<th>Page</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tell the brain something new about the situation</td>
+<td>a <a class="xref" href="../api/EvoSim.Sense.html">Sense</a> (distance bands: <a class="xref" href="../api/EvoSim.BandedSense.html">BandedSense</a>; raycasts: <a class="xref" href="../api/EvoSim.BatchedSense.html">BatchedSense</a>)</td>
+<td>yes</td>
+<td><a href="sense.html">A sense</a></td>
+</tr>
+<tr>
+<td>give animals a new behaviour to choose</td>
+<td>an <a class="xref" href="../api/EvoSim.AnimalAction.html">AnimalAction</a>, with a text gene to steer it</td>
+<td>yes</td>
+<td><a href="action.html">An action</a></td>
+</tr>
+<tr>
+<td>make something happen when an animal reaches its target</td>
+<td>an <a class="xref" href="../api/EvoSim.IInteraction.html">IInteraction</a></td>
+<td>yes</td>
+<td><a href="action.html#interactions">An action</a></td>
+</tr>
+<tr>
+<td>change how a species moves (slopes, mud, paths)</td>
+<td>a <a class="xref" href="../api/EvoSim.Locomotion.html">Locomotion</a> subclass</td>
+<td>yes</td>
+<td><a href="locomotion.html">A locomotion</a></td>
+</tr>
+<tr>
+<td>add a stat (thirst, fear, temperature)</td>
+<td>a <a class="xref" href="../api/EvoSim.SpeciesModule.html">SpeciesModule</a> that declares it</td>
+<td>yes</td>
+<td><a href="stats-and-death.html">Stats, costs and death rules</a></td>
+</tr>
+<tr>
+<td>change what living costs per tick</td>
+<td><a class="xref" href="../api/EvoSim.Metabolism.html">Metabolism</a> (settings, or a subclass)</td>
+<td>maybe</td>
+<td><a href="stats-and-death.html">Stats, costs and death rules</a></td>
+</tr>
+<tr>
+<td>add a cause of death</td>
+<td>a <a class="xref" href="../api/EvoSim.DeathRule.html">DeathRule</a></td>
+<td>yes</td>
+<td><a href="stats-and-death.html">Stats, costs and death rules</a></td>
+</tr>
+<tr>
+<td>give a species a temperament that is not tied to one action</td>
+<td>a free <a class="xref" href="../api/EvoSim.TextGene.html">TextGene</a></td>
+<td>no</td>
+<td><a href="genes.html">Genes</a></td>
+</tr>
+<tr>
+<td>let evolution tune a number (stamina, speed, vision)</td>
+<td>a <a class="xref" href="../api/EvoSim.NumberGene.html">NumberGene</a> and a <a class="xref" href="../api/EvoSim.GaussianMutation.html">GaussianMutation</a></td>
+<td>no</td>
+<td><a href="genes.html">Genes</a></td>
+</tr>
+<tr>
+<td>invent a new kind of gene</td>
+<td>a <a class="xref" href="../api/EvoSim.Gene.html">Gene</a> subclass</td>
+<td>yes</td>
+<td><a href="genes.html">Genes</a></td>
+</tr>
+<tr>
+<td>change how gene sentences mutate</td>
+<td>a mutation deck, or a <a class="xref" href="../api/EvoSim.MutationOperator.html">MutationOperator</a></td>
+<td>maybe</td>
+<td><a href="mutation.html">Mutation</a></td>
+</tr>
+<tr>
+<td>change how parents' genes mix, litter sizes, who mates</td>
+<td><a class="xref" href="../api/EvoSim.Crossover.html">Crossover</a>, <a class="xref" href="../api/EvoSim.Litter.html">Litter</a>, <a class="xref" href="../api/EvoSim.MatingRule.html">MatingRule</a></td>
+<td>maybe</td>
+<td><a href="reproduction.html">Reproduction and population</a></td>
+</tr>
+<tr>
+<td>lay eggs that hatch later, cap or prop up a population</td>
+<td><a class="xref" href="../api/EvoSim.Incubation.html">Incubation</a>, <a class="xref" href="../api/EvoSim.CapRule.html">CapRule</a>, <a class="xref" href="../api/EvoSim.FloorRule.html">FloorRule</a></td>
+<td>no</td>
+<td><a href="reproduction.html">Reproduction and population</a></td>
+</tr>
+<tr>
+<td>decide at other moments, or stagger decisions</td>
+<td>a <a class="xref" href="../api/EvoSim.DecisionSchedule.html">DecisionSchedule</a> on the species</td>
+<td>no</td>
+<td><a href="brain.html#decision-timing">A brain</a></td>
+</tr>
+<tr>
+<td>decide with rules, a small network or another model</td>
+<td>a <a class="xref" href="../api/EvoSim.Brain.html">Brain</a></td>
+<td>yes</td>
+<td><a href="brain.html">A brain</a></td>
+</tr>
+<tr>
+<td>use a model behind a web API, or another mutator server</td>
+<td>an <a class="xref" href="../api/EvoSim.HttpBrain.html">HttpBrain</a>, a <a class="xref" href="../api/EvoSim.MutatorClient.html">MutatorClient</a></td>
+<td>yes</td>
+<td><a href="http-brains.html">An HTTP brain or mutator server</a></td>
+</tr>
+<tr>
+<td>run something every tick (seasons, weather, events)</td>
+<td>a <a class="xref" href="../api/EvoSim.TickPhase.html">TickPhase</a></td>
+<td>yes</td>
+<td><a href="world-modules.html">Phases, services and world hooks</a></td>
+</tr>
+<tr>
+<td>share state or a query between modules</td>
+<td>a <a class="xref" href="../api/EvoSim.WorldService.html">WorldService</a></td>
+<td>yes</td>
+<td><a href="world-modules.html">Phases, services and world hooks</a></td>
+</tr>
+<tr>
+<td>react to every birth and death</td>
+<td><code>OnBorn</code> and <code>OnDied</code> on any module</td>
+<td>yes</td>
+<td><a href="world-modules.html#hooks">Phases, services and world hooks</a></td>
+</tr>
+<tr>
+<td>set worlds up from code before they start</td>
+<td>the <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Configuring">Configuring</a> event</td>
+<td>yes</td>
+<td><a href="world-modules.html#hooks">Phases, services and world hooks</a></td>
+</tr>
+<tr>
+<td>add a food source (berries, water)</td>
+<td>a <a class="xref" href="../api/EvoSim.ResourceLayer.html">ResourceLayer</a></td>
+<td>yes</td>
+<td><a href="environment.html">Food, cover, entities and ground</a></td>
+</tr>
+<tr>
+<td>add hiding places</td>
+<td>a <a class="xref" href="../api/EvoSim.Cover.html">Cover</a></td>
+<td>yes</td>
+<td><a href="environment.html">Food, cover, entities and ground</a></td>
+</tr>
+<tr>
+<td>add objects that live in the world (fruit, nests)</td>
+<td>an <a class="xref" href="../api/EvoSim.EntitySystem-1.html">EntitySystem&lt;T&gt;</a> of your <a class="xref" href="../api/EvoSim.Entity.html">Entity</a></td>
+<td>yes</td>
+<td><a href="environment.html">Food, cover, entities and ground</a></td>
+</tr>
+<tr>
+<td>make something edible, or change who eats whom</td>
+<td><a class="xref" href="../api/EvoSim.Edible.html">Edible</a> and <a class="xref" href="../api/EvoSim.Diet.html">Diet</a></td>
+<td>no</td>
+<td><a href="environment.html#who-eats-what">Food, cover, entities and ground</a></td>
+</tr>
+<tr>
+<td>change what the ground allows</td>
+<td>a <a class="xref" href="../api/EvoSim.Ground.html">Ground</a></td>
+<td>yes</td>
+<td><a href="environment.html">Food, cover, entities and ground</a></td>
+</tr>
+<tr>
+<td>add a species</td>
+<td>duplicate one and change it; subclass <a class="xref" href="../api/EvoSim.Species.html">Species</a> only for hooks</td>
+<td>no</td>
+<td><a href="species-modules.html#species">Species modules</a></td>
+</tr>
+<tr>
+<td>record more numbers or events</td>
+<td><a class="xref" href="../api/EvoSim.IStatsColumns.html">IStatsColumns</a>, <a class="xref" href="../api/EvoSim.IEventSink.html">IEventSink</a>, <code>World.RecordDeath</code></td>
+<td>yes</td>
+<td><a href="recording.html">Recording and statistics</a></td>
+</tr>
+<tr>
+<td>colour or animate the animals</td>
+<td>an <a class="xref" href="../api/EvoSim.AnimalView.html">AnimalView</a> on a body prefab</td>
+<td>yes</td>
+<td><a href="views.html">Views</a></td>
+</tr>
+<tr>
+<td>say that your module needs another one</td>
+<td><code>[RequiresModule(typeof(…))]</code></td>
+<td>yes</td>
+<td><a href="species-modules.html#dependencies">Species modules</a></td>
+</tr>
+<tr>
+<td>catch configuration mistakes before Play</td>
+<td><code>Validate(ValidationReport)</code> and a <a class="xref" href="../api/EvoSim.ValidationFix.html">ValidationFix</a></td>
+<td>yes</td>
+<td><a href="species-modules.html#validation">Species modules</a></td>
+</tr>
+<tr>
+<td>add your own editor window or inspector</td>
+<td>Unity's editor API, reading the World</td>
+<td>yes</td>
+<td><a href="editor.html">The editor</a></td>
+</tr>
+</tbody>
+</table>
+<p>Every abstract and virtual member of every public type is listed in <a href="extension-points.html">Every extension point</a>,
+generated from the code.</p>
+<h2 id="five-rules-every-module-keeps">Five rules every module keeps</h2>
+<ol>
+<li><strong>Draw random numbers only from the stream you are given</strong> (a <a class="xref" href="../api/EvoSim.RandomStream.html">RandomStream</a>), never from
+<code>UnityEngine.Random</code>, <code>System.Random</code> or the clock. Otherwise a seed no longer replays the run (RAND-01).</li>
+<li><strong>Never decide by iterating a <code>Dictionary</code> or a <code>HashSet</code></strong>: their order is not fixed. Iterate lists (RAND-05).</li>
+<li><strong>Keep settings in the module and state in the animal.</strong> One module serves every animal of its species. What
+belongs to one animal goes in its stats, through the ids your module declared.</li>
+<li><strong>Each kind of module does its own job.</strong> Senses only read. Actions only say where to go and what to do on
+arrival; the act phase moves the animal. Phases change the world. Views only display (SPACE-12).</li>
+<li><strong>Set up in <code>Initialize</code>, not in <code>Awake</code> or <code>Start</code>.</strong> The World calls its modules in a fixed order (ARCH-04).</li>
+</ol>
+<div class="TIP">
+<h5>Tip</h5>
+<p>The fastest way in is to rewrite a reference module from its stub: <a href="exercises.html">the teaching path</a>. The
+<a href="samples.html">samples</a> (thirst, water, seasons, slopes…) show complete extensions working together.
+<a href="worked-example-alarm-calls.html">Worked example: alarm calls</a> follows one student change, a sense, an action, a gene
+and a world service, from the idea to a tested scene.</p>
+</div>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

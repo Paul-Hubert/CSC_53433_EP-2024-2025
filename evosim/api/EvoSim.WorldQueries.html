@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class WorldQueries | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class WorldQueries | EvoSim ">
+      
+      <meta name="description" content="The queries senses and actions share (ACT-05, SENSE-06): within the animal&#39;s vision, never itself, never a killed animal, never an animal hidden from it in cover, diets checked. Ties by id (SPACE-08).">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_WorldQueries.md&amp;value=---%0Auid%3A%20EvoSim.WorldQueries%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.WorldQueries">
+
+
+
+  <h1 id="EvoSim_WorldQueries" data-uid="EvoSim.WorldQueries" class="text-break">
+Class WorldQueries  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/WorldQueries.cs/#L22"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Runtime.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>The queries senses and actions share (ACT-05, SENSE-06): within the animal's vision, never itself, never a
+killed animal, never an animal hidden from it in cover, diets checked. Ties by id (SPACE-08).</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class WorldQueries</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">WorldQueries</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+  <h2 id="EvoSim_WorldQueries_examples">Examples</h2>
+  <pre><code class="lang-csharp">var threat = World.Queries.NearestAnimal(a, AnimalSet.Threats);   // within a's vision
+if (threat != null &amp;&amp; threat.Value.Distance &lt; 5f) { /* ... */ }</code></pre>
+
+
+  <h2 id="EvoSim_WorldQueries_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Reach it with <a class="xref" href="EvoSim.World.html#EvoSim_World_Queries">Queries</a>; senses usually call it through their <a class="xref" href="EvoSim.SenseContext.html">SenseContext</a>
+and actions through their <a class="xref" href="EvoSim.ActContext.html">ActContext</a>. Using the same queries is what keeps an action from targeting
+something its senses could not report (ACT-05).</p>
+<p>Every query only reads the world. Results are null when nothing is found.</p>
+</div>
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="EvoSim_WorldQueries__ctor_" data-uid="EvoSim.WorldQueries.#ctor*"></a>
+
+  <h3 id="EvoSim_WorldQueries__ctor_EvoSim_World_" data-uid="EvoSim.WorldQueries.#ctor(EvoSim.World)">
+  WorldQueries(World)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/WorldQueries.cs/#L38"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Makes the queries of a World; the World makes one at each set-up.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public WorldQueries(World world)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>world</code> <a class="xref" href="EvoSim.World.html">World</a></dt>
+    <dd><p>The World to query.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="EvoSim_WorldQueries_ReferenceVision" data-uid="EvoSim.WorldQueries.ReferenceVision">
+  ReferenceVision
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/WorldQueries.cs/#L25"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The vision of a species that declares no &quot;vision&quot; trait, in meters (14: 20 m).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const float ReferenceVision = 20</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_WorldQueries_InCover_" data-uid="EvoSim.WorldQueries.InCover*"></a>
+
+  <h3 id="EvoSim_WorldQueries_InCover_EvoSim_Animal_" data-uid="EvoSim.WorldQueries.InCover(EvoSim.Animal)">
+  InCover(Animal)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/WorldQueries.cs/#L82"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Whether the animal stands in cover of any cover service, whoever looks.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool InCover(Animal a)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True when its position is in cover.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_WorldQueries_IsHiddenFrom_" data-uid="EvoSim.WorldQueries.IsHiddenFrom*"></a>
+
+  <h3 id="EvoSim_WorldQueries_IsHiddenFrom_EvoSim_Animal_EvoSim_Species_" data-uid="EvoSim.WorldQueries.IsHiddenFrom(EvoSim.Animal,EvoSim.Species)">
+  IsHiddenFrom(Animal, Species)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/WorldQueries.cs/#L73"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Whether this animal stands in cover that hides it from that species (ENV-11).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsHiddenFrom(Animal target, Species viewer)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>target</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that may be hidden.</p>
+</dd>
+    <dt><code>viewer</code> <a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd><p>The species that looks.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True when any cover service hides it from that species.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_WorldQueries_IsReady_" data-uid="EvoSim.WorldQueries.IsReady*"></a>
+
+  <h3 id="EvoSim_WorldQueries_IsReady_EvoSim_Animal_" data-uid="EvoSim.WorldQueries.IsReady(EvoSim.Animal)">
+  IsReady(Animal)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/WorldQueries.cs/#L91"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Ready to mate (REPRO-01), by the species' mating rule; never without one.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsReady(Animal a)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True when its species has a mating rule and the rule says it is ready.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_WorldQueries_NearestAnimal_" data-uid="EvoSim.WorldQueries.NearestAnimal*"></a>
+
+  <h3 id="EvoSim_WorldQueries_NearestAnimal_EvoSim_Animal_EvoSim_AnimalSet_System_Collections_Generic_IReadOnlyList_EvoSim_Species__" data-uid="EvoSim.WorldQueries.NearestAnimal(EvoSim.Animal,EvoSim.AnimalSet,System.Collections.Generic.IReadOnlyList{EvoSim.Species})">
+  NearestAnimal(Animal, AnimalSet, IReadOnlyList&lt;Species&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/WorldQueries.cs/#L113"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The nearest visible animal of an animal set within the animal's vision (SPEC-12).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public AnimalHit? NearestAnimal(Animal a, AnimalSet set, IReadOnlyList&lt;Species&gt; listed = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that looks.</p>
+</dd>
+    <dt><code>set</code> <a class="xref" href="EvoSim.AnimalSet.html">AnimalSet</a></dt>
+    <dd><p>Whose animals: its species' threats, prey, kin, or a listed set.</p>
+</dd>
+    <dt><code>listed</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="EvoSim.Species.html">Species</a>&gt;</dt>
+    <dd><p>The species of a listed set; ignored for the others.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.AnimalHit.html">AnimalHit</a>?</dt>
+    <dd><p>The nearest such animal within <a class="xref" href="EvoSim.WorldQueries.html#EvoSim_WorldQueries_Vision_EvoSim_Animal_">Vision(Animal)</a>, with its distance; null when none.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_WorldQueries_NearestAnimal_" data-uid="EvoSim.WorldQueries.NearestAnimal*"></a>
+
+  <h3 id="EvoSim_WorldQueries_NearestAnimal_EvoSim_Animal_System_Collections_Generic_IReadOnlyList_EvoSim_Species__System_Single_" data-uid="EvoSim.WorldQueries.NearestAnimal(EvoSim.Animal,System.Collections.Generic.IReadOnlyList{EvoSim.Species},System.Single)">
+  NearestAnimal(Animal, IReadOnlyList&lt;Species&gt;, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/WorldQueries.cs/#L102"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The nearest visible animal of these species within radius (SPACE-07, ACT-05).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public AnimalHit? NearestAnimal(Animal a, IReadOnlyList&lt;Species&gt; among, float radius)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that looks; never found itself.</p>
+</dd>
+    <dt><code>among</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="EvoSim.Species.html">Species</a>&gt;</dt>
+    <dd><p>The species to search.</p>
+</dd>
+    <dt><code>radius</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The farthest distance, in meters.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.AnimalHit.html">AnimalHit</a>?</dt>
+    <dd><p>The nearest animal not killed and not hidden from <code class="paramref">a</code>, with its distance; null when none.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_WorldQueries_NearestCarcass_" data-uid="EvoSim.WorldQueries.NearestCarcass*"></a>
+
+  <h3 id="EvoSim_WorldQueries_NearestCarcass_EvoSim_Animal_System_Single_" data-uid="EvoSim.WorldQueries.NearestCarcass(EvoSim.Animal,System.Single)">
+  NearestCarcass(Animal, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/WorldQueries.cs/#L166"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The nearest carcass this animal may eat from (06 §4): its diet scavenges it, not its own kill, not eaten
+yet.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public EntityHit&lt;Carcass&gt;? NearestCarcass(Animal a, float radius)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that looks.</p>
+</dd>
+    <dt><code>radius</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The farthest distance, in meters.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.EntityHit-1.html">EntityHit</a>&lt;<a class="xref" href="EvoSim.Carcass.html">Carcass</a>&gt;?</dt>
+    <dd><p>The nearest such carcass, with its distance; null when none or without a carcass system.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_WorldQueries_NearestCover_" data-uid="EvoSim.WorldQueries.NearestCover*"></a>
+
+  <h3 id="EvoSim_WorldQueries_NearestCover_EvoSim_Animal_System_Single_" data-uid="EvoSim.WorldQueries.NearestCover(EvoSim.Animal,System.Single)">
+  NearestCover(Animal, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/WorldQueries.cs/#L192"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The nearest cover within radius; distance 0 when standing in it (ENV-10, ENV-12).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public CoverHit? NearestCover(Animal a, float radius)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that looks.</p>
+</dd>
+    <dt><code>radius</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The farthest distance, in meters.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.CoverHit.html">CoverHit</a>?</dt>
+    <dd><p>The nearest point in cover of any cover service, with its distance; null when none.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_WorldQueries_NearestEgg_" data-uid="EvoSim.WorldQueries.NearestEgg*"></a>
+
+  <h3 id="EvoSim_WorldQueries_NearestEgg_EvoSim_Animal_EvoSim_Species_System_Single_" data-uid="EvoSim.WorldQueries.NearestEgg(EvoSim.Animal,EvoSim.Species,System.Single)">
+  NearestEgg(Animal, Species, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/WorldQueries.cs/#L178"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The nearest egg (of a species, or any) this animal's diet eats, within radius (REPRO-23).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public EntityHit&lt;Egg&gt;? NearestEgg(Animal a, Species of, float radius)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that looks.</p>
+</dd>
+    <dt><code>of</code> <a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd><p>Only eggs of this species, or null for any species.</p>
+</dd>
+    <dt><code>radius</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The farthest distance, in meters.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.EntityHit-1.html">EntityHit</a>&lt;<a class="xref" href="EvoSim.Egg.html">Egg</a>&gt;?</dt>
+    <dd><p>The nearest such egg, with its distance; null when none or without an egg system.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_WorldQueries_NearestEntity_" data-uid="EvoSim.WorldQueries.NearestEntity*"></a>
+
+  <h3 id="EvoSim_WorldQueries_NearestEntity__1_EvoSim_Animal_System_Single_System_Func___0_EvoSim_Animal_System_Boolean__" data-uid="EvoSim.WorldQueries.NearestEntity``1(EvoSim.Animal,System.Single,System.Func{``0,EvoSim.Animal,System.Boolean})">
+  NearestEntity&lt;T&gt;(Animal, float, Func&lt;T, Animal, bool&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/WorldQueries.cs/#L210"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The nearest entity of a kind of your own (fruit, nests…) within radius, across every entity system of that type,
+passing the filter, which receives the viewer; ties by id (SPACE-07, SPACE-08).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public EntityHit&lt;T&gt;? NearestEntity&lt;T&gt;(Animal a, float radius, Func&lt;T, Animal, bool&gt; filter = null) where T : Entity</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that looks; the filter receives it as the viewer.</p>
+</dd>
+    <dt><code>radius</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The farthest distance, in meters.</p>
+</dd>
+    <dt><code>filter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func</a>&lt;T, <a class="xref" href="EvoSim.Animal.html">Animal</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd><p>Which entities count, given the entity and the viewer; null for all.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.EntityHit-1.html">EntityHit</a>&lt;T&gt;?</dt>
+    <dd><p>The nearest entity, with its distance; null when none.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd><p>The entity kind, e.g. a <code>Fruit</code> class derived from <a class="xref" href="EvoSim.Entity.html">Entity</a>.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_WorldQueries_NearestReadyKin_" data-uid="EvoSim.WorldQueries.NearestReadyKin*"></a>
+
+  <h3 id="EvoSim_WorldQueries_NearestReadyKin_EvoSim_Animal_" data-uid="EvoSim.WorldQueries.NearestReadyKin(EvoSim.Animal)">
+  NearestReadyKin(Animal)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/WorldQueries.cs/#L122"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The nearest visible kin that is ready to mate (07 §4, mate), within vision and within the partner range of the
+kin sense that reports readiness: the action never targets what the senses can't report (ACT-05).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public AnimalHit? NearestReadyKin(Animal a)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that looks for a partner.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.AnimalHit.html">AnimalHit</a>?</dt>
+    <dd><p>The nearest ready partner, with its distance; null when none.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_WorldQueries_NearestResource_" data-uid="EvoSim.WorldQueries.NearestResource*"></a>
+
+  <h3 id="EvoSim_WorldQueries_NearestResource_EvoSim_Animal_System_String_System_Single_" data-uid="EvoSim.WorldQueries.NearestResource(EvoSim.Animal,System.String,System.Single)">
+  NearestResource(Animal, string, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/WorldQueries.cs/#L144"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The nearest item of a layer the diet grazes (all of them for an empty name), within radius.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ResourceItem? NearestResource(Animal a, string layerName, float radius)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that looks; its species' diet decides which layers count.</p>
+</dd>
+    <dt><code>layerName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>One layer's name, or null or empty for every layer the diet grazes.</p>
+</dd>
+    <dt><code>radius</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The farthest distance, in meters.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.ResourceItem.html">ResourceItem</a>?</dt>
+    <dd><p>The nearest item (a tie keeps the first layer in diet order); null when none or without a diet.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_WorldQueries_Vision_" data-uid="EvoSim.WorldQueries.Vision*"></a>
+
+  <h3 id="EvoSim_WorldQueries_Vision_EvoSim_Animal_" data-uid="EvoSim.WorldQueries.Vision(EvoSim.Animal)">
+  Vision(Animal)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/WorldQueries.cs/#L59"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The animal's vision (SENSE-22): its &quot;vision&quot; trait, or the reference 20 m.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float Vision(Animal a)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>How far it sees, in meters.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

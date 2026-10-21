@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Recording and statistics | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Recording and statistics | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/recording.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-recording">
+<h1 id="recording-and-statistics">Recording and statistics</h1>
+
+<p>Your module can leave four kinds of trace in a run's files (<a href="../guides/recording-and-outputs.html">Recording and outputs</a>):</p>
+<ul>
+<li><strong>statistics columns</strong>, numbers over time in <code>stats.csv</code>: implement <a class="xref" href="../api/EvoSim.IStatsColumns.html">IStatsColumns</a>;</li>
+<li><strong>causes of death</strong>, each with its own <code>deaths_&lt;cause&gt;</code> column: <code>World.RecordDeath</code>, or a <a class="xref" href="../api/EvoSim.DeathRule.html">DeathRule</a>;</li>
+<li><strong>events of your own</strong> in <code>events.jsonl</code>, one per occurrence, part of the run's history and of its hash: a
+<a class="xref" href="../api/EvoSim.SimEvent.html">SimEvent</a>;</li>
+<li><strong>listeners</strong> that see every event as it is recorded, without changing anything: an <a class="xref" href="../api/EvoSim.IEventSink.html">IEventSink</a>.</li>
+</ul>
+<p>Use a column for a quantity you want to plot, an event for something that happens and must be traceable later.</p>
+<h2 id="statistics-columns">Statistics columns</h2>
+<p><a class="xref" href="../api/EvoSim.IStatsColumns.html">IStatsColumns</a> has two members:</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>What it does, when it is called</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.IStatsColumns.html#EvoSim_IStatsColumns_StatColumns">StatColumns</a></td>
+<td>the column names, without the species prefix, always in the same order</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.IStatsColumns.html#EvoSim_IStatsColumns_StatValue_System_String_">StatValue</a></td>
+<td>one column's value now; called by the <a class="xref" href="../api/EvoSim.RunRecorder.html">RunRecorder</a> for every row, at the end of the record phase, every <code>Stats Every</code> ticks (100)</td>
+</tr>
+</tbody>
+</table>
+<p>Where the columns go depends on what implements it:</p>
+<table>
+<thead>
+<tr>
+<th>Implemented on</th>
+<th>Columns</th>
+<th>Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a <a class="xref" href="../api/EvoSim.SpeciesModule.html">SpeciesModule</a></td>
+<td>in the species' block, after its <code>act_&lt;action&gt;</code> columns, prefixed: <code>mean_age</code> becomes <code>prey_mean_age</code></td>
+<td>that species'</td>
+</tr>
+<tr>
+<td>a <a class="xref" href="../api/EvoSim.TickPhase.html">TickPhase</a> or a <a class="xref" href="../api/EvoSim.WorldService.html">WorldService</a></td>
+<td>at the end of the row, unprefixed (phases first)</td>
+<td>the world's</td>
+</tr>
+</tbody>
+</table>
+<p>Name columns in lower case with underscores, like the built-in ones. A name already in the row is skipped. Values are
+written with at most 4 decimals. A column that appears during the run rewrites the file's header, with empty cells in
+the rows before it.</p>
+<p><code>StatValue</code> only reads: it must not change the world, record events or draw random numbers. A column never changes the
+run or its hash.</p>
+<h3 id="example-the-mean-age">Example: the mean age</h3>
+<pre><code class="lang-csharp">using System.Collections.Generic;
+using EvoSim;
+
+// Adds the column &lt;species&gt;_mean_age to stats.csv: the mean age of the living animals, in ticks.
+public class MeanAgeColumn : SpeciesModule, IStatsColumns
+{
+    static readonly string[] columns = { &quot;mean_age&quot; };
+
+    public IEnumerable&lt;string&gt; StatColumns =&gt; columns;
+
+    public double StatValue(string column)
+    {
+        int n = 0;
+        double sum = 0;
+        foreach (var a in Species.Animals)
+            if (!a.IsGone) { n++; sum += a.Age; }
+        return n &gt; 0 ? sum / n : 0;
+    }
+}
+</code></pre>
+<p>Put it on any GameObject under the species, for example its <code>Stats</code> object. A world-level column works the same way
+on a <a class="xref" href="../api/EvoSim.WorldService.html">WorldService</a> under the World's <code>Recording</code> object.</p>
+<h2 id="causes-of-death">Causes of death</h2>
+<p>Every death goes through <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_RecordDeath_EvoSim_Animal_System_String_">World.RecordDeath</a>: it marks the
+animal gone, records its <code>death</code> event with the cause, counts it, and calls every <code>OnDied</code> hook (ANIM-42). Any cause
+string you pass gets its column, <code>&lt;species&gt;_deaths_&lt;cause&gt;</code>, with no other step.</p>
+<p>There are two ways to kill an animal:</p>
+<ul>
+<li><strong>A death rule</strong>, for a condition checked every tick on every animal (thirst, disease). The death phase asks it and
+records the death for you. List the causes it can give in <a class="xref" href="../api/EvoSim.DeathRule.html#EvoSim_DeathRule_Causes">Causes</a>: their columns then exist
+from the first row. See <a href="stats-and-death.html">Stats, costs and death rules</a>.</li>
+<li><strong>Your own phase</strong>, for an event that strikes from outside. Call <code>RecordDeath</code>, then remove the dead from the
+species' list with <code>Species.RemoveGone()</code> once your loop is over:</li>
+</ul>
+<pre><code class="lang-csharp">using EvoSim;
+using UnityEngine;
+
+// Lightning: each tick, each animal dies with a small chance, whatever its genes. Place it among the Phases, after Deaths.
+public class LightningPhase : TickPhase
+{
+    [SerializeField, Range(0f, 1f), Tooltip(&quot;Chance per animal per tick.&quot;)] float chance = 0.0005f;
+
+    public override void Run(TickContext t)
+    {
+        foreach (var s in World.AllSpecies)
+        {
+            var rng = t.Stream(s, &quot;lightning&quot;);                 // the species' own stream (RAND-03)
+            foreach (var a in s.Animals)
+                if (!a.IsGone &amp;&amp; rng.Chance(chance)) World.RecordDeath(a, &quot;lightning&quot;);
+            s.RemoveGone();                                     // after the loop: the dead leave the list
+        }
+    }
+}
+</code></pre>
+<p>The column <code>prey_deaths_lightning</code> appears at the first such death; rows before it leave it empty.</p>
+<h2 id="events-of-your-own">Events of your own</h2>
+<p>Build a <a class="xref" href="../api/EvoSim.SimEvent.html">SimEvent</a> with its kind, the tick, the animal's id (-1 for none) and the species id (null for a
+world event), add fields with <a class="xref" href="../api/EvoSim.SimEvent.html#EvoSim_SimEvent_With_System_String_System_Object_">With</a>, and record it with
+<a class="xref" href="../api/EvoSim.EventLog.html#EvoSim_EventLog_Record_EvoSim_SimEvent_">World.Events.Record</a>. The egg system records lost eggs this way:</p>
+<pre><code class="lang-cs">World.Events.Record(new SimEvent(&quot;egg_lost&quot;, World.Tick, egg.Id, egg.Species.Id)
+    .With(&quot;parents&quot;, new List&lt;int&gt;(egg.Parents))
+    .With(&quot;reason&quot;, reason));
+</code></pre>
+<p>A world event, from a seasons phase:</p>
+<pre><code class="lang-cs">World.Events.Record(new SimEvent(&quot;season&quot;, t.Tick, -1, null).With(&quot;winter&quot;, winter));
+</code></pre>
+<p>Field values are numbers, strings, bools, lists and dictionaries of those. The line is written as canonical JSON: keys
+sorted, at most 6 decimals. Record from simulation code only, a phase or a module's hook, once per occurrence and in a
+fixed order: the event becomes part of the events hash. Never record from a view, an editor window or a sink.</p>
+<h2 id="listening-to-events">Listening to events</h2>
+<p>An <a class="xref" href="../api/EvoSim.IEventSink.html">IEventSink</a> receives every event, with its canonical line, right after it is hashed:
+<a class="xref" href="../api/EvoSim.IEventSink.html#EvoSim_IEventSink_OnEvent_EvoSim_SimEvent_System_String_">OnEvent</a>. The run recorder and the Event Log window
+are sinks.</p>
+<p>Register with <a class="xref" href="../api/EvoSim.EventLog.html#EvoSim_EventLog_AddSink_EvoSim_IEventSink_">AddSink</a>. The World makes a new event log each time it
+initialises, so register in <code>Begin</code>, when the run's log exists, and unregister when the run stops. This world service
+counts the kills of the last 100 ticks and adds them as a column:</p>
+<pre><code class="lang-csharp">using System.Collections.Generic;
+using EvoSim;
+
+public class RecentKills : WorldService, IEventSink, IStatsColumns
+{
+    static readonly string[] columns = { &quot;recent_kills&quot; };
+    readonly Queue&lt;int&gt; killTicks = new Queue&lt;int&gt;();      // the tick of each kill, oldest first
+
+    public override void Begin()                            // the run's event log exists from here on
+    {
+        killTicks.Clear();
+        World.Events.AddSink(this);
+    }
+
+    public override void OnRunStopped(string reason) =&gt; World.Events.RemoveSink(this);
+
+    public void OnEvent(SimEvent e, string line)           // read only: record nothing, change nothing
+    {
+        if (e.Kind == &quot;death&quot; &amp;&amp; &quot;killed&quot;.Equals(e[&quot;cause&quot;])) killTicks.Enqueue(e.Tick);
+        while (killTicks.Count &gt; 0 &amp;&amp; killTicks.Peek() &lt;= e.Tick - 100) killTicks.Dequeue();
+    }
+
+    public IEnumerable&lt;string&gt; StatColumns =&gt; columns;
+
+    public double StatValue(string column)
+    {
+        int n = 0;
+        foreach (int t in killTicks) if (t &gt; World.Tick - 100) n++;
+        return n;
+    }
+}
+</code></pre>
+<p>Put it on a GameObject under the World's <code>Recording</code> object. A sink only reads: it must not record events, change the
+world or draw random numbers.</p>
+<h2 id="what-changes-the-events-hash">What changes the events hash</h2>
+<p>The hash identifies a run (<a href="../guides/determinism.html">Determinism and replay</a>). Two runs with the same hash recorded
+the same events in the same order.</p>
+<table>
+<thead>
+<tr>
+<th>Changes the hash</th>
+<th>Leaves it unchanged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the run seed or the world seed: the chain starts from them</td>
+<td>the wait mode, run speed, frame rate and ticks per frame (RAND-11)</td>
+</tr>
+<tr>
+<td>anything that changes what happens: a setting, a module, a phase or its place, a brain's answers</td>
+<td>the views, the editor windows, <code>LiveStatistics</code></td>
+</tr>
+<tr>
+<td>an event added, removed, reordered or given another field, such as your own <code>SimEvent</code></td>
+<td>statistics columns and event sinks that only read</td>
+</tr>
+<tr>
+<td>a value written differently in an event</td>
+<td>the compatibility mode, <code>Write Files</code>, the run's folder and <code>run_info.json</code></td>
+</tr>
+</tbody>
+</table>
+<p>Draws from a stream of your own don't shift the numbers of other streams (RAND-02): only what your module then changes
+in the world shows in the hash. Compare hashes on one machine (RAND-12).</p>
+<h2 id="test-it">Test it</h2>
+<p>Build a world with a recorder that writes files, run it, and read <code>stats.csv</code>
+(<a href="testing-your-module.html">Testing your module</a>):</p>
+<pre><code class="lang-csharp">using System.IO;
+using EvoSim;
+using EvoSim.Testing;
+using NUnit.Framework;
+
+public class MeanAgeColumnTests : WorldFixture
+{
+    [Test]
+    public void AddsItsColumn()
+    {
+        var b = New(19, name: &quot;mean-age&quot;).Lab1(prey: 20, predators: 3).Recorder(true, &quot;Logs/EvoSim/test-runs&quot;, &quot;mean-age&quot;);
+        b.Root.transform.Find(&quot;prey&quot;).gameObject.AddComponent&lt;MeanAgeColumn&gt;();
+        var w = b.Build();
+        w.Advance(200);
+        w.Stop(&quot;test&quot;);
+        var header = File.ReadAllLines(Path.Combine(w.Service&lt;RunRecorder&gt;().RunFolder, &quot;stats.csv&quot;))[0].Split(',');
+        CollectionAssert.Contains(header, &quot;prey_mean_age&quot;);
+    }
+}
+</code></pre>
+<p><code>OpenHooksTests.ModulesAddStatsColumns</code> (in <code>Assets/EvoSim/Tests/EditMode/Core</code>) checks a species column, a world column
+and a cause of death recorded by a phase, row by row. To check that a module doesn't change a run, compare
+<code>w.Events.Hash</code> with and without it.</p>
+<h2 id="read-next">Read next</h2>
+<ul>
+<li>Probes that do this: <code>HookProbe</code> (a species module with columns) and <code>WorldHookProbe</code> (a world service with a column),
+in <code>Assets/EvoSim/Testing/Probes</code>.</li>
+<li><a class="xref" href="../api/EvoSim.RunRecorder.html">RunRecorder</a>, <a class="xref" href="../api/EvoSim.EventLog.html">EventLog</a>, <a class="xref" href="../api/EvoSim.LiveStatistics.html">LiveStatistics</a>, <a class="xref" href="../api/EvoSim.CanonicalJson.html">CanonicalJson</a>.</li>
+<li><a href="world-modules.html">Phases, services and world hooks</a>: phases, services, <code>Begin</code>, <code>OnBorn</code> and <code>OnDied</code>.</li>
+<li>Specification: <a href="../spec/13-outputs-and-recording.html">13 — Outputs and recording</a>,
+<a href="../spec/12-tick-order-and-determinism.html">12 — Tick order and determinism</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

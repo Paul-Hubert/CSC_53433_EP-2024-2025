@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class DecisionQuery | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class DecisionQuery | EvoSim ">
+      
+      <meta name="description" content="What a brain receives for one deciding animal (DEC-10): its species, the genes its brain reads (label and sentence, in locus order), its observation, its situation text in the world&#39;s style, and any attachments.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_DecisionQuery.md&amp;value=---%0Auid%3A%20EvoSim.DecisionQuery%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.DecisionQuery">
+
+
+
+  <h1 id="EvoSim_DecisionQuery" data-uid="EvoSim.DecisionQuery" class="text-break">
+Class DecisionQuery  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L14"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Runtime.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>What a brain receives for one deciding animal (DEC-10): its species, the genes its brain reads (label and
+sentence, in locus order), its observation, its situation text in the world's style, and any attachments.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class DecisionQuery</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">DecisionQuery</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="EvoSim_DecisionQuery_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>The ask-brains phase builds one per deciding animal and passes the ones the memo and the cache could not answer to
+<a class="xref" href="EvoSim.Brain.html#EvoSim_Brain_Ask_System_Collections_Generic_IReadOnlyList_EvoSim_DecisionQuery__">Ask(IReadOnlyList&lt;DecisionQuery&gt;)</a>. A brain reads what it needs: a prompt-based brain calls <a class="xref" href="EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Prompt_EvoSim_Brain_">Prompt(Brain)</a>, a numeric one
+reads <a class="xref" href="EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Observation">Observation</a> and <a class="xref" href="EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Genes">Genes</a>. Tools (prompt preview, integrity gates) build queries too.</p>
+</div>
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="EvoSim_DecisionQuery__ctor_" data-uid="EvoSim.DecisionQuery.#ctor*"></a>
+
+  <h3 id="EvoSim_DecisionQuery__ctor_EvoSim_Species_System_Collections_Generic_IReadOnlyList_System_Collections_Generic_KeyValuePair_System_String_System_String___EvoSim_Observation_System_String_EvoSim_TextStyle_System_String_System_Collections_Generic_IReadOnlyList_System_Object__" data-uid="EvoSim.DecisionQuery.#ctor(EvoSim.Species,System.Collections.Generic.IReadOnlyList{System.Collections.Generic.KeyValuePair{System.String,System.String}},EvoSim.Observation,System.String,EvoSim.TextStyle,System.String,System.Collections.Generic.IReadOnlyList{System.Object})">
+  DecisionQuery(Species, IReadOnlyList&lt;KeyValuePair&lt;string, string&gt;&gt;, Observation, string, TextStyle, string, IReadOnlyList&lt;object&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L51"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Makes a query. The ask-brains phase builds them; build one yourself for tools and tests.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DecisionQuery(Species species, IReadOnlyList&lt;KeyValuePair&lt;string, string&gt;&gt; genes, Observation observation, string situation, TextStyle style, string genomeKey, IReadOnlyList&lt;object&gt; attachments = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>species</code> <a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd><p>The deciding animal's species.</p>
+</dd>
+    <dt><code>genes</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2">KeyValuePair</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;&gt;</dt>
+    <dd><p>The genes the brain reads, in locus order, from <a class="xref" href="EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_BrainGenes_EvoSim_Species_EvoSim_Genome_">BrainGenes(Species, Genome)</a>.</p>
+</dd>
+    <dt><code>observation</code> <a class="xref" href="EvoSim.Observation.html">Observation</a></dt>
+    <dd><p>The animal's observation.</p>
+</dd>
+    <dt><code>situation</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The observation as text, from <a class="xref" href="EvoSim.Species.html#EvoSim_Species_Describe_EvoSim_Observation_EvoSim_TextStyle_">Describe(Observation, TextStyle)</a>.</p>
+</dd>
+    <dt><code>style</code> <a class="xref" href="EvoSim.TextStyle.html">TextStyle</a></dt>
+    <dd><p>The style of that text.</p>
+</dd>
+    <dt><code>genomeKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The brain-visible genome key (DEC-31).</p>
+</dd>
+    <dt><code>attachments</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</dt>
+    <dd><p>Attachments from senses, or null for none.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="EvoSim_DecisionQuery_AnimalId_" data-uid="EvoSim.DecisionQuery.AnimalId*"></a>
+
+  <h3 id="EvoSim_DecisionQuery_AnimalId" data-uid="EvoSim.DecisionQuery.AnimalId">
+  AnimalId
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L41"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The deciding animal's id (-1 when the query is built by a tool): for brains that aren't memoizable.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int AnimalId { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_DecisionQuery_Attachments_" data-uid="EvoSim.DecisionQuery.Attachments*"></a>
+
+  <h3 id="EvoSim_DecisionQuery_Attachments" data-uid="EvoSim.DecisionQuery.Attachments">
+  Attachments
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Attachments from senses (images…), or empty (SENSE-40).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;object&gt; Attachments { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_DecisionQuery_Genes_" data-uid="EvoSim.DecisionQuery.Genes*"></a>
+
+  <h3 id="EvoSim_DecisionQuery_Genes" data-uid="EvoSim.DecisionQuery.Genes">
+  Genes
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L20"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Brain-visible genes, in locus order: (label, sentence or number).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;KeyValuePair&lt;string, string&gt;&gt; Genes { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2">KeyValuePair</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_DecisionQuery_GenesBlock_" data-uid="EvoSim.DecisionQuery.GenesBlock*"></a>
+
+  <h3 id="EvoSim_DecisionQuery_GenesBlock" data-uid="EvoSim.DecisionQuery.GenesBlock">
+  GenesBlock
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L65"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The genes block of the prompt: one line per gene, - label: &quot;sentence&quot; (PROMPT-02).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string GenesBlock { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="EvoSim_DecisionQuery_GenesBlock_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>For example <code>- eat: &quot;Eat whenever food is close.&quot;</code>, the label being the action name for action genes.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_DecisionQuery_GenomeKey_" data-uid="EvoSim.DecisionQuery.GenomeKey*"></a>
+
+  <h3 id="EvoSim_DecisionQuery_GenomeKey" data-uid="EvoSim.DecisionQuery.GenomeKey">
+  GenomeKey
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L38"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The brain-visible genome key (DEC-31): a hash of the species id and the alleles the brain reads, or the species id
+when the animal has no genome. Part of the memo and cache keys.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string GenomeKey { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_DecisionQuery_Observation_" data-uid="EvoSim.DecisionQuery.Observation*"></a>
+
+  <h3 id="EvoSim_DecisionQuery_Observation" data-uid="EvoSim.DecisionQuery.Observation">
+  Observation
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L23"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The animal's sense tokens, in sense order (SENSE-02).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Observation Observation { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Observation.html">Observation</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_DecisionQuery_Situation_" data-uid="EvoSim.DecisionQuery.Situation*"></a>
+
+  <h3 id="EvoSim_DecisionQuery_Situation" data-uid="EvoSim.DecisionQuery.Situation">
+  Situation
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L26"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The observation as text, in <a class="xref" href="EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Style">Style</a> (&quot;Energy: low. Food: 1-4 meters away. …&quot;, SENSE-10).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Situation { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_DecisionQuery_Species_" data-uid="EvoSim.DecisionQuery.Species*"></a>
+
+  <h3 id="EvoSim_DecisionQuery_Species" data-uid="EvoSim.DecisionQuery.Species">
+  Species
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L17"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The deciding animal's species: its actions give the row's length and order, its template the prompt.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Species Species { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_DecisionQuery_Style_" data-uid="EvoSim.DecisionQuery.Style*"></a>
+
+  <h3 id="EvoSim_DecisionQuery_Style" data-uid="EvoSim.DecisionQuery.Style">
+  Style
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L29"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The world's text style the situation was written in (SENSE-11); part of the cache key.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TextStyle Style { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.TextStyle.html">TextStyle</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_DecisionQuery_BrainGenes_" data-uid="EvoSim.DecisionQuery.BrainGenes*"></a>
+
+  <h3 id="EvoSim_DecisionQuery_BrainGenes_EvoSim_Species_EvoSim_Genome_" data-uid="EvoSim.DecisionQuery.BrainGenes(EvoSim.Species,EvoSim.Genome)">
+  BrainGenes(Species, Genome)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L83"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Lists the genes a brain reads from a genome, in locus order, with their labels (DEC-10, GENE-03).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;KeyValuePair&lt;string, string&gt;&gt; BrainGenes(Species s, Genome g)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>s</code> <a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd><p>The species whose genes to read.</p>
+</dd>
+    <dt><code>g</code> <a class="xref" href="EvoSim.Genome.html">Genome</a></dt>
+    <dd><p>The genome, or null.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2">KeyValuePair</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;&gt;</dt>
+    <dd><p>(label, sentence or number) per gene the brain reads (text genes by default); empty for a null genome.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_DecisionQuery_Prompt_" data-uid="EvoSim.DecisionQuery.Prompt*"></a>
+
+  <h3 id="EvoSim_DecisionQuery_Prompt_EvoSim_Brain_" data-uid="EvoSim.DecisionQuery.Prompt(EvoSim.Brain)">
+  Prompt(Brain)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L98"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Builds the full prompt for a brain: the species' template with genes, situation and the brain's answer instruction.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Prompt(Brain brain)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>brain</code> <a class="xref" href="EvoSim.Brain.html">Brain</a></dt>
+    <dd><p>The brain that will read it, for its <a class="xref" href="EvoSim.Brain.html#EvoSim_Brain_AnswerInstruction">AnswerInstruction</a>; null leaves {ask} empty.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The prompt text, exactly what an LLM brain sends (PROMPT-01, PROMPT-04).</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

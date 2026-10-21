@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>03 — Environment | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="03 — Environment | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/03-environment.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="03--environment">03 — Environment</h1>
+
+<p>Everything in the world that is not an animal: what grows on the ground
+(resource layers), where animals can hide (cover), and objects with a position
+(entities such as carcasses and eggs). Each is a replaceable module; a world may
+have none, one or several of each kind.</p>
+<h2 id="1-resource-layers">1. Resource layers</h2>
+<p>A resource layer holds edible items spread over the ground, for example grass.
+The diet of a species says which layers it grazes and how much energy an item
+gives (<a href="04-species-and-food-web.html">04</a>).</p>
+<ul>
+<li><strong>ENV-01 (MUST)</strong> A resource layer answers: the nearest item within a radius
+of a point (position and distance), whether an item is within reach of a
+point, and how many items it holds. It can remove (consume) one item.</li>
+<li><strong>ENV-02 (MUST)</strong> Consuming an item removes it at once: two animals can never
+eat the same item. When two animals reach for one item in the same tick, the
+act order decides who gets it (<a href="07-actions-and-locomotion.html#6-act-order">07 §6</a>).</li>
+<li><strong>ENV-03 (MUST)</strong> A layer that changes over time (regrowth) changes only in its
+own phase, once per tick, with its own random stream.</li>
+<li><strong>ENV-04 (SHOULD)</strong> A layer may forbid items in some places (water, cover,
+steep ground) and may vary its growth rate by place (near water, by biome).</li>
+</ul>
+<p><strong>Reference: the food layer of Lab 1.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Reference value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Storage</td>
+<td>one item at most per 1 m × 1 m cell, at the cell centre</td>
+</tr>
+<tr>
+<td>Start</td>
+<td>each walkable cell outside cover holds an item with probability <code>initialFraction</code> = 0.1</td>
+</tr>
+<tr>
+<td>Regrowth</td>
+<td>every tick, each empty walkable cell outside cover grows an item with probability <code>regrowP</code> = 0.0015 (≈ 670 ticks to regrow an eaten cell), the same everywhere: food appears uniformly at random</td>
+</tr>
+<tr>
+<td>Near water (terrain only)</td>
+<td>cells within 3 m of water regrow 2 × faster</td>
+</tr>
+<tr>
+<td>In cover</td>
+<td>no item at the start and no regrowth (&quot;hungry cover&quot;): hiding and eating compete</td>
+</tr>
+<tr>
+<td>Edible</td>
+<td>the layer's edible component: grazed, 25 energy per item (the prototype's <code>eat_gain</code>, a prey setting there)</td>
+</tr>
+<tr>
+<td>Reach</td>
+<td>an item is within reach when the animal is within 0.5 m of the item (Python: on the same cell)</td>
+</tr>
+</tbody>
+</table>
+<p>The food layer can also come from the terrain's grass detail layer (foliage
+lab): the detail map is the cell grid, eating removes the grass.</p>
+<h2 id="2-cover">2. Cover</h2>
+<ul>
+<li><strong>ENV-10 (MUST)</strong> A cover module answers whether a point is in cover and where
+the nearest cover is within a radius.</li>
+<li><strong>ENV-11 (MUST)</strong> An animal in cover is hidden from the species that hunt it:
+their senses don't report it and their actions can't target it or strike it.
+Its kin and the species it hunts still see it. (Who hides from whom is a
+setting of the cover module; the reference hides prey from their threats.)</li>
+<li><strong>ENV-12 (MUST)</strong> Cover is optional: a world without a cover module behaves as
+if no point were in cover.</li>
+<li><strong>ENV-13 (SHOULD)</strong> Using cover is a behaviour the brain can choose, with its
+own action (&quot;hide&quot;), its own sense (&quot;Cover: 1-4 meters away.&quot;) and its own
+gene, in competition with fleeing (<a href="07-actions-and-locomotion.html">07</a>). The
+Unity reference does exactly this (owner decision).</li>
+</ul>
+<p><strong>Reference (Python).</strong> 20 % of walkable ground is cover: the top 20 % of a
+two-octave value-noise map, so it comes in clustered patches (thickets). In the
+prototype cover is not an action, not a sense and not a gene: a <em>fleeing</em> prey
+animal already in cover stays put, and one with cover within 6 m runs into it
+instead of running away. The Unity reference splits this into a separate hide
+action, sense and gene (owner decision); the old coupling stays documented as
+an option of the flee action, off, used only to compare with the prototype
+(<a href="07-actions-and-locomotion.html#4-reference-actions">07 §4</a>).</p>
+<h2 id="3-entities">3. Entities</h2>
+<p>An entity is a world object with a position that is not an animal: a carcass,
+an egg, a water hole, a fruit that falls.</p>
+<ul>
+<li><strong>ENV-20 (MUST)</strong> An entity has an id, a kind, a position and a remaining
+lifetime (or none). Entities of a kind are found through the same spatial
+queries as animals (nearest within a radius, with a filter).</li>
+<li><strong>ENV-21 (MAY)</strong> An entity's position may change (a carcass dragged away, a
+fruit rolling). It changes only in a phase, never from the visuals.</li>
+<li><strong>ENV-22 (MUST)</strong> An entity whose lifetime runs out, or which is used up, is
+removed in the environment phase of that tick.</li>
+<li><strong>ENV-23 (MUST)</strong> A resource item or an entity can be eaten only if its layer
+or entity kind carries an edible component (SPEC-10) and the eater's diet
+lists it. In the reference, food items and carcasses are edible; eggs are not.</li>
+</ul>
+<p><strong>Reference: carcasses.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Reference value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Created by</td>
+<td>a successful strike (a kill), at the killed animal's position</td>
+</tr>
+<tr>
+<td>Portions</td>
+<td><code>portions</code> = 2: one each for up to 2 animals other than the killer (0 = no carcass)</td>
+</tr>
+<tr>
+<td>Edible</td>
+<td>carcasses of a species are described by that species' edible component (portions, energy, lifetime); they are scavenged</td>
+</tr>
+<tr>
+<td>Who may eat</td>
+<td>a species whose diet lists carcasses of the killed species; not the killer; each eater at most one portion</td>
+</tr>
+<tr>
+<td>Energy</td>
+<td>30 per portion (the prototype's <code>carcass_gain</code>, a predator setting there)</td>
+</tr>
+<tr>
+<td>Lifetime</td>
+<td><code>rotTicks</code> = 100 ticks, eaten or not</td>
+</tr>
+<tr>
+<td>After eating</td>
+<td>the eater is busy (digesting) for a time proportional to the energy: 25 ticks for 30 energy when a kill (60) gives 50 (<a href="05-animals-stats-and-life-cycle.html">05</a>)</td>
+</tr>
+<tr>
+<td>Found by</td>
+<td>the hunter's sense &quot;carcass&quot; and its hunt action (the nearer of prey and carcass; a carcass wins a tie, being a sure meal)</td>
+</tr>
+</tbody>
+</table>
+<p>Eggs are entities too (<a href="11-reproduction-and-population.html">11</a>); they have no
+edible component in the reference, so nothing eats them.</p>
+<h2 id="4-options-tried-and-rejected">4. Options tried and rejected</h2>
+<p>Kept in the prototype, off, and recorded so that students know they were tried:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Effect</th>
+<th>Outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Food in cover (<code>cover_food: true</code>)</td>
+<td>cover grows food like other ground</td>
+<td>safe feeding places made crashes worse; replaced by hungry cover</td>
+</tr>
+<tr>
+<td>Ridges</td>
+<td>mountain lines with gaps split the world</td>
+<td>hunters could not reach prey across them and died out</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-extending-the-environment">5. Extending the environment</h2>
+<p>New layers and entities are the natural content of the terrain and foliage
+labs: water (drinking, with a thirst stat), fruit trees (food that depends on
+place), seasons (a regrowth rate that changes with time), moving carcasses,
+burrows. Each comes with its sense and, if animals use it on purpose, its action
+and gene (<a href="22-extending-recipes.html">22</a>).</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

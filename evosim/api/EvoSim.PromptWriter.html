@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class PromptWriter | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class PromptWriter | EvoSim ">
+      
+      <meta name="description" content="Collects the action lines and rule lines that modules contribute to a species&#39; prompt (PROMPT-01). Numbers in rule lines come from placeholders filled from module settings (PROMPT-03): {field} on the writing module, {Module.field} on another module of the species, {species.Module.field} on a module of another species; {name} and {species.name} are display names. A placeholder reads a field or a property; {{ and }} write a brace. A module is named by its class, a base class, or its GameObject.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_PromptWriter.md&amp;value=---%0Auid%3A%20EvoSim.PromptWriter%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.PromptWriter">
+
+
+
+  <h1 id="EvoSim_PromptWriter" data-uid="EvoSim.PromptWriter" class="text-break">
+Class PromptWriter  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/PromptWriter.cs/#L37"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Runtime.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Collects the action lines and rule lines that modules contribute to a species' prompt (PROMPT-01). Numbers in
+rule lines come from placeholders filled from module settings (PROMPT-03): {field} on the writing module,
+{Module.field} on another module of the species, {species.Module.field} on a module of another species;
+{name} and {species.name} are display names. A placeholder reads a field or a property; {{ and }} write a brace.
+A module is named by its class, a base class, or its GameObject.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class PromptWriter</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">PromptWriter</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+  <h2 id="EvoSim_PromptWriter_examples">Examples</h2>
+  <p>A module writes its Inspector text as a rule; the reference prey locomotion's text begins
+<code>&quot;Animals move {walkSpeed} meter per step. Predators run {predator.Locomotion.runSpeed} meters per step when they hunt,&quot;</code>
+and goes on with <code>&quot;{predator.Stamina.max} stamina against an animal's {Stamina.max}&quot;</code>. The sample <code>Thirst</code>
+writes its number itself:</p>
+<pre><code class="lang-csharp">public override void WritePromptRules(PromptWriter w) =&gt;
+    w.Rule($"Thirst grows every step; an animal dies of thirst at {Bands.Number(deadly)}. Drinking resets it.");</code></pre>
+
+
+  <h2 id="EvoSim_PromptWriter_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p><a class="xref" href="EvoSim.PromptWriter.html#EvoSim_PromptWriter_Build_EvoSim_Species_">Build(Species)</a> makes one writer per species when the run starts, and hands it to every module's
+<a class="xref" href="EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_WritePromptRules_EvoSim_PromptWriter_">WritePromptRules(PromptWriter)</a> in hierarchy order (so action lines come in action order), then to every
+world service's <a class="xref" href="EvoSim.WorldService.html#EvoSim_WorldService_WritePromptRules_EvoSim_Species_EvoSim_PromptWriter_">WritePromptRules(Species, PromptWriter)</a>. A module calls <a class="xref" href="EvoSim.PromptWriter.html#EvoSim_PromptWriter_Action_System_String_System_String_">Action(string, string)</a> or
+<a class="xref" href="EvoSim.PromptWriter.html#EvoSim_PromptWriter_Rule_System_String_">Rule(string)</a>; it writes nothing else.</p>
+<p>Placeholders keep the prompt true to the world: change a speed in the Inspector and the prompt says the new
+number (PROMPT-03). The species' header and genes intro, and a frozen prompt, are filled with no writing module:
+there only {name} and the qualified forms work. {genes}, {situation} and {ask} are left for
+<a class="xref" href="EvoSim.PromptTemplate.html#EvoSim_PromptTemplate_Fill_System_String_System_String_System_String_">Fill(string, string, string)</a>. An unknown placeholder stays in the text and is reported (V-53).</p>
+</div>
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="EvoSim_PromptWriter__ctor_" data-uid="EvoSim.PromptWriter.#ctor*"></a>
+
+  <h3 id="EvoSim_PromptWriter__ctor_EvoSim_Species_" data-uid="EvoSim.PromptWriter.#ctor(EvoSim.Species)">
+  PromptWriter(Species)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/PromptWriter.cs/#L63"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Makes an empty writer for a species. <a class="xref" href="EvoSim.PromptWriter.html#EvoSim_PromptWriter_Build_EvoSim_Species_">Build(Species)</a> makes one; tools and tests may too.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public PromptWriter(Species species)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>species</code> <a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd><p>The species whose prompt is written.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="EvoSim_PromptWriter_ActionLines_" data-uid="EvoSim.PromptWriter.ActionLines*"></a>
+
+  <h3 id="EvoSim_PromptWriter_ActionLines" data-uid="EvoSim.PromptWriter.ActionLines">
+  ActionLines
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/PromptWriter.cs/#L53"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The action lines written so far, &quot;- eat: go to the nearest visible food and eat it&quot;.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;string&gt; ActionLines { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_PromptWriter_Current_" data-uid="EvoSim.PromptWriter.Current*"></a>
+
+  <h3 id="EvoSim_PromptWriter_Current" data-uid="EvoSim.PromptWriter.Current">
+  Current
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/PromptWriter.cs/#L50"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The module writing now: {field} placeholders read it.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object Current { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_PromptWriter_Problems_" data-uid="EvoSim.PromptWriter.Problems*"></a>
+
+  <h3 id="EvoSim_PromptWriter_Problems" data-uid="EvoSim.PromptWriter.Problems">
+  Problems
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/PromptWriter.cs/#L59"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Unknown placeholders found while writing (V-53).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;string&gt; Problems { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_PromptWriter_RuleLines_" data-uid="EvoSim.PromptWriter.RuleLines*"></a>
+
+  <h3 id="EvoSim_PromptWriter_RuleLines" data-uid="EvoSim.PromptWriter.RuleLines">
+  RuleLines
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/PromptWriter.cs/#L56"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The rule lines written so far, placeholders filled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;string&gt; RuleLines { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_PromptWriter_Species_" data-uid="EvoSim.PromptWriter.Species*"></a>
+
+  <h3 id="EvoSim_PromptWriter_Species" data-uid="EvoSim.PromptWriter.Species">
+  Species
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/PromptWriter.cs/#L47"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The species whose prompt is being written: {name} is its display name, {Module.field} reads its modules.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Species Species { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_PromptWriter_Action_" data-uid="EvoSim.PromptWriter.Action*"></a>
+
+  <h3 id="EvoSim_PromptWriter_Action_System_String_System_String_" data-uid="EvoSim.PromptWriter.Action(System.String,System.String)">
+  Action(string, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/PromptWriter.cs/#L69"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds one line of the action list: &quot;- name: description&quot; (PROMPT-01).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Action(string name, string description)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The action's name, as the brain reads it (&quot;eat&quot;).</p>
+</dd>
+    <dt><code>description</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>What the action does, from its Inspector text; its placeholders are filled.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_PromptWriter_Action_System_String_System_String__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Every action writes its own line (<code>AnimalAction.WritePromptRules</code>); other modules write rules.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_PromptWriter_Build_" data-uid="EvoSim.PromptWriter.Build*"></a>
+
+  <h3 id="EvoSim_PromptWriter_Build_EvoSim_Species_" data-uid="EvoSim.PromptWriter.Build(EvoSim.Species)">
+  Build(Species)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/PromptWriter.cs/#L207"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The species' prompt template (PROMPT-01): header, actions, rules from its modules and from world services,
+the genes intro and {genes}, the situation and {ask}; or its frozen prompt (PROMPT-04).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static PromptTemplate Build(Species s)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>s</code> <a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd><p>The species, its modules discovered.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.PromptTemplate.html">PromptTemplate</a></dt>
+    <dd><p>The template and the problems found (unknown placeholders, holes missing from a frozen prompt).</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_PromptWriter_Build_EvoSim_Species__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Called by the World for each species when the run starts and when a species is added (SPEC-30), and by
+<a class="xref" href="EvoSim.Species.html#EvoSim_Species_RebuildPrompt">RebuildPrompt()</a>. With a frozen prompt the modules still write, so their problems are reported,
+but only the frozen text is used.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_PromptWriter_Fill_" data-uid="EvoSim.PromptWriter.Fill*"></a>
+
+  <h3 id="EvoSim_PromptWriter_Fill_System_String_" data-uid="EvoSim.PromptWriter.Fill(System.String)">
+  Fill(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/PromptWriter.cs/#L83"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Fills {placeholders} from module settings; unknown ones are kept and reported.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Fill(string text)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>text</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>A text with placeholders, or null.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The text with each placeholder replaced by the value it names, &quot;{{&quot; and &quot;}}&quot; by single braces; {genes},
+{situation}, {ask} and unknown placeholders unchanged.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_PromptWriter_OverlayRule_" data-uid="EvoSim.PromptWriter.OverlayRule*"></a>
+
+  <h3 id="EvoSim_PromptWriter_OverlayRule_EvoSim_Species_" data-uid="EvoSim.PromptWriter.OverlayRule(EvoSim.Species)">
+  OverlayRule(Species)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/PromptWriter.cs/#L189"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The engine's rule line for a species with overlays (ACT-07, PROMPT-03): &quot;Some actions are done in passing
+(alarm): the animal also does its next most likely choice.&quot;; null when the species has none.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string OverlayRule(Species s)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>s</code> <a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd><p>The species, its actions found.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The line, the overlays named in action order, or null.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_PromptWriter_Rule_" data-uid="EvoSim.PromptWriter.Rule*"></a>
+
+  <h3 id="EvoSim_PromptWriter_Rule_System_String_" data-uid="EvoSim.PromptWriter.Rule(System.String)">
+  Rule(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/PromptWriter.cs/#L74"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds one rule line, its placeholders filled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Rule(string line)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>line</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The rule, usually a module's Inspector text; it may hold several lines. Null, empty or blank adds
+nothing, so a module with an empty rule text writes nothing.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_PromptWriter_TryRead_" data-uid="EvoSim.PromptWriter.TryRead*"></a>
+
+  <h3 id="EvoSim_PromptWriter_TryRead_System_Object_System_String_System_String__" data-uid="EvoSim.PromptWriter.TryRead(System.Object,System.String,System.String@)">
+  TryRead(object, string, out string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/PromptWriter.cs/#L153"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads a field, else a property (public or private, of the class or a base class), formatted as the brain reads it.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool TryRead(object target, string field, out string value)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>target</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>The module or object to read.</p>
+</dd>
+    <dt><code>field</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The field's or property's name, exactly as in the code (&quot;runSpeed&quot;, &quot;max&quot;).</p>
+</dd>
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The value as text: numbers as <a class="xref" href="EvoSim.Bands.html#EvoSim_Bands_Number_System_Single_">Number(float)</a> writes them, booleans &quot;yes&quot; / &quot;no&quot;;
+null when not found.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True when a readable field or property was found and its getter did not throw.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

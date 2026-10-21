@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>The editor | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="The editor | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/editor.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-editor">
+<h1 id="the-editor">The editor</h1>
+
+<p>Your module can come with its own editor tools: a window that shows what it does in a running world, an inspector that
+shows computed facts next to its fields, validation messages with fix buttons, a menu item that adds it to a species.
+Choose a <strong>validation message</strong> to catch a configuration mistake before Play; it works in the editor, in batch runs and
+in tests. Choose a <strong>window or inspector</strong> to look at a running world; it exists only in the editor.</p>
+<h2 id="the-hooks">The hooks</h2>
+<table>
+<thead>
+<tr>
+<th>Hook</th>
+<th>Where</th>
+<th>What it does, when it runs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Validate(ValidationReport)</code> on a <a class="xref" href="../api/EvoSim.SpeciesModule.html">SpeciesModule</a> or a <a class="xref" href="../api/EvoSim.WorldModule.html">WorldModule</a></td>
+<td>your module, in <code>Assets/Student</code></td>
+<td>reports configuration problems; called by <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Prepare_EvoSim_ValidationReport_">Prepare(ValidationReport)</a> in the inspectors, before Play, and when a run starts</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.ValidationFix.html">ValidationFix</a></td>
+<td>inside <code>Validate</code></td>
+<td>a button next to the message: a label and the change it makes</td>
+</tr>
+<tr>
+<td>Unity's <code>EditorWindow</code></td>
+<td>an editor-only assembly</td>
+<td>a window, opened from a menu item</td>
+</tr>
+<tr>
+<td>Unity's <code>UnityEditor.Editor</code> with <code>[CustomEditor(typeof(…))]</code></td>
+<td>an editor-only assembly</td>
+<td>replaces the inspector of your component</td>
+</tr>
+<tr>
+<td>Unity's <code>[MenuItem(&quot;…&quot;)]</code></td>
+<td>an editor-only assembly</td>
+<td>a menu item, such as your own <em>Add Action</em> entry</td>
+</tr>
+</tbody>
+</table>
+<h2 id="where-editor-code-lives">Where editor code lives</h2>
+<p>Editor code uses <code>UnityEditor</code>, which players lack, so it lives in an editor-only assembly (EDIT-03); in the runtime
+<code>Student</code> assembly it would break the player build. Create <code>Assets/Student/Editor/Student.Editor.asmdef</code>:</p>
+<pre><code class="lang-json">{
+    &quot;name&quot;: &quot;Student.Editor&quot;,
+    &quot;references&quot;: [&quot;Student&quot;, &quot;EvoSim.Runtime&quot;, &quot;EvoSim.Samples&quot;, &quot;EvoSim.Editor&quot;],
+    &quot;includePlatforms&quot;: [&quot;Editor&quot;]
+}
+</code></pre>
+<p>Put your windows, inspectors and menus in that folder: they see your modules, EvoSim and its editor helpers.</p>
+<h2 id="a-window">A window</h2>
+<p>This window lists the living animals of each species with their energy. It uses <a class="xref" href="../api/EvoSim.Editor.EditorWorlds.html">EditorWorlds</a> to
+find the world the other EvoSim windows show: the one of the selection, else the first running one.</p>
+<pre><code class="lang-csharp">using EvoSim;
+using EvoSim.Editor;
+using UnityEditor;
+using UnityEngine;
+
+public class EnergyListWindow : EditorWindow
+{
+    Vector2 scroll;
+
+    [MenuItem(&quot;Window/EvoSim/Student/Energy List&quot;)]
+    static void Open() =&gt; GetWindow&lt;EnergyListWindow&gt;(&quot;Energy&quot;).Show();
+
+    void OnInspectorUpdate() { if (Application.isPlaying) Repaint(); }   // about ten times a second
+
+    void OnGUI()
+    {
+        var w = EditorWorlds.Current();
+        if (w == null || !w.IsInitialized) { EditorGUILayout.HelpBox(&quot;Enter Play mode in a scene with a World.&quot;, MessageType.Info); return; }
+        scroll = EditorGUILayout.BeginScrollView(scroll);
+        foreach (var s in w.AllSpecies)
+        {
+            var energy = s.Module&lt;Energy&gt;();
+            if (energy == null) continue;
+            EditorGUILayout.LabelField($&quot;{s.DisplayName}: {s.Animals.Count} living&quot;, EditorStyles.boldLabel);
+            foreach (var a in s.Animals)
+                if (!a.IsGone) EditorGUILayout.LabelField($&quot;#{a.Id}&quot;, $&quot;{a[energy.Value]:0} energy&quot;);
+        }
+        EditorGUILayout.EndScrollView();
+    }
+}
+</code></pre>
+<p>Open it with <em>Window ▸ EvoSim ▸ Student ▸ Energy List</em>, then press Play. Other helpers:
+<a class="xref" href="../api/EvoSim.Editor.EditorWorlds.html#EvoSim_Editor_EditorWorlds_SelectedAnimal_EvoSim_World__"><code>EditorWorlds.SelectedAnimal</code></a> gives the animal whose
+body is selected, and <a class="xref" href="../api/EvoSim.Editor.EditorWorlds.html#EvoSim_Editor_EditorWorlds_ActionColor_System_Int32_"><code>EditorWorlds.ActionColor</code></a> the colour
+every EvoSim window uses for an action.</p>
+<h2 id="an-inspector">An inspector</h2>
+<p>An inspector of your own can show what the fields mean, not only what they are (EDIT-04). Write a class
+<code>FearInspector : UnityEditor.Editor</code> with <code>[CustomEditor(typeof(Fear))]</code> (<code>Fear</code> is the module of the next section).
+In <code>OnInspectorGUI</code>, call <code>DrawDefaultInspector()</code> to keep the fields, then draw facts computed from <code>(Fear)target</code>:
+in Play mode, for example, the mean of <code>a[fear.Value]</code> over <code>fear.Species.Animals</code>. Override <code>RequiresConstantRepaint</code>
+to return <code>Application.isPlaying</code> so the numbers follow the run. Write <code>UnityEditor.Editor</code> in full, as EvoSim's own
+inspectors do: inside a namespace under <code>EvoSim</code>, <code>Editor</code> alone means the <code>EvoSim.Editor</code> namespace.</p>
+<h2 id="validation-messages-with-fixes">Validation messages with fixes</h2>
+<p>A module checks its own settings in <code>Validate</code>. Each problem is one message: an id, the object at fault, a sentence that
+names the rule, and a fix when there is an obvious one. This stat module reports a start above its maximum, with a
+<strong>Clamp</strong> button, and notes when no sense lets the brain read it:</p>
+<pre><code class="lang-csharp">using System.Linq;
+using EvoSim;
+using UnityEngine;
+
+/// &lt;summary&gt;A fear stat on every animal of the species, from &lt;c&gt;start&lt;/c&gt; at birth up to &lt;c&gt;max&lt;/c&gt;.&lt;/summary&gt;
+public class Fear : SpeciesModule
+{
+    [SerializeField, Min(0f), Tooltip(&quot;Fear at birth.&quot;)] float start = 0f;
+    [SerializeField, Min(1f), Tooltip(&quot;The most fear an animal can feel.&quot;)] float max = 100f;
+
+    public StatId Value { get; private set; }
+    public float Start =&gt; start;
+
+    public override void Declare(SpeciesBuilder b) =&gt; Value = b.DeclareStat(&quot;fear&quot;, StatStart.Fixed(start), 0f, max);
+
+    public override void Validate(ValidationReport report)
+    {
+        if (start &gt; max)
+            report.Warning(&quot;V-36&quot;, this, $&quot;Fear starts at {start}, above its maximum {max}.&quot;,
+                           new ValidationFix(&quot;Clamp&quot;, () =&gt; start = max));
+        if (!Species.ModulesOf&lt;LevelSense&gt;().Any(s =&gt; s.Stat == &quot;fear&quot;))
+            report.Info(&quot;Fear-01&quot;, this, &quot;No LevelSense reads the stat 'fear': the brain never hears about it.&quot;);
+    }
+
+    public void Configure(float startFear, float maxFear) { start = startFear; max = maxFear; }
+}
+</code></pre>
+<p>Select the World and press <em>Validate</em>: the message reads <code>V-36  Fear starts at 150, above its maximum 100.</code>, with
+<em>Select</em> and <em>Clamp</em> next to it. <em>Clamp</em> runs the fix on your component, marks it changed and validates again. An error
+(<code>report.Error</code>) also stops Play (<a href="../guides/editor-tooling.html#validation">Editor tooling</a>).</p>
+<p>Rules for <code>Validate</code>:</p>
+<ul>
+<li><strong>Only read.</strong> It runs in the editor and at the start of every run. Only the fix changes the scene, when clicked.</li>
+<li><strong>Name the object at fault</strong>, usually <code>this</code>: <em>Select</em> and the Console use it (EDIT-02).</li>
+<li><strong>Error</strong> when the run cannot be right (it blocks Play), <strong>Warning</strong> when it probably runs not as meant, <strong>Info</strong> for
+a fact worth knowing.</li>
+<li><strong>The id is any short string.</strong> Reuse a catalogue id (21 §2) when your check is one of its kinds.</li>
+<li><strong>A fix captures what it needs</strong> in local variables, not loop variables. A fix that changes the component's own
+fields, as above, is saved with the scene.</li>
+</ul>
+<p>More in <a href="species-modules.html#validation">Species modules</a>; to require another module, <code>[RequiresModule]</code> checks it for
+you (<a href="species-modules.html#dependencies">dependencies</a>).</p>
+<h2 id="your-own-add-menu-item">Your own <em>Add</em> menu item</h2>
+<p><em>GameObject ▸ EvoSim ▸ Add Action</em> and <em>Add Sense</em> list fixed items. Each one copies a prefab from
+<code>Assets/EvoSim/Modules</code> with <a class="xref" href="../api/EvoSim.Editor.WorldFactory.html#EvoSim_Editor_WorldFactory_AddModule_UnityEngine_GameObject_System_String_System_String_">AddModule(GameObject, string, string)</a>.
+To offer your own module the same way:</p>
+<ol>
+<li><strong>Make the prefab.</strong> Create an empty GameObject, add your action component and a <a class="xref" href="../api/EvoSim.TextGene.html">TextGene</a>, and fill
+the gene's <strong>Founders</strong> (or set its <strong>Pool</strong>). For a sense, name the GameObject after its label and add the sense.</li>
+<li><strong>Save it</strong> by dragging it into <code>Assets/EvoSim/Modules</code> (an action: <code>Drink.prefab</code>), <code>Assets/EvoSim/Modules/Senses</code>
+or <code>Assets/EvoSim/Modules/Genes</code>. Delete the scene object.</li>
+<li><strong>Add a menu item</strong> in your editor assembly (with the <code>using</code> lines of the window above):</li>
+</ol>
+<pre><code class="lang-csharp">static class MyAddMenus
+{
+    const string Item = &quot;GameObject/EvoSim/Add Action/Drink (mine)&quot;;
+
+    [MenuItem(Item, false, 20)]
+    static void AddDrink()
+    {
+        var species = Selection.activeGameObject.GetComponentInParent&lt;Species&gt;(true);
+        var go = WorldFactory.AddModule(species.gameObject, &quot;Actions&quot;, &quot;Drink&quot;);   // under the species' Actions group
+        Undo.RegisterCreatedObjectUndo(go, &quot;Add Drink&quot;);
+        Selection.activeObject = go;
+    }
+
+    [MenuItem(Item, true)]   // enabled only when a species, or an object under it, is selected
+    static bool CanAddDrink() =&gt; Selection.activeGameObject != null
+                                 &amp;&amp; Selection.activeGameObject.GetComponentInParent&lt;Species&gt;(true) != null;
+}
+</code></pre>
+<p>The kind is <code>&quot;Actions&quot;</code>, <code>&quot;Senses&quot;</code> or <code>&quot;Genes&quot;</code>; the module is the prefab's file name without <code>.prefab</code>. An action is
+renamed in lower case (<code>drink</code>): its GameObject's name is its name in the prompt. You can also skip the menu and drag
+your prefab onto the species' <code>Actions</code> or <code>Senses</code> object.</p>
+<h2 id="test-it">Test it</h2>
+<p>Test validation with a world built in code, in a <a class="xref" href="../api/EvoSim.Testing.WorldFixture.html">WorldFixture</a> class with <code>using System.Linq;</code>
+(<a href="testing-your-module.html">Testing your module</a>):</p>
+<pre><code class="lang-csharp">[Test, Description(&quot;A start above the maximum is reported (V-36), and Clamp fixes it&quot;)]
+public void StartAboveMaximum()
+{
+    var w = New().Flat(20, 20)
+        .Species(&quot;prey&quot;, s =&gt; s.Population(0).Action&lt;RestAction&gt;(&quot;rest&quot;).Module&lt;Fear&gt;(f =&gt; f.Configure(150f, 100f)))
+        .BuildUninitialized();
+    var report = new ValidationReport();
+    w.Prepare(report);
+    report.Messages.First(m =&gt; m.Id == &quot;V-36&quot;).Fix.Apply();
+    Assert.AreEqual(100f, w.FindSpecies(&quot;prey&quot;).Module&lt;Fear&gt;().Start);
+}
+</code></pre>
+<p>Windows and inspectors have no test suite: open them in Play mode and look.</p>
+<h2 id="the-api-for-tools">The API for tools</h2>
+<p>Your editor code can call EvoSim's own tools, all static classes of the <code>EvoSim.Editor</code> assembly. <a href="../guides/running-and-building.html">Running and
+building</a> shows <code>Batch</code> and <code>RealTimeRuns</code> at work, in the editor and in batch mode.</p>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Use it to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.EditorWorlds.html">EditorWorlds</a></td>
+<td>find the open scenes' worlds, the current world, the selected animal, the action colours</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.ValidationPanel.html">ValidationPanel</a>, <a class="xref" href="../api/EvoSim.Editor.PlayModeGate.html">PlayModeGate</a></td>
+<td>validate a world and draw its messages with <em>Select</em> and fix buttons; list the errors that would block Play</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.PromptPreview.html">PromptPreview</a></td>
+<td>build the exact prompt a brain receives for a genome and a situation</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.WorldFactory.html">WorldFactory</a></td>
+<td>make a world, a species, or add a module prefab, exactly as the menus do</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.ScriptTemplates.html">ScriptTemplates</a>, <a class="xref" href="../api/EvoSim.Editor.Exercises.html">Exercises</a></td>
+<td>write a script and its test from a template; swap reference modules for exercise stubs and back</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.ReferenceScenes.html">ReferenceScenes</a>, <a class="xref" href="../api/EvoSim.Editor.RunViews.html">RunViews</a></td>
+<td>the reference folders and decision period, the reference content; add the run views to a scene</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Batch.html">Batch</a></td>
+<td>run a scenario headless (<code>Run</code>, <code>RunScenarioNamed</code>, <code>RunTier</code>), or any action on a scene (<code>WithScene</code>)</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.RealTimeRuns.html">RealTimeRuns</a></td>
+<td>headless runs with files, Play-mode runs with player arguments, run levels L0–L2</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Integrity.html">Integrity</a>, <a class="xref" href="../api/EvoSim.IntegrityGates.html">IntegrityGates</a></td>
+<td>the brain and mutator checks B-01 to B-11, each written as an <a class="xref" href="../api/EvoSim.IntegrityReport.html">IntegrityReport</a></td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.VisualPlayerBuild.html">VisualPlayerBuild</a></td>
+<td>build the Windows player</td>
+</tr>
+</tbody>
+</table>
+<h2 id="read-next">Read next</h2>
+<ul>
+<li><a href="../guides/editor-tooling.html">Editor tooling</a>: every inspector, window and menu EvoSim already has.</li>
+<li><a class="xref" href="../api/EvoSim.Editor.EcologyMonitorWindow.html">EcologyMonitorWindow</a>, <a class="xref" href="../api/EvoSim.Editor.AnimalInspectorWindow.html">AnimalInspectorWindow</a>: short windows to copy from.</li>
+<li><a href="../spec/21-editor-tooling.html">21 — Editor tooling</a>: the validation catalogue and the rules EDIT-01 to EDIT-05.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

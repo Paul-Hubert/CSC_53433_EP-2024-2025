@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class BrainAnswer | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class BrainAnswer | EvoSim ">
+      
+      <meta name="description" content="A brain&#39;s answer to a batch (DEC-11): one probability row per query, in query order, or a failure per query. Fast brains fill it at once; HTTP brains later, from another thread, then mark it done.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_BrainAnswer.md&amp;value=---%0Auid%3A%20EvoSim.BrainAnswer%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.BrainAnswer">
+
+
+
+  <h1 id="EvoSim_BrainAnswer" data-uid="EvoSim.BrainAnswer" class="text-break">
+Class BrainAnswer  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/BrainAnswer.cs/#L17"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Runtime.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>A brain's answer to a batch (DEC-11): one probability row per query, in query order, or a failure per query.
+Fast brains fill it at once; HTTP brains later, from another thread, then mark it done.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class BrainAnswer</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">BrainAnswer</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="EvoSim_BrainAnswer_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Answer now with <a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Now_System_Single_____">Now(float[][])</a>. Answer later with <a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Later_System_Int32_">Later(int)</a>: fill each entry with
+<a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_SetRow_System_Int32_System_Single___">SetRow(int, float[])</a> or <a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Fail_System_Int32_System_String_">Fail(int, string)</a>, from any thread, then call <a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Complete">Complete()</a> exactly once, also when
+everything failed: the choose-actions phase waits on <a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Pending">Pending</a> until then (TICK-03), and in the Freeze wait
+mode it blocks the main thread.</p>
+<p>The choose-actions phase reads each entry with <a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Row_System_Int32_">Row(int)</a> and <a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Failed_System_Int32_">Failed(int)</a>, checks it with
+<a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Check_System_Single___System_Int32_">Check(float[], int)</a>, and treats a bad row like a failure.</p>
+</div>
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="EvoSim_BrainAnswer_Count_" data-uid="EvoSim.BrainAnswer.Count*"></a>
+
+  <h3 id="EvoSim_BrainAnswer_Count" data-uid="EvoSim.BrainAnswer.Count">
+  Count
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/BrainAnswer.cs/#L26"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The number of queries in the batch, so of rows.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Count { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_BrainAnswer_IsDone_" data-uid="EvoSim.BrainAnswer.IsDone*"></a>
+
+  <h3 id="EvoSim_BrainAnswer_IsDone" data-uid="EvoSim.BrainAnswer.IsDone">
+  IsDone
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/BrainAnswer.cs/#L29"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True once <a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Complete">Complete()</a> was called.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsDone { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_BrainAnswer_Milliseconds_" data-uid="EvoSim.BrainAnswer.Milliseconds*"></a>
+
+  <h3 id="EvoSim_BrainAnswer_Milliseconds" data-uid="EvoSim.BrainAnswer.Milliseconds">
+  Milliseconds
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/BrainAnswer.cs/#L43"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Wall-clock time from the batch's creation to its completion, in milliseconds (the summary's backend_s, 13 §5).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double Milliseconds { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_BrainAnswer_ModelCalls_" data-uid="EvoSim.BrainAnswer.ModelCalls*"></a>
+
+  <h3 id="EvoSim_BrainAnswer_ModelCalls" data-uid="EvoSim.BrainAnswer.ModelCalls">
+  ModelCalls
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/BrainAnswer.cs/#L38"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Model calls this batch made (cached answers excluded), for the summary. The brain sets it; 0 for brains without a
+model.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int ModelCalls { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_BrainAnswer_Pending_" data-uid="EvoSim.BrainAnswer.Pending*"></a>
+
+  <h3 id="EvoSim_BrainAnswer_Pending" data-uid="EvoSim.BrainAnswer.Pending">
+  Pending
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/BrainAnswer.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>What the Choose actions phase waits for (TICK-03).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Pending Pending { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Pending.html">Pending</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_BrainAnswer_Check_" data-uid="EvoSim.BrainAnswer.Check*"></a>
+
+  <h3 id="EvoSim_BrainAnswer_Check_System_Single___System_Int32_" data-uid="EvoSim.BrainAnswer.Check(System.Single[],System.Int32)">
+  Check(float[], int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/BrainAnswer.cs/#L122"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Checks a row: one entry per action, all ≥ 0, summing to 1 ± 1e-6 (DEC-11).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string Check(float[] row, int actions)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>row</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>[]</dt>
+    <dd><p>The row to check, or null.</p>
+</dd>
+    <dt><code>actions</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The number of actions of the query's species.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>What is wrong (&quot;no row&quot;, &quot;3 entries for 5 actions&quot;, &quot;sums to 0.9&quot;…), or null when the row is fine.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_BrainAnswer_Complete_" data-uid="EvoSim.BrainAnswer.Complete*"></a>
+
+  <h3 id="EvoSim_BrainAnswer_Complete" data-uid="EvoSim.BrainAnswer.Complete">
+  Complete()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/BrainAnswer.cs/#L96"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Marks the answer done and records its time: call it once, after the last <a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_SetRow_System_Int32_System_Single___">SetRow(int, float[])</a> or
+<a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Fail_System_Int32_System_String_">Fail(int, string)</a>. <a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Now_System_Single_____">Now(float[][])</a> calls it for you.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Complete()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_BrainAnswer_Error_" data-uid="EvoSim.BrainAnswer.Error*"></a>
+
+  <h3 id="EvoSim_BrainAnswer_Error_System_Int32_" data-uid="EvoSim.BrainAnswer.Error(System.Int32)">
+  Error(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/BrainAnswer.cs/#L116"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gives why a query has no row.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Error(int i)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>i</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The query's index in the batch.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The failure message, &quot;no answer&quot; when the row was never set, or null when there is a row.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_BrainAnswer_Fail_" data-uid="EvoSim.BrainAnswer.Fail*"></a>
+
+  <h3 id="EvoSim_BrainAnswer_Fail_System_Int32_System_String_" data-uid="EvoSim.BrainAnswer.Fail(System.Int32,System.String)">
+  Fail(int, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/BrainAnswer.cs/#L90"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The query failed (after retries): the row is not cached (DEC-34) and strict brains stop the run (DEC-40).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Fail(int i, string error)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>i</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The query's index in the batch.</p>
+</dd>
+    <dt><code>error</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>What went wrong, for the log; null gives &quot;failed&quot;.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_BrainAnswer_Failed_" data-uid="EvoSim.BrainAnswer.Failed*"></a>
+
+  <h3 id="EvoSim_BrainAnswer_Failed_System_Int32_" data-uid="EvoSim.BrainAnswer.Failed(System.Int32)">
+  Failed(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/BrainAnswer.cs/#L111"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Tells whether a query has no row: it failed, or the brain never answered it.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Failed(int i)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>i</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The query's index in the batch.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True when there is no row.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_BrainAnswer_Later_" data-uid="EvoSim.BrainAnswer.Later*"></a>
+
+  <h3 id="EvoSim_BrainAnswer_Later_System_Int32_" data-uid="EvoSim.BrainAnswer.Later(System.Int32)">
+  Later(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/BrainAnswer.cs/#L74"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Makes an answer that will be filled later; call <a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Complete">Complete()</a> when every row or failure is in.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BrainAnswer Later(int count)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>count</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The number of queries in the batch.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.BrainAnswer.html">BrainAnswer</a></dt>
+    <dd><p>An empty answer, not done yet.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_BrainAnswer_Later_" data-uid="EvoSim.BrainAnswer.Later*"></a>
+
+  <h3 id="EvoSim_BrainAnswer_Later_System_Int32_EvoSim_Pending_" data-uid="EvoSim.BrainAnswer.Later(System.Int32,EvoSim.Pending)">
+  Later(int, Pending)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/BrainAnswer.cs/#L80"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Makes an answer filled later, done when the given pending is done (fakes that answer after N calls).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BrainAnswer Later(int count, Pending wait)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>count</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The number of queries in the batch.</p>
+</dd>
+    <dt><code>wait</code> <a class="xref" href="EvoSim.Pending.html">Pending</a></dt>
+    <dd><p>What the choose-actions phase waits for instead of this answer's own pending.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.BrainAnswer.html">BrainAnswer</a></dt>
+    <dd><p>An empty answer, not done yet; <a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Complete">Complete()</a> is still needed.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_BrainAnswer_Now_" data-uid="EvoSim.BrainAnswer.Now*"></a>
+
+  <h3 id="EvoSim_BrainAnswer_Now_System_Single_____" data-uid="EvoSim.BrainAnswer.Now(System.Single[][])">
+  Now(float[][])
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/BrainAnswer.cs/#L63"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Makes an answer given at once, already complete.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BrainAnswer Now(float[][] rows)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rows</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>[][]</dt>
+    <dd><p>One probability row per query, in query order; a null row counts as a failure.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.BrainAnswer.html">BrainAnswer</a></dt>
+    <dd><p>The complete answer.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_BrainAnswer_Row_" data-uid="EvoSim.BrainAnswer.Row*"></a>
+
+  <h3 id="EvoSim_BrainAnswer_Row_System_Int32_" data-uid="EvoSim.BrainAnswer.Row(System.Int32)">
+  Row(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/BrainAnswer.cs/#L106"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gives the row of one query.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float[] Row(int i)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>i</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The query's index in the batch.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>[]</dt>
+    <dd><p>The row, or null when the query failed or has no answer yet.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_BrainAnswer_SetRow_" data-uid="EvoSim.BrainAnswer.SetRow*"></a>
+
+  <h3 id="EvoSim_BrainAnswer_SetRow_System_Int32_System_Single___" data-uid="EvoSim.BrainAnswer.SetRow(System.Int32,System.Single[])">
+  SetRow(int, float[])
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/BrainAnswer.cs/#L85"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets the probability row of one query.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetRow(int i, float[] row)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>i</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The query's index in the batch.</p>
+</dd>
+    <dt><code>row</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>[]</dt>
+    <dd><p>One entry per action of the query's species, in action order, ≥ 0, summing to 1 (DEC-11).</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

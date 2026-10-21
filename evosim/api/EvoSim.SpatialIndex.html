@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class SpatialIndex | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class SpatialIndex | EvoSim ">
+      
+      <meta name="description" content="Animals by species in a uniform hash grid (20 &#167;3.11, SENSE-32): rebuilt by the sense and act phases, updated as animals move in a sequential act order. Nearest queries search expanding rings and break ties by id (SPACE-07, SPACE-08). The ring bound assumes the world distance is at least the horizontal Euclidean one.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_SpatialIndex.md&amp;value=---%0Auid%3A%20EvoSim.SpatialIndex%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.SpatialIndex">
+
+
+
+  <h1 id="EvoSim_SpatialIndex" data-uid="EvoSim.SpatialIndex" class="text-break">
+Class SpatialIndex  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpatialIndex.cs/#L17"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Runtime.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Animals by species in a uniform hash grid (20 §3.11, SENSE-32): rebuilt by the sense and act phases, updated
+as animals move in a sequential act order. Nearest queries search expanding rings and break ties by id
+(SPACE-07, SPACE-08). The ring bound assumes the world distance is at least the horizontal Euclidean one.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class SpatialIndex</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">SpatialIndex</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="EvoSim_SpatialIndex_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Reach it with <a class="xref" href="EvoSim.World.html#EvoSim_World_Space">Space</a>. Senses and actions usually go through <a class="xref" href="EvoSim.WorldQueries.html">WorldQueries</a>,
+which adds vision, cover and diet checks. A phase that moves animals must call <a class="xref" href="EvoSim.SpatialIndex.html#EvoSim_SpatialIndex_Moved_EvoSim_Animal_">Moved(Animal)</a> after each
+move, or later queries in the same phase see the animal where it was (ACT-31).</p>
+</div>
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="EvoSim_SpatialIndex__ctor_" data-uid="EvoSim.SpatialIndex.#ctor*"></a>
+
+  <h3 id="EvoSim_SpatialIndex__ctor_EvoSim_World_UnityEngine_Rect_" data-uid="EvoSim.SpatialIndex.#ctor(EvoSim.World,UnityEngine.Rect)">
+  SpatialIndex(World, Rect)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpatialIndex.cs/#L30"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Makes an empty index over a rectangle; <a class="xref" href="EvoSim.World.html#EvoSim_World_Space">Space</a> makes the World's.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SpatialIndex(World world, Rect bounds)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>world</code> <a class="xref" href="EvoSim.World.html">World</a></dt>
+    <dd><p>The World whose animals it indexes and whose distance it measures with.</p>
+</dd>
+    <dt><code>bounds</code> <span class="xref">Rect</span></dt>
+    <dd><p>The world rectangle on the horizontal plane (x is world x, y is world z), in meters.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="EvoSim_SpatialIndex_CellSize" data-uid="EvoSim.SpatialIndex.CellSize">
+  CellSize
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpatialIndex.cs/#L20"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The side of a grid cell, in meters.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const float CellSize = 4</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_SpatialIndex_Added_" data-uid="EvoSim.SpatialIndex.Added*"></a>
+
+  <h3 id="EvoSim_SpatialIndex_Added_EvoSim_Animal_" data-uid="EvoSim.SpatialIndex.Added(EvoSim.Animal)">
+  Added(Animal)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpatialIndex.cs/#L57"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>A new animal (born, hatched, newcomer) enters the index.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Added(Animal a)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal; nothing happens when it is gone.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SpatialIndex_Moved_" data-uid="EvoSim.SpatialIndex.Moved*"></a>
+
+  <h3 id="EvoSim_SpatialIndex_Moved_EvoSim_Animal_" data-uid="EvoSim.SpatialIndex.Moved(EvoSim.Animal)">
+  Moved(Animal)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpatialIndex.cs/#L64"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>An animal moved: its cell is updated, so later actors see it where it is (ACT-31).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Moved(Animal a)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal, at its new position.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SpatialIndex_Nearest_" data-uid="EvoSim.SpatialIndex.Nearest*"></a>
+
+  <h3 id="EvoSim_SpatialIndex_Nearest_EvoSim_Animal_UnityEngine_Vector3_System_Single_System_Collections_Generic_IReadOnlyList_EvoSim_Species__System_Func_EvoSim_Animal_EvoSim_Animal_System_Boolean__EvoSim_AnimalHit__" data-uid="EvoSim.SpatialIndex.Nearest(EvoSim.Animal,UnityEngine.Vector3,System.Single,System.Collections.Generic.IReadOnlyList{EvoSim.Species},System.Func{EvoSim.Animal,EvoSim.Animal,System.Boolean},EvoSim.AnimalHit@)">
+  Nearest(Animal, Vector3, float, IReadOnlyList&lt;Species&gt;, Func&lt;Animal, Animal, bool&gt;, out AnimalHit)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpatialIndex.cs/#L85"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The nearest animal of the given species within radius that the filter accepts. The viewer itself,
+killed animals and gone animals are never candidates (SPACE-07, ANIM-41). Ties go to the lower id.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Nearest(Animal viewer, Vector3 p, float radius, IReadOnlyList&lt;Species&gt; among, Func&lt;Animal, Animal, bool&gt; accept, out AnimalHit hit)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>viewer</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that asks: never found itself, and passed to the filter.</p>
+</dd>
+    <dt><code>p</code> <span class="xref">Vector3</span></dt>
+    <dd><p>The point to measure from, usually the viewer's position.</p>
+</dd>
+    <dt><code>radius</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The farthest distance, in meters (world distance, <a class="xref" href="EvoSim.World.html#EvoSim_World_Distance_UnityEngine_Vector3_UnityEngine_Vector3_">Distance(Vector3, Vector3)</a>).</p>
+</dd>
+    <dt><code>among</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="EvoSim.Species.html">Species</a>&gt;</dt>
+    <dd><p>The species to search.</p>
+</dd>
+    <dt><code>accept</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func</a>&lt;<a class="xref" href="EvoSim.Animal.html">Animal</a>, <a class="xref" href="EvoSim.Animal.html">Animal</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd><p>A filter given the candidate and the viewer (visibility, readiness…), or null for none.</p>
+</dd>
+    <dt><code>hit</code> <a class="xref" href="EvoSim.AnimalHit.html">AnimalHit</a></dt>
+    <dd><p>The animal found and its distance; an empty hit when none.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True when an animal was found.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SpatialIndex_Rebuild_" data-uid="EvoSim.SpatialIndex.Rebuild*"></a>
+
+  <h3 id="EvoSim_SpatialIndex_Rebuild" data-uid="EvoSim.SpatialIndex.Rebuild">
+  Rebuild()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpatialIndex.cs/#L37"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Every living animal of every species, placed again (once per sense and act phase).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Rebuild()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SpatialIndex_Within_" data-uid="EvoSim.SpatialIndex.Within*"></a>
+
+  <h3 id="EvoSim_SpatialIndex_Within_UnityEngine_Vector3_System_Single_System_Collections_Generic_IReadOnlyList_EvoSim_Species__System_Collections_Generic_List_EvoSim_Animal__" data-uid="EvoSim.SpatialIndex.Within(UnityEngine.Vector3,System.Single,System.Collections.Generic.IReadOnlyList{EvoSim.Species},System.Collections.Generic.List{EvoSim.Animal})">
+  Within(Vector3, float, IReadOnlyList&lt;Species&gt;, List&lt;Animal&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpatialIndex.cs/#L142"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Every animal of the given species within radius, in no particular order (for counts and tests).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Within(Vector3 p, float radius, IReadOnlyList&lt;Species&gt; among, List&lt;Animal&gt; result)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>p</code> <span class="xref">Vector3</span></dt>
+    <dd><p>The point to measure from.</p>
+</dd>
+    <dt><code>radius</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The farthest distance, in meters.</p>
+</dd>
+    <dt><code>among</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="EvoSim.Species.html">Species</a>&gt;</dt>
+    <dd><p>The species to search.</p>
+</dd>
+    <dt><code>result</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="EvoSim.Animal.html">Animal</a>&gt;</dt>
+    <dd><p>Cleared, then filled with the animals found (gone ones left out; killed ones and any
+viewer included).</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_SpatialIndex_Within_UnityEngine_Vector3_System_Single_System_Collections_Generic_IReadOnlyList_EvoSim_Species__System_Collections_Generic_List_EvoSim_Animal___remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>It checks every animal of those species: use it for counts and tests, not every tick for every animal.</p>
+</div>
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

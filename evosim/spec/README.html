@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Interface — the contract of the evolving-animals system | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Interface — the contract of the evolving-animals system | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/README.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="interface--the-contract-of-the-evolving-animals-system">Interface — the contract of the evolving-animals system</h1>
+
+<p>This folder describes <strong>what the system does</strong>, as a contract that a Unity
+implementation must keep, and then proposes <strong>how to build it in Unity</strong> so that
+students can read it and extend it.</p>
+<p>The behaviour comes from the Python prototype (<code>prototype/promptevo</code>, state of
+commit <code>1324b43</code>, 2026-10-09). The contract records that behaviour as a set of
+<strong>rules and reference modules</strong>, not as the prototype's code: no Python class,
+function or file layout is part of the contract. Python numbers appear as
+<strong>reference values</strong> (the defaults a Unity scene starts from), and exact
+numeric agreement with Python is <strong>not</strong> required.</p>
+<p>The Unity system differs from the prototype on purpose in a few places, decided
+with the course owner in two rounds on 2026-10-09 (tables below): space is
+continuous, everything is a replaceable component, any number of species eat
+each other through a food web, genes can be sentences or numbers, and hiding in
+cover is its own behaviour.</p>
+<h2 id="contents">Contents</h2>
+<h3 id="part-a--the-contract-what-must-hold">Part A — the contract (what must hold)</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Document</th>
+<th>Covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>01</td>
+<td><a href="01-concepts-and-glossary.html">Concepts and glossary</a></td>
+<td>the loop, every term used in the other documents</td>
+</tr>
+<tr>
+<td>02</td>
+<td><a href="02-space-and-time.html">Space and time</a></td>
+<td>continuous positions, terrain, walkability, distances, ticks, waiting for the brain</td>
+</tr>
+<tr>
+<td>03</td>
+<td><a href="03-environment.html">Environment</a></td>
+<td>resource layers (food), regrowth, cover, carcasses and other entities</td>
+</tr>
+<tr>
+<td>04</td>
+<td><a href="04-species-and-food-web.html">Species and the food web</a></td>
+<td>species, who eats whom, threats, names, species created at run time</td>
+</tr>
+<tr>
+<td>05</td>
+<td><a href="05-animals-stats-and-life-cycle.html">Animals, stats and life cycle</a></td>
+<td>animal state, stats (energy, stamina, …), traits, metabolism, busy states, death</td>
+</tr>
+<tr>
+<td>06</td>
+<td><a href="06-senses-and-observations.html">Senses and observations</a></td>
+<td>discrete observations, distance bands, situation text, batched raycasts, camera senses</td>
+</tr>
+<tr>
+<td>07</td>
+<td><a href="07-actions-and-locomotion.html">Actions and locomotion</a></td>
+<td>actions, search fallback, movement, stamina budget, interactions, act order</td>
+</tr>
+<tr>
+<td>08</td>
+<td><a href="08-decisions-brains-and-prompts.html">Decisions, brains and prompts</a></td>
+<td>when animals decide, the brain interface, the prompt, sampling, memo, cache, failures, reference brains</td>
+</tr>
+<tr>
+<td>09</td>
+<td><a href="09-genes-alleles-and-genomes.html">Genes, alleles and genomes</a></td>
+<td>text and number genes, expression, alleles, registry, founder pools, crossover</td>
+</tr>
+<tr>
+<td>10</td>
+<td><a href="10-mutation.html">Mutation</a></td>
+<td>rates, operators (LLM instruction deck, numeric rules), guards, redraws, asynchronous mutation</td>
+</tr>
+<tr>
+<td>11</td>
+<td><a href="11-reproduction-and-population.html">Reproduction and population</a></td>
+<td>mating, litters, eggs and incubation, caps, migration, floors, newcomers</td>
+</tr>
+<tr>
+<td>12</td>
+<td><a href="12-tick-order-and-determinism.html">Tick order and determinism</a></td>
+<td>the phase list, act order policies, random streams, event hash, replay</td>
+</tr>
+<tr>
+<td>13</td>
+<td><a href="13-outputs-and-recording.html">Outputs and recording</a></td>
+<td>events, stats, alleles, summary, run info</td>
+</tr>
+<tr>
+<td>14</td>
+<td><a href="14-configuration-reference.html">Configuration reference</a></td>
+<td>every parameter with its reference value and unit</td>
+</tr>
+<tr>
+<td>15</td>
+<td><a href="15-controls-metrics-and-gates.html">Controls, metrics and gates</a></td>
+<td>experimental controls, sensitivity metrics, gates G1–G5</td>
+</tr>
+</tbody>
+</table>
+<h3 id="part-b--the-proposed-unity-implementation">Part B — the proposed Unity implementation</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Document</th>
+<th>Covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>20</td>
+<td><a href="20-unity-architecture.html">Unity architecture</a></td>
+<td>the GameObject tree, base classes, data layout, the tick loop, services, assemblies, Unity 6000.3 notes</td>
+</tr>
+<tr>
+<td>21</td>
+<td><a href="21-editor-tooling.html">Editor tooling</a></td>
+<td>validation, inspectors, windows, gizmos, run controls</td>
+</tr>
+<tr>
+<td>22</td>
+<td><a href="22-extending-recipes.html">Extending: recipes for students</a></td>
+<td>add a sense, an action, a gene, a stat, a brain, a mutation, a phase, a resource, a species</td>
+</tr>
+</tbody>
+</table>
+<h3 id="part-c--verification">Part C — verification</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Document</th>
+<th>Covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>30</td>
+<td><a href="30-tests.html">Tests</a></td>
+<td>unit, regression and integration tests for every system, mapped to rule IDs</td>
+</tr>
+<tr>
+<td>31</td>
+<td><a href="31-scenarios.html">Scenarios</a></td>
+<td>test worlds with different options, genes, mutations, senses and actions</td>
+</tr>
+<tr>
+<td>32</td>
+<td><a href="32-integrity-prompts-and-ci.html">Integrity prompts and CI</a></td>
+<td>brain integrity checks, prompts for coding agents, the CI tiers (with real LLMs)</td>
+</tr>
+<tr>
+<td>40</td>
+<td><a href="40-open-questions.html">Open questions</a></td>
+<td>blind spots and decisions still to take</td>
+</tr>
+</tbody>
+</table>
+<p>A prompt for Claude Design turns this folder into an illustrated architecture
+brief (UML, design patterns, worked custom setups):
+<a href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/prompts/05-claude-design-architecture-brief.md"><code>Docs/prompts/05-claude-design-architecture-brief.md</code></a>.
+A prompt for Claude Code implements the whole system in Unity from this folder,
+milestone by milestone:
+<a href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/prompts/06-implement-unity-system.md"><code>Docs/prompts/06-implement-unity-system.md</code></a>.</p>
+<h2 id="how-to-read-the-rules">How to read the rules</h2>
+<p>Each contract document lists numbered rules:</p>
+<blockquote>
+<p><strong>SENSE-01 (MUST)</strong> A sense reads one animal and the world and returns one
+token from a finite list declared before the run.</p>
+</blockquote>
+<ul>
+<li><strong>MUST</strong>: every implementation keeps it; a test checks it.</li>
+<li><strong>SHOULD</strong>: the reference implementation keeps it; another implementation
+may deviate if it says so in its own documentation.</li>
+<li><strong>MAY</strong>: allowed, optional.</li>
+<li><strong>Reference</strong>: the behaviour or value of the reference modules (the Lab 1
+ecology). It is a default, not an obligation.</li>
+</ul>
+<p>Rule ID prefixes:</p>
+<table>
+<thead>
+<tr>
+<th>Prefix</th>
+<th>Document</th>
+<th></th>
+<th>Prefix</th>
+<th>Document</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CORE</code></td>
+<td>01</td>
+<td></td>
+<td><code>GENE</code></td>
+<td>09</td>
+</tr>
+<tr>
+<td><code>SPACE</code></td>
+<td>02</td>
+<td></td>
+<td><code>MUT</code></td>
+<td>10</td>
+</tr>
+<tr>
+<td><code>ENV</code></td>
+<td>03</td>
+<td></td>
+<td><code>REPRO</code>, <code>POP</code></td>
+<td>11</td>
+</tr>
+<tr>
+<td><code>SPEC</code></td>
+<td>04</td>
+<td></td>
+<td><code>TICK</code>, <code>RAND</code></td>
+<td>12</td>
+</tr>
+<tr>
+<td><code>ANIM</code></td>
+<td>05</td>
+<td></td>
+<td><code>OUT</code></td>
+<td>13</td>
+</tr>
+<tr>
+<td><code>SENSE</code></td>
+<td>06</td>
+<td></td>
+<td><code>CFG</code></td>
+<td>14</td>
+</tr>
+<tr>
+<td><code>ACT</code>, <code>MOVE</code></td>
+<td>07</td>
+<td></td>
+<td><code>CTRL</code></td>
+<td>15</td>
+</tr>
+<tr>
+<td><code>DEC</code>, <code>PROMPT</code></td>
+<td>08</td>
+<td></td>
+<td><code>ARCH</code>, <code>EDIT</code></td>
+<td>20, 21</td>
+</tr>
+</tbody>
+</table>
+<p>Every test in <a href="30-tests.html">30</a> names the rules it covers, and every MUST rule
+has at least one test.</p>
+<h2 id="units">Units</h2>
+<table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Unit</th>
+<th>Python prototype</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Distance</td>
+<td>meter (m), measured on the horizontal plane</td>
+<td>one grid cell</td>
+</tr>
+<tr>
+<td>Time</td>
+<td>tick (one simulation step)</td>
+<td>one tick</td>
+</tr>
+<tr>
+<td>Speed</td>
+<td>meters per tick</td>
+<td>cells per tick</td>
+</tr>
+<tr>
+<td>Energy, stamina</td>
+<td>points; stamina = meters an animal can move before it must stop</td>
+<td>points; cells</td>
+</tr>
+</tbody>
+</table>
+<p>The reference values convert one cell to one meter and are otherwise <strong>kept
+exactly as in the prototype</strong> (owner decision). Distances in Python are
+Chebyshev (a diagonal step counts as 1); here they are Euclidean and movement
+goes in straight lines, so a vision disc of 20 m covers about 75 % of the area
+of Python's 20-cell square. The first accepted Unity runs become the new
+reference numbers (<a href="30-tests.html">30</a>, R-02). Texts the brain reads say
+&quot;meters&quot;.</p>
+<h2 id="decisions-taken-with-the-course-owner-2026-10-09-first-round">Decisions taken with the course owner (2026-10-09, first round)</h2>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Space</td>
+<td><strong>Continuous</strong>: float positions changed by direction and speed vectors, on a Unity Terrain with a heightmap and vegetation. Grids exist only inside layers (food cells, cover cells, spatial index). No 8-neighbour moves.</td>
+</tr>
+<tr>
+<td>Movement</td>
+<td>Replaceable: flat ground, terrain-aware, or a NavMesh baked on the terrain.</td>
+</tr>
+<tr>
+<td>Genes</td>
+<td>An interface. A gene can be a <strong>sentence</strong> that goes into the brain's prompt or a <strong>number</strong> that changes a trait directly (e.g. a stamina gene). Any number of genes.</td>
+</tr>
+<tr>
+<td>Extensibility</td>
+<td>Energy, stamina, levels, distance bands, litter sizes, mutation rules (LLM prompts or manual rules), senses and actions are all modules a student adds by subclassing a base class and placing the component in a species' hierarchy.</td>
+</tr>
+<tr>
+<td>Python parity</td>
+<td>Not required. Behaviour matters; Python values are reference defaults.</td>
+</tr>
+<tr>
+<td>Waiting for the brain</td>
+<td>Lockstep: the simulation waits for the answers (a decision is never made on old observations). Freezing <code>FixedUpdate</code> during a batch is acceptable; <a href="02-space-and-time.html">02</a> and <a href="20-unity-architecture.html">20</a> add a wait mode that keeps the editor responsive with identical results.</td>
+</tr>
+<tr>
+<td>Animals</td>
+<td><strong>Data</strong>, processed in batches by systems. GameObjects are only their visible bodies.</td>
+</tr>
+<tr>
+<td>Nesting</td>
+<td>A species nested inside another species is an editor error.</td>
+</tr>
+<tr>
+<td>Species</td>
+<td>Not hard-coded. Any species may eat any species, its own included; genes and observations may name species (&quot;Run from any wolf you see.&quot;); five or six species, or species created at run time.</td>
+</tr>
+<tr>
+<td>Act order</td>
+<td>Configurable: species in turn (as in Python) or all animals of all species mixed in one random order.</td>
+</tr>
+<tr>
+<td>Mutation</td>
+<td>A system of its own. It may be asynchronous: a mating lays eggs that hatch a few ticks later, when the mutator's answer is back.</td>
+</tr>
+<tr>
+<td>Species class</td>
+<td>One class, which may be subclassed; composition with components is the main way.</td>
+</tr>
+<tr>
+<td>World</td>
+<td>Holds an ordered list of tick phase components, each replaceable.</td>
+</tr>
+<tr>
+<td>Environment</td>
+<td>Food, cover, carcasses, walkability, caps and floors and the brain service are components that can be replaced or removed. Carcasses may move. Cover is optional and replaceable. Hiding in cover is an action of its own, separate from fleeing, with its own sense and gene.</td>
+</tr>
+<tr>
+<td>Raycasts</td>
+<td>Allowed inside a tick phase, batched.</td>
+</tr>
+<tr>
+<td>CI</td>
+<td>May include real LLM calls; duration is not a concern.</td>
+</tr>
+<tr>
+<td>Unity</td>
+<td>6000.3, to be upgraded soon: version-specific code stays isolated.</td>
+</tr>
+<tr>
+<td>Defaults</td>
+<td>One text gene per action (free genes allowed), prompts generated from components (frozen text optional), log files in Python's formats, Python's phase order as the default, reference brains = random, keyword, Ollama points, JEV choice; owner-rejected options documented as off; Newtonsoft JSON and the Unity Test Framework; numbered rules; contract pinned to <code>1324b43</code>.</td>
+</tr>
+<tr>
+<td>Integrity prompts</td>
+<td>Both: checks that the brain reads genes, and prompts for coding agents that audit an implementation; used in CI and by hand.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="decisions-second-round-2026-10-09">Decisions, second round (2026-10-09)</h2>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Space and distance</td>
+<td>Continuous, Euclidean distance, straight-line movement.</td>
+</tr>
+<tr>
+<td>Speed</td>
+<td>Set per species (walking and running speeds of the species' locomotion component).</td>
+</tr>
+<tr>
+<td>Reference values</td>
+<td>Exactly the prototype's (one cell = one meter); no number genes in the reference species.</td>
+</tr>
+<tr>
+<td>Units in texts</td>
+<td>&quot;meters&quot;.</td>
+</tr>
+<tr>
+<td>Prompts</td>
+<td>The answer instruction is hard-coded in each brain, as in the prototype. Everything else (header, the line explaining each action, rule lines) is set in the inspector.</td>
+</tr>
+<tr>
+<td>Observations</td>
+<td>Their wording is written in each sense's code; labels and thresholds in the inspector. Distance only for now; angles later.</td>
+</tr>
+<tr>
+<td>Act order</td>
+<td>Species in turn by default. Simultaneous order: contested items go to a random winner.</td>
+</tr>
+<tr>
+<td>Breeding</td>
+<td>In its own phase, after the act phase.</td>
+</tr>
+<tr>
+<td>Eggs</td>
+<td>No incubation by default; a few ticks of incubation can hide the mutator's latency.</td>
+</tr>
+<tr>
+<td>Species names</td>
+<td><code>prey</code> and <code>predator</code>.</td>
+</tr>
+<tr>
+<td>Speciation</td>
+<td>None; later. Adding species at run time stays possible.</td>
+</tr>
+<tr>
+<td>Cannibals</td>
+<td>Flee from their own kind. Knowing whether a cannibal is following you is a sense a student can write.</td>
+</tr>
+<tr>
+<td>Hide and flee</td>
+<td>Separate actions, separate genes, separate senses (cover).</td>
+</tr>
+<tr>
+<td>Gates</td>
+<td>G2 stays even though current models fail it.</td>
+</tr>
+<tr>
+<td>Neutral gene, founder pools, caps</td>
+<td>Configured on their components (the gene, the cap rule…).</td>
+</tr>
+<tr>
+<td>Teaching path</td>
+<td>The reference modules are written exactly like student modules. Students first reimplement existing components against their tests, then invent their own.</td>
+</tr>
+<tr>
+<td>Real time</td>
+<td>Not by default; maybe later.</td>
+</tr>
+<tr>
+<td>Movement</td>
+<td>Kinematic by default (no rigid bodies, no physics). An action only gives a direction; the species' locomotion component decides the actual movement, and whatever it does is the tick's result. Locomotion is a component that can be inherited: slopes, terrain costs, NavMesh, physics come later as subclasses.</td>
+</tr>
+<tr>
+<td>Camera senses</td>
+<td>Later.</td>
+</tr>
+<tr>
+<td>Determinism</td>
+<td>Per machine only; results are never compared across machines.</td>
+</tr>
+<tr>
+<td>Answer cache</td>
+<td>A local JSON file for now.</td>
+</tr>
+<tr>
+<td>Python golden fixtures</td>
+<td>Dropped.</td>
+</tr>
+<tr>
+<td>Scale</td>
+<td>Not needed now; the architecture keeps the path open.</td>
+</tr>
+<tr>
+<td>Unity</td>
+<td>The owner upgrades the project to 6000.3 before work starts.</td>
+</tr>
+<tr>
+<td>CI hardware</td>
+<td>The owner's machine (the one that ran the prototype) as a self-hosted runner.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="decisions-third-round-2026-10-10">Decisions, third round (2026-10-10)</h2>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Where it runs</td>
+<td>All local on the owner's computer for now: JEV and the mutator served there; the default brain is JEV.</td>
+</tr>
+<tr>
+<td>Keyword brain</td>
+<td>Not included in the Unity system. It stays documented as the prototype's brain and as a possible student exercise. Fast tests use the random brain and a test-only scripted brain.</td>
+</tr>
+<tr>
+<td>Edibility</td>
+<td>Anything can be eaten or not, decided by components: the eaten thing carries an <strong>edible</strong> component (how it is eaten, how much energy it holds), the eater's <strong>diet</strong> component lists what it eats. Eggs have no edible component, so they can't be eaten until a student adds one. Everything stays modifiable.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="status">Status</h2>
+<p>Written 2026-10-09, revised the same day after the second round of decisions.
+Nothing in Unity exists yet; the project moves to Unity 6000.3 first. The
+Python prototype keeps evolving; when it changes behaviour, update the matching
+rule and its reference value, and note the commit.</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

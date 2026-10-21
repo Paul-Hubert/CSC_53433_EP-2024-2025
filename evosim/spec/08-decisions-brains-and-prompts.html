@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>08 — Decisions, brains and prompts | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="08 — Decisions, brains and prompts | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/08-decisions-brains-and-prompts.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="08--decisions-brains-and-prompts">08 — Decisions, brains and prompts</h1>
+
+<h2 id="1-when-animals-decide">1. When animals decide</h2>
+<ul>
+<li><strong>DEC-01 (MUST)</strong> Every <code>decisionPeriod</code> ticks (reference 4) every living animal
+that is not busy decides: all together on ticks 0, 4, 8, …, or each on its own
+ticks when decisions are staggered (DEC-04, the reference). On the other ticks only animals
+without an action decide: babies just born or hatched, newcomers, and animals
+whose busy state ended on the previous tick.</li>
+<li><strong>DEC-02 (MUST)</strong> A busy animal never decides (ANIM-30).</li>
+<li><strong>DEC-03 (MUST)</strong> At a decision the animal's <em>searching</em> and <em>bred this
+period</em> flags are cleared.</li>
+<li><strong>DEC-04 (MAY)</strong> A species may have its own decision period, and decisions may
+be staggered (an animal decides when <code>(tick + id) % period == 0</code>) to spread the
+brain's load. Both change behaviour. The reference staggers: every species of the
+reference scenes has a staggered schedule (owner 2026-10-10: under JEV a run is
+about 13 % faster and never stalls ~10 s every fourth tick); its own period is off.
+A world without a schedule decides all together, as the Python prototype does.</li>
+</ul>
+<h2 id="2-queries-and-the-brain-interface">2. Queries and the brain interface</h2>
+<ul>
+<li><strong>DEC-10 (MUST)</strong> Each deciding animal produces one <strong>query</strong>: its species, the
+genes its brain reads (text genes as sentences, in locus order, with their
+labels), its observation, its situation text in the brain's style, and any
+attachments (SENSE-40).</li>
+<li><strong>DEC-11 (MUST)</strong> A brain answers a batch of queries with one probability vector
+per query: one entry per action of the query's species, in the species' action
+order, every entry ≥ 0, summing to 1 (± 1e-6). Answers come back in the order
+of the queries.</li>
+<li><strong>DEC-12 (MUST)</strong> A brain is deterministic given its caches and seeds: the same
+query always gives the same vector (LLMs answer at temperature 0 with a fixed
+seed, or from the cache).</li>
+<li><strong>DEC-13 (MUST)</strong> Each species is decided by one brain, chosen per species with
+a world default. Different species MAY use different brains in one world. A
+brain that cannot mix species in one batch receives one batch per species.</li>
+<li><strong>DEC-14 (MUST)</strong> A brain states its limits (maximum actions, maximum prompt
+length, attachments supported) and every species using it is checked against
+them before the run.</li>
+<li><strong>DEC-15 (SHOULD)</strong> All queries of a tick that go to one brain are sent as one
+batch (one request where the server accepts a list), after the memo removed
+the ones already answered.</li>
+</ul>
+<h2 id="3-drawing-the-action">3. Drawing the action</h2>
+<ul>
+<li><strong>DEC-20 (MUST)</strong> The action is drawn from the vector with the sampling stream.
+With a sampling temperature τ ≠ 1 the vector is first replaced by p^(1/τ),
+renormalised (τ &lt; 1 sharpens, τ &gt; 1 flattens). Reference τ = 1.
+When the drawn action is an overlay (ACT-07), a second draw from the same stream
+picks the carrier from the same tempered vector with every overlay set to 0,
+renormalised; with nothing left, no second draw and no carrier. A species without
+overlays draws exactly once per decision.</li>
+<li><strong>DEC-21 (SHOULD)</strong> The animal keeps its last observation, situation text and
+vector, for the inspector and the logs.</li>
+</ul>
+<h2 id="4-memo-and-answer-cache">4. Memo and answer cache</h2>
+<ul>
+<li><strong>DEC-30 (MUST)</strong> Within a run the answer for a key <em>(species, brain, brain-visible
+genome key, observation)</em> is computed once and reused. A memo hit gives
+exactly what the brain would have answered.</li>
+<li><strong>DEC-31 (MUST)</strong> The brain-visible genome key is a hash of the species id and
+the alleles the brain reads (text genes, in locus order). Number genes the
+brain doesn't read are not part of it, so they don't defeat the memo.</li>
+<li><strong>DEC-32 (MUST)</strong> Within one batch, queries with the same key are sent once.</li>
+<li><strong>DEC-33 (SHOULD)</strong> A persistent <strong>answer cache</strong> stores answers across runs,
+keyed by everything that can change an answer: the brain and its model
+(name and digest or pinned revision), the prompt id (a hash of the template),
+the brain mode, the text style, the genome key and the situation text. A run
+repeated with the same seed replays from the cache without model calls.</li>
+<li><strong>DEC-34 (MUST)</strong> A failed answer is never stored in the memo or the cache.</li>
+</ul>
+<p><strong>Reference.</strong> The memo answers 52–80 % of prey decisions and 46–78 % of predator
+decisions in the reference runs.</p>
+<h2 id="5-failures">5. Failures</h2>
+<ul>
+<li><strong>DEC-40 (MUST)</strong> In <strong>strict</strong> mode (reference for LLM brains in long runs) a
+brain call that still fails after its retries stops the run cleanly: every
+output is written and the run can be resumed. In non-strict mode the
+decision gets a uniform vector, is counted as a failure and is not cached.</li>
+<li><strong>DEC-41 (MUST)</strong> Malformed answers are repaired by documented rules or
+rejected as failures. Reference (points answers): negative points count as 0,
+every action gets +0.01, then the vector is normalised; an all-zero answer
+therefore becomes uniform.</li>
+<li><strong>DEC-42 (SHOULD)</strong> Client retries back off (reference: 3 tries, waits of 1, 2,
+4 s) and time out (reference: 60–120 s).</li>
+</ul>
+<h2 id="6-reference-brains">6. Reference brains</h2>
+<h3 id="random">Random</h3>
+<p>Uniform over the species' actions. The null model: random hunters can't sustain
+themselves, which shows the brain matters.</p>
+<h3 id="keyword-brain-prototype-only-not-in-the-unity-system">Keyword brain (prototype only, not in the Unity system)</h3>
+<p>The Unity system doesn't include this brain (owner decision). It is recorded
+here because the prototype's reference numbers came from it, and because writing
+a rule-based brain is a good student exercise (<a href="22-extending-recipes.html#7-a-brain">22 §7</a>).</p>
+<p>A transparent &quot;ideal interpreter&quot;: default scores from the situation plus a push
+from each gene's keywords. No model, fast; in the prototype, the brain for
+laptops without a GPU and for CI. Logits = defaults + gene weights;
+probabilities = softmax(logits / T), T = 1.</p>
+<p><strong>Default scores (prey).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>eat</td>
+<td>no food in sight: 1.5 (searching); else here 3.0, adjacent 2.5, close 2.0, medium 1.5, far 1.0, plus an energy push: low +1.5, medium +0.5, high −1.0</td>
+</tr>
+<tr>
+<td>flee</td>
+<td>threat adjacent 3.5, close 3.0, medium 1.0, far 0.0, none −3.0</td>
+</tr>
+<tr>
+<td>follow</td>
+<td>kin adjacent −0.5, close −0.5, medium 0.3, far 0.3, none −2.5</td>
+</tr>
+<tr>
+<td>rest</td>
+<td>−0.5; +0.5 if energy high and the threat is none or far; plus a catch-breath push by stamina: low +2.0, medium +0.3, high 0</td>
+</tr>
+<tr>
+<td>mate</td>
+<td>if the kin is ready, the animal is adult and its energy isn't low: kin adjacent 2.5, close 2.5, medium 1.5, far 1.0; else −3.0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Default scores (predator).</strong> hunt: by the nearer of prey and carcass, adjacent
+3.5, close 3.0, medium 2.0, far 1.0, none 1.5 (searching), plus the energy push;
+follow: as the prey; rest: −0.5, +1.0 if energy high, plus the catch-breath push;
+mate: as the prey.</p>
+<p><strong>Gene weight</strong> of the gene of action <em>a</em> (text lower-cased):</p>
+<ol>
+<li>Intensity, first match wins: <em>never, do not, don't, avoid, refuse</em> −2.5;
+<em>rarely, seldom, hardly</em> −1.2; <em>always, whatever happens, at all costs</em> +2.5;
+<em>whenever, often, usually, eagerly, quickly</em> +1.2; <em>sometimes, occasionally,
+maybe</em> +0.3. With no intensity word, a word of the action itself (eat: <em>eat,
+food, feed, graze, forage</em>; flee: <em>flee, run, escape, hide, danger, predator</em>;
+follow: <em>follow, stay close, group, companion, herd, pack</em>; rest: <em>rest, sleep,
+stay still, wait, save energy, stop, catch your breath, recover</em>; mate: <em>mate,
+partner, breed, offspring</em>; hunt: <em>hunt, chase, attack, kill, prey, strike,
+pounce, stalk, carcass, carrion, scavenge, leftovers</em>) gives +0.8. Otherwise 0
+and the gene has no effect.</li>
+<li>Conditions: if the sentence (before any &quot;unless&quot;) names conditions (words
+declared by the senses, SENSE-50: <em>hungry</em>, <em>well fed</em>, <em>tired</em>, <em>predator</em>,
+<em>very close</em>, <em>food is close</em>, <em>food is far</em>, <em>alone</em>, <em>safe</em>, <em>old</em>,
+<em>plentiful</em>, <em>carcass</em>, <em>prey is close</em>, <em>no prey</em>) and none holds, the
+weight is × 0.2.</li>
+<li>&quot;unless X&quot;: if a condition in X holds, the weight becomes −0.5 × itself.</li>
+</ol>
+<p>Known weakness kept on purpose for students to find: some patterns lack word
+boundaries (&quot;strong&quot; matches &quot;strongest&quot;).</p>
+<h3 id="llm-points-mode-ollama">LLM, points mode (Ollama)</h3>
+<p>One chat call per distinct query. The prompt (§7) ends with: <em>Distribute 100
+points across the actions according to how likely this animal is to choose
+each.</em> The answer is constrained by a JSON schema (one integer 0–100 per action,
+all required). Options: temperature 0, a fixed seed, a fixed context length
+(4 096; without it the server reloads the model), thinking off. Points become
+probabilities by DEC-41. Measured: about 4 decisions per second on a 16 GB GPU
+(gemma4:12b); 73 % of answers add up to exactly 100.</p>
+<h3 id="jev-choice-a-distilled-decision-model-on-vllm">JEV choice (a distilled decision model on vLLM)</h3>
+<p>One forward pass per distinct query, no text generated. The request text:</p>
+<pre><code class="lang-text">[kind] choice
+[state] &lt;the species prompt with genes and situation, without the answer instruction&gt;
+[question] Which action does this animal take now?
+[options]
+A) eat
+B) flee
+...
+[decision]:
+</code></pre>
+<p>The completion request asks for one token restricted to the option letters, with
+their log-probabilities. Each option's logit is its log-probability plus a
+per-slot bias from the model's decision head; probabilities are
+softmax(logits / T), with T from the model's calibration file (both pinned to a
+model revision). At most 16 options (A–P). The model was trained on inputs up
+to 1 024 tokens; longer inputs are counted, not cut. Options are always listed in
+the species' action order: the model changes 11.5 % of its answers when only the
+order changes. Measured: about 12 decisions per second.</p>
+<h2 id="7-the-prompt">7. The prompt</h2>
+<ul>
+<li><strong>PROMPT-01 (MUST)</strong> An LLM prompt is assembled from, in order: a header (what
+is being decided, in what world); the action list, one line per action from
+the action's description, in action order; rule lines contributed by modules
+(the search rule, speeds, stamina, breeding, carcasses, cover); the genes
+block; the situation; the brain's answer instruction.</li>
+<li><strong>PROMPT-02 (MUST)</strong> The genes block has one line per text gene, in locus order:
+<code>- &lt;label&gt;: &quot;&lt;sentence&gt;&quot;</code>, the label being the action name for action genes.</li>
+<li><strong>PROMPT-03 (MUST)</strong> Numbers in rule lines come from the configuration
+(placeholders filled from the modules' settings), so the prompt never
+contradicts the world. The prototype's prompts hard-code them.
+A species with overlay actions (ACT-07) gets one engine rule line, first of the
+rules: <code>Some actions are done in passing (alarm): the animal also does its next most likely choice.</code></li>
+<li><strong>PROMPT-04 (MAY)</strong> A species may use a <strong>frozen</strong> prompt text with the
+placeholders <code>{genes}</code>, <code>{situation}</code> and <code>{ask}</code> instead of the assembled one,
+for example the prototype's prompts below.</li>
+<li><strong>PROMPT-05 (MUST)</strong> The prompt id (a hash of the template or of the assembled
+text with placeholders) is part of the cache key.</li>
+<li><strong>PROMPT-06 (MUST)</strong> The editor shows the full prompt for a chosen animal or
+situation, with an estimate of its token count, checked against the brain's
+limit.</li>
+<li><strong>PROMPT-07 (MUST)</strong> Every part except the answer instruction is a text field
+in the inspector: the species' header, each action's line, each module's rule
+lines (owner decision). The answer instruction (&quot;Distribute 100 points…&quot;) is
+hard-coded in each brain, as in the prototype, because the brain's parsing
+depends on it.</li>
+</ul>
+<p><strong>Reference: the prototype's prey prompt</strong> (<code>teacher_v5</code>):</p>
+<pre><code class="lang-text">You decide what a wild animal does next in a simple grid world.
+
+Actions:
+- eat: go to the nearest visible food and eat it
+- flee: run away from the nearest predator
+- follow: move toward the nearest other animal
+- rest: stay still to catch your breath and save energy
+- mate: walk to the nearest ready partner in sight and breed with it
+If the chosen action has nothing to act on in sight (no food, predator, animal or
+ready partner), the animal searches the surroundings instead.
+Animals move one cell per step. Predators run two cells per step when they
+hunt, but they have half an animal's stamina, so a long chase tires them first.
+Every cell moved costs stamina. Standing still brings it back, which costs some
+energy until stamina is full. Without stamina an animal cannot move.
+Breeding needs only one of the two to choose mate: an adult that chooses mate
+breeds as soon as it reaches a ready partner, whatever the partner is doing.
+
+This animal's instincts (its genes). They define its personality: follow them
+even when they seem unwise. Instincts that are meaningless have no effect.
+{genes}
+
+Situation: {situation}
+
+{ask}
+</code></pre>
+<p><strong>Reference: the prototype's predator prompt</strong> (<code>predator_v3</code>):</p>
+<pre><code class="lang-text">You decide what a predator does next in a simple grid world.
+
+Actions:
+- hunt: chase the nearest visible prey animal or carcass; next to a prey animal,
+  try to kill and eat it; next to a carcass, eat from it
+- follow: move toward the nearest other predator
+- rest: stay still to catch your breath and save energy
+- mate: walk to the nearest ready partner (another predator) in sight and breed with it
+If the chosen action has nothing to act on in sight (no prey, carcass, other
+predator or ready partner), the predator searches the surroundings instead.
+Predators run two cells per step when they hunt and walk one cell otherwise.
+Prey animals move one cell per step but have twice a predator's stamina.
+Every cell moved costs stamina. Standing still brings it back, which costs some
+energy until stamina is full. Without stamina a predator cannot move.
+A kill leaves a carcass that up to two other predators can eat from.
+Breeding needs only one of the two to choose mate: an adult that chooses mate
+breeds as soon as it reaches a ready partner, whatever the partner is doing.
+
+This predator's instincts (its genes). They define its personality: follow them
+even when they seem unwise. Instincts that are meaningless have no effect.
+{genes}
+
+Situation: {situation}
+
+{ask}
+</code></pre>
+<p><strong>Reference: the Unity default prey prompt</strong>, as the inspector fields assemble
+it for a founder in one situation. Numbers come from placeholders such as
+<code>{predator.Locomotion.runSpeed}</code>; the last line is the points brain's hard-coded
+answer instruction.</p>
+<pre><code class="lang-text">You decide what a wild animal does next in a simple world.
+
+Actions:
+- eat: go to the nearest visible food and eat it
+- flee: run away from the nearest predator
+- hide: go to the nearest cover and stay in it; predators can't see or catch an animal in cover
+- follow: move toward the nearest other animal
+- rest: stay still to catch your breath and save energy
+- mate: walk to the nearest ready partner in sight and breed with it
+If the chosen action has nothing to act on in sight (no food, predator, cover,
+animal or ready partner), the animal searches the surroundings instead.
+Animals move 1 meter per step. Predators run 2 meters per step when they hunt,
+but they have 30 stamina against an animal's 60, so a long chase tires them first.
+Every meter moved costs stamina. Standing still brings it back, which costs some
+energy until stamina is full. Without stamina an animal cannot move.
+Breeding needs only one of the two to choose mate: an adult that chooses mate
+breeds as soon as it reaches a ready partner, whatever the partner is doing.
+
+This animal's instincts (its genes). They define its personality: follow them
+even when they seem unwise. Instincts that are meaningless have no effect.
+- eat: &quot;Eat whenever food is close.&quot;
+- flee: &quot;Run from any predator you see.&quot;
+- hide: &quot;Hide when a predator is close.&quot;
+- follow: &quot;Stay close to other animals.&quot;
+- rest: &quot;Rest when you are tired.&quot;
+- mate: &quot;Look for a partner when energy is high.&quot;
+
+Situation: Energy: low. Stamina: high. Food: 1-4 meters away. Predator: 4-10 meters away. Cover: 1-4 meters away. Animal: none within 20 meters. Age: adult.
+
+Distribute 100 points across the actions according to how likely this animal is to choose each.
+</code></pre>
+<p>Where each part comes from: the header from the species; the action lines from
+the actions; &quot;If the chosen action has nothing to act on…&quot; from the search rule;
+the speed lines from the locomotion components; the stamina lines from the
+stamina stat; the breeding lines from the mating rule; the carcass line (in the
+predator's prompt) from the carcass system; the instincts paragraph and the
+genes from the genes block; the situation from the senses; the last line from
+the brain.</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

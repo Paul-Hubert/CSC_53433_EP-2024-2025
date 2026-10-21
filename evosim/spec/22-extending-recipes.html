@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>22 — Extending: recipes for students | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="22 — Extending: recipes for students | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/22-extending-recipes.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="22--extending-recipes-for-students">22 — Extending: recipes for students</h1>
+
+<div class="NOTE">
+<h5>Note</h5>
+<p>These recipes were written before the code. Their sketches show the ideas, but some names and signatures differ from the code as it is now. Code that compiles is in the samples (<code>Assets/EvoSim/Samples</code>, <a href="../extending/samples.html">The samples</a>) and on the <a href="../extending/index.html">Extending</a> pages.</p>
+</div>
+<p>Every extension is one class deriving from one base class, placed as a
+component in the right part of the tree. Each recipe ends with a checklist: what
+the validator expects (<a href="21-editor-tooling.html">21</a>) and which test to copy from
+the templates (<a href="30-tests.html">30</a>).</p>
+<p>The running example: <strong>water and thirst</strong>. The terrain lab adds lakes; animals
+get thirsty, sense water, can choose to drink, and a gene says when.</p>
+<h2 id="0-the-teaching-path">0. The teaching path</h2>
+<p>The reference modules are written exactly like student modules (ARCH-11), so
+the course can go in two steps (owner decision):</p>
+<ol>
+<li><strong>Reimplement what exists.</strong> A reference module is replaced by an empty class
+of the same base class (<code>EvoSim ▸ Exercises ▸ Replace with stub</code>); its unit
+tests and the conformance suite of its kind (<a href="30-tests.html">30</a>) grade the
+student's version, and the world runs with it. A natural order, from the
+smallest to the largest: <code>RestAction</code>, <code>LevelSense</code>, <code>Starvation</code>, <code>EatAction</code>,
+<code>NearestAnimalSense</code>, <code>FleeAction</code>, <code>HideAction</code>, <code>Stamina</code>, <code>Litter</code>,
+<code>UniformCrossover</code>, <code>KinematicLocomotion</code>, <code>HuntAction</code>, <code>RandomBrain</code>,
+<code>LlmMutation</code>.</li>
+<li><strong>Invent.</strong> Then students add their own: the recipes below, or ideas of their
+own, each with its tests.</li>
+</ol>
+<h2 id="1-a-stat-thirst">1. A stat: thirst</h2>
+<pre><code class="lang-csharp">public class Thirst : SpeciesModule
+{
+    [SerializeField] float perTick = 0.5f, deadly = 100f;
+    public StatId Value { get; private set; }
+    public float PerTick =&gt; perTick;
+    public float Deadly =&gt; deadly;
+
+    public override void Declare(SpeciesBuilder b) =&gt;
+        Value = b.DeclareStat(&quot;thirst&quot;, start: StatStart.Fixed(0f), min: 0f, max: deadly);
+
+    public override void WritePromptRules(PromptWriter w) =&gt;
+        w.Rule($&quot;Thirst grows every step; an animal dies of thirst at {deadly}. Drinking resets it.&quot;);
+}
+
+/// Thirst grows by itself: a small death rule does both jobs.
+public class DiesOfThirst : DeathRule
+{
+    Thirst thirst;
+    public override void Initialize() =&gt; thirst = Species.Module&lt;Thirst&gt;();
+    public override string CauseOfDeath(Animal a)
+    {
+        a[thirst.Value] += thirst.PerTick;                    // ages with the animal, in the death phase
+        return a[thirst.Value] &gt;= thirst.Deadly ? &quot;thirst&quot; : null;
+    }
+}
+</code></pre>
+<p>Checklist: the cause name appears in <code>death</code> events and the statistics
+(<code>deaths_thirst</code>); copy <em>T-ANIM stat template</em>.</p>
+<h2 id="2-a-sense-thirst-level-and-nearest-water">2. A sense: thirst level and nearest water</h2>
+<pre><code class="lang-csharp">// Thirst as low / medium / high: the existing LevelSense, no code.
+//   Add [LevelSense] stat &quot;thirst&quot;, thresholds 30 / 70, label &quot;Thirst&quot;,
+//   V2 words: &quot;I am not thirsty.&quot; / &quot;I am thirsty.&quot; / &quot;I am parched.&quot;
+
+public class NearestWaterSense : Sense
+{
+    [SerializeField] Bands bands = Bands.Reference;
+    Ground ground;
+    public override IReadOnlyList&lt;string&gt; Tokens =&gt; bands.TokensWithHere;   // here, adjacent, ..., none
+    public override void Initialize() =&gt; ground = World.Service&lt;Ground&gt;();
+    public override int Read(Animal a, SenseContext s)
+    {
+        var water = ground.NearestWater(a.Position, bands.Vision(a));      // a query the terrain ground offers
+        return water == null ? bands.None : bands.IndexOf(water.Value.Distance, here: 0.5f);
+    }
+    public override string Write(int t, TextStyle style) =&gt; $&quot;Water: {bands.Describe(t, style)}.&quot;;
+}
+</code></pre>
+<p>Checklist: observation space grows (×3 for thirst, ×6 for water) and the species
+inspector shows the new size; copy <em>T-SENSE template</em> (tokens, text, the
+&quot;nothing there&quot; case, hidden things).</p>
+<h2 id="3-an-action-drink">3. An action: drink</h2>
+<pre><code class="lang-csharp">public class DrinkAction : AnimalAction
+{
+    Thirst thirst;
+    public override void Initialize() =&gt; thirst = Species.Module&lt;Thirst&gt;();
+
+    public override void Act(Animal a, ActContext c)
+    {
+        var water = c.Ground.NearestWater(a.Position, c.Vision(a));
+        if (water == null) { c.Search(); return; }
+        c.WalkTo(water.Value.Shore, stopAt: 0f);
+        c.OnArrival(new Drink(thirst));
+    }
+
+    public override bool IsRelevant(ObservationView o) =&gt; o.Token(&quot;Water&quot;) != &quot;none&quot;;
+
+    sealed class Drink : IInteraction
+    {
+        readonly Thirst thirst;
+        public Drink(Thirst t) =&gt; thirst = t;
+        public float Reach =&gt; 0.5f;
+        public void Apply(Animal a, InteractionContext c) =&gt; a[thirst.Value] = 0f;
+    }
+}
+</code></pre>
+<p>Then, on the action's GameObject, a <code>TextGene</code> with founders such as &quot;Drink
+whenever you pass water.&quot;, &quot;Drink only when very thirsty.&quot;, the neutral &quot;No
+preference.&quot;, and a contrast pair &quot;Always drink, whatever happens.&quot; / &quot;Never
+drink unless parched.&quot;. Set the action's description: <em>go to the nearest visible
+water and drink</em>. Save the GameObject as a prefab in <code>Modules/</code> to share it.</p>
+<p>Checklist: the action shows in the species' action table and the prompt preview;
+the gene passes the guards; the signature changes (accept it); copy <em>T-ACT
+template</em> (search when nothing is in sight, reach, intent never moves the animal
+itself).</p>
+<h2 id="4-a-number-gene">4. A number gene</h2>
+<p>No code: add a <code>NumberGene</code> under the species, set its trait (<code>stamina.max</code>),
+range and founder values, and make sure a <code>GaussianMutation</code> accepts it. To keep
+the gene interesting, give the trait a cost: e.g. a <code>Metabolism</code> setting
+&quot;base cost per tick += 0.01 × stamina.max&quot;. Validator V-47 reminds you.</p>
+<h2 id="5-a-free-text-gene-a-temperament">5. A free text gene (a temperament)</h2>
+<p>Add a <code>TextGene</code> that is not under an action and tick <em>free</em>; give it a label
+(&quot;temperament&quot;) and founders (&quot;Be bold.&quot;, &quot;Be careful.&quot;, &quot;No preference.&quot;).
+It appears in the prompt's genes block and every brain that reads text reads it.</p>
+<h2 id="6-a-resource-layer-berries">6. A resource layer: berries</h2>
+<pre><code class="lang-csharp">public class BerryBushes : ResourceLayer
+{
+    [SerializeField] float regrowPerBushPerTick = 0.01f;
+    [SerializeField] int berriesPerBush = 5;
+    // Bushes are the terrain's tree instances of one prototype; each holds up to N berries.
+    public override ResourceItem Nearest(Vector3 p, float radius) =&gt; ...;
+    public override bool Consume(ResourceItem item) =&gt; ...;
+    public override void Tick(RandomStream rng) =&gt; ...;      // regrowth, in the environment phase
+}
+</code></pre>
+<p>Then add a diet entry <code>graze BerryBushes +15</code> to the species that eat berries, and
+a <code>NearestResourceSense</code> with layer &quot;Berries&quot; if the brain should know about
+them. Checklist: copy <em>T-ENV layer template</em> (consume once, regrow in its own
+phase with its own stream).</p>
+<h2 id="7-a-brain">7. A brain</h2>
+<pre><code class="lang-csharp">public class TinyNetBrain : Brain
+{
+    [SerializeField] int hidden = 8;
+    public override string Id =&gt; $&quot;tinynet-{hidden}&quot;;
+    public override BrainAnswer Ask(IReadOnlyList&lt;DecisionQuery&gt; batch)
+    {
+        var rows = new float[batch.Count][];
+        for (int i = 0; i &lt; batch.Count; i++)
+            rows[i] = Softmax(Forward(Encode(batch[i].Observation), WeightsFrom(batch[i].Genes)));
+        return BrainAnswer.Now(rows);                        // answered at once, nothing to wait for
+    }
+}
+</code></pre>
+<p>An HTTP brain derives from <code>HttpBrain</code> and only builds the request and reads the
+answer. A good &quot;invent&quot; exercise is a <strong>rule-based brain</strong> like the prototype's
+keyword brain (its tables are in <a href="08-decisions-brains-and-prompts.html#6-reference-brains">08 §6</a>):
+transparent, fast, and a way to see where words and meaning part. Checklist: copy <em>T-DEC brain template</em> (row length, sums to 1, order,
+same query same answer, failure handling).</p>
+<h2 id="8-a-mutation-operator-the-intensity-ladder">8. A mutation operator: the intensity ladder</h2>
+<pre><code class="lang-csharp">public class IntensityLadder : MutationOperator
+{
+    static readonly string[] Ladder = { &quot;never&quot;, &quot;rarely&quot;, &quot;sometimes&quot;, &quot;often&quot;, &quot;always&quot; };
+    public override bool Accepts(Gene g) =&gt; g.Kind == AlleleKind.Text;
+    public override MutationJob Start(Gene g, Allele parent, RandomStream rng)
+    {
+        var words = parent.Text.Split(' ');
+        int i = Array.FindIndex(words, w =&gt; Ladder.Contains(w.ToLowerInvariant()));
+        if (i &lt; 0) return MutationJob.Failed(&quot;no intensity word&quot;);
+        int k = Array.IndexOf(Ladder, words[i].ToLowerInvariant());
+        int step = rng.NextBool() ? 1 : -1;
+        words[i] = Ladder[Mathf.Clamp(k + step, 0, Ladder.Length - 1)];
+        return MutationJob.Done(string.Join(&quot; &quot;, words), $&quot;ladder{step:+0;-0}&quot;);
+    }
+}
+</code></pre>
+<p>Put it under the species' <code>Mutation</code> object, with <code>onlyThese</code> naming the genes
+it applies to. Checklist: copy <em>T-MUT template</em> (blind: it receives only the gene;
+deterministic with a seed; guards still apply).</p>
+<h2 id="9-a-tick-phase-seasons">9. A tick phase: seasons</h2>
+<pre><code class="lang-csharp">public class SeasonsPhase : TickPhase
+{
+    [SerializeField] int yearLength = 2000;
+    [SerializeField] float winterRegrowFactor = 0.2f;
+    FoodGrid food;
+    public override void Initialize() =&gt; food = World.Service&lt;FoodGrid&gt;(&quot;Grass&quot;);
+    public override void Run(TickContext t)
+    {
+        bool winter = t.Tick % yearLength &gt;= yearLength / 2;
+        food.RegrowFactor = winter ? winterRegrowFactor : 1f;
+    }
+}
+</code></pre>
+<p>Place it among the <code>Phases</code> children before <em>Environment</em>. Checklist: V-08 checks
+the order; copy <em>T-TICK phase template</em>.</p>
+<h2 id="10-a-species">10. A species</h2>
+<p>Duplicate the prey, rename it (&quot;deer&quot;), change its display name, body,
+parameters and founder sentences; put a diet entry on the predator (&quot;strike
+deer +80&quot;). The food web window shows the new edges and the threats update by
+themselves. A cannibal species simply lists itself in its diet: its animals then
+flee from their own kind like from any threat.</p>
+<h2 id="11-hide-and-flee">11. Hide and flee</h2>
+<p>The reference prey has both, as separate actions, genes and senses: a
+<code>FleeAction</code> (with <em>flee into cover</em> off), a <code>HideAction</code> with its gene, and the
+<code>NearestCoverSense</code>. Remove the hide action and the cover sense to get a prey
+that can only run; turn <em>flee into cover</em> on as well to get the prototype's
+behaviour. Scenario S06 compares the three (<a href="31-scenarios.html">31</a>).</p>
+<h2 id="12-act-order-and-decision-timing">12. Act order and decision timing</h2>
+<ul>
+<li>Act order: a setting of the <code>ActPhase</code> (species in turn by default, all mixed,
+simultaneous).</li>
+<li>Decision period and staggering: settings of the World and, per species, of an
+optional <code>DecisionSchedule</code> module.</li>
+<li>Species added during a run: <code>World.AddSpecies</code> (SPEC-30). Rules that decide
+<em>when</em> to split a species (speciation) are left for later (owner decision).</li>
+</ul>
+<h2 id="13-a-sense-is-a-threat-chasing-me">13. A sense: is a threat chasing me?</h2>
+<p>A cannibal flees from its own kind, but it can't tell a hungry neighbour from a
+peaceful one. This sense says whether the nearest threat is coming for it:</p>
+<pre><code class="lang-csharp">public class ChasedSense : Sense
+{
+    static readonly string[] tokens = { &quot;no&quot;, &quot;yes&quot; };
+    [SerializeField] float vision = 20f;
+    public override IReadOnlyList&lt;string&gt; Tokens =&gt; tokens;
+
+    public override int Read(Animal a, SenseContext s)
+    {
+        var threat = s.NearestAnimal(a, AnimalSet.Threats, vision);
+        if (threat == null) return 0;
+        var t = threat.Animal;
+        bool hunting = t.Action &gt;= 0 &amp;&amp; t.Species.Actions[t.Action] is HuntAction;
+        return hunting &amp;&amp; s.CurrentTarget(t) == a ? 1 : 0;   // the hunter's target this tick
+    }
+
+    public override string Write(int t, TextStyle style) =&gt;
+        style == TextStyle.V2 ? (t == 1 ? &quot;Something is chasing me.&quot; : &quot;Nothing is chasing me.&quot;)
+                              : $&quot;Chased: {tokens[t]}.&quot;;
+}
+</code></pre>
+<p>Checklist: the observation space doubles; <code>CurrentTarget</code> is read from the state
+at the start of the tick (SENSE-04); copy <em>T-SENSE template</em>.</p>
+<h2 id="14-a-locomotion-slopes-cost-more">14. A locomotion: slopes cost more</h2>
+<pre><code class="lang-csharp">public class SlopeLocomotion : KinematicLocomotion
+{
+    [SerializeField] float maxSlopeDegrees = 35f, energyPerMeterClimbed = 0.3f;
+
+    public override float Move(Animal a, Intent intent, float stamina, MoveContext c)
+    {
+        Vector3 ahead = a.Position + intent.Direction;
+        if (c.Ground.SlopeDegrees(a.Position, ahead) &gt; maxSlopeDegrees)
+            intent = intent.Stay();                               // too steep: don't go
+        return base.Move(a, intent, stamina, c);
+    }
+
+    public override float ExtraCost(Animal a, Vector3 from, Vector3 to) =&gt;
+        Mathf.Max(0f, to.y - from.y) * energyPerMeterClimbed;
+}
+</code></pre>
+<p>Give the predator a <code>SlopeLocomotion</code> and leave the prey kinematic, and the two
+species now move differently over the same terrain. Checklist: V-13 (exactly one
+locomotion per species); MOVE-02 still holds; copy <em>T-MOVE locomotion template</em>.</p>
+<h2 id="15-food-make-eggs-edible">15. Food: make eggs edible</h2>
+<p>No code. Eggs exist only while they incubate, so first give the species an
+incubation above 0 (e.g. 20 ticks on its <code>Incubation</code>). Then:</p>
+<ol>
+<li>add an <code>Edible</code> to the world's <code>EggSystem</code> (method <em>graze</em>: an egg is taken
+whole; energy 15);</li>
+<li>on the egg eater (a new species, or the predator), add a diet entry
+<code>egg:prey</code>;</li>
+<li>give the egg eater a way to find eggs: an <code>EatAction</code> pointed at eggs, or a
+new action, with a sense &quot;Eggs: 1-4 meters away.&quot; if its brain should know.</li>
+</ol>
+<p>Validation V-24 stays quiet once the egg kind is edible; eaten eggs are recorded
+as <code>egg_lost</code> with the reason &quot;eaten&quot;. The same two components make anything
+else edible: fruit entities, a species that was never prey, carcasses of a
+species that leaves none by default.</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Writing documentation comments | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Writing documentation comments | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/documenting-your-code.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="documenting-your-code">
+<h1 id="writing-documentation-comments">Writing documentation comments</h1>
+
+<p>Every type and every member in EvoSim carries a <code>///</code> documentation comment. Your editor shows it when you hover over a
+name, and the <a href="../api/index.html">API reference</a> of this site is built from it. Document your own modules the same way:
+the next reader may be you, three weeks later.</p>
+<p>This page is the house style. A checker, the <a href="#check-your-comments">doc audit</a>, enforces the parts a program can check.</p>
+<h2 id="what-gets-a-comment">What gets a comment</h2>
+<table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Every type (class, struct, interface, enum, delegate), public or not</td>
+<td>a <code>&lt;summary&gt;</code></td>
+</tr>
+<tr>
+<td>Every member (method, property, constructor, event, operator, indexer, enum member, constant), public or not</td>
+<td>a <code>&lt;summary&gt;</code></td>
+</tr>
+<tr>
+<td>Every public or protected method, constructor, delegate or indexer</td>
+<td>a <code>&lt;param&gt;</code> for each parameter, a <code>&lt;returns&gt;</code> for a returned value, a <code>&lt;typeparam&gt;</code> for each type parameter</td>
+</tr>
+<tr>
+<td>A public or protected field</td>
+<td>a <code>&lt;summary&gt;</code></td>
+</tr>
+<tr>
+<td>A private field</td>
+<td>a <code>&lt;summary&gt;</code>, <strong>or</strong> a <code>[Tooltip]</code> (the Inspector shows it), <strong>or</strong> a <code>//</code> comment at the end of its line or on the line just above, <strong>or</strong> nothing when it only backs a property of the same name (<code>animals</code> behind <code>Animals</code>)</td>
+</tr>
+<tr>
+<td>An override whose base text fits</td>
+<td><code>/// &lt;inheritdoc/&gt;</code></td>
+</tr>
+<tr>
+<td>An override that does something particular</td>
+<td>its own <code>&lt;summary&gt;</code> plus <code>/// &lt;inheritdoc/&gt;</code>, which keeps the base's parameters and returns</td>
+</tr>
+<tr>
+<td>A test method</td>
+<td>its <code>[Test, Description(&quot;…&quot;)]</code> (no <code>///</code> needed); the test class and its helpers get a <code>&lt;summary&gt;</code></td>
+</tr>
+<tr>
+<td>A partial type (<code>World</code>)</td>
+<td>a <code>&lt;summary&gt;</code> in its main file only; each other part starts with a <code>//</code> line saying what that file holds</td>
+</tr>
+</tbody>
+</table>
+<p>Inside method bodies, write a <code>//</code> comment where a step is not obvious from the code: why it is done, which rule it keeps,
+what would break without it. Don't narrate code that reads well by itself.</p>
+<h2 id="how-to-write-a-summary">How to write a summary</h2>
+<p><strong>One or two sentences</strong> that say what the thing is for, in the words of the simulation, not of the code.</p>
+<ul>
+<li>Types and properties: a noun phrase. <em>The species' brain, or the World's default (DEC-13).</em></li>
+<li>Methods: a verb in the third person. <em>Reads one animal at a decision and returns one of its tokens (SENSE-03).</em></li>
+<li>Booleans: <em>True when …</em>; say what false means if it is not the plain opposite.</li>
+<li>Say what <code>null</code>, empty, <code>-1</code> or <code>0</code> mean: <em>… or null when nothing is in sight.</em></li>
+<li>Give the unit of every quantity: meters, ticks, points (energy, stamina), seconds, <em>per tick</em>.</li>
+<li>Say <strong>when</strong> it is called and <strong>by whom</strong> for hooks and lifecycle methods: <em>Called by the World once per run, after
+every module declared its stats and before founders spawn.</em></li>
+<li>For something a student overrides, say <strong>what it must keep</strong>: the same tokens for the same animal, random draws only
+from the stream it is given, no change to the world from inside <code>Act</code>…</li>
+</ul>
+<p>Avoid: <em>This method…</em>, <em>Gets or sets…</em>, <em>Helper</em>, repeating the name (<em>The species.</em> for <code>Species</code>), the history of the
+code (<em>fixed in M13.4</em> belongs to the implementation log), and <em>we</em>.</p>
+<p>Write plain English for second-year students: short sentences, common words, one idea per sentence. The first time a
+page uses a term of the glossary (allele, locus, tick, phase…), link it or explain it.</p>
+<h3 id="rule-ids-and-spec-references">Rule ids and spec references</h3>
+<p>The <a href="../spec/README.html">specification</a> numbers its rules. Name the rule a piece of code keeps, in parentheses:
+<em>(SENSE-01)</em>, <em>(DEC-30, DEC-33)</em>. Sections of a spec document are written <em>(07 §4)</em>, validation messages <em>V-08</em>, tests
+<em>T-ACT-09</em>. The site turns rule ids into links to the specification.</p>
+<h2 id="tags">Tags</h2>
+<table>
+<thead>
+<tr>
+<th>Tag</th>
+<th>Use it for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;summary&gt;</code></td>
+<td>always; one or two sentences</td>
+</tr>
+<tr>
+<td><code>&lt;param name=&quot;x&quot;&gt;</code></td>
+<td>what the argument is and what values it takes: <em>The animal that decides.</em></td>
+</tr>
+<tr>
+<td><code>&lt;returns&gt;</code></td>
+<td>what comes back, including the &quot;nothing&quot; case: <em>The nearest prey within vision, or null.</em></td>
+</tr>
+<tr>
+<td><code>&lt;typeparam name=&quot;T&quot;&gt;</code></td>
+<td>what the type parameter stands for: <em>The kind of module to find.</em></td>
+</tr>
+<tr>
+<td><code>&lt;remarks&gt;</code></td>
+<td>anything longer: lifecycle, rules to keep, how to extend, performance. Use <code>&lt;para&gt;</code> for paragraphs and <code>&lt;list type=&quot;bullet&quot;&gt;&lt;item&gt;&lt;description&gt;…&lt;/description&gt;&lt;/item&gt;&lt;/list&gt;</code> for lists</td>
+</tr>
+<tr>
+<td><code>&lt;example&gt;</code> + <code>&lt;code&gt;</code></td>
+<td>on base classes students derive from and on the most used methods: a short, real example, taken from EvoSim or its samples</td>
+</tr>
+<tr>
+<td><code>&lt;see cref=&quot;…&quot;/&gt;</code></td>
+<td>a link to a type or member the reader may want to open next: <code>&lt;see cref=&quot;ActContext.Search&quot;/&gt;</code>, <code>&lt;see cref=&quot;Species.Module{T}&quot;/&gt;</code></td>
+</tr>
+<tr>
+<td><code>&lt;paramref name=&quot;x&quot;/&gt;</code></td>
+<td>a parameter named in the text</td>
+</tr>
+<tr>
+<td><code>&lt;c&gt;…&lt;/c&gt;</code></td>
+<td>a literal value, a file name, an Inspector field or code inline: <code>&lt;c&gt;&quot;none&quot;&lt;/c&gt;</code>, <code>&lt;c&gt;stats.csv&lt;/c&gt;</code></td>
+</tr>
+<tr>
+<td><code>&lt;see langword=&quot;null&quot;/&gt;</code></td>
+<td><code>null</code>, <code>true</code>, <code>false</code> when they are values (plain &quot;null&quot; is fine in a sentence)</td>
+</tr>
+<tr>
+<td><code>&lt;inheritdoc/&gt;</code></td>
+<td>take the base type's or interface's text</td>
+</tr>
+<tr>
+<td><code>&lt;exception cref=&quot;…&quot;&gt;</code></td>
+<td>an exception the caller should expect and handle</td>
+</tr>
+</tbody>
+</table>
+<p>XML rules: write <code>&lt;</code> as <code>&amp;lt;</code>, <code>&gt;</code> as <code>&amp;gt;</code> and <code>&amp;</code> as <code>&amp;amp;</code>, also inside <code>&lt;code&gt;</code>. Generic types in a <code>cref</code> take
+braces: <code>&lt;see cref=&quot;EntitySystem{T}&quot;/&gt;</code>. The compiler checks every <code>cref</code>: a wrong one is reported by the audit.</p>
+<p>Keep lines under 140 characters; wrap long comments on several <code>///</code> lines.</p>
+<h2 id="examples">Examples</h2>
+<p>A base class students derive from:</p>
+<pre><code class="lang-cs">/// &lt;summary&gt;
+/// Reads one animal and the world and returns one token from a fixed list (SENSE-01): what the brain is told about one
+/// aspect of the situation, such as the nearest food or the energy level.
+/// &lt;/summary&gt;
+/// &lt;remarks&gt;
+/// &lt;para&gt;Derive from it, declare every token in &lt;see cref=&quot;Tokens&quot;/&gt;, implement &lt;see cref=&quot;Read&quot;/&gt;, and place the component
+/// under a species: its depth-first place among the species' senses is its place in the situation text.&lt;/para&gt;
+/// &lt;para&gt;A sense only reads. It sees the world as it was at the start of the tick (SENSE-04) and draws no random number.&lt;/para&gt;
+/// &lt;/remarks&gt;
+/// &lt;example&gt;
+/// &lt;code&gt;
+/// public class HungerSense : Sense
+/// {
+///     static readonly string[] tokens = { &quot;fed&quot;, &quot;hungry&quot; };
+///     Energy energy;
+///     public override IReadOnlyList&amp;lt;string&amp;gt; Tokens =&gt; tokens;
+///     public override void Initialize() =&gt; energy = Species.Module&amp;lt;Energy&amp;gt;();
+///     public override int Read(Animal a, SenseContext s) =&gt; a[energy.Value] &amp;lt; 30f ? 1 : 0;
+/// }
+/// &lt;/code&gt;
+/// &lt;/example&gt;
+public abstract class Sense : SpeciesModule
+</code></pre>
+<p>A method with parameters:</p>
+<pre><code class="lang-cs">/// &lt;summary&gt;Reads one animal at a decision (SENSE-03).&lt;/summary&gt;
+/// &lt;param name=&quot;a&quot;&gt;The animal that decides.&lt;/param&gt;
+/// &lt;param name=&quot;s&quot;&gt;The world as it was at the start of the tick: nearest animals, food, cover, distances.&lt;/param&gt;
+/// &lt;returns&gt;An index into &lt;see cref=&quot;Tokens&quot;/&gt;.&lt;/returns&gt;
+public abstract int Read(Animal a, SenseContext s);
+</code></pre>
+<p>An override that does something particular, keeping the base's parameters:</p>
+<pre><code class="lang-cs">/// &lt;summary&gt;Walks to the nearest visible food the diet allows and grazes it on arrival; searches when none is in sight (ACT-04).&lt;/summary&gt;
+/// &lt;inheritdoc/&gt;
+public override void Act(Animal a, ActContext c)
+</code></pre>
+<p>An override that changes nothing in the contract:</p>
+<pre><code class="lang-cs">/// &lt;inheritdoc/&gt;
+public override bool IsRelevant(ObservationView o) =&gt; Seen(o.Token(relevantSense));
+</code></pre>
+<p>Private state:</p>
+<pre><code class="lang-cs">[SerializeField, Tooltip(&quot;A layer name; empty = every layer the diet grazes.&quot;)]
+string target = &quot;&quot;;            // the Tooltip documents it
+Species eggsOf;                // whose eggs this action eats, when its target is &quot;egg:&lt;species&gt;&quot;
+readonly List&lt;Animal&gt; animals = new List&lt;Animal&gt;();   // backs Animals: nothing more to say
+</code></pre>
+<h2 id="check-your-comments">Check your comments</h2>
+<p>The doc audit compiles the EvoSim assemblies with Unity's own compiler and lists what is missing or malformed:</p>
+<pre><code class="lang-powershell">powershell -File Docs\Site\tools\audit.ps1                                  # everything
+powershell -File Docs\Site\tools\audit.ps1 --only Runtime/Senses --max 50   # one folder (relative to Assets/EvoSim)
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CS1591</code></td>
+<td>a public or protected type or member has no doc comment</td>
+</tr>
+<tr>
+<td><code>DOC01</code></td>
+<td>a non-public type or member has no doc comment (fields: see the table above)</td>
+</tr>
+<tr>
+<td><code>DOC02</code></td>
+<td>a public or protected member's comment lacks a <code>&lt;param&gt;</code>, <code>&lt;typeparam&gt;</code> or <code>&lt;returns&gt;</code></td>
+</tr>
+<tr>
+<td><code>CS1570</code></td>
+<td>the comment is not well-formed XML (an unescaped <code>&lt;</code> or <code>&amp;</code>?)</td>
+</tr>
+<tr>
+<td><code>CS1572</code>, <code>CS1573</code></td>
+<td>a <code>&lt;param&gt;</code> names no parameter, or a parameter has none</td>
+</tr>
+<tr>
+<td><code>CS1574</code>, <code>CS1580</code>, <code>CS1584</code></td>
+<td>a <code>cref</code> points to nothing, or is badly written</td>
+</tr>
+<tr>
+<td><code>CS1587</code></td>
+<td>a <code>///</code> comment sits on nothing (use <code>//</code> there)</td>
+</tr>
+</tbody>
+</table>
+<p><code>--same-code GITREF</code> checks that only comments and spaces changed since a git revision: use it after a pass that should
+not touch the code.</p>
+<p>The site itself is built by <code>Docs/Site/build.ps1</code> (see <code>Docs/Site/README.md</code>).</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

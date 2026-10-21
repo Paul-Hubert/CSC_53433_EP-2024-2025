@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>13 — Outputs and recording | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="13 — Outputs and recording | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/13-outputs-and-recording.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="13--outputs-and-recording">13 — Outputs and recording</h1>
+
+<p>A run writes enough to rebuild its whole gene history afterwards, and its
+files follow the prototype's formats so that the prototype's analysis tools
+(<code>gene_report</code>, <code>gene_timeline</code>, <code>mutation_list</code>) can read Unity runs.</p>
+<h2 id="1-rules">1. Rules</h2>
+<ul>
+<li><strong>OUT-01 (MUST)</strong> Each run writes into its own folder.</li>
+<li><strong>OUT-02 (MUST)</strong> Events are written in tick order, one JSON object per line,
+keys sorted. Every event has <code>kind</code>, <code>t</code> (tick) and <code>id</code> (the animal), and the
+species id in <code>species</code>.</li>
+<li><strong>OUT-03 (MUST)</strong> The events are enough to rebuild every genome over time:
+every founder, newcomer and birth carries its genome, every death its cause.</li>
+<li><strong>OUT-04 (MUST)</strong> No API key or other secret is ever written to an output, a
+log, a scene, a prefab or a configuration asset. Keys come from environment
+variables or the user's local preferences.</li>
+<li><strong>OUT-05 (SHOULD)</strong> A compatibility mode writes two-species worlds exactly as
+the prototype does (prey events without a <code>species</code> field, predator events
+with <code>&quot;species&quot;: &quot;predator&quot;</code>, prey loci without a prefix).</li>
+<li><strong>OUT-06 (SHOULD)</strong> The recorder is a module; other sinks (live graphs in the
+editor, a database) receive the same events.</li>
+</ul>
+<h2 id="2-files">2. Files</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>events.jsonl</code></td>
+<td>one line per event (§3)</td>
+</tr>
+<tr>
+<td><code>stats.csv</code></td>
+<td>one row every <code>statsEvery</code> ticks (reference 100), §4</td>
+</tr>
+<tr>
+<td><code>alleles.jsonl</code></td>
+<td>every allele seen, all species: <code>id</code>, <code>locus</code>, <code>text</code> (or <code>value</code> for number genes), <code>origin</code>, <code>parent_id</code>, <code>operator</code>, <code>model</code>, <code>seed</code></td>
+</tr>
+<tr>
+<td><code>final_population.json</code></td>
+<td>the living animals at the end: <code>id</code>, <code>gen</code>, <code>genome</code> (allele ids), <code>species</code></td>
+</tr>
+<tr>
+<td><code>summary.json</code></td>
+<td>totals per species and for the run (§5)</td>
+</tr>
+<tr>
+<td><code>run_info.json</code></td>
+<td>what ran: scene or configuration snapshot, git commit, Unity version, brains (model names, digests or pinned revisions, hosts), mutator (API, host, model), seeds, wait mode, act order</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-events">3. Events</h2>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>founder</code></td>
+<td><code>id</code>, <code>genome</code></td>
+</tr>
+<tr>
+<td><code>immigrant</code></td>
+<td><code>id</code>, <code>genome</code> (a newcomer below the floor)</td>
+</tr>
+<tr>
+<td><code>birth</code></td>
+<td><code>id</code>, <code>parents</code>, <code>gen</code>, <code>genome</code>, <code>litter</code> (its litter's size), <code>mutations</code>: a list of {<code>locus</code>, <code>parent</code> (allele id), <code>child</code> (new allele id), <code>prompt</code> (instruction number, LLM operator) or <code>operator</code>, <code>text</code> or <code>value</code>}; a hatched egg also has <code>laid</code> (the conception tick)</td>
+</tr>
+<tr>
+<td><code>death</code></td>
+<td><code>id</code>, <code>cause</code> (<code>starvation</code>, <code>old_age</code>, <code>predator</code>/<code>killed</code>, <code>migrated</code>, or a module's cause), <code>age</code>, <code>gen</code>, <code>food</code> (meals), <code>offspring</code>, and <code>killer</code> for a kill</td>
+</tr>
+<tr>
+<td><code>egg_lost</code> (Unity)</td>
+<td><code>id</code> of the egg, <code>parents</code>, <code>reason</code></td>
+</tr>
+<tr>
+<td><code>species_created</code> (Unity)</td>
+<td><code>species</code>, <code>name</code>, <code>parent_species</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-statistics-rows">4. Statistics rows</h2>
+<p>One row per <code>statsEvery</code> ticks, columns <code>t</code> then, per species with the prefix
+<code>&lt;species&gt;_</code> (the prototype: none for the prey, <code>pred_</code> for predators):</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pop</code></td>
+<td>living animals</td>
+</tr>
+<tr>
+<td><code>mean_energy</code>, <code>mean_stamina</code></td>
+<td>means over the living animals</td>
+</tr>
+<tr>
+<td><code>exhausted</code></td>
+<td>cumulative animal-ticks that began without stamina for any movement</td>
+</tr>
+<tr>
+<td><code>mean_gen</code>, <code>max_gen</code></td>
+<td>generations of the living animals</td>
+</tr>
+<tr>
+<td><code>births</code>, <code>immigrants</code></td>
+<td>cumulative</td>
+</tr>
+<tr>
+<td><code>deaths_starve</code>, <code>deaths_pred</code> (killed), <code>deaths_age</code>, <code>deaths_migrated</code></td>
+<td>cumulative deaths by cause</td>
+</tr>
+<tr>
+<td><code>decisions</code>, <code>backend_queries</code>, <code>invalid</code></td>
+<td>cumulative decisions, brain queries after the memo, searching choices</td>
+</tr>
+<tr>
+<td><code>act_&lt;action&gt;</code></td>
+<td>cumulative decisions per action</td>
+</tr>
+<tr>
+<td><code>portions</code></td>
+<td>cumulative carcass portions eaten (hunters)</td>
+</tr>
+</tbody>
+</table>
+<p>and <code>alleles</code>, the number of alleles registered (all species).</p>
+<h2 id="5-summary">5. Summary</h2>
+<p>Per species: final population, births, newcomers, hatched eggs, deaths by cause,
+mean lifespan, maximum generation, decisions, brain queries, memo hit rate,
+brain time, searching rate (<code>invalid_rate</code>), share of animal-ticks out of breath,
+share of each action; for hunters also kills and carcass portions. For the run:
+ticks, seed, brains, mutation statistics (attempts, successes, calls, rejections
+by reason), number of alleles, the events hash (first 16 hex digits), why the run
+stopped, wall-clock minutes, model calls not answered by a cache, failures.</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

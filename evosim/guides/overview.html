@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>How EvoSim works | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="How EvoSim works | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/overview.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="guide-overview">
+<h1 id="how-evosim-works">How EvoSim works</h1>
+
+<p>This page is the whole system in one read. Each section links to the guide that explains that part in depth.</p>
+<h2 id="the-idea">The idea</h2>
+<p>An animal's behaviour is not coded: it is described by <strong>genes</strong>, short English sentences such as <em>&quot;Eat whenever you see
+grass.&quot;</em> or <em>&quot;Run from any predator you see.&quot;</em>. At each decision, the animal's <strong>senses</strong> describe its situation in a few
+words (<em>&quot;Food: 1-4 meters away. Predator: none within 20 meters.&quot;</em>). A language model, the <strong>brain</strong>, reads the genes
+and the situation and gives a probability for each <strong>action</strong> the species can take: eat, flee, hide, follow, rest,
+mate, hunt. The animal draws one action from those probabilities and carries it out for a few ticks.</p>
+<p>Animals that eat well and avoid predators live longer and breed more. A baby takes each gene from one parent or the
+other, and sometimes a gene <strong>mutates</strong>: a second language model, the <strong>mutator</strong>, rewrites the sentence. Sentences that
+help animals survive spread through the population; the others die out. That is evolution, with English as the genetic
+code.</p>
+<h2 id="the-pieces">The pieces</h2>
+<pre><code class="lang-mermaid">flowchart LR
+    W[World] --&gt; S1[Species: prey]
+    W --&gt; S2[Species: predator]
+    W --&gt; P[Tick phases]
+    W --&gt; SV[Services: ground, food, cover, brains, recorder]
+    S1 --&gt; M[Modules: senses, actions, genes, stats, rules, mutation]
+    S1 --&gt; A[(Animals: plain data)]
+</code></pre>
+<ul>
+<li>The <strong>World</strong> is a GameObject. Everything else is a component under it, so a scene is a complete experiment.
+(<a href="world-and-modules.html">The world and its modules</a>)</li>
+<li>A <strong>species</strong> is a GameObject under the World. Its child components are its <strong>modules</strong>: senses, actions, genes,
+stats, life rules and mutation operators. Add a component and the species has that feature.</li>
+<li><strong>Animals</strong> are plain C# objects owned by their species, not GameObjects. Each has a position, stats such as energy
+and stamina, a genome, an age and a current action. (<a href="animals-and-stats.html">Animals, stats and death</a>)</li>
+<li><strong>Services</strong> are shared parts under the World: the ground, food layers, cover, carcasses and eggs, the brains, the
+mutator, the recorder. (<a href="environment.html">The environment</a>)</li>
+<li><strong>Tick phases</strong> are components under the World's <code>Phases</code> object. The World runs them in hierarchy order, once per
+tick. (<a href="the-tick.html">A tick, phase by phase</a>)</li>
+</ul>
+<h2 id="one-tick">One tick</h2>
+<p>Simulation time advances in <strong>ticks</strong>. A tick runs every phase in order:</p>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sense</td>
+<td>each animal that decides this tick reads its senses: one token per sense, then its situation text</td>
+</tr>
+<tr>
+<td>Ask brains</td>
+<td>situations already answered come from the memo or the cache; the others go to the brains, one batch per brain</td>
+</tr>
+<tr>
+<td>Choose actions</td>
+<td>the World waits for the answers, then draws each deciding animal's action from its probabilities</td>
+</tr>
+<tr>
+<td>Act</td>
+<td>each action gives an intent (go there, flee from that); the locomotion moves the animal; interactions happen on arrival (graze, strike, scavenge); living costs energy</td>
+</tr>
+<tr>
+<td>Breed</td>
+<td>an animal that chose to mate and reaches a ready partner conceives a litter: one egg per baby, genes crossed over, mutations drawn and sent to the mutator</td>
+</tr>
+<tr>
+<td>Hatch</td>
+<td>eggs due this tick hatch, once their mutated genes are back</td>
+</tr>
+<tr>
+<td>Deaths</td>
+<td>killed animals die; every animal ages by one tick; death rules run (starvation, old age)</td>
+</tr>
+<tr>
+<td>Migration</td>
+<td>species above their cap lose animals chosen at random</td>
+</tr>
+<tr>
+<td>Environment</td>
+<td>food regrows, carcasses rot</td>
+</tr>
+<tr>
+<td>Floor</td>
+<td>species below their floor get newcomers</td>
+</tr>
+<tr>
+<td>Record</td>
+<td>a statistics row every 100 ticks, and the files are flushed; events are written as they happen</td>
+</tr>
+</tbody>
+</table>
+<p>An animal does not decide every tick. In the reference scenes it decides every <strong>4 ticks</strong> (the World's decision
+period), and each species' decision schedule staggers its animals by id, so about a quarter of them decide on each
+tick and the brain's work is spread out. A newborn decides at once; a busy animal (digesting a kill) does not decide.
+Between decisions an animal keeps its action. (<a href="brains-and-decisions.html">Decisions and brains</a>)</p>
+<h2 id="from-senses-to-an-action">From senses to an action</h2>
+<pre><code class="lang-mermaid">flowchart LR
+    SE[Senses] --&gt;|tokens| SI[Situation text]
+    G[Genes] --&gt; Q[Query]
+    SI --&gt; Q
+    Q --&gt; MC{Memo or cache?}
+    MC --&gt;|known| PB[Probabilities]
+    MC --&gt;|new| BR[Brain reads the prompt] --&gt; PB
+    PB --&gt;|draw with temperature| AC[Action]
+</code></pre>
+<ol>
+<li>Each <strong>sense</strong> returns one token from a fixed list, for example <em>here</em>, <em>adjacent</em>, <em>close</em>, <em>medium</em>, <em>far</em> or
+<em>none</em> for the nearest food. The tokens together are the animal's <strong>observation</strong>.
+(<a href="senses-and-prompts.html">Senses and prompts</a>)</li>
+<li>The genes and the situation make a <strong>query</strong>. The brain turns it into a <strong>prompt</strong> from the species' template: a
+header, one line per action, the rules of the world, the animal's genes, the situation text, and the question.</li>
+<li>The same genes in the same situation always get the same answer from the same brain. The <strong>memo</strong> remembers answers
+during a run and the <strong>answer cache</strong> on disk across runs. Only new questions reach the model.</li>
+<li>The <strong>brain</strong> returns one probability per action. JEV, a language model served on <code>localhost:8000</code>, is the reference
+brain. The random brain answers uniformly and needs no server.</li>
+<li>The animal <strong>draws</strong> its action, after the probabilities are sharpened or flattened by the sampling temperature.</li>
+</ol>
+<h2 id="from-an-action-to-a-movement">From an action to a movement</h2>
+<p>An action never moves the animal itself. It tells an <a class="xref" href="../api/EvoSim.ActContext.html">ActContext</a> where to go (<em>walk to that grass</em>, <em>run
+away from that predator</em>) and what to do on arrival (<em>graze it</em>, <em>strike it</em>). The species' <strong>locomotion</strong> then moves the
+animal as far as its speed and stamina allow, and the interaction happens if the target is within reach. (<a href="actions-and-movement.html">Actions and
+movement</a>, <a href="food-web.html">The food web</a>)</p>
+<h2 id="from-parents-to-babies">From parents to babies</h2>
+<p>A mating pair produces a <strong>litter</strong>. Each baby takes each gene from one parent or the other (crossover). Each gene then
+mutates with a small probability (3 % per gene per birth in the reference). A mutation asks the mutator model to rewrite
+the sentence, for example by making it stronger, weaker or about something else. Each baby starts as an <strong>egg</strong> that
+carries its genes until the mutator's answers are back. In the reference the incubation is 0 ticks: the eggs hatch in
+the same tick, and the tick waits for the mutator if it must. Give a species an incubation of a few ticks and the world
+goes on while the mutator works. (<a href="genes-and-mutation.html">Genes and mutation</a>,
+<a href="reproduction-and-population.html">Reproduction and population</a>)</p>
+<h2 id="same-seed-same-run">Same seed, same run</h2>
+<p>Every random draw comes from a named stream derived from the World's seed. As long as the brain answers the same way,
+which the memo and the answer cache ensure, a run repeats exactly on the same machine: in the editor, headless, or in a
+player build, whatever the speed and the wait mode. Each run ends with an <strong>events hash</strong> that identifies it.
+(<a href="determinism.html">Determinism and replay</a>)</p>
+<h2 id="what-you-watch-and-what-you-keep">What you watch and what you keep</h2>
+<p>The views only display: bodies follow their animals, with a marker coloured by their action, over a ground painted with
+food and cover. The recorder writes every event and statistic to <code>Logs/EvoSim/runs/</code>. (<a href="views-and-real-time.html">Views and real time</a>,
+<a href="recording-and-outputs.html">Recording and outputs</a>)</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

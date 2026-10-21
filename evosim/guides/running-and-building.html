@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Running and building | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Running and building | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/running-and-building.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="guide-running-and-building">
+<h1 id="running-and-building">Running and building</h1>
+
+<p>A world can run in four ways: in Play mode in the editor, headless from the editor, in batch mode with the editor
+closed, or in a Windows player build. All four give the same events hash for the same scene, seed and brain answers
+(see <a href="determinism.html">Determinism and replay</a>). This page says when to use each and how.</p>
+<table>
+<thead>
+<tr>
+<th>Way</th>
+<th>Use it to</th>
+<th>Speed</th>
+<th>Shows the world</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Play mode</td>
+<td>watch, inspect, debug a module</td>
+<td>as you set it</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Headless in the editor</td>
+<td>get a run's numbers quickly while the editor is open</td>
+<td>as fast as the brain allows</td>
+<td>no</td>
+</tr>
+<tr>
+<td>Batch mode</td>
+<td>CI, scenarios, replays, long checks with the editor closed</td>
+<td>as fast as the brain allows</td>
+<td>no</td>
+</tr>
+<tr>
+<td>Player build</td>
+<td>long watched runs, demos, runs on another machine</td>
+<td>as you set it</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-worlds-run-settings">The World's run settings</h2>
+<p>These fields of the <a class="xref" href="../api/EvoSim.World.html">World</a> decide how and how long a run goes. Every way of running reads them.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>What it does</th>
+<th>Reference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Seed</strong></td>
+<td>the run's seed: every random stream derives from it (RAND-02)</td>
+<td>1234</td>
+</tr>
+<tr>
+<td><strong>Wait Mode</strong></td>
+<td><em>Responsive</em>: while the brain answers, Unity keeps drawing and the tick resumes later. <em>Freeze</em>: the main thread blocks until the answers are in. Both give the same run (SPACE-14)</td>
+<td>Responsive</td>
+</tr>
+<tr>
+<td><strong>Run Speed</strong></td>
+<td><em>PerFixedUpdate</em>: a fixed number of ticks per physics step. <em>Fast</em>: as many ticks as fit in a frame budget. <em>RealTime</em>: a fixed number of ticks per second</td>
+<td>PerFixedUpdate</td>
+</tr>
+<tr>
+<td><strong>Ticks Per Fixed Update</strong>, <strong>Fast Budget Ms</strong>, <strong>Real Time Ticks Per Second</strong></td>
+<td>the number that goes with each speed</td>
+<td>1, 10 ms, 5</td>
+</tr>
+<tr>
+<td><strong>Start On Play</strong></td>
+<td>initialise and run when Play mode starts</td>
+<td>on</td>
+</tr>
+<tr>
+<td><strong>Tick Limit</strong>, <strong>Wall Clock Minutes</strong></td>
+<td>stop after this many ticks, or minutes of real time (0 = never)</td>
+<td>0</td>
+</tr>
+<tr>
+<td><strong>Stop File</strong></td>
+<td>stop at the next tick when this file exists</td>
+<td>empty</td>
+</tr>
+<tr>
+<td><strong>Stop On Extinction</strong></td>
+<td>stop when a species has no animal left</td>
+<td>off</td>
+</tr>
+<tr>
+<td><strong>No Mutation</strong></td>
+<td>switch mutation off (a control run)</td>
+<td>off</td>
+</tr>
+</tbody>
+</table>
+<p>A brain answer that takes time never changes the result: the World waits for it, whatever the speed. The speed only
+says how fast ticks go when nothing is waited for.</p>
+<h2 id="play-mode">Play mode</h2>
+<p>Open a scene and press Play (<a href="getting-started.html">Getting started</a>). The run views draw the ground, the animals and the
+panel; see <a href="views-and-real-time.html">Views and real time</a> for the camera keys. To watch at a steady pace, set <strong>Run
+Speed</strong> to <em>RealTime</em> and <strong>Real Time Ticks Per Second</strong> to 5 or 20.</p>
+<h2 id="run-levels">Run levels</h2>
+<p>Three levels name the usual combinations of brain and mutation:</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Brain</th>
+<th>Mutation</th>
+<th>Servers needed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0</td>
+<td>the random brain</td>
+<td>off</td>
+<td>none</td>
+</tr>
+<tr>
+<td>L1</td>
+<td>the scene's brain (JEV)</td>
+<td>off</td>
+<td>JEV</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>the scene's brain (JEV)</td>
+<td>the LLM mutator</td>
+<td>JEV and Ollama</td>
+</tr>
+</tbody>
+</table>
+<p><code>EvoSim.Editor.RealTimeRuns.SetLevel(world, &quot;L0&quot;)</code> sets a world to a level. In batch mode, <code>-level</code> exists only for
+<code>RealTimeRuns.FromCommandLine</code> (below). The player has <strong>no</strong> <code>-level</code> argument, and it ignores an argument it doesn't
+know without a word: <code>EvoSim.exe -level L0</code> runs the scene as it is, which is L2, calling JEV and Ollama. Give the player
+the equivalent arguments instead (<code>RealTimeRuns.LevelArgs</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Player arguments</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0</td>
+<td><code>-brain Random -noMutation</code></td>
+</tr>
+<tr>
+<td>L1</td>
+<td><code>-noMutation</code></td>
+</tr>
+<tr>
+<td>L2</td>
+<td>none</td>
+</tr>
+</tbody>
+</table>
+<h2 id="headless-from-the-editor">Headless, from the editor</h2>
+<p><code>EvoSim.Editor.RealTimeRuns</code> runs a scene without drawing it, in <em>Freeze</em> mode, and writes the run's files:</p>
+<pre><code class="lang-csharp">// From an editor script, e.g. a menu item of your own: scene, seed, ticks, level, run name.
+string line = EvoSim.Editor.RealTimeRuns.Headless(&quot;HideVsFlee&quot;, 1234, 600, &quot;L0&quot;, &quot;my-run&quot;);
+// → &quot;HideVsFlee L0 seed 1234: 600 ticks, hash 27c52857…, brain Random, brain calls 0, …, folder C:\…\Logs\EvoSim\runs\my-run&quot;
+</code></pre>
+<p><code>Headless</code> blocks the editor until the run ends. For a long run with model calls, <code>HeadlessStart</code> starts the same run
+and advances it from the editor's update loop, one tick at a time for up to 50 ms per editor update, so the editor stays
+usable; <code>HeadlessStatus</code> gives its progress, then its result line, which also goes to
+<code>Logs/EvoSim/realtime-headless.txt</code>. One stepped run goes at a time. In both cases the scene must not be open in the
+editor: the run opens the scene file itself, additively, and closes it without saving.</p>
+<p>To run a scenario asset the same way, use the <em>Scenario Runner</em> window (<a href="editor-tooling.html#scenario-runner">Editor tooling</a>)
+or <code>EvoSim.Batch.RunScenarioNamed(&quot;S03&quot;)</code>, which returns one summary line per seed.</p>
+<h2 id="batch-mode">Batch mode</h2>
+<p>With the editor closed, Unity runs a static method and quits. From the repository root:</p>
+<pre><code class="lang-powershell">$U = &quot;C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Unity.exe&quot;
+&amp; $U -batchmode -nographics -projectPath . -executeMethod EvoSim.Batch.RunScenario -scenario S03 -seed 7 -ticks 2000 -quit
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Arguments</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>EvoSim.Batch.RunScenario</code></td>
+<td><code>-scenario S03 [-variant name] [-seed n] [-ticks n] [-responsive]</code></td>
+<td>runs one scenario asset (S00–S27), every seed of it unless <code>-seed</code> is given; one run folder per seed, <code>Logs/EvoSim/runs/&lt;scenario&gt;-&lt;variant&gt;-s&lt;seed&gt;-&lt;time&gt;/</code>, with <code>run_info.json</code>, <code>events.jsonl</code>, <code>stats.csv</code>, <code>alleles.jsonl</code>, <code>final_population.json</code> and <code>summary.json</code></td>
+</tr>
+<tr>
+<td><code>EvoSim.Batch.RunRegression</code></td>
+<td></td>
+<td>runs the EditMode tests of category T3 (pinned hashes, equivalences, scene checks); totals in <code>Logs/EvoSim/Reports/regression-&lt;time&gt;.txt</code></td>
+</tr>
+<tr>
+<td><code>EvoSim.Batch.RunScenarios</code></td>
+<td><code>-tier T2\|T3\|T4 [-ticks n]</code></td>
+<td>runs every scenario variant of a tier, each seed twice, and checks both runs give the same hash; <code>Logs/EvoSim/Reports/scenarios-&lt;tier&gt;-&lt;time&gt;.txt</code></td>
+</tr>
+<tr>
+<td><code>EvoSim.Batch.RunIntegrity</code></td>
+<td><code>[-checks B-02,B-03] [-scene path] [-brain JEV] [-cpu] [-judge gemma4:12b]</code></td>
+<td>the brain and mutator checks B-01–B-11 (32 §2); without <code>-checks</code>, all but B-07 and B-10. One JSON and one Markdown report per check</td>
+</tr>
+<tr>
+<td><code>EvoSim.Editor.RealTimeRuns.FromCommandLine</code></td>
+<td><code>-do headless\|behaviour -scene HideVsFlee -seed 1234 -ticks 600 -level L2 [-run NAME] -quit</code></td>
+<td>a headless run, or the behaviour probe (hiding, kills, food, babies); the result line is appended to <code>Logs/EvoSim/realtime-batch.txt</code></td>
+</tr>
+<tr>
+<td><code>EvoSim.Editor.VisualPlayerBuild.BuildFromCommandLine</code></td>
+<td><code>[-scenes A,B] [-out folder]</code></td>
+<td>builds the Windows player (default: the six scenes, into <code>Builds/EvoSim/&lt;yyyy-MM-dd&gt;</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>Reports go to <code>Logs/EvoSim/Reports</code>, run folders to <code>Logs/EvoSim/runs</code>. The <code>Batch</code> methods and <code>BuildFromCommandLine</code>
+exit Unity themselves: 0 on success, 1 when a run, a test, the build or a blocking check (B-01) failed, and 2 for
+<code>RunScenario</code> and <code>RunIntegrity</code> on an error such as an unknown scenario. <code>FromCommandLine</code> does not exit by itself:
+pass <code>-quit</code>. Its exit code is then 0 whatever happened, so read its result line.</p>
+<div class="NOTE">
+<h5>Note</h5>
+<p>Batch mode cannot open a project that an open editor holds: close the editor first.</p>
+</div>
+<h2 id="player-builds">Player builds</h2>
+<p>The player is not in the repository: <code>Builds/</code> is ignored by git, so build it yourself the first time.
+<em>EvoSim ▸ Build ▸ Visual Player</em> builds a Windows 64-bit player of the six reference scenes, HideVsFlee first, into
+<code>Builds/EvoSim/&lt;yyyy-MM-dd&gt;/EvoSim.exe</code>, and shows the result in a dialog. The build never edits the project's Build
+Settings: it passes its own scene list. It needs the Mono scripting backend for Standalone, and stops with a message
+rather than change Player settings. From the open editor, <code>EvoSim.Editor.VisualPlayerBuild.BuildLater()</code> starts the same
+build and writes its result to <code>Logs/EvoSim/visual-player-build.txt</code>.</p>
+<p>The player takes its settings from the command line. They are applied to the World before it starts:</p>
+<pre><code class="lang-powershell">EvoSim.exe -scene HideVsFlee -seed 1234 -ticks 600 -speed 20 -capture 10 -run demo -window 1920x1080 -quitAtEnd
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-scene NAME</code></td>
+<td>the scene to load (default: the first one, HideVsFlee)</td>
+</tr>
+<tr>
+<td><code>-seed N</code></td>
+<td>the run's seed</td>
+</tr>
+<tr>
+<td><code>-ticks N</code>, <code>-minutes M</code></td>
+<td>stop after N ticks, or M minutes of wall-clock time</td>
+</tr>
+<tr>
+<td><code>-speed X</code></td>
+<td>X ticks per second (RealTime), or <code>fast</code>, or <code>fixed</code> (PerFixedUpdate)</td>
+</tr>
+<tr>
+<td><code>-wait responsive\|freeze</code></td>
+<td>the wait mode</td>
+</tr>
+<tr>
+<td><code>-brain NAME</code></td>
+<td>the default brain, by GameObject name or brain id (<code>-brain Random</code>)</td>
+</tr>
+<tr>
+<td><code>-noMutation</code></td>
+<td>switch mutation off</td>
+</tr>
+<tr>
+<td><code>-stagger</code></td>
+<td>every species decides staggered (DEC-04)</td>
+</tr>
+<tr>
+<td><code>-capture S</code></td>
+<td>a screenshot every S seconds (<code>0</code>: start and end only, <code>off</code>: none)</td>
+</tr>
+<tr>
+<td><code>-cache FOLDER</code></td>
+<td>the answer cache to read and write</td>
+</tr>
+<tr>
+<td><code>-run NAME</code></td>
+<td>the run folder's name</td>
+</tr>
+<tr>
+<td><code>-window WxH</code></td>
+<td>a window of that size instead of full screen</td>
+</tr>
+<tr>
+<td><code>-quitAtEnd</code></td>
+<td>quit when the run stops, and log the events hash</td>
+</tr>
+</tbody>
+</table>
+<p>Run files, captures and the answer cache land next to the exe: <code>Logs/EvoSim/…</code> and <code>Library/EvoSim/AnswerCache</code>. To
+replay a live run without calling the model again, give the player the cache the live run wrote (<code>-cache</code>). To replay
+a player run headless in the editor, see <a href="determinism.html#replay-a-player-run-in-the-editor">Replay a player run in the editor</a>.</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

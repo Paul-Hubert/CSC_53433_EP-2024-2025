@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>An action or an interaction | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="An action or an interaction | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/action.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-action">
+<h1 id="an-action-or-an-interaction">An action or an interaction</h1>
+
+<p>An action is a behaviour the brain can choose: drink, dig, call for help. Write one when animals need to <em>do</em>
+something new. If the brain should only <em>know</em> something new, write a <a href="sense.html">sense</a> instead. If the new thing
+happens on contact (drink at the shore, drag a carcass), the action asks for an <strong>interaction</strong>, a small class that
+runs once the animal is within reach. How actions run is explained in <a href="../guides/actions-and-movement.html">Actions and movement</a>.</p>
+<h2 id="the-base-class">The base class</h2>
+<p>Derive from <a class="xref" href="../api/EvoSim.AnimalAction.html">AnimalAction</a>, itself a <a href="species-modules.html">species module</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>You</th>
+<th>What it does, when it is called</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.AnimalAction.html#EvoSim_AnimalAction_Act_EvoSim_Animal_EvoSim_ActContext_">Act</a></td>
+<td>must implement</td>
+<td>Plans one tick for an animal that chose this action, through the context. Called by the act phase every tick until the animal's next decision.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.AnimalAction.html#EvoSim_AnimalAction_DefaultDescription">DefaultDescription</a></td>
+<td>should override</td>
+<td>The action's line in the prompt, used when the Inspector's <strong>Description</strong> is empty.</td>
+</tr>
+<tr>
+<td><code>Initialize()</code></td>
+<td>may override</td>
+<td>Find the modules you need once, after every module has declared its stats.</td>
+</tr>
+<tr>
+<td><code>Declare(SpeciesBuilder)</code>, <code>Validate(ValidationReport)</code></td>
+<td>may override</td>
+<td>Declare stats or traits; report configuration mistakes before Play.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.AnimalAction.html#EvoSim_AnimalAction_Rests">Rests</a></td>
+<td>may override</td>
+<td>True for a resting action: a still tick costs the rest cost, not the base cost.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.AnimalAction.html#EvoSim_AnimalAction_Mates">Mates</a></td>
+<td>may override</td>
+<td>True for an action that seeks a partner: the breed phase breeds animals that chose it.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.AnimalAction.html#EvoSim_AnimalAction_Hunts">Hunts</a></td>
+<td>may override</td>
+<td>True for an action that chases and strikes; senses such as the sample <a class="xref" href="../api/EvoSim.Samples.ChasedSense.html">ChasedSense</a> read it.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.AnimalAction.html#EvoSim_AnimalAction_Overlay">Overlay</a>, <a class="xref" href="../api/EvoSim.AnimalAction.html#EvoSim_AnimalAction_OverlayTicks">OverlayTicks</a></td>
+<td>may override</td>
+<td>True for an action done in passing, beside a second action drawn from the rest of the row; for how many ticks. See <a href="#actions-done-in-passing">Actions done in passing</a>.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.AnimalAction.html#EvoSim_AnimalAction_IsRelevant_EvoSim_ObservationView_">IsRelevant</a></td>
+<td>may override</td>
+<td>Declares when a situation is relevant to this action, for the specification's directed tests (CTRL-10). The simulation never calls it.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.AnimalAction.html#EvoSim_AnimalAction_ActAll_System_Collections_Generic_IReadOnlyList_EvoSim_Animal__EvoSim_ActContext_System_Span_EvoSim_ActPlan__">ActAll</a></td>
+<td>may override</td>
+<td>Plans a group of animals at once (20 §10). It must give exactly the plans <code>Act</code> gives.</td>
+</tr>
+<tr>
+<td><code>Name</code>, <code>Description</code>, <code>Gene</code>, <code>Index</code></td>
+<td>read</td>
+<td>The GameObject's name; the prompt line; the bound text gene; the place in the action order.</td>
+</tr>
+</tbody>
+</table>
+<p>The base class already writes the action's line in the prompt, <code>- name: description</code> (PROMPT-01).</p>
+<h2 id="a-complete-example">A complete example</h2>
+<p>The sample <a class="xref" href="../api/EvoSim.Samples.DrinkAction.html">DrinkAction</a> (<code>Assets/EvoSim/Samples/DrinkAction.cs</code>, recipe 22 §3) walks to the
+nearest visible water and resets the animal's thirst there. Thirst is a stat declared by the sample
+<a class="xref" href="../api/EvoSim.Samples.Thirst.html">Thirst</a> module. Its relevance test and its validation are left out here.</p>
+<pre><code class="lang-csharp">[RequiresModule(typeof(Thirst))]
+public class DrinkAction : AnimalAction
+{
+    Thirst thirst;   // the species' thirst module, found in Initialize
+
+    protected override string DefaultDescription =&gt; &quot;go to the nearest visible water and drink&quot;;
+
+    public override void Initialize() =&gt; thirst = Species.Module&lt;Thirst&gt;();
+
+    public override void Act(Animal a, ActContext c)
+    {
+        var water = c.Ground != null ? c.Ground.NearestWater(a.Position, c.Vision(a)) : null;
+        if (water == null) { c.Search(); return; }               // nothing in sight: search (ACT-04)
+        c.WalkTo(water.Value.Shore, 0f);
+        c.OnArrival(new Drink(thirst));                          // applied after moving, within reach
+    }
+
+    sealed class Drink : IInteraction
+    {
+        readonly Thirst thirst;   // the module whose stat is reset
+        public Drink(Thirst t) { thirst = t; }
+        public float Reach =&gt; 0.5f;
+        public void Apply(Animal a, InteractionContext c) { if (thirst != null) a[thirst.Value] = 0f; }
+    }
+}
+</code></pre>
+<p><code>[RequiresModule(typeof(Thirst))]</code> makes validation warn when the species has no thirst module (V-26), and makes the
+conformance suite add one when it tests the action.</p>
+<h2 id="where-to-put-it">Where to put it</h2>
+<ol>
+<li><em>Assets ▸ Create ▸ EvoSim ▸ Script ▸ Action</em> asks for a class name and writes <code>Assets/Student/&lt;Name&gt;.cs</code>, an
+action that only searches, with a test in <code>Assets/Student/Tests/&lt;Name&gt;Tests.cs</code>.</li>
+<li>In the scene, add a child GameObject under the species' <code>Actions</code> object and name it after the action, for example
+<code>drink</code>. That name is the action's name in the prompt; it must be unique in the species (V-03).</li>
+<li>Add your component to it, and a <a class="xref" href="../api/EvoSim.TextGene.html">TextGene</a> on the same GameObject with its founder sentences
+(<em>&quot;Drink whenever you pass water.&quot;</em>). Without a gene the brain can't be steered for the action (V-05, with a fix).
+See <a href="genes.html">Genes</a>.</li>
+<li>The actions' depth-first order is their order in the prompt and in the brain's answer (SPEC-03). Adding an action
+changes the species' signature; accept it in the validation panel (V-12).</li>
+</ol>
+<p>The prompt then lists <code>- drink: go to the nearest visible water and drink</code>. Set the <strong>Description</strong> field to change
+that line for one scene.</p>
+<h2 id="the-act-context">The act context</h2>
+<p><code>Act</code> receives an <a class="xref" href="../api/EvoSim.ActContext.html">ActContext</a>. The context is reset to <em>stay, no interaction</em> before each animal, and the
+last intent and the last <code>OnArrival</code> called are the plan.</p>
+<p><strong>Queries.</strong> Each returns only what the animal's senses could report (ACT-05), or <code>null</code> when nothing is in sight.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Vision(a)</code></td>
+<td>the animal's vision radius, in meters (20 in the reference)</td>
+</tr>
+<tr>
+<td><code>NearestAnimal(a, set, listed)</code></td>
+<td>the nearest visible animal of a set (<a class="xref" href="../api/EvoSim.AnimalSet.html">AnimalSet</a>: threats, prey, kin, listed), with its distance</td>
+</tr>
+<tr>
+<td><code>NearestReadyPartner(a)</code></td>
+<td>the nearest kin in sight that is ready to mate</td>
+</tr>
+<tr>
+<td><code>NearestResource(a, layerName)</code></td>
+<td>the nearest food item its diet grazes, on one layer or all of them</td>
+</tr>
+<tr>
+<td><code>NearestCarcass(a)</code></td>
+<td>the nearest carcass it may eat from</td>
+</tr>
+<tr>
+<td><code>NearestEgg(a, of)</code></td>
+<td>the nearest egg its diet eats, of one species or any</td>
+</tr>
+<tr>
+<td><code>NearestEntity&lt;T&gt;(a, filter)</code></td>
+<td>the nearest entity of a kind of your own; no diet check</td>
+</tr>
+<tr>
+<td><code>NearestCover(a, radius)</code></td>
+<td>the nearest point in cover; distance 0 when already in cover</td>
+</tr>
+<tr>
+<td><code>InCover(a)</code>, <code>IsReady(other)</code></td>
+<td>whether the animal stands in cover; whether another one is ready to mate</td>
+</tr>
+</tbody>
+</table>
+<p><code>World</code>, <code>Ground</code> and <code>Tick</code> give the rest, for example <code>c.Ground.NearestWater(...)</code>.</p>
+<p><strong>Intents.</strong> Say where to go this tick (ACT-03).</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Intent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>WalkTo(point, stopAt)</code>, <code>RunTo(point, stopAt)</code></td>
+<td>go toward a point and stop at a distance from it, never past it (MOVE-04)</td>
+</tr>
+<tr>
+<td><code>WalkTo(animal, stopAt)</code>, <code>RunTo(animal, stopAt)</code></td>
+<td>the same toward an animal, recorded as the animal's target</td>
+</tr>
+<tr>
+<td><code>RunAwayFrom(animal)</code>, <code>RunAwayFrom(point)</code>, <code>WalkAwayFrom(point)</code></td>
+<td>go straight away, as far as speed and stamina allow</td>
+</tr>
+<tr>
+<td><code>Stay()</code></td>
+<td>stay where it is</td>
+</tr>
+<tr>
+<td><code>Wander()</code></td>
+<td>keep the heading, sometimes turn by ±45° or ±90°; walks (MOVE-05)</td>
+</tr>
+<tr>
+<td><code>Search()</code></td>
+<td>wander, and count the choice as searching once per decision (ACT-04)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Arrival.</strong> <code>OnArrival(Interaction.Graze(item))</code> asks for a reference interaction; the other builders of
+<a class="xref" href="../api/EvoSim.Interaction.html">Interaction</a> are <code>Strike(animal)</code>, <code>Scavenge(carcass)</code> and <code>EatEgg(egg)</code>. <code>OnArrival(myInteraction)</code> asks
+for one of your own.</p>
+<h2 id="interactions">Interactions</h2>
+<p>An interaction is the effect of contact. It is the only place where an action changes an animal (ACT-06). Implement
+<a class="xref" href="../api/EvoSim.IInteraction.html">IInteraction</a>:</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>What it does, when it is called</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.IInteraction.html#EvoSim_IInteraction_Reach">Reach</a></td>
+<td>How close to the point its intent was heading to, in meters, the animal must end its move. For a <code>Stay</code>, that point is the animal's own position.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.IInteraction.html#EvoSim_IInteraction_Apply_EvoSim_Animal_EvoSim_InteractionContext_">Apply</a></td>
+<td>Called once, in the same tick, right after the animal moved, if it is within reach and was not killed earlier in the tick.</td>
+</tr>
+</tbody>
+</table>
+<p><code>Apply</code> receives an <a class="xref" href="../api/EvoSim.InteractionContext.html">InteractionContext</a>: <code>World</code>, <code>Ground</code>, <code>Tick</code>,
+<a class="xref" href="../api/EvoSim.InteractionContext.html#EvoSim_InteractionContext_Feed_EvoSim_Animal_System_Single_System_Boolean_">Feed</a> and
+<a class="xref" href="../api/EvoSim.InteractionContext.html#EvoSim_InteractionContext_Stream_EvoSim_Species_System_String_">Stream</a>. <code>Feed(a, energy, digest)</code> feeds an
+animal like a meal: energy gained up to the maximum, one meal counted, and, if <code>digest</code> is true, digestion afterwards
+for a species with a <a class="xref" href="../api/EvoSim.Digestion.html">Digestion</a> module. It checks no diet, so check the eater's <a class="xref" href="../api/EvoSim.Diet.html">Diet</a> yourself when your food should depend on it.</p>
+<p>A complete action with an interaction that feeds: the test probe <a class="xref" href="../api/EvoSim.Testing.FeedAction.html">FeedAction</a>
+(<code>Assets/EvoSim/Testing/Probes/FeedAction.cs</code>) stays where it is and eats a snack every tick.</p>
+<pre><code class="lang-csharp">public class FeedAction : AnimalAction
+{
+    public float Energy = 5f;
+
+    protected override string DefaultDescription =&gt; &quot;stay and eat a snack (a test probe)&quot;;
+
+    public override void Act(Animal a, ActContext c)
+    {
+        c.Stay();
+        c.OnArrival(new Snack(Energy));          // reach is measured from where it stays: always in reach
+    }
+
+    sealed class Snack : IInteraction
+    {
+        readonly float energy;   // the snack's energy, in points
+        public Snack(float e) { energy = e; }
+        public float Reach =&gt; 0.5f;
+        public void Apply(Animal actor, InteractionContext c) =&gt; c.Feed(actor, energy);
+    }
+}
+</code></pre>
+<p><code>Reach</code> may be <code>float.PositiveInfinity</code>: the sample <a class="xref" href="../api/EvoSim.Samples.DragAction.html">DragAction</a> uses it to move a carcass along
+with the animal, wherever it ends up.</p>
+<h2 id="actions-done-in-passing">Actions done in passing</h2>
+<p>An action normally runs every tick until the next decision (ACT-02), and decides the intent: where the animal goes.
+That doesn't suit something done in a moment, such as a call, a scent mark or a look around: an animal that stood
+still to call would stand still for a whole decision period, next to the predator it warns about. Such an action is an
+<strong>overlay</strong> (ACT-07): override <code>Overlay</code> to return true.</p>
+<ul>
+<li>When the brain's draw picks an overlay, the engine draws a second action, the <strong>carrier</strong>, from the same row with
+every overlay set to 0 (DEC-20). That is what the animal would have done had it not drawn the overlay: flee, hide,
+eat. A row with nothing else leaves no carrier, and the animal stays.</li>
+<li>Each tick the carrier plans as usual. Then the overlay's <code>Act</code> runs in the same context: its intent is ignored, its
+interaction applies after the carrier's, measured from the point its own intent names (none: where the animal stood).
+Use <code>float.PositiveInfinity</code> as the reach for an effect that happens wherever the carrier took the animal.</li>
+<li>It acts for <code>OverlayTicks</code> ticks (1 by default: once, on the tick of the decision; 0: until the next decision), and
+ends early when the animal becomes busy or dies. The brain is asked nothing more; a species without overlays draws
+exactly as before.</li>
+<li>The prompt keeps the action's line, and the engine adds one rule: <em>Some actions are done in passing (mark): the
+animal also does its next most likely choice.</em></li>
+<li>A species needs at least one action that is not an overlay (V-19), and an overlay may not mate or hunt (V-27).</li>
+<li>The inspector shows both, &quot;flee + mark&quot;; the decision counts count the overlay and its carrier.</li>
+</ul>
+<pre><code class="lang-csharp">public class MarkAction : AnimalAction
+{
+    public override bool Overlay =&gt; true;                    // done in passing (ACT-07)
+
+    protected override string DefaultDescription =&gt; &quot;leave a scent mark&quot;;
+
+    public override void Act(Animal a, ActContext c) =&gt; c.OnArrival(new Mark());   // no intent: the carrier moves it
+
+    sealed class Mark : IInteraction
+    {
+        public float Reach =&gt; float.PositiveInfinity;        // wherever the carrier took the animal
+        public void Apply(Animal actor, InteractionContext c) =&gt;
+            actor.Species.Module&lt;Energy&gt;()?.Pay(actor, 0.2f);   // a mark costs a little energy
+    }
+}
+</code></pre>
+<p>The worked example <a href="worked-example-alarm-calls.html">Alarm calls</a> builds a complete overlay, with a world service that
+keeps the calls and a sense that hears them.</p>
+<h2 id="rules">Rules</h2>
+<ol>
+<li><strong>Search when there is nothing to act on</strong> (ACT-04). Call <code>c.Search()</code>, not <code>c.Wander()</code>, so the choice is counted.</li>
+<li><strong>Target only what the context returns</strong> (ACT-05): within vision, not hidden, not killed, not itself.</li>
+<li><strong>Never change an animal in <code>Act</code></strong> (ACT-06): no positions, stats or flags, yours included. Effects go through
+interactions, and the act phase moves the animal.</li>
+<li><strong>Never read gene sentences or decision records</strong> (ACT-20). Genes reach an action only through traits.</li>
+<li><strong>Draw random numbers only from the species' streams</strong> (RAND-03): <code>World.Random.For(Species, &quot;actions&quot;)</code> in <code>Act</code>,
+<code>c.Stream(actor.Species, &quot;actions&quot;)</code> in <code>Apply</code>. Never <code>UnityEngine.Random</code>.</li>
+<li><strong>Keep settings in the module, state in the animal.</strong> One action object serves every animal of its species; a
+per-animal memory goes in a stat you declare.</li>
+<li><strong>Set up in <code>Initialize</code></strong>, not in <code>Awake</code> or <code>Start</code>.</li>
+</ol>
+<h2 id="test-it">Test it</h2>
+<p>The conformance suite runs every action class in the project: <em>Window ▸ General ▸ Test Runner</em>, EditMode,
+<code>ConformanceTests</code> ▸ <code>ActionConformance</code>, one case per class (the T-ACT template). It puts your action, with a text
+gene and the modules it requires, under the prey of a small world and checks that:</p>
+<ul>
+<li>the action has a description and a bound gene;</li>
+<li>calling <code>Act</code> on every prey changes no animal anywhere (ACT-06);</li>
+<li>alone in an empty world, the action searches or stays (ACT-04); resting actions are exempt; an overlay plans no
+move and must not search (ACT-07), and gets a rest action beside it as its carrier.</li>
+</ul>
+<p>A test to copy, from <code>Assets/EvoSim/Tests/EditMode/Samples/SampleTests.cs</code> (its class derives from
+<a class="xref" href="../api/EvoSim.Testing.WorldFixture.html">WorldFixture</a>, which provides <code>New()</code>):</p>
+<pre><code class="lang-csharp">[Test]
+public void DrinkResetsThirst()
+{
+    var w = New().Ground&lt;PondGround&gt;(20, 20).Food(0f, 0f).Phase&lt;ActPhase&gt;()
+        .Species(&quot;prey&quot;, s =&gt; s.PreyBody().Action&lt;DrinkAction&gt;(&quot;drink&quot;).Module&lt;Thirst&gt;()).Build();
+    var sp = w.FindSpecies(&quot;prey&quot;);
+    var a = Place.Animal(sp, Place.At(10f, 15f));
+    var thirst = sp.Module&lt;Thirst&gt;().Value;
+    a[thirst] = 50f;
+    a.Choose(&quot;drink&quot;);
+    w.Advance(3);
+    Assert.AreEqual(0f, a[thirst], &quot;drank&quot;);
+}
+</code></pre>
+<p>See <a href="testing-your-module.html">Testing your module</a> for the world builder and the other suites.</p>
+<h2 id="read-next">Read next</h2>
+<ul>
+<li>The reference actions, smallest first: <a class="xref" href="../api/EvoSim.RestAction.html">RestAction</a>, <a class="xref" href="../api/EvoSim.FollowAction.html">FollowAction</a>,
+<a class="xref" href="../api/EvoSim.EatAction.html">EatAction</a>, <a class="xref" href="../api/EvoSim.FleeAction.html">FleeAction</a>, <a class="xref" href="../api/EvoSim.HideAction.html">HideAction</a>, <a class="xref" href="../api/EvoSim.HuntAction.html">HuntAction</a>,
+<a class="xref" href="../api/EvoSim.MateAction.html">MateAction</a>. Rewrite one from its stub: <a href="exercises.html">the teaching path</a>.</li>
+<li>The samples <a class="xref" href="../api/EvoSim.Samples.DrinkAction.html">DrinkAction</a> and <a class="xref" href="../api/EvoSim.Samples.DragAction.html">DragAction</a>: <a href="samples.html">the samples</a>.</li>
+<li><a href="locomotion.html">A locomotion</a>, to change how animals move; <a href="genes.html">Genes</a>, for the gene on your action.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

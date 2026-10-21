@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Genes and mutation | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Genes and mutation | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/genes-and-mutation.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="guide-genes-and-mutation">
+<h1 id="genes-and-mutation">Genes and mutation</h1>
+
+<p>An animal's behaviour comes from its <strong>genes</strong>: short English sentences the brain reads before every decision, and
+sometimes numbers that set a trait such as maximum stamina. A baby inherits a mix of its parents' genes, and now and then
+one gene <strong>mutates</strong>: a second language model, the <strong>mutator</strong>, rewrites the sentence. Selection does the rest. This page
+explains how genes are stored, expressed and changed. How parents and babies meet is in
+<a href="reproduction-and-population.html">Reproduction and population</a>.</p>
+<h2 id="genes-loci-and-alleles">Genes, loci and alleles</h2>
+<p>A gene is a component under a species, a <a class="xref" href="../api/EvoSim.Gene.html">Gene</a>. Each gene is one <strong>locus</strong>: one slot in the genome of every
+animal of the species. The value an animal carries in that slot is an <strong>allele</strong>. Two animals with the same sentence at
+the same gene carry the same allele.</p>
+<table>
+<thead>
+<tr>
+<th>Gene kind</th>
+<th>Holds</th>
+<th>Expressed as</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.TextGene.html">TextGene</a></td>
+<td>a sentence, e.g. <em>&quot;Run from any predator you see.&quot;</em></td>
+<td>a line of the prompt's genes block (GENE-03)</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.NumberGene.html">NumberGene</a></td>
+<td>a number, e.g. 60</td>
+<td>a trait of the animal, e.g. <code>stamina.max</code> (GENE-04)</td>
+</tr>
+</tbody>
+</table>
+<p>A text gene placed on an action, or below it, is <strong>bound</strong> to that action and takes its name as label (GENE-05). Each
+reference action prefab (<code>Eat</code>, <code>Flee</code>, <code>Rest</code>…) carries its own text gene, so the prey's flee gene is labelled <code>flee</code>.
+A text gene under no action must have <strong>Free</strong> ticked: it appears under its own label, for a temperament or a general
+rule.</p>
+<p>The species collects its genes depth first in the hierarchy. That order is the <strong>locus order</strong>
+(<a class="xref" href="../api/EvoSim.Gene.html#EvoSim_Gene_Locus">Locus</a>), the same in every genome. Each gene has a <strong>locus id</strong> <code>&lt;species id&gt;.&lt;label&gt;</code>, unique in the
+world: <code>prey.flee</code>, <code>predator.hunt</code> (GENE-11).</p>
+<h2 id="alleles-and-the-registry">Alleles and the registry</h2>
+<p>Every allele seen in a run is registered once, in <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Alleles">Alleles</a> (an <a class="xref" href="../api/EvoSim.AlleleRegistry.html">AlleleRegistry</a>, GENE-10).
+Sentences are compared after collapsing spaces; numbers at the gene's <a class="xref" href="../api/EvoSim.Gene.html#EvoSim_Gene_Decimals">Decimals</a> (4 by default). Each
+<a class="xref" href="../api/EvoSim.Allele.html">Allele</a> gets an id <code>&lt;locus id&gt;:&lt;n&gt;</code>, counted from 0 per locus: <code>prey.flee:0</code>, <code>prey.flee:1</code>… It also
+records where it came from (GENE-12):</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Origin</code></td>
+<td><code>founder</code>, <code>neutral</code>, <code>control</code>, <code>mutant</code></td>
+</tr>
+<tr>
+<td><code>ParentId</code></td>
+<td><code>prey.flee:2</code>, for a mutant of that allele</td>
+</tr>
+<tr>
+<td><code>Operator</code></td>
+<td><code>llm#5</code> (instruction 5 of the deck), <code>gauss</code></td>
+</tr>
+<tr>
+<td><code>Model</code>, <code>Seed</code></td>
+<td><code>gemma4:26b</code> and the call's seed, for a sentence written by the mutator</td>
+</tr>
+</tbody>
+</table>
+<p>Following parent ids back from a mutant gives its lineage, down to a founder. The recorder writes every allele to
+<code>alleles.jsonl</code> (<a href="recording-and-outputs.html">Recording and outputs</a>).</p>
+<h2 id="founder-pools">Founder pools</h2>
+<p>Each gene has a <strong>founder pool</strong>, <a class="xref" href="../api/EvoSim.Gene.html#EvoSim_Gene_FounderPool">FounderPool</a> (GENE-20). The founders at tick 0, and the newcomers that
+arrive below a species' floor, draw each locus independently and uniformly from it.</p>
+<ul>
+<li>A text gene's pool is its founder sentences, plus the <strong>neutral</strong> allele <em>&quot;No preference.&quot;</em> unless <strong>Has Neutral</strong> is
+off (GENE-24). The reference sentences live in shared <a class="xref" href="../api/EvoSim.AllelePool.html">AllelePool</a> assets, one per locus, in
+<code>Assets/EvoSim/Data/AllelePools</code> (<code>prey_flee.asset</code>, <code>predator_hunt.asset</code>…).</li>
+<li>A number gene's pool is its founder values: 45, 60 and 75 for the reference stamina gene.</li>
+</ul>
+<p>Pools are frozen for an experiment (GENE-21): the World registers them before anything else, so founder alleles have the
+same ids in every run. Founder sentences pass the same guards as mutants (GENE-22): at most 12 words, ASCII letters,
+digits, spaces and <code>, . ' ’ ; : ! ? -</code> (<a class="xref" href="../api/EvoSim.SentenceGuards.html">SentenceGuards</a>).</p>
+<h2 id="genomes-and-expression">Genomes and expression</h2>
+<p>A <a class="xref" href="../api/EvoSim.Genome.html">Genome</a> holds one allele per locus, in locus order (GENE-06). It never changes: a baby gets a new one. Its
+<a class="xref" href="../api/EvoSim.Genome.html#EvoSim_Genome_Key">Key</a> hashes the species and every allele value (GENE-13); its <a class="xref" href="../api/EvoSim.Genome.html#EvoSim_Genome_BrainKey">BrainKey</a> hashes
+only the genes the brain reads, and is part of the memo and cache keys (DEC-31).</p>
+<p><a class="xref" href="../api/EvoSim.Gene.html#EvoSim_Gene_Express_EvoSim_AlleleValue_EvoSim_Expression_">Express</a> turns an allele into what acts, through an
+<a class="xref" href="../api/EvoSim.Expression.html">Expression</a>. It runs at two moments:</p>
+<ul>
+<li><strong>at birth</strong>, a number gene sets its trait, or multiplies the trait's default, clamped to the trait's range;</li>
+<li><strong>when a decision's prompt is written</strong>, each gene the brain reads adds one line to the genes block (PROMPT-02).</li>
+</ul>
+<p>For a reference prey, the genes block looks like this:</p>
+<pre><code class="lang-text">- eat: &quot;Eat whenever food is close.&quot;
+- flee: &quot;Run from any predator you see.&quot;
+- hide: &quot;No preference.&quot;
+- follow: &quot;Keep your distance from other animals.&quot;
+- rest: &quot;Rest only when you feel safe.&quot;
+- mate: &quot;Mate with any nearby adult.&quot;
+</code></pre>
+<p>A number gene stays out of the prompt unless its <strong>Show In Prompt</strong> is on.</p>
+<h2 id="mutation">Mutation</h2>
+<pre><code class="lang-mermaid">flowchart LR
+    C[Conception] --&gt; R{Rate draw}
+    R --&gt;|no| K[Inherited allele]
+    R --&gt;|yes| O[Operator draws its choices]
+    O --&gt;|number| J[Job done]
+    O --&gt;|text| S[Mutator service]
+    S --&gt; M[Mutator model] --&gt; G{Clean and guards}
+    G --&gt;|rejected, tries left| S
+    G --&gt;|5 rejected| K
+    G --&gt;|accepted| J
+    J --&gt; H{Hatching: gene check}
+    H --&gt;|ok| A[New allele]
+    H --&gt;|refused or unchanged| K
+</code></pre>
+<ol>
+<li><strong>Which loci.</strong> In the breed phase, after each baby's crossover, each locus mutates with the probability <strong>Rate</strong> of
+its operator: 0.03 per gene per baby (MUT-01). The draw comes from the species' <code>mutation</code> stream.</li>
+<li><strong>Which operator.</strong> Exactly one <a class="xref" href="../api/EvoSim.MutationOperator.html">MutationOperator</a> applies to a locus: the first one that accepts the gene
+and lists it in <strong>Only These</strong>, else the first one that accepts it and lists no gene (MUT-02). The reference uses
+<a class="xref" href="../api/EvoSim.LlmMutation.html">LlmMutation</a> for text genes and <a class="xref" href="../api/EvoSim.GaussianMutation.html">GaussianMutation</a> for number genes.</li>
+<li><strong>Draw now.</strong> The operator draws all its random choices at conception (MUT-30) and returns a
+<a class="xref" href="../api/EvoSim.MutationJob.html">MutationJob</a>. A Gaussian job is done at once: v′ = clamp(v + N(0, σ)) within the gene's range, σ = 5
+(MUT-20).</li>
+<li><strong>Ask the mutator.</strong> An LLM job goes to the World's <a class="xref" href="../api/EvoSim.MutatorService.html">MutatorService</a>, described below.</li>
+<li><strong>Hatch.</strong> The egg hatches once its jobs are done (MUT-32). Each new value must pass the gene's
+<a class="xref" href="../api/EvoSim.Gene.html#EvoSim_Gene_Check_EvoSim_AlleleValue_">Check</a>; it is then registered as a mutant and listed in the baby's
+<code>birth</code> event (MUT-03). A failed job, a refused value or a value equal to the parent leaves the inherited allele
+(MUT-04).</li>
+</ol>
+<h3 id="the-llm-mutator">The LLM mutator</h3>
+<p>The deck is a text file of instructions, one per line; lines starting with <code>#</code> are ignored (MUT-10). The reference deck
+<code>Assets/EvoSim/Data/Decks/mutate_v4.txt</code> has seven, such as <em>&quot;Make the rule in this sentence a little weaker.&quot;</em> and
+<em>&quot;Change when this rule applies.&quot;</em>. For each of its 5 tries, <code>LlmMutation</code> draws an instruction and a seed at conception.
+The prompt is exactly (MUT-11):</p>
+<pre><code class="lang-text">The sentence below is a rule that a wild animal follows.
+Make this rule say the opposite.
+
+&quot;Run from any predator you see.&quot;
+
+Reply with the new sentence only.
+</code></pre>
+<p>The mutator sees nothing else: no animal, no world, no other gene (CORE-07).</p>
+<ul>
+<li><strong>Batches.</strong> The service sends all first tries of a tick as one batch at the end of the breed phase, then the redraws as
+later batches (MUT-31), through the World's <a class="xref" href="../api/EvoSim.MutatorClient.html">MutatorClient</a>. The reference client,
+<a class="xref" href="../api/EvoSim.OllamaMutatorClient.html">OllamaMutatorClient</a>, asks <code>gemma4:26b</code> in Ollama (<code>http://localhost:11434</code>) on the CPU, so the GPU stays
+the brain's; temperature 1.2, thinking off.</li>
+<li><strong>Cache.</strong> Answers are stored in the <a class="xref" href="../api/EvoSim.AnswerCache.html">AnswerCache</a> under the model, prompt, seed and temperature (MUT-14):
+a repeated run gets the same mutants without a model call.</li>
+<li><strong>Cleaning and guards</strong> (MUT-12, <a class="xref" href="../api/EvoSim.MutationText.html">MutationText</a>). The service keeps the quoted part, drops a leading
+&quot;Here is …:&quot;, keeps the first sentence, adds a final period and a capital. It rejects the answer as <code>invalid</code> (no word,
+more than 12 words, the parent again, a forbidden character) or <code>unchanged</code> (only punctuation differs).</li>
+<li><strong>Redraws.</strong> A rejected try is followed by the next one, with its own instruction and seed (MUT-13). After 5 rejected
+tries the gene stays as it was.</li>
+<li><strong>No mutator.</strong> If the server can't be reached, the gene stays unchanged (MUT-04). With <strong>Strict</strong> on, the run also
+stops at the end of the tick.</li>
+</ul>
+<p>A real mutation: <em>&quot;Run from any predator you see.&quot;</em> → <em>&quot;Run quickly from any predator you see.&quot;</em></p>
+<h3 id="eggs-and-waiting">Eggs and waiting</h3>
+<p>The mutator takes time, so babies wait as <strong>eggs</strong> until their genome is complete. With the reference incubation of 0
+ticks, eggs hatch in the tick they are laid, and that tick waits for the mutator's answers. An
+<a class="xref" href="../api/EvoSim.Incubation.html">Incubation</a> of a few ticks lets the world go on while the answers arrive (MUT-33). Either way the result is
+the same: every choice was drawn at conception, so it never depends on when an answer comes back.</p>
+<h2 id="the-main-types">The main types</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Gene.html">Gene</a></td>
+<td>the base class of a locus: label, kind, founder pool, expression, allowed values</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.TextGene.html">TextGene</a>, <a class="xref" href="../api/EvoSim.NumberGene.html">NumberGene</a></td>
+<td>the reference gene kinds</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.AllelePool.html">AllelePool</a></td>
+<td>an asset of founder and contrast sentences shared by several text genes</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Allele.html">Allele</a>, <a class="xref" href="../api/EvoSim.AlleleValue.html">AlleleValue</a></td>
+<td>one registered value with its lineage; the value itself</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.AlleleRegistry.html">AlleleRegistry</a></td>
+<td>every allele of the run, once per locus and value</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Genome.html">Genome</a></td>
+<td>one allele per locus, in locus order</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Expression.html">Expression</a></td>
+<td>what <code>Express</code> writes into: a trait, or a prompt line</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.MutationOperator.html">MutationOperator</a></td>
+<td>the base class of a mutation rule; <a class="xref" href="../api/EvoSim.LlmMutation.html">LlmMutation</a>, <a class="xref" href="../api/EvoSim.GaussianMutation.html">GaussianMutation</a></td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.MutationJob.html">MutationJob</a></td>
+<td>one mutation of one gene of one baby: done, failed or still running</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.MutatorService.html">MutatorService</a>, <a class="xref" href="../api/EvoSim.MutatorClient.html">MutatorClient</a></td>
+<td>batches, cleans and caches LLM mutations; sends the prompts to a server</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.MutationStats.html">MutationStats</a></td>
+<td>the run's counts: attempts, successes, model calls, rejections by reason (MUT-05)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="settings">Settings</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Field</th>
+<th>Reference</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Text gene</td>
+<td><strong>Pool</strong></td>
+<td>the locus' asset</td>
+<td>shared founders; empty = the <strong>Founders</strong> list</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Has Neutral</strong>, <strong>Neutral</strong>, <strong>Neutral Mutates</strong></td>
+<td>on, &quot;No preference.&quot;, on</td>
+<td>the neutral allele and whether it may mutate (MUT-22)</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Free</strong></td>
+<td>off</td>
+<td>not bound to an action</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Max Words</strong></td>
+<td>12</td>
+<td>word limit for founders and mutants</td>
+</tr>
+<tr>
+<td>Number gene</td>
+<td><strong>Trait</strong>, <strong>Multiply Default</strong></td>
+<td><code>stamina.max</code>, off</td>
+<td>the trait it sets; replace or multiply its default</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Min</strong>, <strong>Max</strong>, <strong>Founders</strong></td>
+<td>20, 120; 45, 60, 75</td>
+<td>the gene's own range and founder values</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Show In Prompt</strong>, <strong>Decimals</strong></td>
+<td>off, 4</td>
+<td>whether the brain reads it; comparison precision</td>
+</tr>
+<tr>
+<td>Any operator</td>
+<td><strong>Rate</strong>, <strong>Only These</strong></td>
+<td>0.03, empty</td>
+<td>probability per gene per baby; genes it is configured for</td>
+</tr>
+<tr>
+<td>LLM mutation</td>
+<td><strong>Deck</strong>, <strong>Context Line</strong>, <strong>Tries</strong>, <strong>Max Words</strong></td>
+<td><code>mutate_v4</code>, the line above, 5, 12</td>
+<td></td>
+</tr>
+<tr>
+<td>Gaussian mutation</td>
+<td><strong>Sigma</strong></td>
+<td>5</td>
+<td>standard deviation, in the gene's unit</td>
+</tr>
+<tr>
+<td>Mutator service</td>
+<td><strong>Model</strong>, <strong>Temperature</strong>, <strong>Strict</strong>, <strong>Use Cache</strong></td>
+<td><code>gemma4:26b</code>, 1.2, off, on</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>On the World, the controls of <a href="../spec/15-controls-metrics-and-gates.html">15 — Controls</a> change genes for a whole run:
+<strong>No Mutation</strong> (C2) sets every rate to 0; <strong>Shuffled Genes</strong> (C3) makes each decision read the genes of another living
+animal of the species; <strong>Random Founders</strong> (C4) draws founder sentences from the World's <strong>Control Sentences</strong> and
+founder numbers uniformly in each gene's range.</p>
+<h2 id="in-the-editor">In the editor</h2>
+<ul>
+<li>The species inspector's <strong>Genes</strong> foldout lists the genes in locus order, with their locus id, kind, founder count
+and the operator that applies, with its rate.</li>
+<li><em>Window ▸ EvoSim ▸ Gene Pool</em>, in Play mode: pick a species and a locus. For a text gene it shows the allele shares over
+time (one colour per allele id), the 12 most common alleles with their text, origin and id, and, when you click one,
+its lineage back to a founder. For a number gene it shows a histogram of the living animals' values. It samples every
+20 ticks while it is open.</li>
+<li><em>GameObject ▸ EvoSim ▸ Add Gene ▸ Stamina gene</em> adds the reference number gene with its Gaussian operator.</li>
+<li><em>Assets ▸ Create ▸ EvoSim ▸ Mutation Deck</em> writes a copy of the reference deck for you to edit.</li>
+<li>Validation reports bad founders (V-40, V-42), empty pools (V-41), a missing neutral allele (V-43), a number gene's
+unknown trait or missing cost (V-45, V-47), a gene no operator accepts (V-48), a missing deck (V-20) or mutator (V-63).</li>
+</ul>
+<h2 id="go-further">Go further</h2>
+<ul>
+<li>Add a free gene, a number gene or a new gene kind: <a href="../extending/genes.html">Genes</a>.</li>
+<li>Write your own deck or mutation operator: <a href="../extending/mutation.html">Mutation</a>. Rewrite <code>LlmMutation</code> from its stub:
+<a href="../extending/exercises.html">the teaching path</a>.</li>
+<li>Use another mutator server: <a href="../extending/http-brains.html">An HTTP brain or mutator server</a>.</li>
+<li>The contract: <a href="../spec/09-genes-alleles-and-genomes.html">09 — Genes, alleles and genomes</a> and
+<a href="../spec/10-mutation.html">10 — Mutation</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

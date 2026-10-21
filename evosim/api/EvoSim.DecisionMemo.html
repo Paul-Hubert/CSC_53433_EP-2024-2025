@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class DecisionMemo | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class DecisionMemo | EvoSim ">
+      
+      <meta name="description" content="Within a run, the answer for a key (species, brain, brain-visible genome key, observation) is computed once and reused (DEC-30). A hit gives exactly what the brain answered. Failed answers are never stored (DEC-34). Keys are kept as 128-bit hashes and identical rows are shared, so a long run&#39;s memo stays small (R-06).">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_DecisionMemo.md&amp;value=---%0Auid%3A%20EvoSim.DecisionMemo%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.DecisionMemo">
+
+
+
+  <h1 id="EvoSim_DecisionMemo" data-uid="EvoSim.DecisionMemo" class="text-break">
+Class DecisionMemo  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionMemo.cs/#L17"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Runtime.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Within a run, the answer for a key (species, brain, brain-visible genome key, observation) is computed once and
+reused (DEC-30). A hit gives exactly what the brain answered. Failed answers are never stored (DEC-34).
+Keys are kept as 128-bit hashes and identical rows are shared, so a long run's memo stays small (R-06).</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class DecisionMemo</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">DecisionMemo</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="EvoSim_DecisionMemo_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>The World holds one, in <a class="xref" href="EvoSim.DecisionState.html#EvoSim_DecisionState_Memo">Memo</a>, cleared when a run starts. The ask-brains phase looks
+each decision up with <a class="xref" href="EvoSim.DecisionMemo.html#EvoSim_DecisionMemo_TryGet_System_String_System_Single____">TryGet(string, out float[])</a> before asking the brain; the choose-actions phase stores fresh answers,
+and answers read from the answer cache, with <a class="xref" href="EvoSim.DecisionMemo.html#EvoSim_DecisionMemo_Store_System_String_System_Single___">Store(string, float[])</a>.</p>
+<p>Rows are shared between keys: never change a row the memo gave you.</p>
+</div>
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="EvoSim_DecisionMemo_Capacity_" data-uid="EvoSim.DecisionMemo.Capacity*"></a>
+
+  <h3 id="EvoSim_DecisionMemo_Capacity" data-uid="EvoSim.DecisionMemo.Capacity">
+  Capacity
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionMemo.cs/#L45"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Most keys kept; a full memo stores no new key (results don't change: brains are deterministic, DEC-12). 0 = no
+limit.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Capacity { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="EvoSim_DecisionMemo_Capacity_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Set from the World's memo capacity at the start of a run (reference 262 144 keys, about 10 MB). Beyond it,
+new situations go to the brain, and its answer cache, every time.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_DecisionMemo_Count_" data-uid="EvoSim.DecisionMemo.Count*"></a>
+
+  <h3 id="EvoSim_DecisionMemo_Count" data-uid="EvoSim.DecisionMemo.Count">
+  Count
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionMemo.cs/#L37"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The number of keys stored.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Count { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_DecisionMemo_DistinctRows_" data-uid="EvoSim.DecisionMemo.DistinctRows*"></a>
+
+  <h3 id="EvoSim_DecisionMemo_DistinctRows" data-uid="EvoSim.DecisionMemo.DistinctRows">
+  DistinctRows
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionMemo.cs/#L48"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Different rows among the stored answers (they are shared between keys).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int DistinctRows { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_DecisionMemo_Hits_" data-uid="EvoSim.DecisionMemo.Hits*"></a>
+
+  <h3 id="EvoSim_DecisionMemo_Hits" data-uid="EvoSim.DecisionMemo.Hits">
+  Hits
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionMemo.cs/#L51"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Lookups answered from the memo since the last <a class="xref" href="EvoSim.DecisionMemo.html#EvoSim_DecisionMemo_Clear">Clear()</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Hits { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_DecisionMemo_Clear_" data-uid="EvoSim.DecisionMemo.Clear*"></a>
+
+  <h3 id="EvoSim_DecisionMemo_Clear" data-uid="EvoSim.DecisionMemo.Clear">
+  Clear()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionMemo.cs/#L90"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Forgets every key and row and resets <a class="xref" href="EvoSim.DecisionMemo.html#EvoSim_DecisionMemo_Hits">Hits</a>: the World calls it when a run starts.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Clear()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_DecisionMemo_Key_" data-uid="EvoSim.DecisionMemo.Key*"></a>
+
+  <h3 id="EvoSim_DecisionMemo_Key_EvoSim_Species_EvoSim_Brain_System_String_EvoSim_Observation_" data-uid="EvoSim.DecisionMemo.Key(EvoSim.Species,EvoSim.Brain,System.String,EvoSim.Observation)">
+  Key(Species, Brain, string, Observation)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionMemo.cs/#L60"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Builds the memo key of a decision (DEC-30).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string Key(Species s, Brain b, string genomeKey, Observation o)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>s</code> <a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd><p>The deciding animal's species.</p>
+</dd>
+    <dt><code>b</code> <a class="xref" href="EvoSim.Brain.html">Brain</a></dt>
+    <dd><p>Its brain, or null (&quot;-&quot;).</p>
+</dd>
+    <dt><code>genomeKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The brain-visible genome key (DEC-31): <a class="xref" href="EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_GenomeKey">GenomeKey</a>.</p>
+</dd>
+    <dt><code>o</code> <a class="xref" href="EvoSim.Observation.html">Observation</a></dt>
+    <dd><p>The animal's observation.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>&quot;species|brain|genome key|observation key&quot;; the ask-brains phase appends &quot;|&quot; and the attachment key when
+there is one.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_DecisionMemo_Store_" data-uid="EvoSim.DecisionMemo.Store*"></a>
+
+  <h3 id="EvoSim_DecisionMemo_Store_System_String_System_Single___" data-uid="EvoSim.DecisionMemo.Store(System.String,System.Single[])">
+  Store(string, float[])
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionMemo.cs/#L78"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Stores the row of a key, sharing it with any equal row already stored.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Store(string key, float[] row)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>key</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>A key from <a class="xref" href="EvoSim.DecisionMemo.html#EvoSim_DecisionMemo_Key_EvoSim_Species_EvoSim_Brain_System_String_EvoSim_Observation_">Key(Species, Brain, string, Observation)</a>; null stores nothing.</p>
+</dd>
+    <dt><code>row</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>[]</dt>
+    <dd><p>A good row, never a failure (DEC-34); null stores nothing. Don't change it afterwards.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_DecisionMemo_Store_System_String_System_Single____remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>When the memo is full (<a class="xref" href="EvoSim.DecisionMemo.html#EvoSim_DecisionMemo_Capacity">Capacity</a>), a new key is not stored; a known key is still updated.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_DecisionMemo_TryGet_" data-uid="EvoSim.DecisionMemo.TryGet*"></a>
+
+  <h3 id="EvoSim_DecisionMemo_TryGet_System_String_System_Single____" data-uid="EvoSim.DecisionMemo.TryGet(System.String,System.Single[]@)">
+  TryGet(string, out float[])
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionMemo.cs/#L67"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Looks a key up and counts a hit.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool TryGet(string key, out float[] row)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>key</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>A key from <a class="xref" href="EvoSim.DecisionMemo.html#EvoSim_DecisionMemo_Key_EvoSim_Species_EvoSim_Brain_System_String_EvoSim_Observation_">Key(Species, Brain, string, Observation)</a>, or null (never found).</p>
+</dd>
+    <dt><code>row</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>[]</dt>
+    <dd><p>The stored row, shared: don't change it. Null when not found.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True when the key was found.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

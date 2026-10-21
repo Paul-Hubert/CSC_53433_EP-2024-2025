@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class SpeciesSetup | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class SpeciesSetup | EvoSim ">
+      
+      <meta name="description" content="Adds modules to one species of a world being built: what  hands to its configure callback.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_Testing_SpeciesSetup.md&amp;value=---%0Auid%3A%20EvoSim.Testing.SpeciesSetup%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.Testing.SpeciesSetup">
+
+
+
+  <h1 id="EvoSim_Testing_SpeciesSetup" data-uid="EvoSim.Testing.SpeciesSetup" class="text-break">
+Class SpeciesSetup  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/SpeciesSetup.cs/#L23"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a>.<a class="xref" href="EvoSim.Testing.html">Testing</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Testing.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Adds modules to one species of a world being built: what <a class="xref" href="EvoSim.Testing.WorldBuilder.html#EvoSim_Testing_WorldBuilder_Species_System_String_System_Action_EvoSim_Testing_SpeciesSetup__System_String_">Species(string, Action&lt;SpeciesSetup&gt;, string)</a> hands to its
+<code>configure</code> callback.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class SpeciesSetup</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">SpeciesSetup</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+  <dl class="typelist extensionMethods">
+    <dt>Extension Methods</dt>
+    <dd>
+  <div>
+      <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_Gene_EvoSim_Testing_SpeciesSetup_System_String_System_String_System_String_">Lab.Gene(SpeciesSetup, string, string, string)</a>
+  </div>
+  <div>
+      <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_LifeRules_EvoSim_Testing_SpeciesSetup_System_Int32_System_Int32_System_Int32_">Lab.LifeRules(SpeciesSetup, int, int, int)</a>
+  </div>
+  <div>
+      <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_LlmMutation_EvoSim_Testing_SpeciesSetup_System_Single_">Lab.LlmMutation(SpeciesSetup, float)</a>
+  </div>
+  <div>
+      <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_PredatorActionSet_EvoSim_Testing_SpeciesSetup_">Lab.PredatorActionSet(SpeciesSetup)</a>
+  </div>
+  <div>
+      <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_PredatorBody_EvoSim_Testing_SpeciesSetup_System_String_System_Single_">Lab.PredatorBody(SpeciesSetup, string, float)</a>
+  </div>
+  <div>
+      <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_PredatorSenses_EvoSim_Testing_SpeciesSetup_">Lab.PredatorSenses(SpeciesSetup)</a>
+  </div>
+  <div>
+      <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_PreyActionSet_EvoSim_Testing_SpeciesSetup_">Lab.PreyActionSet(SpeciesSetup)</a>
+  </div>
+  <div>
+      <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_PreyBody_EvoSim_Testing_SpeciesSetup_System_Single_System_Single_">Lab.PreyBody(SpeciesSetup, float, float)</a>
+  </div>
+  <div>
+      <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_PreySenses_EvoSim_Testing_SpeciesSetup_">Lab.PreySenses(SpeciesSetup)</a>
+  </div>
+  </dd></dl>
+
+
+  <h2 id="EvoSim_Testing_SpeciesSetup_examples">Examples</h2>
+  <pre><code class="lang-csharp">New().Flat(20, 20).Species("prey", s =&gt; s.Population(2).Action&lt;ProbeAction&gt;().Sense&lt;ProbeSense&gt;())</code></pre>
+
+
+  <h2 id="EvoSim_Testing_SpeciesSetup_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Every module goes on its own child GameObject, as in a scene: actions under <code>Actions</code>, senses under
+<code>Senses</code>, everything else under <code>Life</code>. Order matters (SPEC-03): actions and senses take their order
+from the calls, which is the order of the probability rows, of the prompt and of the situation text.</p>
+<p>The <a class="xref" href="EvoSim.Testing.Lab.html">Lab</a> extension methods add whole sets at once: <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_PreyBody_EvoSim_Testing_SpeciesSetup_System_Single_System_Single_">PreyBody(SpeciesSetup, float, float)</a>,
+<a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_PreySenses_EvoSim_Testing_SpeciesSetup_">PreySenses(SpeciesSetup)</a>, <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_PreyActionSet_EvoSim_Testing_SpeciesSetup_">PreyActionSet(SpeciesSetup)</a> and the predator's.</p>
+</div>
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="EvoSim_Testing_SpeciesSetup_GameObject_" data-uid="EvoSim.Testing.SpeciesSetup.GameObject*"></a>
+
+  <h3 id="EvoSim_Testing_SpeciesSetup_GameObject" data-uid="EvoSim.Testing.SpeciesSetup.GameObject">
+  GameObject
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/SpeciesSetup.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The species' own GameObject, to add components by hand.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public GameObject GameObject { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">GameObject</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_SpeciesSetup_Species_" data-uid="EvoSim.Testing.SpeciesSetup.Species*"></a>
+
+  <h3 id="EvoSim_Testing_SpeciesSetup_Species" data-uid="EvoSim.Testing.SpeciesSetup.Species">
+  Species
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/SpeciesSetup.cs/#L29"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The Species component being set up.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Species Species { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_Testing_SpeciesSetup_Action_" data-uid="EvoSim.Testing.SpeciesSetup.Action*"></a>
+
+  <h3 id="EvoSim_Testing_SpeciesSetup_Action__1_System_String_System_Action___0__System_Collections_Generic_IEnumerable_System_String__System_Boolean_" data-uid="EvoSim.Testing.SpeciesSetup.Action``1(System.String,System.Action{``0},System.Collections.Generic.IEnumerable{System.String},System.Boolean)">
+  Action&lt;T&gt;(string, Action&lt;T&gt;, IEnumerable&lt;string&gt;, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/SpeciesSetup.cs/#L68"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds an action on its own GameObject, after the actions added so far, with a bound text gene on the same object
+(GENE-05) unless <code class="paramref">withGene</code> is false.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SpeciesSetup Action&lt;T&gt;(string name = null, Action&lt;T&gt; configure = null, IEnumerable&lt;string&gt; founders = null, bool withGene = true) where T : AnimalAction</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The action's name (its GameObject's name), which <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_Choose_EvoSim_Animal_System_String_">Choose(Animal, string)</a> and the prompt use; null = the class name
+without &quot;Action&quot;, in lower case (<code>EatAction</code> gives &quot;eat&quot;).</p>
+</dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;T&gt;</dt>
+    <dd><p>Called at once with the new action, to set it up; null = defaults.</p>
+</dd>
+    <dt><code>founders</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd><p>The gene's founder sentences, before the neutral &quot;No preference.&quot;; null = the neutral one only.</p>
+</dd>
+    <dt><code>withGene</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>False: no gene, so validation warns (V-05) unless the test wants that.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>This setup, to chain more calls.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd><p>The action class.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_SpeciesSetup_Find_" data-uid="EvoSim.Testing.SpeciesSetup.Find*"></a>
+
+  <h3 id="EvoSim_Testing_SpeciesSetup_Find__1_System_String_" data-uid="EvoSim.Testing.SpeciesSetup.Find``1(System.String)">
+  Find&lt;T&gt;(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/SpeciesSetup.cs/#L131"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Finds a module of a type on the child GameObject with a given name (e.g. the gene of the action &quot;eat&quot;).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public T Find&lt;T&gt;(string gameObjectName) where T : Component</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>gameObjectName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The GameObject's name: an action's name, a sense's or module's name.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">T</span></dt>
+    <dd><p>The component, or null when no such GameObject carries one.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd><p>The component class to find.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_SpeciesSetup_Get_" data-uid="EvoSim.Testing.SpeciesSetup.Get*"></a>
+
+  <h3 id="EvoSim_Testing_SpeciesSetup_Get__1" data-uid="EvoSim.Testing.SpeciesSetup.Get``1">
+  Get&lt;T&gt;()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/SpeciesSetup.cs/#L125"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Finds the first module of a type added so far, to wire one module to another in a test.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public T Get&lt;T&gt;() where T : Component</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">T</span></dt>
+    <dd><p>The first one in hierarchy order, or null.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd><p>The component class to find.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_SpeciesSetup_Module_" data-uid="EvoSim.Testing.SpeciesSetup.Module*"></a>
+
+  <h3 id="EvoSim_Testing_SpeciesSetup_Module__1_System_Action___0__System_String_" data-uid="EvoSim.Testing.SpeciesSetup.Module``1(System.Action{``0},System.String)">
+  Module&lt;T&gt;(Action&lt;T&gt;, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/SpeciesSetup.cs/#L103"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds any other species module (stat, rule, locomotion, gene, crossover, mutation…) on its own GameObject under <code>Life</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SpeciesSetup Module&lt;T&gt;(Action&lt;T&gt; configure = null, string name = null) where T : SpeciesModule</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;T&gt;</dt>
+    <dd><p>Called at once with the new module, to set it up; null = defaults.</p>
+</dd>
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The GameObject's name; null = the class name.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>This setup, to chain more calls.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd><p>The module class.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_SpeciesSetup_On_" data-uid="EvoSim.Testing.SpeciesSetup.On*"></a>
+
+  <h3 id="EvoSim_Testing_SpeciesSetup_On__1_System_Action___0__" data-uid="EvoSim.Testing.SpeciesSetup.On``1(System.Action{``0})">
+  On&lt;T&gt;(Action&lt;T&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/SpeciesSetup.cs/#L115"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds a component on the species' own GameObject: an <a class="xref" href="EvoSim.Edible.html">Edible</a>, a <a class="xref" href="EvoSim.SearchRule.html">SearchRule</a>, a body.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SpeciesSetup On&lt;T&gt;(Action&lt;T&gt; configure = null) where T : Component</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;T&gt;</dt>
+    <dd><p>Called at once with the new component, to set it up; null = defaults.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>This setup, to chain more calls.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd><p>The component class.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_SpeciesSetup_Population_" data-uid="EvoSim.Testing.SpeciesSetup.Population*"></a>
+
+  <h3 id="EvoSim_Testing_SpeciesSetup_Population_System_Int32_" data-uid="EvoSim.Testing.SpeciesSetup.Population(System.Int32)">
+  Population(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/SpeciesSetup.cs/#L49"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets how many founders the World creates at initialisation (POP-04); 0 by default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SpeciesSetup Population(int founders)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>founders</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The number of founders, placed at random walkable positions.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>This setup, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_SpeciesSetup_Sense_" data-uid="EvoSim.Testing.SpeciesSetup.Sense*"></a>
+
+  <h3 id="EvoSim_Testing_SpeciesSetup_Sense__1_System_Action___0__System_String_" data-uid="EvoSim.Testing.SpeciesSetup.Sense``1(System.Action{``0},System.String)">
+  Sense&lt;T&gt;(Action&lt;T&gt;, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/SpeciesSetup.cs/#L88"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds a sense on its own GameObject, after the senses added so far: its place in the situation text (SPEC-03).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SpeciesSetup Sense&lt;T&gt;(Action&lt;T&gt; configure = null, string name = null) where T : Sense</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;T&gt;</dt>
+    <dd><p>Called at once with the new sense, to set it up; null = defaults.</p>
+</dd>
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The GameObject's name; null = the class name without &quot;Sense&quot;, in lower case.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>This setup, to chain more calls.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd><p>The sense class.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Mutation | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Mutation | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/mutation.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-mutation">
+<h1 id="mutation">Mutation</h1>
+
+<p>There are three ways to change how genes mutate:</p>
+<ul>
+<li>a <strong>mutation deck</strong>, to change what the mutator model is asked to do with a sentence (no code);</li>
+<li>a <strong>mutation operator</strong>, to change how values change: a rule without a model, a new number rule, your own model;</li>
+<li>a <strong>mutator client</strong>, to send the same prompts to another server: see
+<a href="http-brains.html">An HTTP brain or mutator server</a>.</li>
+</ul>
+<p>How mutation works from conception to hatching is explained in <a href="../guides/genes-and-mutation.html">Genes and mutation</a>.</p>
+<h2 id="a-mutation-deck">A mutation deck</h2>
+<p>The deck is the list of instructions the <a class="xref" href="../api/EvoSim.LlmMutation.html">LlmMutation</a> draws from. Each mutation draws one per try and sends
+it to the mutator with the sentence.</p>
+<ol>
+<li><em>Assets ▸ Create ▸ EvoSim ▸ Mutation Deck</em> asks where to save a <code>.txt</code> file and writes a copy of the reference deck
+<code>mutate_v4.txt</code> into it.</li>
+<li>Edit it: one instruction per line. Blank lines and lines starting with <code>#</code> are ignored (MUT-10). Short instructions
+about the rule work best, such as <em>&quot;Change when this rule applies.&quot;</em>.</li>
+<li>Drag the file into the <strong>Deck</strong> field of the species' <strong>Llm Mutation</strong> (in the reference scenes, on the species'
+<code>Mutation</code> object).</li>
+</ol>
+<p>The same component has three more fields: <strong>Context Line</strong>, the one fixed line before the instruction (no line break, no
+<code>{</code>: V-49); <strong>Tries</strong>, 5 instructions and seeds per mutation before the gene stays unchanged; <strong>Max Words</strong>, 12, the
+longest mutant (a text gene's own <strong>Max Words</strong> wins when smaller).</p>
+<div class="NOTE">
+<h5>Note</h5>
+<p>A mutant records its instruction's index in the deck (<code>llm#3</code>, and <code>&quot;prompt&quot;: 3</code> in the birth event). Reordering the
+lines changes what those numbers mean. New instructions make new prompts, which the answer cache has never seen.</p>
+</div>
+<h2 id="a-mutation-operator">A mutation operator</h2>
+<p>Derive from <a class="xref" href="../api/EvoSim.MutationOperator.html">MutationOperator</a>. <em>Assets ▸ Create ▸ EvoSim ▸ Script ▸ Mutation operator</em> writes a template
+into <code>Assets/Student</code> (a number operator that adds ±1), with a test in <code>Assets/Student/Tests</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th></th>
+<th>What it does, and when it is called</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.MutationOperator.html#EvoSim_MutationOperator_Accepts_EvoSim_Gene_">Accepts</a></td>
+<td>must implement</td>
+<td>Whether it can change this gene, usually by its <code>Kind</code>. Asked for each locus at each conception (MUT-02), and by the validator (V-48).</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.MutationOperator.html#EvoSim_MutationOperator_StartMutation_EvoSim_Gene_EvoSim_Allele_EvoSim_RandomStream_">StartMutation</a></td>
+<td>must implement</td>
+<td>Draws every random choice from <code>rng</code>, then returns a job. Called in the breed phase, once per mutating locus of each baby.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.MutationOperator.html#EvoSim_MutationOperator_UsesMutatorService">UsesMutatorService</a></td>
+<td>may override</td>
+<td>True when the work goes to the <a class="xref" href="../api/EvoSim.MutatorService.html">MutatorService</a> (see below).</td>
+</tr>
+<tr>
+<td><code>Validate</code></td>
+<td>may override</td>
+<td>Call <code>base.Validate(report)</code> first: it checks the rate (V-35).</td>
+</tr>
+<tr>
+<td><strong>Rate</strong>, <strong>Only These</strong></td>
+<td>Inspector</td>
+<td>The probability per gene per baby (reference 0.03); the genes it is configured for.</td>
+</tr>
+</tbody>
+</table>
+<p><code>StartMutation</code> returns a <a class="xref" href="../api/EvoSim.MutationJob.html">MutationJob</a>:</p>
+<table>
+<thead>
+<tr>
+<th>Factory</th>
+<th>Use it when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.MutationJob.html#EvoSim_MutationJob_Done_System_String_System_String_">MutationJob.Done(text, op)</a>, <a class="xref" href="../api/EvoSim.MutationJob.html#EvoSim_MutationJob_Done_System_Single_System_String_">Done(number, op)</a></td>
+<td>the new value is ready at once; <code>op</code> is the short detail recorded with the allele, e.g. <code>ladder+1</code></td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.MutationJob.html#EvoSim_MutationJob_Failed_System_String_">MutationJob.Failed(reason)</a></td>
+<td>there is nothing to change: the gene keeps its allele (MUT-04)</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.MutationJob.html#EvoSim_MutationJob_Running_EvoSim_Pending_">MutationJob.Running(pending)</a></td>
+<td>the work goes on in the background (see below)</td>
+</tr>
+</tbody>
+</table>
+<p>A complete example, the sample <code>Assets/EvoSim/Samples/IntensityLadder.cs</code> (<a class="xref" href="../api/EvoSim.Samples.IntensityLadder.html">IntensityLadder</a>): it
+moves the sentence's intensity word one step along a ladder, without any model (MUT-21).</p>
+<pre><code class="lang-csharp">using System;
+using EvoSim;
+using UnityEngine;
+
+public class IntensityLadder : MutationOperator
+{
+    static readonly string[] Ladder = { &quot;never&quot;, &quot;rarely&quot;, &quot;sometimes&quot;, &quot;often&quot;, &quot;always&quot; };
+
+    public override bool Accepts(Gene g) =&gt; g.Kind == AlleleKind.Text;
+
+    public override MutationJob StartMutation(Gene g, Allele parent, RandomStream rng)
+    {
+        var words = parent.Text.Split(' ');
+        int i = -1, k = -1;
+        for (int w = 0; w &lt; words.Length &amp;&amp; i &lt; 0; w++)
+        {
+            k = Array.IndexOf(Ladder, words[w].ToLowerInvariant().Trim('.', ',', '!', '?', ';', ':'));
+            if (k &gt;= 0) i = w;
+        }
+        if (i &lt; 0) return MutationJob.Failed(&quot;no intensity word&quot;);
+        int step = rng.NextBool() ? 1 : -1;
+        string next = Ladder[Mathf.Clamp(k + step, 0, Ladder.Length - 1)];
+        string original = words[i];
+        string trail = original.Substring(original.TrimEnd('.', ',', '!', '?', ';', ':').Length);
+        if (char.IsUpper(original[0])) next = char.ToUpperInvariant(next[0]) + next.Substring(1);
+        words[i] = next + trail;
+        return MutationJob.Done(string.Join(&quot; &quot;, words), step &gt; 0 ? &quot;ladder+1&quot; : &quot;ladder-1&quot;);
+    }
+}
+</code></pre>
+<p>Put the component under the species, for example on its <code>Mutation</code> object, and list the genes it should mutate in its
+<strong>Only These</strong>. Exactly one operator applies to a locus (MUT-02): the first that accepts the gene and lists it, else the
+first that accepts it and lists no gene. With an empty <strong>Only These</strong> next to the reference <code>LlmMutation</code>, the one found
+first in the hierarchy would be the default for every text gene.</p>
+<h2 id="rules-your-operator-keeps">Rules your operator keeps</h2>
+<ul>
+<li><strong>Blind</strong> (CORE-07). It reads the gene's settings and the parent allele, nothing else: no animal, no other gene, no
+world state, no clock. Selection alone decides what is good.</li>
+<li><strong>Draw now, from the given stream</strong> (MUT-30). Every random choice comes from <code>rng</code>, inside <code>StartMutation</code>, as many
+draws whatever happens later. The same stream state gives the same job, so a seed replays the run.</li>
+<li><strong>Guards hold.</strong> At hatching the gene's <a class="xref" href="../api/EvoSim.Gene.html#EvoSim_Gene_Check_EvoSim_AlleleValue_">Check</a> judges every result: a
+refused value (a 13-word sentence, a number outside the range) leaves the inherited allele and counts as <code>not allowed</code>.
+A result equal to the parent counts as <code>unchanged</code> (MUT-04).</li>
+<li><strong>A stable operator detail.</strong> The <code>op</code> string is recorded with every mutant (GENE-12): keep it short and meaningful.</li>
+</ul>
+<h2 id="an-asynchronous-operator">An asynchronous operator</h2>
+<p>A model takes time to answer. A job may finish after <code>StartMutation</code> returns: the egg then waits until its genome is
+complete (MUT-32).</p>
+<p><strong>Through the mutator service.</strong> The World's <a class="xref" href="../api/EvoSim.MutatorService.html">MutatorService</a> sends prompts to the mutator server in batches,
+caches the answers, cleans and checks them (MUT-12) and redraws rejected ones (MUT-13). Draw each try's instruction and
+seed, then <a class="xref" href="../api/EvoSim.MutatorService.html#EvoSim_MutatorService_Submit_System_String_System_Int32___System_Int64___System_String_System_Collections_Generic_IReadOnlyList_System_String__System_Int32_">Submit</a>
+them. Return true from <code>UsesMutatorService</code>, so the client records the model's identity in the run info.</p>
+<pre><code class="lang-csharp">using System.Collections.Generic;
+using EvoSim;
+
+public class OppositeMutation : MutationOperator
+{
+    static readonly List&lt;string&gt; Deck = new List&lt;string&gt; { &quot;Make this rule say the opposite.&quot; };
+
+    public override bool Accepts(Gene g) =&gt; g.Kind == AlleleKind.Text;
+    public override bool UsesMutatorService =&gt; true;
+
+    public override MutationJob StartMutation(Gene gene, Allele parent, RandomStream rng)
+    {
+        var instruction = new int[3];                                          // every try uses instruction 0
+        var seeds = new long[3];
+        for (int i = 0; i &lt; 3; i++) seeds[i] = rng.NextUInt() &amp; 0x7FFFFFFF;    // drawn now, used or not (MUT-30)
+        var service = World.Service&lt;MutatorService&gt;();
+        if (service == null) return MutationJob.Failed(&quot;no mutator&quot;);
+        return service.Submit(parent.Text, instruction, seeds, &quot;The sentence below is a rule that a wild animal follows.&quot;, Deck, 12);
+    }
+}
+</code></pre>
+<p><strong>With your own background work.</strong> Return <code>MutationJob.Running</code> with a <a class="xref" href="../api/EvoSim.Pending.html">Pending</a> that tells when the work is
+done, and complete or fail the job as the work's last step:</p>
+<pre><code class="lang-csharp">public override MutationJob StartMutation(Gene gene, Allele parent, RandomStream rng)
+{
+    bool up = rng.NextBool();                          // every draw now, on the main thread (MUT-30)
+    string text = parent.Text;                         // copy what the work needs: no Unity object in the task
+    var job = MutationJob.Running(null);
+    job.Pending = Pending.Of(System.Threading.Tasks.Task.Run(() =&gt;
+    {
+        string mutant = text.Replace(&quot;often&quot;, up ? &quot;always&quot; : &quot;rarely&quot;);   // stands for slow work
+        if (mutant == text) job.Fail(&quot;no often&quot;);
+        else job.Complete(AlleleValue.OfText(mutant), up ? &quot;often+1&quot; : &quot;often-1&quot;);
+    }));
+    return job;
+}
+</code></pre>
+<p>The result must depend only on the parent and the draws, never on timing: then the Freeze and Responsive wait modes, and
+a replay, give the same genes. Never touch Unity objects or the world from the background thread.</p>
+<h2 id="test-it">Test it</h2>
+<p>Your operator enters the T-MUT conformance suite by itself (<em>Window ▸ General ▸ Test Runner</em>, EditMode,
+<code>ConformanceTests</code> ▸ <code>MutationOperatorConformance</code>). It mutates a text gene and a number gene twice with the same seed and
+checks that the operator accepts at least one of them, that both jobs finish with the same outcome and the same value,
+and that the value passes the gene's <code>Check</code>. For a test of your own, copy <code>IntensityLadderSteps</code> in
+<code>Assets/EvoSim/Tests/EditMode/Samples/SampleTests.cs</code>; see <a href="testing-your-module.html">Testing your module</a>.</p>
+<h2 id="read-next">Read next</h2>
+<ul>
+<li>The reference operators: <a class="xref" href="../api/EvoSim.LlmMutation.html">LlmMutation</a>, <a class="xref" href="../api/EvoSim.GaussianMutation.html">GaussianMutation</a>; rewrite <code>LlmMutation</code> from its stub
+in <a href="exercises.html">the teaching path</a>.</li>
+<li>The prompt, cleaning and guards as pure functions: <a class="xref" href="../api/EvoSim.MutationText.html">MutationText</a>, <a class="xref" href="../api/EvoSim.SentenceGuards.html">SentenceGuards</a>.</li>
+<li>New kinds of values to mutate: <a href="genes.html">Genes</a>. Another server: <a href="http-brains.html">An HTTP brain or mutator server</a>.</li>
+<li>The contract: <a href="../spec/10-mutation.html">10 — Mutation</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

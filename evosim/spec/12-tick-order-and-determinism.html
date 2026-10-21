@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>12 — Tick order and determinism | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="12 — Tick order and determinism | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/12-tick-order-and-determinism.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="12--tick-order-and-determinism">12 — Tick order and determinism</h1>
+
+<h2 id="1-phases">1. Phases</h2>
+<ul>
+<li><strong>TICK-01 (MUST)</strong> A world runs an ordered list of <strong>phases</strong> every tick. The
+list is configuration: a phase can be replaced, removed, or added anywhere
+(seasons, disease, weather) without changing the others.</li>
+<li><strong>TICK-02 (MUST)</strong> A phase changes only what it is responsible for. What it
+changes is visible to the phases after it in the same tick.</li>
+<li><strong>TICK-03 (MUST)</strong> A phase that needs answers from a service (decisions,
+mutations) says whether it is ready; the world doesn't run it before it is
+(SPACE-13).</li>
+</ul>
+<p><strong>TICK-04 (MUST) The reference phase list.</strong></p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Phase</th>
+<th>Does</th>
+<th>Waits for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Sense</strong></td>
+<td>picks who decides (DEC-01); builds spatial indexes; reads every sense of every deciding animal (batched raycasts)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Ask brains</strong></td>
+<td>memo lookups; sends one batch per brain</td>
+<td>—</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Choose actions</strong></td>
+<td>stores answers in the memo and cache; draws each animal's action</td>
+<td>the brains</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Act</strong></td>
+<td>in the act order (ACT-30): each animal's action → intent → locomotion → interactions; then its metabolism; busy animals count down</td>
+<td>—</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Breed</strong></td>
+<td>conceives litters (REPRO-02), lays eggs, draws and sends mutation requests</td>
+<td>—</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Hatch</strong></td>
+<td>eggs due this tick become animals</td>
+<td>the mutator</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>Deaths</strong></td>
+<td>removes killed animals; every animal ages by 1; starvation; old age</td>
+<td>—</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>Migration</strong></td>
+<td>cap rules (POP-01)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>Environment</strong></td>
+<td>resource layers regrow; entities rot, move or vanish</td>
+<td>—</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>Floor</strong></td>
+<td>newcomers for species below their floor (POP-03)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>Record</strong></td>
+<td>a stats row every <code>statsEvery</code> ticks; periodic flushes</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>Then the tick count grows by one.</p>
+<ul>
+<li><strong>TICK-05 (MUST)</strong> Decisions use the state at the start of the tick, i.e. after
+the previous tick's floor phase.</li>
+<li><strong>TICK-06 (MUST)</strong> Breeding is its own phase, after all animals acted (owner
+decision). The prototype bred each species right after it acted (prey act,
+prey breed, predators act, predators breed); the difference only affects an
+animal that would breed and then be killed later in the same tick.</li>
+<li><strong>TICK-07 (MUST)</strong> Phases run in the same order in every tick; a phase that has
+nothing to do (no decisions due, no eggs) returns at once.</li>
+</ul>
+<h2 id="2-randomness">2. Randomness</h2>
+<ul>
+<li><p><strong>RAND-01 (MUST)</strong> Simulation code uses no global or unseeded random source:
+no <code>UnityEngine.Random</code>, no <code>new System.Random()</code> without a seed, no GUIDs or
+time as randomness.</p>
+</li>
+<li><p><strong>RAND-02 (MUST)</strong> Every draw comes from a <strong>named stream</strong> derived from the run
+seed and the stream's name. Streams are independent: adding draws to one
+never shifts the numbers of another, so changing how food regrows doesn't
+change who mates.</p>
+</li>
+<li><p><strong>RAND-03 (MUST)</strong> Streams are per purpose and, where a species is involved, per
+species, so adding a species doesn't change the draws of the others:</p>
+<table>
+<thead>
+<tr>
+<th>Stream</th>
+<th>Used for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>world</code> (own seed allowed)</td>
+<td>terrain, cover, initial food</td>
+</tr>
+<tr>
+<td><code>&lt;layer&gt;</code></td>
+<td>regrowth of one resource layer</td>
+</tr>
+<tr>
+<td><code>act-order</code></td>
+<td>the order animals act in</td>
+</tr>
+<tr>
+<td><code>&lt;species&gt;/founders</code></td>
+<td>founder and newcomer genomes and positions</td>
+</tr>
+<tr>
+<td><code>&lt;species&gt;/sampling</code></td>
+<td>drawing actions</td>
+</tr>
+<tr>
+<td><code>&lt;species&gt;/actions</code></td>
+<td>wandering, sidesteps, strike rolls</td>
+</tr>
+<tr>
+<td><code>&lt;species&gt;/litter</code></td>
+<td>litter sizes</td>
+</tr>
+<tr>
+<td><code>&lt;species&gt;/mutation</code></td>
+<td>crossover and mutation choices</td>
+</tr>
+<tr>
+<td><code>&lt;species&gt;/migration</code></td>
+<td>who leaves above the cap</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p><strong>RAND-04 (MUST)</strong> The world may have its own seed, so many runs share one map
+while everything else varies.</p>
+</li>
+<li><p><strong>RAND-05 (MUST)</strong> Simulation code iterates only ordered collections (lists by
+creation or id). Hash sets and dictionaries are never iterated to make a
+decision.</p>
+</li>
+</ul>
+<h2 id="3-the-events-hash">3. The events hash</h2>
+<ul>
+<li><strong>RAND-10 (MUST)</strong> Every recorded event updates a running SHA-256 hash of its
+canonical text (keys sorted, fixed number formatting). The final hash
+identifies the run.</li>
+<li><strong>RAND-11 (MUST)</strong> The same configuration, seed and answer caches give the same
+hash on the same platform and build, whatever the wait mode, frame rate, ticks
+per frame, and whether anything is rendered.</li>
+<li><strong>RAND-12 (MAY)</strong> Hashes are compared on one machine only (owner decision).
+Across machines and scripting backends floating-point results may differ, and
+so may hashes; nothing relies on them matching.</li>
+<li><strong>RAND-13 (MUST)</strong> Two different seeds give different hashes.</li>
+</ul>
+<h2 id="4-stopping-and-resuming">4. Stopping and resuming</h2>
+<ul>
+<li><strong>RAND-20 (MUST)</strong> A run stops cleanly at a tick boundary (button, stop file,
+tick limit, wall-clock limit, a brain failure in strict mode, an exception),
+with every output written.</li>
+<li><strong>RAND-21 (SHOULD)</strong> Resuming = running the same configuration and seed again:
+the part already done replays from the answer caches without model calls,
+then the run continues. Saving and loading a full snapshot MAY replace replay.</li>
+<li><strong>RAND-22 (SHOULD)</strong> Outputs are flushed regularly (reference: events and stats
+every 500 ticks, the allele list every 5 000), so a hard stop loses little.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>The teaching path | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="The teaching path | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/exercises.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-exercises">
+<h1 id="the-teaching-path">The teaching path</h1>
+
+<p>The teaching path is a way in: rewrite a reference module yourself, from an empty class, and watch the world run with
+your version. Fourteen reference modules have a stub, from the smallest (stay still to rest) to the largest (a gene
+rewritten by a language model), in the order of 22 §0. Nothing grades your version and nothing has to match the
+reference: write it your own way, or change what it does. The conformance suite of its kind only checks that it fits
+the system. When you are done, invent modules of your own: <a href="index.html">Extending EvoSim</a>.</p>
+<h2 id="replace-with-stub-restore-reference">Replace with stub, Restore reference</h2>
+<ol>
+<li>Open a scene, for example <code>Assets/EvoSim/Scenes/Lab1_Small.unity</code>. Work on a copy (<em>File ▸ Save As</em>) if you want
+to keep the reference scene as it is.</li>
+<li>Choose <em>EvoSim ▸ Exercises ▸ Replace with stub ▸ 1 RestAction</em> (or any of the 14).
+<ul>
+<li>It writes <code>Assets/Student/Exercises/MyRestAction.cs</code> from the template <code>Assets/EvoSim/Exercises/MyRestAction.cs.txt</code>.
+If the file already exists, it is kept: your work is never overwritten. The first time, the menu also creates the
+<code>Student</code> and <code>Student.Tests</code> assemblies.</li>
+<li>Once Unity has compiled the stub, every component of exactly the reference type in the open scenes is replaced by
+the stub: on the same GameObject, at the same place among its components, with the same settings (every field of
+the same name) and the same enabled state. Subclasses of the reference are left alone.</li>
+<li>The swap can be undone (<em>Edit ▸ Undo</em>) and marks the scene as modified: save the scene to keep it.</li>
+<li>If the stub doesn't compile, the Console says so: fix the errors, then choose the menu item again.</li>
+</ul>
+</li>
+<li>Write the methods that throw. Until you do, each one throws a <code>NotImplementedException</code> that names it
+(<em>&quot;Exercise: write MyRestAction.Act your own way…&quot;</em>), so the run stops when the World first calls it.</li>
+<li>Press <strong>Play</strong> and watch. Run the conformance suite of the module's kind (see <a href="#tips">Tips</a>).</li>
+<li><em>EvoSim ▸ Exercises ▸ Restore reference</em> puts the reference module back wherever an exercise class stands in the open
+scenes, with its settings. Your files stay in <code>Assets/Student/Exercises</code>.</li>
+</ol>
+<h2 id="what-a-stub-gives-you">What a stub gives you</h2>
+<pre><code class="lang-csharp">/// &lt;summary&gt;Exercise 1: stay still to rest (ACT-02, ANIM-21). Reference: &lt;see cref=&quot;RestAction&quot;/&gt;.&lt;/summary&gt;
+[ExerciseOf(typeof(RestAction))]
+public class MyRestAction : AnimalAction
+{
+    /// &lt;summary&gt;The action's line in the prompt (08 §7), used when the Inspector's description is empty.&lt;/summary&gt;
+    protected override string DefaultDescription =&gt; &quot;stay still to catch your breath and save energy&quot;;
+
+    public override bool Rests =&gt; true;
+
+    /// &lt;summary&gt;… The reference gives the intent of staying, &lt;c&gt;c.Stay()&lt;/c&gt;, and nothing else …&lt;/summary&gt;
+    public override void Act(Animal a, ActContext c) =&gt; throw new NotImplementedException(ExerciseOfAttribute.Todo(&quot;MyRestAction&quot;, &quot;Act&quot;));
+}
+</code></pre>
+<p>A stub has the reference's base class, its Inspector settings under the same names (so the swap keeps them), and the
+small members that are not the exercise (the prompt line, the tokens, <code>IsRelevant</code>). The methods to write throw. Each
+one's documentation comment says what the reference does, step by step, with the calls it uses. <code>[ExerciseOf]</code>
+(<a class="xref" href="../api/EvoSim.ExerciseOfAttribute.html">ExerciseOfAttribute</a>) ties the stub to its reference, for the two menu items.</p>
+<h2 id="the-fourteen-exercises">The fourteen exercises</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Stub</th>
+<th>Base class</th>
+<th>Reference</th>
+<th>Write</th>
+<th>Look at</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>MyRestAction</code></td>
+<td><a class="xref" href="../api/EvoSim.AnimalAction.html">AnimalAction</a></td>
+<td><a class="xref" href="../api/EvoSim.RestAction.html">RestAction</a></td>
+<td><code>Act</code></td>
+<td><a class="xref" href="../api/EvoSim.ActContext.html#EvoSim_ActContext_Stay">Stay</a>; <code>Rests</code> makes the metabolism charge the rest cost</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>MyLevelSense</code></td>
+<td><a class="xref" href="../api/EvoSim.Sense.html">Sense</a></td>
+<td><a class="xref" href="../api/EvoSim.LevelSense.html">LevelSense</a></td>
+<td><code>Read</code>, <code>Write</code></td>
+<td>find the stat once in <code>Initialize</code> with <a class="xref" href="../api/EvoSim.SpeciesBuilder.html#EvoSim_SpeciesBuilder_FindStat_System_String_">FindStat</a>; low below 30, high above 70</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>MyStarvation</code></td>
+<td><a class="xref" href="../api/EvoSim.DeathRule.html">DeathRule</a></td>
+<td><a class="xref" href="../api/EvoSim.Starvation.html">Starvation</a></td>
+<td><code>CauseOfDeath</code></td>
+<td>find the <a class="xref" href="../api/EvoSim.Energy.html">Energy</a> module in <code>Initialize</code>; energy ≤ 0 gives &quot;starvation&quot;</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>MyEatAction</code></td>
+<td><a class="xref" href="../api/EvoSim.AnimalAction.html">AnimalAction</a></td>
+<td><a class="xref" href="../api/EvoSim.EatAction.html">EatAction</a></td>
+<td><code>Act</code></td>
+<td><a class="xref" href="../api/EvoSim.ActContext.html#EvoSim_ActContext_NearestResource_EvoSim_Animal_System_String_">NearestResource</a>, <a class="xref" href="../api/EvoSim.ActContext.html#EvoSim_ActContext_GrazeReach">GrazeReach</a>, <a class="xref" href="../api/EvoSim.Interaction.html#EvoSim_Interaction_Graze_EvoSim_ResourceItem_">Interaction.Graze</a>; search when nothing is in sight (ACT-04)</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>MyNearestAnimalSense</code></td>
+<td><a class="xref" href="../api/EvoSim.BandedSense.html">BandedSense</a></td>
+<td><a class="xref" href="../api/EvoSim.NearestAnimalSense.html">NearestAnimalSense</a></td>
+<td><code>BuildTokens</code>, <code>Read</code></td>
+<td>the base's <code>bands</code>, <code>Add</code> and <code>NoneToken</code>; <a class="xref" href="../api/EvoSim.SenseContext.html#EvoSim_SenseContext_NearestAnimal_EvoSim_Animal_EvoSim_AnimalSet_System_Single_System_Collections_Generic_IReadOnlyList_EvoSim_Species__">NearestAnimal</a>, <a class="xref" href="../api/EvoSim.SenseContext.html#EvoSim_SenseContext_IsReady_EvoSim_Animal_">IsReady</a></td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>MyFleeAction</code></td>
+<td><a class="xref" href="../api/EvoSim.AnimalAction.html">AnimalAction</a></td>
+<td><a class="xref" href="../api/EvoSim.FleeAction.html">FleeAction</a></td>
+<td><code>Act</code></td>
+<td><a class="xref" href="../api/EvoSim.ActContext.html#EvoSim_ActContext_NearestAnimal_EvoSim_Animal_EvoSim_AnimalSet_System_Collections_Generic_IReadOnlyList_EvoSim_Species__">NearestAnimal</a>, <a class="xref" href="../api/EvoSim.ActContext.html#EvoSim_ActContext_RunAwayFrom_EvoSim_Animal_">RunAwayFrom</a>; the <em>Flee Into Cover</em> option</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>MyHideAction</code></td>
+<td><a class="xref" href="../api/EvoSim.AnimalAction.html">AnimalAction</a></td>
+<td><a class="xref" href="../api/EvoSim.HideAction.html">HideAction</a></td>
+<td><code>Act</code></td>
+<td><a class="xref" href="../api/EvoSim.ActContext.html#EvoSim_ActContext_InCover_EvoSim_Animal_">InCover</a>, <a class="xref" href="../api/EvoSim.ActContext.html#EvoSim_ActContext_NearestCover_EvoSim_Animal_System_Single_">NearestCover</a>; no cover in sight: search (ENV-12)</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>MyStamina</code></td>
+<td><a class="xref" href="../api/EvoSim.Stamina.html">Stamina</a></td>
+<td><a class="xref" href="../api/EvoSim.Stamina.html">Stamina</a></td>
+<td><code>Budget</code>, <code>Settle</code></td>
+<td>the stat <code>Value</code>, the traits <code>Max</code> and <code>Regen</code>, <code>RegenEnergyCost</code>, <a class="xref" href="../api/EvoSim.Energy.html#EvoSim_Energy_Pay_EvoSim_Animal_System_Single_">Energy.Pay</a></td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>MyLitter</code></td>
+<td><a class="xref" href="../api/EvoSim.Litter.html">Litter</a></td>
+<td><a class="xref" href="../api/EvoSim.Litter.html">Litter</a></td>
+<td><code>Size</code></td>
+<td><code>Min</code>, <code>Max</code>, <code>ChildEnergy</code>; draw k with <code>rng.Range(Min, Max + 1)</code> (REPRO-10)</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>MyUniformCrossover</code></td>
+<td><a class="xref" href="../api/EvoSim.Crossover.html">Crossover</a></td>
+<td><a class="xref" href="../api/EvoSim.UniformCrossover.html">UniformCrossover</a></td>
+<td><code>Cross</code></td>
+<td><a class="xref" href="../api/EvoSim.Crossover.html#EvoSim_Crossover_CheckSpecies_EvoSim_Genome_EvoSim_Genome_">CheckSpecies</a>, one <code>rng.NextBool()</code> per locus (GENE-30)</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>MyKinematicLocomotion</code></td>
+<td><a class="xref" href="../api/EvoSim.Locomotion.html">Locomotion</a></td>
+<td><a class="xref" href="../api/EvoSim.KinematicLocomotion.html">KinematicLocomotion</a></td>
+<td><code>Move</code></td>
+<td>the speed traits <code>WalkSpeed</code> and <code>RunSpeed</code>, <a class="xref" href="../api/EvoSim.Ground.html#EvoSim_Ground_SlideTo_UnityEngine_Vector3_UnityEngine_Vector3_">SlideTo</a>, <a class="xref" href="../api/EvoSim.Ground.html#EvoSim_Ground_SideStep_UnityEngine_Vector3_System_Single_EvoSim_RandomStream_">SideStep</a> (MOVE-02, MOVE-04)</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>MyHuntAction</code></td>
+<td><a class="xref" href="../api/EvoSim.AnimalAction.html">AnimalAction</a></td>
+<td><a class="xref" href="../api/EvoSim.HuntAction.html">HuntAction</a></td>
+<td><code>Act</code></td>
+<td><a class="xref" href="../api/EvoSim.ActContext.html#EvoSim_ActContext_NearestCarcass_EvoSim_Animal_">NearestCarcass</a>, <a class="xref" href="../api/EvoSim.Interaction.html#EvoSim_Interaction_Strike_EvoSim_Animal_">Interaction.Strike</a>, <a class="xref" href="../api/EvoSim.Interaction.html#EvoSim_Interaction_Scavenge_EvoSim_Carcass_">Interaction.Scavenge</a></td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>MyRandomBrain</code></td>
+<td><a class="xref" href="../api/EvoSim.Brain.html">Brain</a></td>
+<td><a class="xref" href="../api/EvoSim.RandomBrain.html">RandomBrain</a></td>
+<td><code>Ask</code></td>
+<td><a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_Uniform_System_Int32_">Uniform</a>, <a class="xref" href="../api/EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Now_System_Single_____">BrainAnswer.Now</a> (DEC-11)</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>MyLlmMutation</code></td>
+<td><a class="xref" href="../api/EvoSim.MutationOperator.html">MutationOperator</a></td>
+<td><a class="xref" href="../api/EvoSim.LlmMutation.html">LlmMutation</a></td>
+<td><code>StartMutation</code></td>
+<td><a class="xref" href="../api/EvoSim.MutationText.html#EvoSim_MutationText_Instructions_System_String_">MutationText.Instructions</a>, <a class="xref" href="../api/EvoSim.MutatorService.html#EvoSim_MutatorService_Submit_System_String_System_Int32___System_Int64___System_String_System_Collections_Generic_IReadOnlyList_System_String__System_Int32_">MutatorService.Submit</a>; draw every try first (MUT-30)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="why-mystamina-and-mylitter-derive-from-the-reference">Why MyStamina and MyLitter derive from the reference</h2>
+<p>Twelve stubs derive from the reference's base class, as a module of your own would. <code>MyStamina</code> and <code>MyLitter</code> derive
+from the reference itself, because other parts of the system look these two modules up by their type: the act phase
+and the metabolism ask the species for its <a class="xref" href="../api/EvoSim.Stamina.html">Stamina</a>, and the breed phase asks for its
+<a class="xref" href="../api/EvoSim.Litter.html">Litter</a>. A stub of another type would not be found.</p>
+<p>Deriving also keeps what the reference declares. <code>MyStamina</code> inherits the stamina stat and the <code>stamina.max</code> and
+<code>stamina.regen</code> traits, so the stamina sense and number genes still work; you override only
+<a class="xref" href="../api/EvoSim.Stamina.html#EvoSim_Stamina_Budget_EvoSim_Animal_">Budget</a> and
+<a class="xref" href="../api/EvoSim.Stamina.html#EvoSim_Stamina_Settle_EvoSim_Animal_System_Single_EvoSim_Energy_">Settle</a>. <code>MyLitter</code> inherits the <em>Min</em>,
+<em>Max</em> and <em>Child Energy</em> settings; you override only <a class="xref" href="../api/EvoSim.Litter.html#EvoSim_Litter_Size_EvoSim_RandomStream_System_Single___">Size</a>.</p>
+<h2 id="what-the-stubs-leave-out">What the stubs leave out</h2>
+<p>A stub holds what you must write. Some references do a little more, which you may want to add yourself:</p>
+<table>
+<thead>
+<tr>
+<th>Stub</th>
+<th>The reference also</th>
+<th>Why it matters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MyHuntAction</code></td>
+<td>overrides <a class="xref" href="../api/EvoSim.AnimalAction.html#EvoSim_AnimalAction_Hunts">Hunts</a> to return <code>true</code></td>
+<td>senses such as the sample <a class="xref" href="../api/EvoSim.Samples.ChasedSense.html">ChasedSense</a> read it to know an animal is hunting</td>
+</tr>
+<tr>
+<td><code>MyLlmMutation</code></td>
+<td>overrides <a class="xref" href="../api/EvoSim.MutationOperator.html#EvoSim_MutationOperator_UsesMutatorService">UsesMutatorService</a> to return <code>true</code>, and reads its deck in <code>Initialize</code></td>
+<td>it tells the mutator client that an operator sends it work; the Ollama client then fetches the model's digest, recorded with the alleles (GENE-12)</td>
+</tr>
+<tr>
+<td><code>MyNearestAnimalSense</code></td>
+<td>overrides <a class="xref" href="../api/EvoSim.Sense.html#EvoSim_Sense_Write_System_Int32_EvoSim_TextStyle_">Write</a> to add &quot;, ready to mate.&quot; or &quot;, not ready to mate.&quot;, and names its label after the species when the set holds one</td>
+<td>without it the readiness tokens are written like the plain band, and renaming a species doesn't change the label (SPEC-20)</td>
+</tr>
+</tbody>
+</table>
+<p>Several references also set themselves up in <code>Initialize</code> (the level sense finds its stat, starvation finds the energy
+module, eat, flee and the animal sense resolve species names) and check their settings in <code>Validate</code>. Each stub's
+class comment says which.</p>
+<h2 id="tips">Tips</h2>
+<ul>
+<li><strong>Read the reference's API page</strong> (the links in the table) and the stub's comments before you write: they say what the
+reference does and when the World calls each method. The <a href="index.html">extension page of the kind</a> lists the
+rules a module of that kind keeps.</li>
+<li><strong>Draw from the streams you are given.</strong> <code>Size</code>, <code>Cross</code> and <code>StartMutation</code> receive a <a class="xref" href="../api/EvoSim.RandomStream.html">RandomStream</a>; a
+locomotion asks the move context for one (<code>c.Stream(Species, &quot;actions&quot;)</code>). Never use <code>UnityEngine.Random</code>: a seed must
+replay the run (RAND-01). If your version does what the reference does, with the same draws in the same order, the
+run even gives the same events hash.</li>
+<li><strong>Run the conformance suite of the kind</strong> in the Test Runner: the stub is in the <code>Student</code> assembly, so the suite
+finds it at once, and fails until the methods are written. Crossovers, litters and death rules have no suite of their
+own. See <a href="testing-your-module.html">Testing your module</a>.</li>
+<li><strong>The reference's unit tests keep testing the reference.</strong> To hold your version to the same checks, copy a reference
+test into <code>Assets/Student/Tests</code> and put your class in the builder call (<code>Action&lt;MyRestAction&gt;(&quot;rest&quot;)</code>), with the
+helpers of <a href="../guides/testing.html">Testing</a>.</li>
+<li><strong>Restore the reference before the regression tests.</strong> They run the reference scenes and compare pinned hashes.</li>
+</ul>
+<h2 id="read-next">Read next</h2>
+<ul>
+<li><a href="index.html">Extending EvoSim</a>: the base class for each kind of module, once you invent your own.</li>
+<li><a href="samples.html">The samples</a>: complete extensions (thirst, water, seasons, slopes) to read and combine.</li>
+<li><a href="../spec/22-extending-recipes.html">22 — Extending: recipes</a>: the teaching path and the recipes in the specification.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

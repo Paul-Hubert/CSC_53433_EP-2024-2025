@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>21 — Editor tooling | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="21 — Editor tooling | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/21-editor-tooling.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="21--editor-tooling">21 — Editor tooling</h1>
+
+<p>The editor is where students meet the system. Its job: make the configuration
+visible (orders, food web, prompt, observation space), catch mistakes before
+Play, and make a running world readable (who does what, which genes spread).</p>
+<h2 id="1-rules">1. Rules</h2>
+<ul>
+<li><strong>EDIT-01 (MUST)</strong> One validation engine runs everywhere: live in inspectors, on
+a <em>Validate</em> button, before entering Play mode (errors block Play), in
+<code>World.Initialize</code>, and in CI (an EditMode test validates every scene and
+module prefab).</li>
+<li><strong>EDIT-02 (MUST)</strong> Every message names the object at fault (clicking it selects
+it) and, where possible, offers a fix button.</li>
+<li><strong>EDIT-03 (MUST)</strong> Editor code lives in the editor assembly. Runtime code never
+depends on it.</li>
+<li><strong>EDIT-04 (SHOULD)</strong> Inspectors show computed facts, not only fields: orders,
+signature, observation-space size, prompt preview, food web.</li>
+<li><strong>EDIT-05 (SHOULD)</strong> Every tool works in edit mode on the configuration and in
+Play mode on the running world.</li>
+</ul>
+<h2 id="2-validation-catalogue">2. Validation catalogue</h2>
+<p>Severity: <strong>E</strong> error (blocks Play), <strong>W</strong> warning, <strong>I</strong> information.</p>
+<table>
+<thead>
+<tr>
+<th>Id</th>
+<th>Sev.</th>
+<th>Check</th>
+<th>Fix offered</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Structure</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>V-01</td>
+<td>E</td>
+<td>a species inside another species (SPEC-05)</td>
+<td>move it up</td>
+</tr>
+<tr>
+<td>V-02</td>
+<td>E</td>
+<td>a species module with no species above it</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V-03</td>
+<td>E</td>
+<td>two actions of a species with the same name</td>
+<td>rename</td>
+</tr>
+<tr>
+<td>V-04</td>
+<td>E</td>
+<td>a species with no action</td>
+<td>add Rest</td>
+</tr>
+<tr>
+<td>V-05</td>
+<td>W</td>
+<td>an action without a gene (the brain can't be steered for it)</td>
+<td>add a text gene</td>
+</tr>
+<tr>
+<td>V-06</td>
+<td>W</td>
+<td>a text gene neither bound to an action nor marked free</td>
+<td>mark free</td>
+</tr>
+<tr>
+<td>V-07</td>
+<td>E</td>
+<td>two species with the same id or display name</td>
+<td>rename</td>
+</tr>
+<tr>
+<td>V-08</td>
+<td>E</td>
+<td>phases in an impossible order (Choose actions before Ask brains, Hatch before Breed)</td>
+<td>reorder</td>
+</tr>
+<tr>
+<td>V-09</td>
+<td>W</td>
+<td>a core phase missing (no Deaths phase: nobody dies)</td>
+<td>add it</td>
+</tr>
+<tr>
+<td>V-10</td>
+<td>E</td>
+<td>a species without a brain and no world default</td>
+<td>pick one</td>
+</tr>
+<tr>
+<td>V-11</td>
+<td>E</td>
+<td>a brain's limits exceeded: more than 16 actions for JEV, prompt estimate above its token limit (DEC-14)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V-12</td>
+<td>W</td>
+<td>the species' signature changed since it was last accepted (SPEC-03): results and caches change</td>
+<td>accept</td>
+</tr>
+<tr>
+<td>V-13</td>
+<td>E</td>
+<td>a species without exactly one locomotion component (MOVE-01)</td>
+<td>add <code>KinematicLocomotion</code></td>
+</tr>
+<tr>
+<td>V-19</td>
+<td>E</td>
+<td>every action of a species is an overlay: nothing can carry the animal (ACT-07)</td>
+<td>add Rest</td>
+</tr>
+<tr>
+<td>V-27</td>
+<td>E</td>
+<td>an overlay that mates or hunts (ACT-07)</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>References</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>V-20</td>
+<td>E</td>
+<td>a module names a layer, entity kind or species that doesn't exist</td>
+<td>pick from a list</td>
+</tr>
+<tr>
+<td>V-21</td>
+<td>W</td>
+<td>an animal set resolves to nothing (flee with no threat, hunt with no prey)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V-22</td>
+<td>W</td>
+<td>a species with no food source in its diet</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V-24</td>
+<td>E</td>
+<td>a diet entry whose target has no edible component, so it can never be eaten (SPEC-10)</td>
+<td>add an <code>Edible</code> to the target</td>
+</tr>
+<tr>
+<td>V-25</td>
+<td>I</td>
+<td>something edible that no diet lists</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V-23</td>
+<td>W</td>
+<td>a gene or founder sentence mentions a species name that doesn't exist (SPEC-21)</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Values</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>V-30</td>
+<td>E</td>
+<td>band edges not increasing, or not below the vision (SENSE-21)</td>
+<td>sort</td>
+</tr>
+<tr>
+<td>V-31</td>
+<td>E</td>
+<td>level thresholds with low &gt; high</td>
+<td>swap</td>
+</tr>
+<tr>
+<td>V-32</td>
+<td>E</td>
+<td>floor &gt; cap, or initial population &gt; cap</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V-33</td>
+<td>E</td>
+<td>litter min &gt; max, or min &lt; 1</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V-34</td>
+<td>W</td>
+<td><code>childEnergy × litterMin / parents &gt; mateEnergy</code>: parents can fall below zero (REPRO-10)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V-35</td>
+<td>E</td>
+<td>a probability or rate outside [0, 1]; a decision period &lt; 1</td>
+<td>clamp</td>
+</tr>
+<tr>
+<td>V-36</td>
+<td>W</td>
+<td>a trait default outside its range</td>
+<td>clamp</td>
+</tr>
+<tr>
+<td><strong>Genes</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>V-40</td>
+<td>E</td>
+<td>a founder sentence that fails the mutation guards: too many words, forbidden characters (GENE-22)</td>
+<td>highlights the problem</td>
+</tr>
+<tr>
+<td>V-41</td>
+<td>E</td>
+<td>an empty founder pool</td>
+<td>add the neutral allele</td>
+</tr>
+<tr>
+<td>V-42</td>
+<td>W</td>
+<td>duplicate founder sentences</td>
+<td>remove</td>
+</tr>
+<tr>
+<td>V-43</td>
+<td>W</td>
+<td>a text gene with no neutral allele</td>
+<td>add &quot;No preference.&quot;</td>
+</tr>
+<tr>
+<td>V-44</td>
+<td>I</td>
+<td>a text gene with no contrast pair: brain tests skip it</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V-45</td>
+<td>E</td>
+<td>a number gene whose trait no module declares</td>
+<td>pick from a list</td>
+</tr>
+<tr>
+<td>V-46</td>
+<td>W</td>
+<td>number-gene founder values outside the gene's range</td>
+<td>clamp</td>
+</tr>
+<tr>
+<td>V-47</td>
+<td>I</td>
+<td>a number gene's trait affects no cost: the gene will drift to one end (09 §5)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V-48</td>
+<td>W</td>
+<td>a gene that no mutation operator accepts</td>
+<td>add an operator</td>
+</tr>
+<tr>
+<td><strong>Observations and brains</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>V-50</td>
+<td>W / E</td>
+<td>observation space above 100 000 (W) or 10 000 000 (E) (SENSE-05)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V-51</td>
+<td>E</td>
+<td>a sense with attachments and a brain that can't read them (SENSE-41)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V-53</td>
+<td>E</td>
+<td>a prompt field (header, action line, rule line) or a frozen prompt with an unknown placeholder; a frozen prompt without <code>{genes}</code>, <code>{situation}</code> or <code>{ask}</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Services and secrets</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>V-60</td>
+<td>W</td>
+<td>an HTTP brain or the mutator is unreachable (checked on demand: <em>Test connection</em>)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V-61</td>
+<td>E</td>
+<td>a key or token in a serialized field of a scene, prefab or asset (OUT-04)</td>
+<td>move to an environment variable</td>
+</tr>
+<tr>
+<td>V-62</td>
+<td>E</td>
+<td>the answer cache folder can't be written</td>
+<td>pick another</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-inspectors">3. Inspectors</h2>
+<p><strong>World.</strong> State (not initialised, running, waiting: &quot;waiting for JEV: 213
+queries, 1.4 s&quot;), tick, run controls (Play, Pause, Step, Run N, Fast, Real time),
+seed, wait mode, act order; the phase list as a reorderable view of the
+<code>Phases</code> children with enable toggles; the services; the validation panel.</p>
+<p><strong>Species.</strong> Read-only tables computed from the subtree:</p>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Columns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Actions</td>
+<td>order, name, bound gene, relevance condition</td>
+</tr>
+<tr>
+<td>Senses</td>
+<td>order, label, token count, example fragment (V1 and V2)</td>
+</tr>
+<tr>
+<td>Genes</td>
+<td>locus, kind, founder pool size, mutation operator and rate</td>
+</tr>
+<tr>
+<td>Stats and traits</td>
+<td>name, declared by, read by, written by, default, range</td>
+</tr>
+<tr>
+<td>Food</td>
+<td>what it eats (diet, energy scale), whether and how it is edible itself (method, energy, carcass); derived threats</td>
+</tr>
+<tr>
+<td>Population</td>
+<td>initial, floor, cap, cap rule</td>
+</tr>
+</tbody>
+</table>
+<p>Plus: observation-space size (e.g. &quot;4 860 situations&quot;), the signature, and a
+<strong>prompt preview</strong>: pick a founder genome and a situation (dropdowns per sense,
+or <em>random</em>), switch V1/V2, see the full prompt with its token estimate, copy it.</p>
+<p><strong>Module drawers.</strong></p>
+<ul>
+<li><em>Text gene</em>: each founder sentence with its word count and forbidden characters
+highlighted; neutral and contrast fields.</li>
+<li><em>Number gene</em>: range slider, founder values on it; in Play mode a histogram of
+the living animals' values.</li>
+<li><em>Sense</em>: its tokens and the fragment each writes.</li>
+<li><em>Bands</em>: the edges drawn on a ruler up to the vision.</li>
+<li><em>LLM mutation</em>: the deck, and a <em>Try</em> button that mutates a sample sentence
+with the real mutator and shows the raw answer, the cleaned sentence and the
+guards' verdict.</li>
+</ul>
+<h2 id="4-windows">4. Windows</h2>
+<table>
+<thead>
+<tr>
+<th>Window</th>
+<th>Shows</th>
+<th>Lab activity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Ecology monitor</strong></td>
+<td>population per species over time, deaths by cause, births, mean energy and stamina, action shares, memo hit rate, brain time, ticks per second</td>
+<td>A, B</td>
+</tr>
+<tr>
+<td><strong>Gene pool</strong></td>
+<td>per locus: allele frequencies over time (stacked), current top alleles with their text and origin, the lineage of a selected allele as a chain of text diffs; number genes as histograms over time</td>
+<td>D, E</td>
+</tr>
+<tr>
+<td><strong>Animal inspector</strong></td>
+<td>the selected animal: stats, traits, genome sentences, last situation text, last probabilities as bars, current action (&quot;carrier + overlay&quot; under an overlay, ACT-07) and target, busy reason, parents and children</td>
+<td>C</td>
+</tr>
+<tr>
+<td><strong>Ask the brain</strong></td>
+<td>build a genome (founders, edited sentences, contrast pro/anti, random text), pick a situation, query several brains side by side; one click for a directed test (pro vs anti ΔP) and a random-text comparison</td>
+<td>C, I</td>
+</tr>
+<tr>
+<td><strong>Food web</strong></td>
+<td>species and layers as a graph with graze, strike and scavenge edges; threats; warnings</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Event log</strong></td>
+<td>events filtered by kind, species and animal; follow a lineage</td>
+<td>D</td>
+</tr>
+<tr>
+<td><strong>Scenario runner</strong></td>
+<td>scenario assets, run N seeds headless, results against expected ranges, pass or fail (<a href="31-scenarios.html">31</a>)</td>
+<td>G</td>
+</tr>
+<tr>
+<td><strong>Brain health</strong></td>
+<td>hosts, <em>Test connection</em>, model digests or revisions, latency, failures, cache size and hit rate</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-scene-view">5. Scene view</h2>
+<ul>
+<li><strong>Gizmos</strong> for the selected animal: vision circle and band rings, a line to its
+target coloured by action, its reach, its NavMesh path.</li>
+<li><strong>An overlay</strong> (Unity 6 Overlays) with toggles: food items, cover, carcasses,
+eggs; a letter or colour per action above each animal (stable colours from
+the action order); species filters; heat maps of deaths and food.</li>
+</ul>
+<h2 id="6-creating-things">6. Creating things</h2>
+<ul>
+<li><code>GameObject ▸ EvoSim ▸ New World</code> builds the default tree: ground,
+environment, brains, recorder and the eleven phases.</li>
+<li><code>GameObject ▸ EvoSim ▸ New Species</code> adds a species with a kinematic
+locomotion, energy, stamina, metabolism, diet, mating, litter, crossover,
+starvation, old age, cap and floor.</li>
+<li><code>EvoSim ▸ Exercises ▸ Replace with stub</code> swaps a reference module for an empty
+student class of the same base class, keeping its inspector settings, so that
+the reference module's tests grade the student's version (the teaching path,
+<a href="22-extending-recipes.html#0-the-teaching-path">22 §0</a>); <code>Restore reference</code>
+undoes it.</li>
+<li><code>GameObject ▸ EvoSim ▸ Add Action / Sense / Gene</code> instantiates module prefabs
+from <code>Modules/</code>.</li>
+<li><code>Assets ▸ Create ▸ EvoSim ▸</code> <em>Allele Pool</em>, <em>Scenario</em>, <em>Mutation Deck</em>, and
+<em>Script</em> templates for a new sense, action, gene kind, stat, phase, brain or
+mutation operator, each with the methods to override and a matching test file.</li>
+</ul>
+<h2 id="7-a-students-loop">7. A student's loop</h2>
+<p>Open the scene → validation is green → Play → watch the ecology monitor → pause →
+click an animal → read its genes and why it chose → open <em>Ask the brain</em>, change a
+sentence, compare → stop → change a gene in the founder pool → run again with the
+same seed → compare the two runs in the gene pool window.</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

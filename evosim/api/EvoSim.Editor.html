@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Namespace EvoSim.Editor | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Namespace EvoSim.Editor | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.Editor">
+
+  <h1 id="EvoSim_Editor" data-uid="EvoSim.Editor" class="text-break">Namespace EvoSim.Editor</h1>
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="markdown level0 remarks"></div>
+
+    <h3 id="classes">
+Classes
+</h3>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.AnimalInspectorWindow.html">AnimalInspectorWindow</a></dt>
+      <dd><p>The selected animal (21 §4, lab C): stats, traits, genome sentences, last situation, last probabilities as bars,
+current action and target, busy reason, parents and offspring. Click an animal's view to select it.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.AskTheBrainWindow.html">AskTheBrainWindow</a></dt>
+      <dd><p>Ask the brain (21 §4, labs C and I): build a genome (founders, edited sentences, a gene's contrast pair, control
+sentences), pick a situation, and ask several brains side by side; a directed test asks with a gene's pro sentence,
+then with its anti one, so P(action) can be compared. Queries are built from texts only: nothing is registered in
+the world, so asking never changes a run.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.BrainHealthWindow.html">BrainHealthWindow</a></dt>
+      <dd><p>Brain health (21 §4): every brain and mutator client of the current world with its host, a Test connection
+button (V-60, on demand), model and revision or digest, latency, failures, and the answer cache's size and hits.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.EcologyMonitorWindow.html">EcologyMonitorWindow</a></dt>
+      <dd><p>The ecology monitor (21 §4, labs A and B): population per species over time, deaths by cause, births, action
+shares, memo hit rate, ticks per second — from LiveStatistics and the species counters.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.EditorWorlds.html">EditorWorlds</a></dt>
+      <dd><p>What the windows look at (EDIT-05): the worlds of the open scenes, the selected world, the selected animal.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.EventLogWindow.html">EventLogWindow</a></dt>
+      <dd><p>The event log (21 §4, lab D): the running world's events as they are recorded, filtered by kind, species and
+animal; following an animal shows its line and its descendants' births.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.EvoSimOverlay.html">EvoSimOverlay</a></dt>
+      <dd><p>The scene-view overlay (21 §5): toggles for food, cover, carcasses, eggs and action letters, and species filters.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.Exercises.html">Exercises</a></dt>
+      <dd><p>EvoSim ▸ Exercises (21 §6, 22 §0): Replace with stub writes the student stub of a reference module into
+Assets/Student and swaps the module for it in the open scenes, keeping its settings; Restore reference undoes it.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.FoodWebWindow.html">FoodWebWindow</a></dt>
+      <dd><p>The food web (21 §4): species and layers as a graph with graze, strike, scavenge and egg edges, the derived
+threats, and the food-web warnings of validation.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.GenePoolWindow.html">GenePoolWindow</a></dt>
+      <dd><p>The gene pool (21 §4, labs D and E): per locus, the allele shares among the living over time (stacked), the
+current top alleles with their text and origin, and the lineage of a selected allele as a chain of texts; number
+genes as histograms of the living animals' values.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.PlayModeGate.html">PlayModeGate</a></dt>
+      <dd><p>EDIT-01: before Play, every enabled World in the open scenes is validated with the same engine as
+World.Initialize; errors cancel Play and are logged with the object at fault (EDIT-02).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.PromptPreview.html">PromptPreview</a></dt>
+      <dd><p>The species inspector's prompt preview (21 §3, PROMPT-06): built by the same code as the Ask brains phase, so it
+is exactly what the brain receives — for JEV, its whole input text (T-PROMPT-05).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.RealTimeRuns.html">RealTimeRuns</a></dt>
+      <dd><p>The real-time visual test from the unity CLI (eval): a headless reference run, a scene set up for Play mode, and the
+run's status while it plays. Levels: L0 the random brain and no mutation (offline), L1 the scene's brain (JEV) and
+no mutation, L2 the scene's brain and mutator. Example:</p>
+<pre><code class="lang-csharp">unity command eval --code 'return EvoSim.Editor.RealTimeRuns.Headless("HideVsFlee", 1234, 600, "L2", "RT-L2-headless");'</code></pre>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.ReferenceScenes.html">ReferenceScenes</a></dt>
+      <dd><p>Builds the reference content (20 §2, §7; 09 §3): the allele pools from the prototype's pool files, the module
+prefabs (Modules/), placeholder bodies, and the scenes Lab1_Small, Lab1_Full, HideVsFlee, ThreeSpecies,
+Terrain_Locomotion and Sandbox. The scenes are then the configuration (ARCH-01): edit them, not this builder,
+unless the reference itself changes. Scenes are opened additively from an empty file, so the editor's own open
+scene is never touched.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.RunViews.html">RunViews</a></dt>
+      <dd><p>Makes a scene watchable (20 §6): a &quot;Run views&quot; object with the ground, entity markers, overlay and capture, and a
+<a class="xref" href="EvoSim.WorldCamera.html">WorldCamera</a> on the main camera; and the reference bodies (a capsule standing on the ground, a nose
+that shows where it goes, a marker in the colour of its action). All of them only read the World (SPACE-12).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.ScenarioRunnerWindow.html">ScenarioRunnerWindow</a></dt>
+      <dd><p>The scenario runner (21 §4, lab G): the scenario assets, a variant, seeds and length; runs them headless (Freeze,
+the same code as EvoSim.Batch.RunScenario) and lists the results; &quot;twice&quot; checks the reproducibility fact.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.SceneDrawing.html">SceneDrawing</a></dt>
+      <dd><p>The scene view (21 §5): gizmos for the selected animal (vision, a line to its target, a 1 m circle coloured by
+action) and, as the overlay's toggles say, food items, cover, carcasses, eggs and a letter per action above each
+animal (stable colours from the action order). Drawing only reads the world (SPACE-12).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.ScriptTemplates.html">ScriptTemplates</a></dt>
+      <dd><p>Assets ▸ Create ▸ EvoSim (21 §6): script templates for a new sense, action, gene kind, stat, phase, brain or
+mutation operator — each with the methods to override and a matching test — and a mutation deck. Scripts go to
+Assets/Student (with its assembly), tests to Assets/Student/Tests (with a test assembly that sees EvoSim.Testing).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.SpeciesInspector.html">SpeciesInspector</a></dt>
+      <dd><p>The Species inspector (21 §3, EDIT-04): read-only tables computed from the subtree (actions, senses, genes, stats
+and traits, food, population), the observation-space size, the signature, and a prompt preview built by the same
+code as the Ask brains phase (T-PROMPT-05).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.ValidationPanel.html">ValidationPanel</a></dt>
+      <dd><p>The validation list of the inspectors (EDIT-01, EDIT-02): one line per message with its severity, a button that
+selects the object at fault, and the fix button when the validator offers one.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.VisualPlayerBuild.html">VisualPlayerBuild</a></dt>
+      <dd><p>Builds a Windows player that draws a run (07 real-time test): Windows 64-bit, Mono, the reference scenes
+(HideVsFlee first) given here, not in the Build Settings, into Builds/EvoSim/&lt;date&gt;/EvoSim.exe. Project and
+Player settings are left as they are. Batch: -executeMethod EvoSim.Editor.VisualPlayerBuild.BuildFromCommandLine
+[-scenes HideVsFlee,Lab1_Full] [-out folder]. Run it: EvoSim.exe -scene HideVsFlee -seed 1234 -ticks 600
+-speed 5 -brain JEV -capture 10 -quitAtEnd -screen-fullscreen 0 -logFile player.log (PlayerArgs).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.WorldFactory.html">WorldFactory</a></dt>
+      <dd><p>Creating things from the menus (21 §6): a new world with the default tree, a new species with the reference
+body modules, and actions, senses and genes from the module prefabs in Modules/. The static methods are what
+the menus call, so tests build worlds exactly as a student does.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Editor.WorldInspector.html">WorldInspector</a></dt>
+      <dd><p>The World inspector (21 §3): state and tick, run controls in Play mode, the settings, the phases in order with
+their enable toggles, the services, and the validation panel.</p>
+</dd>
+    </dl>
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

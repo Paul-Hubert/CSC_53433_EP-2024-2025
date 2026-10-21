@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Reproduction and population | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Reproduction and population | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/reproduction.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-reproduction">
+<h1 id="reproduction-and-population">Reproduction and population</h1>
+
+<p>Six modules in a species' <code>Life</code> group decide how it breeds and how many of its animals the world keeps: who mates, how
+many babies a mating makes, how the parents' genes mix, how long eggs incubate, and the population's cap and floor. Most
+changes are settings; override a member when the rule itself must change. How these modules work together is explained
+in <a href="../guides/reproduction-and-population.html">Reproduction and population</a>.</p>
+<p>The phases find each module by its type (<code>s.Module&lt;Litter&gt;()</code>), so a species has one of each, and a replacement derives
+from the reference class: <code>MyLitter : Litter</code>, <code>MyRule : MatingRule</code>. Crossovers derive from the abstract
+<a class="xref" href="../api/EvoSim.Crossover.html">Crossover</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Override</th>
+<th>Called</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Crossover.html">Crossover</a></td>
+<td><a class="xref" href="../api/EvoSim.Crossover.html#EvoSim_Crossover_Cross_EvoSim_Genome_EvoSim_Genome_EvoSim_RandomStream_">Cross</a> (must), <a class="xref" href="../api/EvoSim.Crossover.html#EvoSim_Crossover_Copy_EvoSim_Genome_">Copy</a></td>
+<td>breed phase, once per baby of two parents (<code>Cross</code>) or one parent (<code>Copy</code>)</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Litter.html">Litter</a></td>
+<td><a class="xref" href="../api/EvoSim.Litter.html#EvoSim_Litter_Size_EvoSim_RandomStream_System_Single___">Size</a>, <a class="xref" href="../api/EvoSim.Litter.html#EvoSim_Litter_ChildEnergy">ChildEnergy</a></td>
+<td>breed phase, once per conception; hatch phase, for each baby's energy</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.MatingRule.html">MatingRule</a></td>
+<td><a class="xref" href="../api/EvoSim.MatingRule.html#EvoSim_MatingRule_IsReady_EvoSim_Animal_">IsReady</a>, <a class="xref" href="../api/EvoSim.MatingRule.html#EvoSim_MatingRule_IsAdult_EvoSim_Animal_">IsAdult</a>, <a class="xref" href="../api/EvoSim.MatingRule.html#EvoSim_MatingRule_Sexual">Sexual</a></td>
+<td>breed phase, for seekers and partners; kin senses, to report readiness</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Incubation.html">Incubation</a></td>
+<td><a class="xref" href="../api/EvoSim.Incubation.html#EvoSim_Incubation_Ticks">Ticks</a></td>
+<td>breed phase, once per conception</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.CapRule.html">CapRule</a></td>
+<td><a class="xref" href="../api/EvoSim.CapRule.html#EvoSim_CapRule_Cap">Cap</a></td>
+<td>migration phase every tick; breed phase in Block mode</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.FloorRule.html">FloorRule</a></td>
+<td>settings only (<strong>Floor</strong>)</td>
+<td>floor phase every tick</td>
+</tr>
+</tbody>
+</table>
+<h2 id="a-crossover">A crossover</h2>
+<p>The reference <a class="xref" href="../api/EvoSim.UniformCrossover.html">UniformCrossover</a> takes each locus from either parent with probability ½ (GENE-30). This one
+cuts the genome once: loci before a random cut come from one parent, the others from the other.</p>
+<pre><code class="lang-csharp">using EvoSim;
+
+public class OnePointCrossover : Crossover
+{
+    public override Allele[] Cross(Genome a, Genome b, RandomStream rng)
+    {
+        CheckSpecies(a, b);                            // genomes never cross species (SPEC-04)
+        bool aFirst = rng.NextBool();                  // which parent gives the loci before the cut
+        int cut = rng.Range(0, a.Count + 1);
+        var first = aFirst ? a : b;
+        var second = aFirst ? b : a;
+        var child = new Allele[a.Count];
+        for (int i = 0; i &lt; child.Length; i++) child[i] = i &lt; cut ? first[i] : second[i];
+        return child;
+    }
+}
+</code></pre>
+<p>Replace the <code>UniformCrossover</code> component of the species' <code>Life</code> group with yours.</p>
+<div class="NOTE">
+<h5>Note</h5>
+<p>Neighbouring loci now travel together, like linked genes on a chromosome. This leaves the contract's independent loci
+(GENE-30): fine for an experiment, but it is no longer the reference.</p>
+</div>
+<h2 id="a-litter">A litter</h2>
+<p>Override <a class="xref" href="../api/EvoSim.Litter.html#EvoSim_Litter_Size_EvoSim_RandomStream_System_Single___">Size</a> to change how many babies a mating
+makes. The reference draws k in [<strong>Min</strong>, <strong>Max</strong>] and cuts it to what the parents can pay, never below <strong>Min</strong>
+(REPRO-10). This one makes small litters unless both parents are rich:</p>
+<pre><code class="lang-csharp">using EvoSim;
+using UnityEngine;
+
+public class CarefulLitter : Litter
+{
+    [SerializeField, Min(0f), Tooltip(&quot;Energy every parent needs for a full litter, in points.&quot;)]
+    float richEnergy = 80f;
+
+    public override int Size(RandomStream rng, float[] parentEnergies)
+    {
+        int k = base.Size(rng, parentEnergies);        // always draw: the stream stays the same
+        foreach (var e in parentEnergies) if (e &lt; richEnergy) return Min;
+        return k;
+    }
+}
+</code></pre>
+<p>Each parent then pays <strong>Child Energy</strong> / (number of parents) × k (REPRO-11). The cap's Block mode may cut the litter
+further.</p>
+<h2 id="who-mates">Who mates</h2>
+<p>Most changes to the <a class="xref" href="../api/EvoSim.MatingRule.html">MatingRule</a> are settings: <strong>Mate Energy</strong> (50 points), <strong>Maturity</strong> (150 ticks, a trait
+a number gene can set), <strong>Reach</strong> (1 m), <strong>Sexual</strong>. Override a predicate to change who is ready:</p>
+<pre><code class="lang-csharp">using EvoSim;
+
+public class AgeLimitedMating : MatingRule
+{
+    public override bool IsReady(Animal a) =&gt; base.IsReady(a) &amp;&amp; a.Age &lt; 1200;   // old animals stop breeding
+}
+</code></pre>
+<p>The brain reads the rule in the prompt: when you change who mates, change <strong>Prompt Rule</strong> to say so.</p>
+<h2 id="incubation-caps-and-floors">Incubation, caps and floors</h2>
+<ul>
+<li><strong>Incubation.</strong> Set <strong>Ticks</strong> above 0 and babies hatch later; the mutator's answers usually arrive meanwhile, so the
+world doesn't wait (MUT-33). Override <code>Ticks</code> to compute it, without random draws.</li>
+<li><strong>Cap.</strong> Choose <strong>Mode</strong> Migrate (reference: random animals leave above the cap) or Block (no conception at the cap).
+Override <code>Cap</code> to compute it, without random draws.</li>
+<li><strong>Floor.</strong> <strong>Floor</strong> 0 means no newcomers. To bring newcomers another way, replace the <code>FloorPhase</code> with your own
+<a href="world-modules.html">tick phase</a>.</li>
+</ul>
+<h2 id="eggs-as-food">Eggs as food</h2>
+<p>In the reference nothing eats eggs. Eggs exist only while they incubate, so:</p>
+<ol>
+<li>give the species that lays them an <strong>Incubation</strong> above 0, e.g. 20 ticks;</li>
+<li>add an <a class="xref" href="../api/EvoSim.Edible.html">Edible</a> to the World's <code>Environment ▸ Eggs</code> object (method <em>graze</em>: an egg is taken whole);</li>
+<li>add a diet entry <code>egg:prey</code> to the egg eater's <a class="xref" href="../api/EvoSim.Diet.html">Diet</a>, and give it a way to find eggs: an action pointed
+at eggs, and a sense if its brain should know about them.</li>
+</ol>
+<p>An eaten egg never hatches and is recorded as an <code>egg_lost</code> event with the reason <code>eaten</code> (REPRO-23). The details are in
+<a href="environment.html#who-eats-what">Food, cover, entities and ground</a>.</p>
+<h2 id="rules-your-module-keeps">Rules your module keeps</h2>
+<ul>
+<li><strong>Draw only from the stream you are given</strong> (RAND-03): <code>Size</code> gets the species' <code>litter</code> stream, <code>Cross</code> its <code>mutation</code>
+stream. Draw the same number of times whatever the parents, as <code>CarefulLitter</code> does by calling <code>base.Size</code> first.</li>
+<li><strong>A crossover returns a new array</strong>: one allele per locus, in locus order, each taken from that same locus of a parent
+(GENE-30), after <code>CheckSpecies</code>. It never changes the parents' genomes. It is called once per baby, so siblings differ
+(GENE-32).</li>
+<li><strong>Readiness only reads.</strong> <code>IsReady</code>, <code>IsAdult</code> and <code>Sexual</code> change nothing and draw nothing: kin senses call <code>IsReady</code>
+too, while the world is being sensed.</li>
+<li><strong>Computed settings are deterministic.</strong> <code>Ticks</code>, <code>Cap</code> and <code>ChildEnergy</code> depend only on the settings and the world
+state, never on the clock or <code>UnityEngine.Random</code>.</li>
+</ul>
+<h2 id="test-it">Test it</h2>
+<p>These modules have no conformance suite. Copy the tests in
+<code>Assets/EvoSim/Tests/EditMode/Reproduction/ReproductionTests.cs</code>: T-REPRO-05 checks litter sizes and the energy cut,
+T-GENE-08 runs 10 000 crossovers and checks that each locus comes from the first parent half the time. See
+<a href="testing-your-module.html">Testing your module</a>.</p>
+<h2 id="read-next">Read next</h2>
+<ul>
+<li>Rewrite the reference <code>Litter</code> and <code>UniformCrossover</code> from their stubs (<em>EvoSim ▸ Exercises ▸ Replace with stub ▸
+9 Litter</em>, <em>10 UniformCrossover</em>): <a href="exercises.html">the teaching path</a>.</li>
+<li>What a baby inherits and how it mutates: <a href="genes.html">Genes</a>, <a href="mutation.html">Mutation</a>.</li>
+<li>The contract: <a href="../spec/11-reproduction-and-population.html">11 — Reproduction and population</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Senses and prompts | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Senses and prompts | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/senses-and-prompts.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="guide-senses-and-prompts">
+<h1 id="senses-and-prompts">Senses and prompts</h1>
+
+<p>A brain never sees the world. It reads a few words about it. At each decision, every <strong>sense</strong> of the animal's species
+turns one aspect of the world (the nearest food, the energy level) into one <strong>token</strong> from a short, fixed list. The
+tokens together are the animal's <strong>observation</strong>, and the species writes them as a <strong>situation text</strong> such as
+<em>&quot;Energy: low. Food: 1-4 meters away.&quot;</em>. The species then puts that text into its <strong>prompt</strong>, with the rules of the
+world and the animal's genes. Discrete tokens keep the prompt short and let identical situations be answered once
+(<a href="../spec/06-senses-and-observations.html">06 — Senses</a>).</p>
+<h2 id="how-it-works">How it works</h2>
+<pre><code class="lang-mermaid">flowchart LR
+    S[Senses] --&gt;|one token each| O[Observation]
+    O --&gt;|Write per token| T[Situation text]
+    P[Prompt template] --&gt; F[Full prompt]
+    G[Genes block] --&gt; F
+    T --&gt; F
+    B[Brain's answer instruction] --&gt; F
+</code></pre>
+<ol>
+<li>The sense phase picks the animals that decide this tick (<a href="brains-and-decisions.html">Decisions and brains</a>).</li>
+<li>It casts the rays of the batched senses, then calls every sense of every deciding animal. Each sense returns an index
+into its token list (SENSE-01).</li>
+<li>The indices, in sense order, make an <a class="xref" href="../api/EvoSim.Observation.html">Observation</a> (SENSE-02).
+<a class="xref" href="../api/EvoSim.Species.html#EvoSim_Species_Describe_EvoSim_Observation_EvoSim_TextStyle_">Describe(Observation, TextStyle)</a> has each sense write its token and joins the
+fragments with spaces: the situation text (SENSE-10).</li>
+<li>A brain that reads text fills the species' prompt template, built when the run started, with the animal's genes,
+the situation text and its own answer instruction (<a class="xref" href="../api/EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Prompt_EvoSim_Brain_">Prompt</a>).</li>
+</ol>
+<h2 id="senses-and-tokens">Senses and tokens</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Sense.html">Sense</a></td>
+<td>reads one animal and returns one token from its fixed <a class="xref" href="../api/EvoSim.Sense.html#EvoSim_Sense_Tokens">Tokens</a> list</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.BandedSense.html">BandedSense</a></td>
+<td>a sense of distance, in bands: &quot;here&quot;, &quot;adjacent&quot; … &quot;far&quot;, &quot;none&quot;</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.BatchedSense.html">BatchedSense</a></td>
+<td>a sense that casts rays, all in one batch per tick</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.SenseContext.html">SenseContext</a></td>
+<td>what a sense may read: the state at the start of the tick, through the same queries as actions</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Observation.html">Observation</a></td>
+<td>one token index per sense, in sense order</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.ObservationView.html">ObservationView</a></td>
+<td>an observation read by sense label, as actions do in <code>IsRelevant</code></td>
+</tr>
+</tbody>
+</table>
+<p>The senses' depth-first order under the species is the order of the tokens in the observation and of the fragments in
+the situation text. Each sense has a <strong>Label</strong> (&quot;Food&quot;, &quot;Predator&quot;), which starts its V1 fragment; two senses of one
+species can't share a label (V-17). A sense sees the world as it was at the start of the tick (SENSE-04), and never an
+animal hidden from it in cover nor one killed this tick (SENSE-06).</p>
+<p>The number of possible observations is the product of the token counts (SENSE-05). The species inspector shows it as
+<strong>Observation space</strong>. Validation warns above 100 000 (V-50), because the memo and the answer cache then rarely help.</p>
+<h2 id="the-reference-senses">The reference senses</h2>
+<table>
+<thead>
+<tr>
+<th>Label</th>
+<th>Class</th>
+<th>Tokens</th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Energy</td>
+<td><a class="xref" href="../api/EvoSim.LevelSense.html">LevelSense</a></td>
+<td>low, medium, high</td>
+<td>low below 30, high above 70</td>
+</tr>
+<tr>
+<td>Stamina</td>
+<td><a class="xref" href="../api/EvoSim.LevelSense.html">LevelSense</a></td>
+<td>low, medium, high</td>
+<td>prey 20 / 40, predators 10 / 20</td>
+</tr>
+<tr>
+<td>Food</td>
+<td><a class="xref" href="../api/EvoSim.NearestResourceSense.html">NearestResourceSense</a></td>
+<td>here, adjacent, close, medium, far, none</td>
+<td>nearest item of a layer the diet grazes; &quot;here&quot; within the 0.5 m graze reach</td>
+</tr>
+<tr>
+<td>Predator</td>
+<td><a class="xref" href="../api/EvoSim.NearestAnimalSense.html">NearestAnimalSense</a> (threats)</td>
+<td>adjacent, close, medium, far, none</td>
+<td>nearest animal of a species whose diet strikes this one</td>
+</tr>
+<tr>
+<td>Prey</td>
+<td><a class="xref" href="../api/EvoSim.NearestAnimalSense.html">NearestAnimalSense</a> (prey)</td>
+<td>adjacent, close, medium, far, none</td>
+<td>nearest animal of a species this one strikes</td>
+</tr>
+<tr>
+<td>Cover</td>
+<td><a class="xref" href="../api/EvoSim.NearestCoverSense.html">NearestCoverSense</a></td>
+<td>here, adjacent, close, medium, far, none</td>
+<td>&quot;here&quot; when standing in cover</td>
+</tr>
+<tr>
+<td>Carcass</td>
+<td><a class="xref" href="../api/EvoSim.NearestEntitySense.html">NearestEntitySense</a></td>
+<td>adjacent, close, medium, far, none</td>
+<td>nearest carcass it may eat: portions left, not its own kill, not eaten from yet</td>
+</tr>
+<tr>
+<td>Animal, Other predator</td>
+<td><a class="xref" href="../api/EvoSim.NearestAnimalSense.html">NearestAnimalSense</a> (kin, readiness on)</td>
+<td>4 bands × (ready, not ready), none</td>
+<td>readiness is seen within the <strong>Partner Range</strong>, 20 m</td>
+</tr>
+<tr>
+<td>Age</td>
+<td><a class="xref" href="../api/EvoSim.AgeSense.html">AgeSense</a></td>
+<td>young, adult</td>
+<td>adult from the &quot;maturity&quot; trait, 150 ticks</td>
+</tr>
+</tbody>
+</table>
+<p>The reference prey has Energy, Stamina, Food, Predator, Cover, Animal and Age: 29 160 possible observations. The
+reference predator has Energy, Stamina, Prey, Carcass, Other predator and Age: 4 050. <em>GameObject ▸ EvoSim ▸ Add Sense</em>
+adds any of them to the selected species, from the prefabs in <code>Assets/EvoSim/Modules/Senses</code>.</p>
+<h2 id="distance-bands">Distance bands</h2>
+<p>A <a class="xref" href="../api/EvoSim.BandedSense.html">BandedSense</a> turns a distance into a band (SENSE-20). Its <strong>Bands</strong> setting (<a class="xref" href="../api/EvoSim.Bands.html">Bands</a>) holds
+the edges 1, 4 and 10 m and a vision of 20 m:</p>
+<table>
+<thead>
+<tr>
+<th>Token</th>
+<th>Distance</th>
+<th>V1 text</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>here (food, cover)</td>
+<td>within reach, or standing in it</td>
+<td>Food: here.</td>
+</tr>
+<tr>
+<td>adjacent</td>
+<td>≤ 1 m</td>
+<td>Food: within 1 meter.</td>
+</tr>
+<tr>
+<td>close</td>
+<td>1–4 m</td>
+<td>Food: 1-4 meters away.</td>
+</tr>
+<tr>
+<td>medium</td>
+<td>4–10 m</td>
+<td>Food: 4-10 meters away.</td>
+</tr>
+<tr>
+<td>far</td>
+<td>10–20 m</td>
+<td>Food: 10-20 meters away.</td>
+</tr>
+<tr>
+<td>none</td>
+<td>nothing within the vision</td>
+<td>Food: none within 20 meters.</td>
+</tr>
+</tbody>
+</table>
+<p>Vision is a <strong>trait</strong>, &quot;vision&quot;, so a number gene can change it (SENSE-22). The sense reads each animal's own vision
+when it looks. The texts state the trait's default, so one token always gives one text. Band edges must be positive,
+increasing and below the vision (SENSE-21, V-30).</p>
+<h2 id="situation-texts-v1-and-v2">Situation texts: V1 and V2</h2>
+<p>The World's <strong>Text Style</strong> chooses how every sense writes (SENSE-11). <strong>V1</strong> is terse, <strong>V2</strong> is first person. The
+reference uses V1. The same prey situation in both styles:</p>
+<pre><code class="lang-text">V1: Energy: low. Stamina: high. Food: 1-4 meters away. Predator: 4-10 meters away. Cover: here.
+    Animal: 10-20 meters away, ready to mate. Age: adult.
+
+V2: I am hungry and weak. I am rested. The nearest food is 1-4 meters away. The nearest predator is 4-10 meters away.
+    I am in cover. The nearest other animal is 10-20 meters away. It is ready to mate. I am an adult.
+</code></pre>
+<p>A text depends on the token only, never on the animal: the same observation always gives the same text (SENSE-10).
+The answer cache relies on it. Distances always say &quot;meters&quot; (SENSE-13). A level sense takes its V2 sentences from its
+<strong>Words</strong> field. A banded sense builds them from its <strong>Noun</strong> (&quot;food&quot;, &quot;other animal&quot;).</p>
+<h2 id="batched-raycasts">Batched raycasts</h2>
+<p>A sense that needs line of sight or the terrain ahead derives from <a class="xref" href="../api/EvoSim.BatchedSense.html">BatchedSense</a>. It asks for its rays in
+<a class="xref" href="../api/EvoSim.BatchedSense.html#EvoSim_BatchedSense_RequestRays_EvoSim_Animal_EvoSim_RayBatch_">RequestRays(Animal, RayBatch)</a>. The sense phase casts the rays of every deciding
+animal in one batch (SENSE-30), then the sense reads its results through <a class="xref" href="../api/EvoSim.SenseContext.html#EvoSim_SenseContext_Rays">Rays</a>. The tokens
+must be the same as when rays are cast one at a time (SENSE-31). Rays never hit the views, so what an animal senses never
+depends on rendering (RAND-11). No reference sense casts rays; the test sense <a class="xref" href="../api/EvoSim.Testing.ObstacleSense.html">ObstacleSense</a> does.</p>
+<h2 id="attachments">Attachments</h2>
+<p>A sense may also attach an object to the query, such as a small camera image, for a brain that reads images (SENSE-40).
+A query with an attachment is memoised and cached only if the sense gives a key for it (SENSE-41). The species' brain
+must accept attachments (V-51). No reference brain does. See <a href="../extending/sense.html#attachments">A sense</a>.</p>
+<h2 id="how-the-prompt-is-written">How the prompt is written</h2>
+<p>When the run starts, <a class="xref" href="../api/EvoSim.PromptWriter.html#EvoSim_PromptWriter_Build_EvoSim_Species_">Build(Species)</a> writes each species' prompt template
+(<a class="xref" href="../api/EvoSim.Species.html#EvoSim_Species_Prompt">Prompt</a>), in this order (PROMPT-01):</p>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Comes from</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Header</td>
+<td>the species' <strong>Prompt Header</strong> (&quot;You decide what a wild animal does next in a simple world.&quot;)</td>
+</tr>
+<tr>
+<td><code>Actions:</code> and one line per action, in action order</td>
+<td>each action's <strong>Description</strong>: <code>- eat: go to the nearest visible food and eat it</code></td>
+</tr>
+<tr>
+<td>Rule lines</td>
+<td>every species module's <code>WritePromptRules</code> (search rule, locomotion, stamina, mating), then every world service's (the carcass line)</td>
+</tr>
+<tr>
+<td>Genes intro</td>
+<td>the species' <strong>Genes Intro</strong> (&quot;This animal's instincts (its genes)…&quot;)</td>
+</tr>
+<tr>
+<td><code>{genes}</code></td>
+<td>one line per gene the brain reads, in locus order: <code>- eat: &quot;Eat whenever food is close.&quot;</code> (PROMPT-02)</td>
+</tr>
+<tr>
+<td><code>Situation: {situation}</code></td>
+<td>the situation text</td>
+</tr>
+<tr>
+<td><code>{ask}</code></td>
+<td>the brain's <a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_AnswerInstruction">AnswerInstruction</a>, hard-coded in the brain because its parsing depends on it (PROMPT-07)</td>
+</tr>
+</tbody>
+</table>
+<p>The reference prey's prompt, for a founder in one situation, with the Ollama points brain (shortened):</p>
+<pre><code class="lang-text">You decide what a wild animal does next in a simple world.
+
+Actions:
+- eat: go to the nearest visible food and eat it
+- flee: run away from the nearest predator
+- hide: go to the nearest cover and stay in it; predators can't see or catch an animal in cover
+…
+Animals move 1 meter per step. Predators run 2 meters per step when they hunt,
+but they have 30 stamina against an animal's 60, so a long chase tires them first.
+…
+This animal's instincts (its genes). They define its personality: follow them
+even when they seem unwise. Instincts that are meaningless have no effect.
+- eat: &quot;Eat whenever food is close.&quot;
+- flee: &quot;Run from any predator you see.&quot;
+…
+Situation: Energy: low. Stamina: high. Food: 1-4 meters away. Predator: 4-10 meters away. Cover: 1-4 meters away. Animal: none within 20 meters. Age: adult.
+
+Distribute 100 points across the actions according to how likely this animal is to choose each.
+</code></pre>
+<p>JEV adds no instruction: it sends this text without its last line, followed by its own question and the actions as
+lettered options. The template's <a class="xref" href="../api/EvoSim.PromptTemplate.html#EvoSim_PromptTemplate_Id">Id</a> is a hash of its text. It is part of the answer
+cache's keys, so editing a header, a description or a rule line asks the model again (PROMPT-05).</p>
+<h2 id="placeholders">Placeholders</h2>
+<p>Numbers in descriptions and rule lines come from the modules' settings, so the prompt never contradicts the world
+(PROMPT-03). The speed line above is written <code>Animals move {walkSpeed} meter per step. Predators run {predator.Locomotion.runSpeed} meters per step…</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Placeholder</th>
+<th>Reads</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{field}</code></td>
+<td>a field or property of the module writing the line: <code>{walkSpeed}</code></td>
+</tr>
+<tr>
+<td><code>{Module.field}</code></td>
+<td>another module of the same species, named by its class, a base class or its GameObject: <code>{Stamina.max}</code></td>
+</tr>
+<tr>
+<td><code>{species.Module.field}</code></td>
+<td>a module of another species: <code>{predator.Stamina.max}</code></td>
+</tr>
+<tr>
+<td><code>{name}</code></td>
+<td>this species' display name</td>
+</tr>
+<tr>
+<td><code>{species.name}</code>, <code>{species.id}</code></td>
+<td>another species' display name or id</td>
+</tr>
+<tr>
+<td><code>{{</code> and <code>}}</code></td>
+<td>a literal brace</td>
+</tr>
+</tbody>
+</table>
+<p>A field can be public or private. Numbers are written as the brain reads them (&quot;4&quot;, &quot;2.5&quot;), booleans as &quot;yes&quot; or &quot;no&quot;.
+An unknown placeholder stays in the text and validation reports it (V-53). The header and the genes intro have no
+writing module, so only <code>{name}</code> and the dotted forms work there.</p>
+<h2 id="frozen-prompts">Frozen prompts</h2>
+<p>A species can use a fixed text instead of the assembled one: set its <strong>Frozen Prompt</strong> to a text asset that contains
+<code>{genes}</code>, <code>{situation}</code> and <code>{ask}</code> (PROMPT-04). The prototype's prompts in <a href="../spec/08-decisions-brains-and-prompts.html">08 §7</a>
+are examples. Placeholders in it are still filled. A missing hole is reported (V-53).</p>
+<h2 id="settings">Settings</h2>
+<table>
+<thead>
+<tr>
+<th>Where</th>
+<th>Field</th>
+<th>Reference</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>World</td>
+<td><strong>Text Style</strong></td>
+<td>V1</td>
+<td>V1 or V2 situation texts, for every species</td>
+</tr>
+<tr>
+<td>Species</td>
+<td><strong>Prompt Header</strong>, <strong>Genes Intro</strong></td>
+<td>see above</td>
+<td>the fixed parts of the prompt</td>
+</tr>
+<tr>
+<td>Species</td>
+<td><strong>Frozen Prompt</strong></td>
+<td>none</td>
+<td>replaces the assembled prompt</td>
+</tr>
+<tr>
+<td>Any sense</td>
+<td><strong>Label</strong></td>
+<td>empty = the sense's default</td>
+<td>the name the brain reads; must be unique in the species</td>
+</tr>
+<tr>
+<td>Banded sense</td>
+<td><strong>Bands</strong> (Edges, Names, Vision), <strong>Noun</strong></td>
+<td>1, 4, 10 m; vision 20 m</td>
+<td>the bands, and the noun of V2 texts</td>
+</tr>
+<tr>
+<td>Level sense</td>
+<td><strong>Stat</strong>, <strong>Low</strong>, <strong>High</strong>, <strong>Words</strong></td>
+<td>energy 30 / 70</td>
+<td>which stat, the thresholds, the V2 sentences</td>
+</tr>
+<tr>
+<td>Nearest animal sense</td>
+<td><strong>Targets</strong>, <strong>Listed</strong>, <strong>Report Readiness</strong>, <strong>Partner Range</strong></td>
+<td>threats; readiness off; 20 m</td>
+<td>which animals, and whether readiness is written</td>
+</tr>
+<tr>
+<td>Action</td>
+<td><strong>Description</strong></td>
+<td>per action</td>
+<td>its line in the prompt</td>
+</tr>
+</tbody>
+</table>
+<h2 id="in-the-editor">In the editor</h2>
+<ul>
+<li>Select a <strong>species</strong>. In Edit mode, press <strong>Show the computed tables</strong>. The inspector lists the senses in
+situation-text order, with their tokens and the V1 and V2 texts of the first token. It also shows the
+<strong>Observation space</strong> and the <strong>Signature</strong>, which changes when a sense is added, removed, renamed or moved (V-12).</li>
+<li>Its <strong>Prompt preview</strong> builds the exact text a brain receives. Pick a <strong>Brain</strong>, a <strong>Founder genome</strong>, a <strong>Text style</strong>
+and one token per sense (or <strong>Random situation</strong>), then press <strong>Build</strong>. It shows the estimated token count and the
+brain's limit; <strong>Copy</strong> puts the text on the clipboard.</li>
+<li><em>Window ▸ EvoSim ▸ Animal Inspector</em> shows the last situation text of the selected animal.</li>
+<li><em>Window ▸ EvoSim ▸ Ask the Brain</em> asks brains about a genome and a situation of your choice.</li>
+</ul>
+<h2 id="go-further">Go further</h2>
+<ul>
+<li><a href="../extending/sense.html">A sense</a>: write your own sense, banded or batched.</li>
+<li><a href="brains-and-decisions.html">Decisions and brains</a>: what happens to the observation and the prompt next.</li>
+<li><a href="../extending/species-modules.html">Species modules</a>: <code>WritePromptRules</code>, for rule lines of your own modules.</li>
+<li>API: <a class="xref" href="../api/EvoSim.Sense.html">Sense</a>, <a class="xref" href="../api/EvoSim.SenseContext.html">SenseContext</a>, <a class="xref" href="../api/EvoSim.Bands.html">Bands</a>, <a class="xref" href="../api/EvoSim.PromptWriter.html">PromptWriter</a>,
+<a class="xref" href="../api/EvoSim.PromptTemplate.html">PromptTemplate</a>, <a class="xref" href="../api/EvoSim.Editor.SpeciesInspector.html">SpeciesInspector</a>.</li>
+<li>Specification: <a href="../spec/06-senses-and-observations.html">06 — Senses and observations</a>,
+<a href="../spec/08-decisions-brains-and-prompts.html">08 — Decisions, brains and prompts</a> §7.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

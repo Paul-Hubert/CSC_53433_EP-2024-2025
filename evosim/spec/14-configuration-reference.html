@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>14 — Configuration reference | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="14 — Configuration reference | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/14-configuration-reference.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="14--configuration-reference">14 — Configuration reference</h1>
+
+<h2 id="1-rules">1. Rules</h2>
+<ul>
+<li><strong>CFG-01 (MUST)</strong> Each parameter lives on the one module that uses it, with
+its unit and valid range, and is visible in the inspector.</li>
+<li><strong>CFG-02 (MUST)</strong> A <strong>scenario</strong> (a preset) can override any parameter by path
+(<code>&lt;species&gt;/&lt;module&gt;/&lt;field&gt;</code>, e.g. <code>Prey/Litter/max</code>) without editing the
+scene, like the prototype's <code>--set agents.litter=[1,1]</code>.</li>
+<li><strong>CFG-03 (MUST)</strong> The full effective configuration is saved with every run
+(<code>run_info.json</code>).</li>
+<li><strong>CFG-04 (MUST)</strong> A parameter that a gene may change is a trait (ANIM-16).</li>
+<li><strong>CFG-05 (SHOULD)</strong> Presets exist for the reference worlds: Lab 1 full, Lab 1
+small, terrain preview.</li>
+</ul>
+<h2 id="2-reference-values">2. Reference values</h2>
+<p>Values of the prototype on 2026-10-09 (<code>configs/base.yaml</code>), one cell read as one
+meter, kept exactly (owner decision). &quot;small&quot; is the profile for tests and quick checks.</p>
+<h3 id="world">World</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>seed</td>
+<td>1234</td>
+<td>—</td>
+</tr>
+<tr>
+<td>size</td>
+<td>192 × 192 (small 48 × 48)</td>
+<td>m</td>
+</tr>
+<tr>
+<td>decision period</td>
+<td>4</td>
+<td>ticks</td>
+</tr>
+<tr>
+<td>sampling temperature</td>
+<td>1.0</td>
+<td>—</td>
+</tr>
+<tr>
+<td>stats interval</td>
+<td>100</td>
+<td>ticks</td>
+</tr>
+<tr>
+<td>act order</td>
+<td>species in turn (simultaneous: random winner for contested items)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>wait mode</td>
+<td>responsive in the editor, freeze in batch mode</td>
+<td>—</td>
+</tr>
+<tr>
+<td>text style</td>
+<td>V1</td>
+<td>—</td>
+</tr>
+<tr>
+<td>unit word in texts</td>
+<td>&quot;meters&quot;</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ground-terrain-preview-only-lab-1-is-flat">Ground (terrain preview only; Lab 1 is flat)</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>water fraction, mountain fraction</td>
+<td>0.15, 0.10 (Lab 1: 0, 0)</td>
+</tr>
+<tr>
+<td>noise octaves (cell sizes)</td>
+<td>16, 8, 4 m</td>
+</tr>
+<tr>
+<td>minimum connected walkable share, retries</td>
+<td>0.60, 50</td>
+</tr>
+<tr>
+<td>ridges (k × k areas), gap</td>
+<td>0 (off), 4 m</td>
+</tr>
+</tbody>
+</table>
+<h3 id="food-layer">Food layer</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cell size</td>
+<td>1</td>
+<td>m</td>
+</tr>
+<tr>
+<td>initial fraction</td>
+<td>0.1</td>
+<td>of walkable cells outside cover</td>
+</tr>
+<tr>
+<td>regrowth probability</td>
+<td>0.0015 (terrain preview 0.001)</td>
+<td>per empty cell per tick</td>
+</tr>
+<tr>
+<td>near-water bonus, radius</td>
+<td>× 2, 3</td>
+<td>—, m</td>
+</tr>
+<tr>
+<td>food in cover</td>
+<td>no</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cover-and-carcasses">Cover and carcasses</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cover fraction</td>
+<td>0.2 (0 = no cover)</td>
+<td>of walkable ground</td>
+</tr>
+<tr>
+<td>cover noise octaves</td>
+<td>8, 4</td>
+<td>m</td>
+</tr>
+<tr>
+<td>flee into cover within (prototype option)</td>
+<td>6 (Unity reference: off, hide action instead)</td>
+<td>m</td>
+</tr>
+<tr>
+<td>carcass portions (on the prey's edible component)</td>
+<td>2 (0 = no carcass)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>carcass energy per portion (same)</td>
+<td>30</td>
+<td>energy</td>
+</tr>
+<tr>
+<td>carcass lifetime (same)</td>
+<td>100</td>
+<td>ticks</td>
+</tr>
+<tr>
+<td>eggs edible</td>
+<td>no (no edible component)</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="perception">Perception</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>band edges</td>
+<td>1, 4, 10</td>
+<td>m</td>
+</tr>
+<tr>
+<td>vision (trait)</td>
+<td>20</td>
+<td>m</td>
+</tr>
+<tr>
+<td>partner readiness range</td>
+<td>20</td>
+<td>m</td>
+</tr>
+<tr>
+<td>energy levels</td>
+<td>low &lt; 30 ≤ medium ≤ 70 &lt; high</td>
+<td>energy</td>
+</tr>
+</tbody>
+</table>
+<h3 id="species">Species</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th><code>prey</code></th>
+<th><code>predator</code></th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>initial population</td>
+<td>136 (small 24)</td>
+<td>28 (small 4)</td>
+<td>animals</td>
+</tr>
+<tr>
+<td>floor</td>
+<td>10</td>
+<td>3</td>
+<td>animals</td>
+</tr>
+<tr>
+<td>cap</td>
+<td>270 (small 40)</td>
+<td>68 (small 6)</td>
+<td>animals</td>
+</tr>
+<tr>
+<td>cap rule</td>
+<td>migrate</td>
+<td>migrate</td>
+<td>—</td>
+</tr>
+<tr>
+<td>maximum energy</td>
+<td>100</td>
+<td>100</td>
+<td>energy</td>
+</tr>
+<tr>
+<td>start energy (founders, newcomers)</td>
+<td>60</td>
+<td>60</td>
+<td>energy</td>
+</tr>
+<tr>
+<td>base cost</td>
+<td>0.7</td>
+<td>0.7</td>
+<td>energy per tick</td>
+</tr>
+<tr>
+<td>move cost</td>
+<td>0.5</td>
+<td>0.5</td>
+<td>energy per meter</td>
+</tr>
+<tr>
+<td>rest cost</td>
+<td>0.2</td>
+<td>0.2</td>
+<td>energy per tick</td>
+</tr>
+<tr>
+<td>locomotion</td>
+<td>kinematic, straight lines</td>
+<td>kinematic, straight lines</td>
+<td>—</td>
+</tr>
+<tr>
+<td>walk speed (trait of the locomotion)</td>
+<td>1</td>
+<td>1</td>
+<td>m per tick</td>
+</tr>
+<tr>
+<td>run speed (trait of the locomotion)</td>
+<td>1 (flee)</td>
+<td>2 (hunt)</td>
+<td>m per tick</td>
+</tr>
+<tr>
+<td>maximum stamina (trait)</td>
+<td>60</td>
+<td>30</td>
+<td>m</td>
+</tr>
+<tr>
+<td>stamina recovery</td>
+<td>2</td>
+<td>2</td>
+<td>per tick without moving</td>
+</tr>
+<tr>
+<td>recovery cost</td>
+<td>0.3</td>
+<td>0.3</td>
+<td>energy per tick</td>
+</tr>
+<tr>
+<td>stamina levels</td>
+<td>20 / 40</td>
+<td>10 / 20</td>
+<td>low / high thresholds</td>
+</tr>
+<tr>
+<td>maturity (trait)</td>
+<td>150</td>
+<td>150</td>
+<td>ticks</td>
+</tr>
+<tr>
+<td>maximum age</td>
+<td>1 500</td>
+<td>1 500</td>
+<td>ticks</td>
+</tr>
+<tr>
+<td>mate energy</td>
+<td>50</td>
+<td>50</td>
+<td>energy</td>
+</tr>
+<tr>
+<td>child energy</td>
+<td>40</td>
+<td>40</td>
+<td>energy per baby, shared by the parents</td>
+</tr>
+<tr>
+<td>litter</td>
+<td>2–4</td>
+<td>2–4</td>
+<td>babies</td>
+</tr>
+<tr>
+<td>incubation</td>
+<td>0</td>
+<td>0</td>
+<td>ticks (a few ticks hide the mutator's latency)</td>
+</tr>
+<tr>
+<td>wander turn probability</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>per tick</td>
+</tr>
+<tr>
+<td>energy gained per food item (set on the food layer's edible component)</td>
+<td>25</td>
+<td>—</td>
+<td>energy</td>
+</tr>
+<tr>
+<td>kill chance (trait)</td>
+<td>—</td>
+<td>0.5</td>
+<td>per strike</td>
+</tr>
+<tr>
+<td>energy gained per kill (set on the prey's edible component)</td>
+<td>—</td>
+<td>60</td>
+<td>energy</td>
+</tr>
+<tr>
+<td>digestion</td>
+<td>—</td>
+<td>50 ticks per kill, in proportion for portions</td>
+<td>ticks</td>
+</tr>
+</tbody>
+</table>
+<p>Options of the prototype, off: predator interference (c = 0, radius 3 m),
+prey per predator (q = 0), prey seen for breeding (m = 0), egg bank (off, 2 000
+ticks), one shared cap.</p>
+<h3 id="evolution">Evolution</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sexual</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>mutation rate</td>
+<td>0.03 per gene per baby</td>
+</tr>
+<tr>
+<td>text operator</td>
+<td>LLM instruction deck v4 (7 instructions)</td>
+</tr>
+<tr>
+<td>context line</td>
+<td>&quot;The sentence below is a rule that a wild animal follows.&quot;</td>
+</tr>
+<tr>
+<td>mutator temperature</td>
+<td>1.2</td>
+</tr>
+<tr>
+<td>maximum words</td>
+<td>12</td>
+</tr>
+<tr>
+<td>tries</td>
+<td>5</td>
+</tr>
+<tr>
+<td>controls</td>
+<td>shuffled: off, random founders: off (<a href="15-controls-metrics-and-gates.html">15</a>)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="brains-and-services">Brains and services</h3>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>where everything runs</td>
+<td>—</td>
+<td>the owner's computer, locally (owner decision)</td>
+</tr>
+<tr>
+<td>world default brain</td>
+<td>—</td>
+<td>JEV (the keyword brain is not part of the Unity system)</td>
+</tr>
+<tr>
+<td>answer cache</td>
+<td>format, place</td>
+<td>a local JSON-lines file per brain</td>
+</tr>
+<tr>
+<td>Ollama points brain (optional)</td>
+<td>model</td>
+<td>gemma4:12b</td>
+</tr>
+<tr>
+<td></td>
+<td>host</td>
+<td><code>http://localhost:11434</code> (or a cloud host with a key from an environment variable)</td>
+</tr>
+<tr>
+<td></td>
+<td>parallel requests</td>
+<td>2</td>
+</tr>
+<tr>
+<td></td>
+<td>context length, thinking</td>
+<td>4 096, off</td>
+</tr>
+<tr>
+<td></td>
+<td>timeout, keep-alive</td>
+<td>120 s, 30 min</td>
+</tr>
+<tr>
+<td>JEV brain</td>
+<td>host</td>
+<td><code>http://localhost:8000</code> (vLLM)</td>
+</tr>
+<tr>
+<td></td>
+<td>served model</td>
+<td><code>jev-decision</code> (the LoRA module)</td>
+</tr>
+<tr>
+<td></td>
+<td>model repository, revision</td>
+<td><code>autotrust/JEV-9B</code>, pinned <code>b63f651c…</code></td>
+</tr>
+<tr>
+<td></td>
+<td>maximum input</td>
+<td>1 024 tokens (counted, not cut)</td>
+</tr>
+<tr>
+<td></td>
+<td>timeout, strict</td>
+<td>60 s, yes</td>
+</tr>
+<tr>
+<td>Mutator</td>
+<td>API, host</td>
+<td>Ollama, <code>http://localhost:11434</code> (its own address; an OpenAI-compatible server also works)</td>
+</tr>
+<tr>
+<td></td>
+<td>model</td>
+<td>qwen3.5:0.8b on the CPU (context 1 024, thinking off)</td>
+</tr>
+<tr>
+<td></td>
+<td>timeout</td>
+<td>60 s</td>
+</tr>
+</tbody>
+</table>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

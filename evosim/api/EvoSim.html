@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Namespace EvoSim | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Namespace EvoSim | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim">
+
+  <h1 id="EvoSim" data-uid="EvoSim" class="text-break">Namespace EvoSim</h1>
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="markdown level0 remarks"></div>
+
+    <h3 id="classes">
+Classes
+</h3>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ActContext.html">ActContext</a></dt>
+      <dd><p>What an action may do in one tick (ACT-06): ask questions about what the animal could sense, and say where it
+wants to go (an intent) and what to do on arrival (an interaction). It can't move or change any animal itself.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ActPhase.html">ActPhase</a></dt>
+      <dd><p>Every living animal acts, in the act order (ACT-30): its action plans an intent and an interaction, its species'
+locomotion moves it, interactions apply within reach, then its metabolism is paid and busy counters drop
+(TICK-04 #4, ANIM-20, ANIM-30).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ActionColors.html">ActionColors</a></dt>
+      <dd><p>One colour per action name, shared by the views and the overlay's legend. Actions it doesn't know get a colour
+from their name's characters (the same on every run; no random numbers, RAND-11).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ActionView.html">ActionView</a></dt>
+      <dd><p>The reference body's view (20 §6): a marker above the head in the colour of the animal's action
+(<a class="xref" href="EvoSim.ActionColors.html">ActionColors</a>), and a body that darkens as its energy drops. It only reads the animal (SPACE-12).
+Copy it to show something else: override <a class="xref" href="EvoSim.AnimalView.html#EvoSim_AnimalView_OnShow_EvoSim_Animal_">OnShow(Animal)</a> and read what you need.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.AgeSense.html">AgeSense</a></dt>
+      <dd><p>Young or adult (06 §4): adult from the maturity trait (ANIM-36), reference 150 ticks.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Allele.html">Allele</a></dt>
+      <dd><p>One registered allele with its lineage (GENE-11, GENE-12): one version of a gene, such as the sentence
+&quot;Rest when you are tired.&quot; at the prey's rest gene, or the number 60 at a stamina gene.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.AllelePool.html">AllelePool</a></dt>
+      <dd><p>Founder and contrast sentences shared by several text genes, as an asset (GENE-24, 20 §3.8).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.AlleleRegistry.html">AlleleRegistry</a></dt>
+      <dd><p>Every allele seen in a run, once per (locus, value) (GENE-10), with ids <code>&quot;&lt;locus&gt;:&lt;n&gt;&quot;</code> (GENE-11).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+      <dd><p>One animal: plain data owned by its species (ANIM-01, ARCH-03). Modules read and write it through this record.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.AnimalAction.html">AnimalAction</a></dt>
+      <dd><p>A behaviour the brain can choose (ACT-01). Each tick it gives an intent and maybe an interaction; it never moves
+anything itself.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.AnimalView.html">AnimalView</a></dt>
+      <dd><p>One animal's view (20 §6): it holds only the animal's id and has no Update; the World places it in LateUpdate
+and never reads it back (SPACE-12).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.AnimalWords.html">AnimalWords</a></dt>
+      <dd><p>Common animal words, for the stale-name check V-23 (SPEC-21): a founder sentence naming one of them that is no
+species of the world was probably written for another world, or before a rename.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.AnswerCache.html">AnswerCache</a></dt>
+      <dd><p>A persistent store of brain and mutator answers (DEC-33, MUT-14): append-only JSON lines, one file per brain,
+loaded at the first lookup. Keys hash everything that can change an answer, so a repeated run replays
+without model calls (RAND-21). Rows are stored with round-trip precision, so a replay is bit-identical.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.AskBrainsPhase.html">AskBrainsPhase</a></dt>
+      <dd><p>Builds each deciding animal's query (DEC-10), answers it from the memo (DEC-30) or the answer cache (DEC-33),
+sends the rest as one batch per brain — per species for brains that can't mix species — with identical keys
+sent once (DEC-13, DEC-15, DEC-32). Nothing in the world changes here (CORE-06).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.BandedSense.html">BandedSense</a></dt>
+      <dd><p>A sense that reports how far the nearest something is, in bands (06 §3): &quot;here&quot; (optional), the bands, &quot;none&quot;.
+Wording (SENSE-10…13): V1 &quot;Food: 1-4 meters away.&quot; / V2 &quot;The nearest food is 1-4 meters away.&quot;.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Bands.html">Bands</a></dt>
+      <dd><p>Distance bands (06 §3, SENSE-20): increasing edges e1 &lt; … &lt; ek and a vision v &gt; ek. A distance falls in
+the first band with d ≤ ei, in &quot;far&quot; if ek &lt; d ≤ v, and is &quot;none&quot; beyond v. Reference: 1, 4, 10 m and 20 m.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Batch.html">Batch</a></dt>
+      <dd><p>Headless runs (30 §6, 31 §1, 32 §4): Unity -batchmode -executeMethod EvoSim.Batch.RunScenario -scenario S03
+[-variant name] [-seed n] [-ticks n] [-responsive]. In the open editor the same runs go through RunScenarioNamed (the unity CLI's
+eval). Worlds run in Freeze mode, outside Play mode: the World initialises itself (ARCH-04).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.BatchedSense.html">BatchedSense</a></dt>
+      <dd><p>A sense that casts rays (line of sight, terrain ahead): it asks for its rays first; the sense phase casts the
+rays of all deciding animals in one batch, then each sense reads its results (SENSE-30). It must give the same
+tokens as evaluating it one animal at a time (SENSE-31).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Body.html">Body</a></dt>
+      <dd><p>What a species' animals look like (20 §6): a view prefab, or a placeholder capsule of a colour. Views only
+read the simulation (SPACE-12); a species without a Body runs unseen.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Brain.html">Brain</a></dt>
+      <dd><p>Maps a batch of queries to probability rows over the species' actions (DEC-11).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.BrainAnswer.html">BrainAnswer</a></dt>
+      <dd><p>A brain's answer to a batch (DEC-11): one probability row per query, in query order, or a failure per query.
+Fast brains fill it at once; HTTP brains later, from another thread, then mark it done.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.BrainRequest.html">BrainRequest</a></dt>
+      <dd><p>One decision query as an HTTP brain sends it: its place in the batch, the text for the model and the species'
+action names. <a class="xref" href="EvoSim.HttpBrain.html#EvoSim_HttpBrain_Ask_System_Collections_Generic_IReadOnlyList_EvoSim_DecisionQuery__">Ask(IReadOnlyList&lt;DecisionQuery&gt;)</a> builds it on the main thread; <a class="xref" href="EvoSim.HttpBrain.html#EvoSim_HttpBrain_AnswerAsync_EvoSim_HttpCaller_System_Collections_Generic_IReadOnlyList_EvoSim_BrainRequest__EvoSim_BrainAnswer_">AnswerAsync(HttpCaller, IReadOnlyList&lt;BrainRequest&gt;, BrainAnswer)</a> reads it
+on the thread pool, so it holds plain values only, no Unity object.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.BreedPhase.html">BreedPhase</a></dt>
+      <dd><p>After all animals acted (TICK-06): each ready animal that chose mate and hasn't bred this period breeds with the
+nearest ready partner within reach that hasn't bred either — one partner's choice is enough (REPRO-02, REPRO-03).
+A litter is conceived (REPRO-10, REPRO-11): one egg per baby with its own crossover and its mutations drawn now
+(GENE-32, MUT-30); the LLM mutations are sent as one batch at the end (MUT-31).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.CanonicalJson.html">CanonicalJson</a></dt>
+      <dd><p>Writes JSON with sorted keys and fixed number formatting, so equal data gives equal text (RAND-10).
+Separators follow Python's json.dumps defaults (&quot;, &quot; and &quot;: &quot;), the prototype's format.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.CapRule.html">CapRule</a></dt>
+      <dd><p>The maximum population of a species (POP-01). Migrate (reference): births go on, and above the cap random older
+animals leave the world. Block: no conception at the cap, litters cut to the places left.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Carcass.html">Carcass</a></dt>
+      <dd><p>What a kill leaves (03 §3): a few portions that other eaters may eat, one portion each, never the killer. It rots
+away when its lifetime runs out, eaten or not, and goes as soon as its last portion is eaten (ENV-22).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.CarcassSystem.html">CarcassSystem</a></dt>
+      <dd><p>Carcasses, as each species' edible component describes them: portions, energy, lifetime (03 §3).
+A carcass of a species is edible when that species' Edible leaves one; diets name it &quot;carcass:&lt;species&gt;&quot;.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.CellGrid.html">CellGrid</a></dt>
+      <dd><p>A grid of square cells over the world rectangle, used inside layers (food cells, cover cells) — never to
+place animals (02 intro). Finds the nearest marked cell by expanding rings (20 §9).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ChooseActionsPhase.html">ChooseActionsPhase</a></dt>
+      <dd><p>Waits for the brains (TICK-03), stores fresh answers in the memo and the cache (never a failure, DEC-34), and
+draws each deciding animal's action with its species' sampling stream after the temperature (DEC-20, RAND-03).
+A failed answer stops a strict run cleanly; otherwise it becomes a uniform row and is counted (DEC-40).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ContactSheet.html">ContactSheet</a></dt>
+      <dd><p>A grid of a folder's PNG captures, scaled down on the GPU, saved as contact_sheet.png.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Cover.html">Cover</a></dt>
+      <dd><p>Places where an animal is hidden from the species that hunt it (03 §2). Optional: a world without one
+behaves as if no point were in cover (ENV-12).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.CoverLayer.html">CoverLayer</a></dt>
+      <dd><p>Cover in clustered patches (thickets): the top <span class="xref">EvoSim.CoverLayer.fraction</span> of walkable cells of a value-noise
+map, drawn from the world stream (03 §2 reference: 20 %, octaves 8 and 4 m).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Crossover.html">Crossover</a></dt>
+      <dd><p>Builds a baby's genome from its parents', locus by locus (09 §4). Genomes never cross species (SPEC-04).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.DeathPhase.html">DeathPhase</a></dt>
+      <dd><p>Removes killed animals; every living animal ages by one tick (babies of this tick included); then each species'
+death rules (starvation, old age…) in module order. Every death is recorded once (TICK-04 #7, ANIM-35, ANIM-40…43).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.DeathRule.html">DeathRule</a></dt>
+      <dd><p>A cause of death checked in the death phase (ANIM-40): return the cause's name, or null to live on.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Decision.html">Decision</a></dt>
+      <dd><p>One animal deciding this tick: what it sensed, what its brain was asked and answered (08 §1–§5).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.DecisionMemo.html">DecisionMemo</a></dt>
+      <dd><p>Within a run, the answer for a key (species, brain, brain-visible genome key, observation) is computed once and
+reused (DEC-30). A hit gives exactly what the brain answered. Failed answers are never stored (DEC-34).
+Keys are kept as 128-bit hashes and identical rows are shared, so a long run's memo stays small (R-06).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.DecisionQuery.html">DecisionQuery</a></dt>
+      <dd><p>What a brain receives for one deciding animal (DEC-10): its species, the genes its brain reads (label and
+sentence, in locus order), its observation, its situation text in the world's style, and any attachments.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.DecisionSchedule.html">DecisionSchedule</a></dt>
+      <dd><p>A species' own decision period, and staggering (DEC-04, MAY): an animal decides when (tick + id) % period == 0.
+Both change behaviour. In the reference scenes every species has one, staggered, with the World's period (owner
+2026-10-10); a species without one decides all together, every World period, as the Python prototype does.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.DecisionState.html">DecisionState</a></dt>
+      <dd><p>The decisions of the current tick, the brain answers they wait for, and the run's memo (08 §1–§4).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Diet.html">Diet</a></dt>
+      <dd><p>What a species eats (SPEC-15): layers, species, &quot;carcass:&lt;species&gt;&quot;, &quot;egg:&lt;species&gt;&quot;. Each target must
+carry an Edible (SPEC-10, V-24). A species with no diet eats nothing.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Diet.Entry.html">Diet.Entry</a></dt>
+      <dd><p>One line of the diet: what is eaten, and how much its energy is scaled (SPEC-15).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Digestion.html">Digestion</a></dt>
+      <dd><p>After a kill or a carcass portion the eater is busy digesting for round(digestTicks × gain / killGain) ticks:
+50 after a kill (+60), 25 after a portion (+30). Grazing never makes an animal busy (05 §5).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.EatAction.html">EatAction</a></dt>
+      <dd><p>Go to the nearest visible food and eat it (07 §4). Nothing in sight: search (ACT-04).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Edible.html">Edible</a></dt>
+      <dd><p>Makes what it sits on edible (SPEC-10): a species' animals, a resource layer's items, an entity kind.
+Without it nothing can eat that thing, whatever the diets say (ENV-23).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.EdibleTarget.html">EdibleTarget</a></dt>
+      <dd><p>One resolved diet entry: what is eaten, how (its Edible), and the energy scale (SPEC-15).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Egg.html">Egg</a></dt>
+      <dd><p>A conceived baby waiting to hatch (REPRO-20): its parents, generation, genome after crossover, the mutations
+still running, and when it hatches. Not an animal: it doesn't sense, decide, move or count toward caps (REPRO-22).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.EggMutation.html">EggMutation</a></dt>
+      <dd><p>One pending mutation of an egg: the locus, the inherited allele, the operator and its job (MUT-30).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.EggSystem.html">EggSystem</a></dt>
+      <dd><p>Eggs as entities (REPRO-20). In the reference they have no Edible, so nothing eats them (owner decision);
+an Edible on this GameObject and a diet entry &quot;egg:&lt;species&gt;&quot; make them food (22 §15).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Energy.html">Energy</a></dt>
+      <dd><p>The energy stat (05 §4): founders and newcomers start at 60, the maximum is 100. Gains are clamped (ANIM-22).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Entity.html">Entity</a></dt>
+      <dd><p>A world object with a position that is not an animal: a carcass, an egg, a water hole (ENV-20).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.EntityKind.html">EntityKind</a></dt>
+      <dd><p>A kind of entity and its system (ENV-20): carcasses, eggs. Diets name it &quot;&lt;kind&gt;:&lt;species&gt;&quot;.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.EntityMarkers.html">EntityMarkers</a></dt>
+      <dd><p>Small markers for the World's entities (ENV-20): a dark red disc per carcass, an ivory ball per egg, a grey cube
+for any other kind. Pooled primitives, placed each frame from the entity systems; they only read the World
+(SPACE-12): no collider, the Ignore Raycast layer.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.EntitySystem-1.html">EntitySystem&lt;T&gt;</a></dt>
+      <dd><p>The entities of one kind, found through spatial queries like animals (ENV-20).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.EnvironmentPhase.html">EnvironmentPhase</a></dt>
+      <dd><p>Resource layers regrow, each with its own stream; entities move, rot or vanish (TICK-04 #9, ENV-03, ENV-22).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.EventLog.html">EventLog</a></dt>
+      <dd><p>The world's events and their running hash (RAND-10). The hash is chained:
+h0 = SHA-256 of the seeds, h(i) = SHA-256(h(i-1) ‖ UTF-8(line i)), so it can be read after any event.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ExerciseOfAttribute.html">ExerciseOfAttribute</a></dt>
+      <dd><p>Marks a student class as the exercise version of a reference module (22 §0, the teaching path):
+EvoSim ▸ Exercises ▸ Replace with stub swaps the reference for it, keeping the settings; Restore reference undoes it.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Expression.html">Expression</a></dt>
+      <dd><p>What a gene expresses into (GENE-03/04): a trait of the animal being born, or a line of the prompt.
+<a class="xref" href="EvoSim.Gene.html#EvoSim_Gene_Express_EvoSim_AlleleValue_EvoSim_Expression_">Express(AlleleValue, Expression)</a> receives one and calls <a class="xref" href="EvoSim.Expression.html#EvoSim_Expression_SetTrait_System_String_System_Single_System_Boolean_">SetTrait(string, float, bool)</a> or <a class="xref" href="EvoSim.Expression.html#EvoSim_Expression_PromptGene_System_String_System_String_">PromptGene(string, string)</a>.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.FieldPath.html">FieldPath</a></dt>
+      <dd><p>Reads and overrides any serialized setting by path (CFG-02): &quot;&lt;GameObject path&gt;/&lt;Component&gt;/&lt;field&gt;&quot;,
+relative to the World, e.g. &quot;Prey/Litter/max&quot;, &quot;World/decisionPeriod&quot;, &quot;prey/Actions/flee/FleeAction/fleeIntoCover&quot;.
+Names are matched without case; a component is found by its class or a base class, on the GameObject or below it.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.FlatGround.html">FlatGround</a></dt>
+      <dd><p>The Lab 1 ground: a flat rectangle at height 0, walkable everywhere inside (02 §1).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.FleeAction.html">FleeAction</a></dt>
+      <dd><p>Run away from the nearest threat (07 §4). The prototype's &quot;flee into cover&quot; is an option, off in the reference:
+already in cover, stay; cover within coverSeek, run into it.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.FloorPhase.html">FloorPhase</a></dt>
+      <dd><p>While a species has fewer animals than its floor, a newcomer arrives (POP-03); it decides at the next tick (TICK-05).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.FloorRule.html">FloorRule</a></dt>
+      <dd><p>The minimum population (POP-03): below it, newcomers with founder genomes arrive at random walkable places in the
+floor phase. A world that needs them is reported (POP-05): they restart that species' evolution.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.FollowAction.html">FollowAction</a></dt>
+      <dd><p>Walk toward the nearest other animal of the species, stopping at 1 m (07 §4).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.FoodGrid.html">FoodGrid</a></dt>
+      <dd><p>The Lab 1 food layer (03 §1): at most one item per cell, at the cell centre; a share of walkable cells starts
+with an item; empty cells regrow at random, uniformly; no food in cover (&quot;hungry cover&quot;, ENV-04).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.GaussianMutation.html">GaussianMutation</a></dt>
+      <dd><p>The reference operator for number genes (MUT-20): v' = clamp(v + N(0, σ)) to the gene's range.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Gene.html">Gene</a></dt>
+      <dd><p>A gene (locus) of a species: a sentence for the brain or a number for a trait (GENE-01…04). Each animal carries one
+allele (one value) of every gene of its species.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Genome.html">Genome</a></dt>
+      <dd><p>One allele per locus of a species, in the species' locus order (GENE-06): the genes of one animal.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Ground.html">Ground</a></dt>
+      <dd><p>Answers, for any point, its height and whether it is walkable (SPACE-04), inside a bounded rectangle with hard
+borders (SPACE-03). It also owns the world's distance function (SPACE-02): every module measures through it.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.GroundView.html">GroundView</a></dt>
+      <dd><p>Draws a flat world's ground (02 §1) with its cover cells and food items (03 §1–2): one quad the size of the
+ground and a texture of one pixel per cell, repainted when a tick changed a cell. It only reads the World
+(SPACE-12): no collider, the Ignore Raycast layer, no random numbers.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Hashing.html">Hashing</a></dt>
+      <dd><p>SHA-256 helpers for keys, signatures and prompt ids. Pure functions, no state.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.HatchPhase.html">HatchPhase</a></dt>
+      <dd><p>Eggs due this tick hatch, in conception order (REPRO-22), once their genome is complete: the tick waits for the
+mutator if its answers aren't in (MUT-32, REPRO-24). Each baby starts with the child energy, full stamina, age 0,
+at its first parent's position (REPRO-12), and a birth event records its litter and mutations (MUT-03).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.HideAction.html">HideAction</a></dt>
+      <dd><p>Go to the nearest cover and stay in it (07 §4, ENV-13). No cover in sight, or no cover module: search.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.HttpBrain.html">HttpBrain</a></dt>
+      <dd><p>The base of the brains that ask a model server over HTTP (08 §6): it turns a batch of queries into requests, sends
+them off the main thread and fills the <a class="xref" href="EvoSim.BrainAnswer.html">BrainAnswer</a> when the answers come back.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.HttpCaller.html">HttpCaller</a></dt>
+      <dd><p>JSON calls to one server with the reference client behaviour (DEC-42): a time-out per try, tries with doubling
+waits between them, a cap on requests in flight. The API key is read from its environment variable at each
+call and only sent, never stored or logged (OUT-04).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.HttpChecks.html">HttpChecks</a></dt>
+      <dd><p>Checks shared by HTTP brains and mutator clients (the key checks, V-61, are <a class="xref" href="EvoSim.Secrets.html#EvoSim_Secrets_CheckFields_EvoSim_ValidationReport_UnityEngine_MonoBehaviour_">CheckFields(ValidationReport, MonoBehaviour)</a>).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.HttpFailure.html">HttpFailure</a></dt>
+      <dd><p>An HTTP call that failed: an error status, or every try used (DEC-40, DEC-42). Messages never hold keys (OUT-04).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.HttpMutatorClient.html">HttpMutatorClient</a></dt>
+      <dd><p>A mutator model behind a server (10 §2): one chat call per request with the prompt alone (CORE-07, MUT-11), the
+request's seed and temperature, thinking off. Calls run on the thread pool and fill the reply; the
+MutatorService caches answers and batches rounds (MUT-14, MUT-31).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.HttpStats.html">HttpStats</a></dt>
+      <dd><p>What a brain's or mutator's HTTP calls did: tries, retries, failures, latencies (B-01, brain health window).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.HuntAction.html">HuntAction</a></dt>
+      <dd><p>Chase the nearer of the nearest huntable animal and the nearest carcass it may eat (a carcass wins a tie, being a
+sure meal); strike the animal or eat from the carcass on arrival (07 §4).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Incubation.html">Incubation</a></dt>
+      <dd><p>Ticks between conception and hatching (REPRO-20, REPRO-21): 0 in the reference (babies hatch the same tick);
+a few ticks hide the mutator's latency (MUT-33).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Integrity.html">Integrity</a></dt>
+      <dd><p>Brain and mutator integrity checks against the real servers (32 §2): B-01 smoke and B-11 blindness here, the gates
+B-02 to B-10 in <a class="xref" href="EvoSim.IntegrityGates.html">IntegrityGates</a>. Command line: -executeMethod EvoSim.Integrity.RunIntegrity [-checks B-01,B-11]
+[-scene path] [-brain JEV]; in the open editor: Integrity.RunNamed through the unity CLI's eval.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.IntegrityGates.html">IntegrityGates</a></dt>
+      <dd><p>The brain and mutator gates of 32 §2 (B-02…B-10), measured as the prototype measured them (e1_sensitivity):
+genomes from texts (founders, control sentences, the neutral genome, contrast pairs, single edits) × the
+reference situations (15 §2), through the scene's real prompt and brain. Queries are built from texts only:
+nothing is registered in the world. Each writes a report (IntegrityReport).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.IntegrityReport.html">IntegrityReport</a></dt>
+      <dd><p>The result of one brain or mutator integrity check (32 §2): pass or fail, facts (models, digests or revisions,
+prompt ids, date), rows, written as JSON and Markdown under Logs/EvoSim/Reports so results compare over time.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.InteractionContext.html">InteractionContext</a></dt>
+      <dd><p>What a custom interaction may use when it applies: the world, the ground, the actor's streams.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.InteractionResolver.html">InteractionResolver</a></dt>
+      <dd><p>Applies the interactions of 07 §3 after moving (ACT-10, ACT-11): only within reach, only if the target is
+edible and the eater's diet lists it (SPEC-13). Hunters strike at most once per tick (ACT-12).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.JevBrain.html">JevBrain</a></dt>
+      <dd><p>JEV choice (08 §6): a distilled decision model behind vLLM. One /v1/completions request per batch with the list
+of texts, max_tokens 1, the option letters as the only allowed tokens and their log-probabilities; each row is
+softmax((log-prob + head bias) / T) with the head and T of the pinned revision. Options always in the species'
+action order; at most 16 (DEC-14); inputs above the training length are counted, not cut.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.JevBrain.SpeciesQuestion.html">JevBrain.SpeciesQuestion</a></dt>
+      <dd><p>The question asked for one species (the prototype asked predators &quot;Which action does this predator take now?&quot;).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.JevHead.html">JevHead</a></dt>
+      <dd><p>JEV's decision head and calibration at a pinned revision (08 §6): the option letters' token ids, a bias per
+slot, the temperature of the &quot;choice&quot; kind. Row = softmax((log-prob + bias) / T) over the options.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.KinematicLocomotion.html">KinematicLocomotion</a></dt>
+      <dd><p>The reference locomotion (MOVE-04): straight lines, no physics. Moves by the smallest of speed, stamina and the
+intent's maximum distance; slides along borders and obstacles; if stuck, takes a random sidestep.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.LevelSense.html">LevelSense</a></dt>
+      <dd><p>A stat as low, medium or high (ANIM-12): low &lt; low threshold ≤ medium ≤ high threshold &lt; high.
+Reference: energy 30 / 70, stamina prey 20 / 40, predators 10 / 20.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Litter.html">Litter</a></dt>
+      <dd><p>Litter size and the energy babies cost (REPRO-10, REPRO-11): k uniform in [min, max], cut so that no parent pays
+more than it has, never below min; each baby starts with childEnergy, paid by the parents in equal shares.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.LiveStatistics.html">LiveStatistics</a></dt>
+      <dd><p>Time series for the editor's ecology monitor (21 §4, OUT-06): population, mean energy and stamina, births,
+deaths and memo hit rate per species, sampled every few ticks into fixed-size buffers.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.LlmMutation.html">LlmMutation</a></dt>
+      <dd><p>The reference operator for text genes (10 §2): one instruction drawn from a deck, sent to the mutator with the
+sentence after one fixed context line, and nothing else (CORE-07, MUT-11). Every try's instruction and seed are
+drawn now (MUT-30); rejected answers are drawn again, up to <code>tries</code> (MUT-13).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Locomotion.html">Locomotion</a></dt>
+      <dd><p>How a species moves (MOVE-01): it turns each animal's intent into movement, and whatever it does is the tick's
+result. Inherit it for terrain, NavMesh or physics movement (MOVE-07). Speeds are traits (MOVE-03).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ManualPending.html">ManualPending</a></dt>
+      <dd><p>A pending completed by code: Wait() runs the given completion if it isn't done yet.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.MateAction.html">MateAction</a></dt>
+      <dd><p>Walk to the nearest ready partner in sight, stopping at 1 m (07 §4). Breeding itself happens in the breed phase,
+never here (ACT-13).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.MatingRule.html">MatingRule</a></dt>
+      <dd><p>Who may breed and with whom (11 §1): an adult with enough energy is ready (REPRO-01); an animal that chose mate
+breeds with a ready partner within reach, whatever the partner chose (REPRO-02), once per decision period (REPRO-03).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Metabolism.html">Metabolism</a></dt>
+      <dd><p>What a tick costs, once per living animal after it acted (ANIM-20), from the meters its locomotion reported,
+its action and whether it was busy (05 §4 reference table).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.MigrationPhase.html">MigrationPhase</a></dt>
+      <dd><p>Above its cap, a species loses animals chosen uniformly at random with its migration stream, ignoring genes,
+stats and position (POP-01, POP-02); animals born this tick are spared unless too few older ones remain.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.MoveContext.html">MoveContext</a></dt>
+      <dd><p>What a locomotion gets to move animals: the ground, the distance function, the streams, stamina budgets.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.MutationJob.html">MutationJob</a></dt>
+      <dd><p>One mutation of one gene of one baby (10 §1): its choices are drawn at conception (MUT-30); the result may
+come later, from the mutator (MUT-32). Succeeded → a new value; failed → the inherited allele stays (MUT-04).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.MutationOperator.html">MutationOperator</a></dt>
+      <dd><p>A rule that changes one allele, blind to everything but the gene and the allele (CORE-07, 10 §1).
+Exactly one operator applies to a locus: the one configured for the gene, else the species' default for its kind (MUT-02).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.MutationStats.html">MutationStats</a></dt>
+      <dd><p>Mutation statistics of a run (MUT-05): attempts, successes, model calls, rejections by reason.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.MutationText.html">MutationText</a></dt>
+      <dd><p>The LLM mutation's prompt, cleaning and guards (MUT-10…12), as the prototype does them
+(prototype/promptevo/evolution/mutation.py). Pure functions.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.MutatorClient.html">MutatorClient</a></dt>
+      <dd><p>Sends prompts to the mutator model: Ollama or an OpenAI-compatible server in EvoSim.Http, a fake in tests.
+It never sees anything but the prompts (CORE-07).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.MutatorReply.html">MutatorReply</a></dt>
+      <dd><p>The answers to a batch of mutator requests, filled later: an answer or an error per request.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.MutatorService.html">MutatorService</a></dt>
+      <dd><p>Runs LLM mutations (10 §2, §4): every try's instruction and seed are drawn at conception (MUT-30); requests are
+batched by round — all first tries together, then the redraws of the rejected ones (MUT-31); answers are
+cached by model, prompt, seed and temperature (MUT-14). It advances only when pumped on the main thread, so
+the Freeze and Responsive wait modes give the same results.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.NearestAnimalSense.html">NearestAnimalSense</a></dt>
+      <dd><p>The nearest animal of a set (threats, prey, kin, listed species), in bands (06 §4). With readiness on, a kin
+sense also says whether that animal is ready to mate, when it is within the partner range; beyond it readiness
+is unknown and not written. Hidden and killed animals are never reported (SENSE-06).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.NearestCoverSense.html">NearestCoverSense</a></dt>
+      <dd><p>The nearest cover (06 §4): &quot;here&quot; when standing in cover, else the bands or none. Without a cover module it
+always says none (ENV-12). Reference label &quot;Cover&quot;.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.NearestEntitySense.html">NearestEntitySense</a></dt>
+      <dd><p>The nearest entity this animal may eat (06 §4): a carcass with portions left, not its own kill, not eaten from
+by it yet; or an egg its diet eats. Reference: the predator's &quot;Carcass&quot; sense.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.NearestResourceSense.html">NearestResourceSense</a></dt>
+      <dd><p>The nearest item of a layer the species grazes (06 §4): here, the bands, none. Reference label &quot;Food&quot;.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.NumberGene.html">NumberGene</a></dt>
+      <dd><p>A number expressed into one trait (GENE-04), e.g. a stamina gene setting stamina.max.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Observation.html">Observation</a></dt>
+      <dd><p>The tuple of an animal's sense tokens at one decision, in sense order (SENSE-02).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ObservationSet.html">ObservationSet</a></dt>
+      <dd><p>A fixed list of situations, written by sense label and token (15 §2, &quot;the 48 situations&quot;): the prototype's
+rows ({&quot;energy&quot;: &quot;low&quot;, &quot;food&quot;: &quot;close&quot;, &quot;animal&quot;: &quot;adjacent&quot;, &quot;animal_ready&quot;: true, …}) are matched to a
+species' senses by label; a sense the row doesn't name takes a default token.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ObservationSet.Row.html">ObservationSet.Row</a></dt>
+      <dd><p>One situation: tokens by sense label, plus its source and tags.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ObservationView.html">ObservationView</a></dt>
+      <dd><p>An observation read through its species' senses: the token of a sense by label (CTRL-10).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.OldAge.html">OldAge</a></dt>
+      <dd><p>Death of old age: age above the maximum (reference 1 500 ticks; ANIM-40).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.OllamaMutatorClient.html">OllamaMutatorClient</a></dt>
+      <dd><p>The reference mutator (10 §2): a model in Ollama on the CPU (gemma4:26b, owner 2026-10-10; num_gpu 0, num_ctx 1 024),
+thinking off, so the GPU stays JEV's.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.OllamaPointsBrain.html">OllamaPointsBrain</a></dt>
+      <dd><p>LLM, points mode (08 §6): one Ollama chat call per distinct query; the prompt ends with the points instruction,
+the answer is constrained by a JSON schema, temperature 0, a fixed seed, a fixed context length, thinking off;
+points become a row by DEC-41.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.OllamaTags.html">OllamaTags</a></dt>
+      <dd><p>Reads a model's digest from Ollama's /api/tags (first 12 characters), for cache keys and run info (DEC-33, GENE-12).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.OpenAIMutatorClient.html">OpenAIMutatorClient</a></dt>
+      <dd><p>A mutator behind an OpenAI-compatible server (vLLM, docker profile gpu-mutator): /v1/chat/completions with the
+seed and temperature, thinking off through chat_template_kwargs.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Ownership.html">Ownership</a></dt>
+      <dd><p>Who owns which module (ARCH-05, ARCH-06): the nearest owner above it; disabled means absent.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Pending.html">Pending</a></dt>
+      <dd><p>Work a phase waits for: brain answers, mutations (TICK-03, SPACE-13).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.PlayerArgs.html">PlayerArgs</a></dt>
+      <dd><p>A watched run's settings from a command line (the Windows player): -scene name, -seed n, -ticks n, -minutes m (wall clock),
+-speed (ticks per second | fast | fixed), -wait (responsive | freeze), -brain (a brain's GameObject name or id),
+-capture seconds (0 = start and end only, off = none), -cache folder, -run folder name, -noMutation, -quitAtEnd,
+-window WIDTHxHEIGHT (a window of that many pixels), -stagger (every species decides staggered, DEC-04).
+Parsing and applying are separate, so tests check both without a player.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.PlayerLauncher.html">PlayerLauncher</a></dt>
+      <dd><p>In a player (not the editor), reads the command line (<a class="xref" href="EvoSim.PlayerArgs.html">PlayerArgs</a>) and sets each World before it
+starts (<a class="xref" href="EvoSim.World.html#EvoSim_World_Configuring">Configuring</a>). With -scene, a World of another scene doesn't start and that scene
+loads instead. With -quitAtEnd, the player quits once the run stopped and its captures are written.
+Run files, captures and the answer cache land next to the build (paths are relative to its folder).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.PointsAnswer.html">PointsAnswer</a></dt>
+      <dd><p>Points answers to rows (DEC-41): a missing action counts 0, negative points count 0, every action gets +0.01,
+then the row is normalised, so an all-zero answer becomes uniform. An answer that isn't a JSON object, or
+points that aren't numbers, are failures (as the prototype's int() raised).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.PromptTemplate.html">PromptTemplate</a></dt>
+      <dd><p>A species' prompt with three holes: {genes}, {situation}, {ask} (PROMPT-01, PROMPT-04). Its id is a hash of
+this text, so any change to a header, an action line or a rule changes the id and the cache key (PROMPT-05).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.PromptWriter.html">PromptWriter</a></dt>
+      <dd><p>Collects the action lines and rule lines that modules contribute to a species' prompt (PROMPT-01). Numbers in
+rule lines come from placeholders filled from module settings (PROMPT-03): {field} on the writing module,
+{Module.field} on another module of the species, {species.Module.field} on a module of another species;
+{name} and {species.name} are display names. A placeholder reads a field or a property; {{ and }} write a brace.
+A module is named by its class, a base class, or its GameObject.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.PrototypeFormat.html">PrototypeFormat</a></dt>
+      <dd><p>The Python prototype's file conventions, for the recorder's compatibility mode (OUT-05): its two species were
+&quot;the agents&quot; and the predators, it logged kills as &quot;predator&quot; and prefixed predator statistics with &quot;pred_&quot;.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.QuitWhenStopped.html">QuitWhenStopped</a></dt>
+      <dd><p>Quits the player once its World stopped and the captures are written (-quitAtEnd).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.RandomBrain.html">RandomBrain</a></dt>
+      <dd><p>Uniform over the species' actions, whatever the genes and the situation: the null model (08 §6).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.RandomStream.html">RandomStream</a></dt>
+      <dd><p>One named random stream: a PCG32 generator seeded from SHA-256 of the seed and the name (RAND-02).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.RandomStreams.html">RandomStreams</a></dt>
+      <dd><p>The named random streams of one world (RAND-02…04). Asking twice for a name returns the same stream.
+Map layers use &quot;world/&lt;layer name&gt;&quot;, so adding a layer never changes another layer's map.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.RayBatch.html">RayBatch</a></dt>
+      <dd><p>The rays of all deciding animals of a sense phase, cast in one batch (SENSE-30) with RaycastCommand, or one at a
+time with Physics.Raycast (Immediate, for comparison: SENSE-31). Version-specific physics code lives here (ARCH-10).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.RecordPhase.html">RecordPhase</a></dt>
+      <dd><p>A statistics row every statsEvery ticks and the periodic flushes (TICK-04 #11, RAND-22); live statistics for the editor.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.RecordingTransport.html">RecordingTransport</a></dt>
+      <dd><p>Wraps a transport and keeps every request body and answer, for integrity checks that inspect what a model
+received (B-11). The API key is passed through and never kept (OUT-04).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.RequiresModuleAttribute.html">RequiresModuleAttribute</a></dt>
+      <dd><p>Names a module this one needs beside it (a drink needs thirst): a species module on the same species, or a world
+module (a service or a phase) under the World. Validation reports a missing one (V-26) with a fix that adds it, and
+the conformance suites add it before testing the module.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ResourceLayer.html">ResourceLayer</a></dt>
+      <dd><p>Edible items spread over the ground, e.g. grass (03 §1). The layer's <a class="xref" href="EvoSim.Edible.html">Edible</a> says how
+it is eaten; diets name the layer by its GameObject's name.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.RestAction.html">RestAction</a></dt>
+      <dd><p>Stay still to catch your breath and save energy (07 §4). Never searches; the metabolism charges its rest cost.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.RunCapture.html">RunCapture</a></dt>
+      <dd><p>Saves what the screen shows (overlay included): a PNG when the run starts, every few seconds of real time, and
+when it stops, into &lt;folder&gt;/&lt;run&gt;/ (the run recorder's folder name), then a contact sheet of them.
+PNGs are encoded off the main thread. It only reads the World and draws no random numbers (RAND-11).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.RunInfo.html">RunInfo</a></dt>
+      <dd><p>What ran (13 §2, CFG-03): the scene, the full effective configuration by path, git commit, Unity version,
+brains and mutator (models, hosts), seeds, wait mode, act order and controls. Never any secret (OUT-04).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.RunNumbers.html">RunNumbers</a></dt>
+      <dd><p>What the overlay shows of a run, read from the World's own counters (13 §4–5) and nothing else: tick, state,
+population, births, deaths, kills, mutations, model calls. Read only; a test compares it with the event log.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.RunOverlay.html">RunOverlay</a></dt>
+      <dd><p>The run's numbers on screen, in the editor and in a build (immediate-mode GUI): tick, state and what the tick
+waits for, ticks per second achieved against the target, frames per second, each species' population, births
+and deaths, mutations, model calls; and the followed animal's action, stats and genes (<a class="xref" href="EvoSim.WorldCamera.html">WorldCamera</a>).
+It only reads the World (<a class="xref" href="EvoSim.RunNumbers.html">RunNumbers</a>). Tab hides it.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.RunRecorder.html">RunRecorder</a></dt>
+      <dd><p>Writes a run into its own folder (13): events.jsonl, stats.csv, alleles.jsonl, final_population.json,
+summary.json, run_info.json. Events and stats are flushed every 500 ticks, alleles every 5 000 (RAND-22), and
+every file is written when the run stops, whatever the reason (RAND-20). The compatibility mode writes a
+two-species world exactly as the prototype does (OUT-05).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Sampling.html">Sampling</a></dt>
+      <dd><p>Sampling temperature (DEC-20): p^(1/τ), renormalised; τ &lt; 1 sharpens, τ &gt; 1 flattens. Pure functions.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ScenarioAsset.html">ScenarioAsset</a></dt>
+      <dd><p>A scenario (31 §1, CFG-02): a scene plus overrides by path, variants, seeds, a length, a brain and the expected
+facts. The scenario runner window and EvoSim.Batch.RunScenario read it.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ScenarioAsset.Override.html">ScenarioAsset.Override</a></dt>
+      <dd><p>One setting to override: a path and its new value, as text.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ScenarioAsset.Variant.html">ScenarioAsset.Variant</a></dt>
+      <dd><p>A variant of the scenario: its own brain, tier, overrides and removed GameObjects, on top of the scenario's.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.SearchRule.html">SearchRule</a></dt>
+      <dd><p>The prompt's search rule (PROMPT-01): what an animal does when its action has nothing to act on (ACT-04).
+Put it on the species' own GameObject so it comes first among the rule lines.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Secrets.html">Secrets</a></dt>
+      <dd><p>What a key, token or password looks like (OUT-04): one rule for validation (V-61, every serialized string of the
+World), the HTTP checks and the command line written to run_info.json.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Sense.html">Sense</a></dt>
+      <dd><p>Reads one animal and the world and returns one token from a fixed list (SENSE-01): what the brain is told about one
+aspect of the situation, such as the nearest food or the energy level.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.SenseContext.html">SenseContext</a></dt>
+      <dd><p>What a sense may read at a decision: the world state at the start of the tick (SENSE-04), through the same
+queries as actions, so hidden and killed animals are never reported (SENSE-06).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.SensePhase.html">SensePhase</a></dt>
+      <dd><p>Picks who decides (DEC-01): every living, not busy animal on the decision ticks, and animals without an action
+on the others; rebuilds the spatial index; casts the rays of batched senses in one batch; reads every sense of
+every deciding animal from the state at the start of the tick (TICK-04 #1, SENSE-04, TICK-05).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.SentenceGuards.html">SentenceGuards</a></dt>
+      <dd><p>The checks a gene sentence must pass, founder or mutant (MUT-12, GENE-22). Pure functions.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.SimEvent.html">SimEvent</a></dt>
+      <dd><p>One logged fact (OUT-02): kind, tick, animal id, species, and more fields. Keys are written sorted.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.SpatialIndex.html">SpatialIndex</a></dt>
+      <dd><p>Animals by species in a uniform hash grid (20 §3.11, SENSE-32): rebuilt by the sense and act phases, updated
+as animals move in a sequential act order. Nearest queries search expanding rings and break ties by id
+(SPACE-07, SPACE-08). The ring bound assumes the world distance is at least the horizontal Euclidean one.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Species.html">Species</a></dt>
+      <dd><p>A kind of animal (SPEC-01, SPEC-02). Configure it with child components; subclass it only for hooks.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.SpeciesBuilder.html">SpeciesBuilder</a></dt>
+      <dd><p>Collects the stats and traits a species' modules declare before any animal exists (ANIM-10, ANIM-15).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.SpeciesBuilder.StatDeclaration.html">SpeciesBuilder.StatDeclaration</a></dt>
+      <dd><p>One declared stat, with the module that declared it (for the species inspector).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.SpeciesBuilder.TraitDeclaration.html">SpeciesBuilder.TraitDeclaration</a></dt>
+      <dd><p>One declared trait, with the module that declared it.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.SpeciesCounters.html">SpeciesCounters</a></dt>
+      <dd><p>Cumulative counts of one species for the statistics rows and the summary (13 §4, §5).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.SpeciesModule.html">SpeciesModule</a></dt>
+      <dd><p>A component under a species: a gene, a sense, an action, a stat, a rule...</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Stamina.html">Stamina</a></dt>
+      <dd><p>Stamina: the meters an animal can move before it must stop (05 §4). Each meter moved costs one point; standing
+still brings it back, which costs some energy until it is full (ANIM-21).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Starvation.html">Starvation</a></dt>
+      <dd><p>Death by starvation: energy ≤ 0 at the death check (ANIM-40).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.SystemHttpTransport.html">SystemHttpTransport</a></dt>
+      <dd><p>The real transport: an HttpClient owned by one brain or mutator client (ARCH-07: nothing shared between worlds),
+every await with ConfigureAwait(false) so answers never need the main thread (the Freeze mode blocks it,
+SPACE-14). Time-outs come from the caller (DEC-42).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.TerrainGround.html">TerrainGround</a></dt>
+      <dd><p>A Unity Terrain as ground (02 §1): heights from the heightmap; walkable above the water level, below a
+maximum steepness, outside tree footprints; only the largest connected walkable region is kept (SPACE-05).
+Walkability is computed once, on a grid of cells.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.TextGene.html">TextGene</a></dt>
+      <dd><p>A sentence the brain reads in the genes block of the prompt (GENE-03, PROMPT-02).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.TickContext.html">TickContext</a></dt>
+      <dd><p>What a phase gets each tick: the world, the tick number and the named streams.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.TickPhase.html">TickPhase</a></dt>
+      <dd><p>One step of a tick. The World runs its phases in hierarchy order (TICK-01).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.UniformCrossover.html">UniformCrossover</a></dt>
+      <dd><p>For each locus independently, the allele of one parent or the other with probability ½ (GENE-30).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Units.html">Units</a></dt>
+      <dd><p>Units of the simulation: meters on the horizontal plane, ticks for time (README, Units).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ValidationFix.html">ValidationFix</a></dt>
+      <dd><p>A fix button for a validation message (EDIT-02).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ValidationMessage.html">ValidationMessage</a></dt>
+      <dd><p>One problem, naming the object at fault (EDIT-02).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ValidationReport.html">ValidationReport</a></dt>
+      <dd><p>The messages of one validation pass. The same engine runs in the editor, at Initialize and in CI (EDIT-01).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ValueNoise.html">ValueNoise</a></dt>
+      <dd><p>Value noise on a lattice: random values at lattice points, smoothly interpolated (the prototype's cover and
+terrain maps). A noise map is built once from a stream; sampling it is a pure function.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ViewPool.html">ViewPool</a></dt>
+      <dd><p>Inactive views of one species, reused (20 §6): a new animal takes one, a dead one gives it back. Views have no
+active collider and sit on the &quot;Ignore Raycast&quot; layer, which every sense ray leaves out, so what the animals sense
+never depends on rendering (SPACE-12, RAND-11).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.World.html">World</a></dt>
+      <dd><p>The root of a simulation (01 §3): finds its species, phases and services in its subtree, initialises them
+in a fixed order (ARCH-04, 20 §4) and runs ticks. FixedUpdate only drives the loop; time is Tick (SPACE-10).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.WorldCamera.html">WorldCamera</a></dt>
+      <dd><p>A camera for watching a run: it frames the world at the start; WASD or the arrows pan, the wheel zooms, the right
+mouse button (or Q and E) orbits, the middle button drags, F frames the world again. A left click on an animal
+follows it (Esc stops). Picking is done on screen, from the views' positions: views have no colliders (SPACE-12),
+and the camera only reads the World.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.WorldModule.html">WorldModule</a></dt>
+      <dd><p>A component under the World (not under a species): a phase or a service.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.WorldQueries.html">WorldQueries</a></dt>
+      <dd><p>The queries senses and actions share (ACT-05, SENSE-06): within the animal's vision, never itself, never a
+killed animal, never an animal hidden from it in cover, diets checked. Ties by id (SPACE-08).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.WorldService.html">WorldService</a></dt>
+      <dd><p>Something phases and modules use: ground, layers, brains, recorder. Found with World.Service&lt;T&gt;().</p>
+</dd>
+    </dl>
+    <h3 id="structs">
+Structs
+</h3>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ActPlan.html">ActPlan</a></dt>
+      <dd><p>One animal's plan for a tick (<a class="xref" href="EvoSim.ActContext.html#EvoSim_ActContext_Plan">Plan</a>): what <a class="xref" href="EvoSim.AnimalAction.html#EvoSim_AnimalAction_ActAll_System_Collections_Generic_IReadOnlyList_EvoSim_Animal__EvoSim_ActContext_System_Span_EvoSim_ActPlan__">ActAll(IReadOnlyList&lt;Animal&gt;, ActContext, Span&lt;ActPlan&gt;)</a> writes for each
+animal of its group, and what the act phase then moves and applies.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.AlleleValue.html">AlleleValue</a></dt>
+      <dd><p>One allele value: a sentence or a number.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.AnimalHit.html">AnimalHit</a></dt>
+      <dd><p>An animal found by a spatial query, with its distance from the asker (SPACE-07).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.CoverHit.html">CoverHit</a></dt>
+      <dd><p>The nearest cover found by a query: a point in cover and its distance (ENV-10).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.EntityHit-1.html">EntityHit&lt;T&gt;</a></dt>
+      <dd><p>An entity found by a spatial query, with its distance (ENV-20).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.FounderAllele.html">FounderAllele</a></dt>
+      <dd><p>One value of a founder pool and its origin (founder, neutral, control…) (GENE-20).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Intent.html">Intent</a></dt>
+      <dd><p>What an action wants this tick (ACT-03): a direction (or none: stay), walk or run, and the farthest it should go
+(to stop at a target). The locomotion decides what actually happens (MOVE-01).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Interaction.html">Interaction</a></dt>
+      <dd><p>The contact an action asks for on arrival (ACT-03, ACT-10): graze an item, strike an animal, eat a carcass
+portion or an egg, or a custom one. A small value, so planning allocates nothing.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.LiveStatistics.Point.html">LiveStatistics.Point</a></dt>
+      <dd><p>One sample of one species.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.MutatorRequest.html">MutatorRequest</a></dt>
+      <dd><p>One prompt for the mutator model, with its seed and temperature (MUT-11, MUT-14).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ResourceItem.html">ResourceItem</a></dt>
+      <dd><p>One item of a resource layer found by a query: its layer, cell, position and distance (ENV-01).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.RunNumbers.SpeciesLine.html">RunNumbers.SpeciesLine</a></dt>
+      <dd><p>One species' line of the overlay.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.SpeciesBuilder.Problem.html">SpeciesBuilder.Problem</a></dt>
+      <dd><p>A declaration problem, reported by validation: V-36 (a default outside its range), V-38 (declared twice
+differently).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.StatId.html">StatId</a></dt>
+      <dd><p>A handle to a declared stat (ANIM-10): its slot in the animal record, its name and its range.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.StatStart.html">StatStart</a></dt>
+      <dd><p>The value a stat takes when an animal is created (ANIM-10).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.TraitId.html">TraitId</a></dt>
+      <dd><p>A handle to a declared trait (ANIM-15): a per-animal number fixed at birth, with a default and a range.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.WaterHit.html">WaterHit</a></dt>
+      <dd><p>The nearest water found by a ground: the water point, a walkable shore point next to it, the distance.</p>
+</dd>
+    </dl>
+    <h3 id="interfaces">
+Interfaces
+</h3>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.IEventSink.html">IEventSink</a></dt>
+      <dd><p>Receives every recorded event with its canonical line (OUT-06): the run recorder, live graphs, tests.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.IHttpTransport.html">IHttpTransport</a></dt>
+      <dd><p>Sends one HTTP request and returns the response body; throws HttpFailure for an error status. The real one is
+SystemHttpTransport; tests inject a fake (30 §2) so brains and mutators are tested without servers.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.IInteraction.html">IInteraction</a></dt>
+      <dd><p>A custom contact effect (22 §3, drink): applied after moving when the animal is within <a class="xref" href="EvoSim.IInteraction.html#EvoSim_IInteraction_Reach">Reach</a> of the
+point its action walked or ran to (ACT-10).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.INumberRange.html">INumberRange</a></dt>
+      <dd><p>A gene whose values are numbers within a range: what number operators (Gaussian, MUT-20) and the random-founders
+control (CTRL-01) need, so a student's own number gene kind works with them.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.IStatsColumns.html">IStatsColumns</a></dt>
+      <dd><p>A module that adds columns to stats.csv (13 §4). A species module's columns get its species' prefix and hold that
+species' values; a world module's columns go at the end of the row, unprefixed. A new column during the run
+rewrites the header, with empty cells in the rows before it.</p>
+</dd>
+    </dl>
+    <h3 id="enums">
+Enums
+</h3>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.ActOrder.html">ActOrder</a></dt>
+      <dd><p>The order in which animals act within a tick (ACT-30).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.AlleleKind.html">AlleleKind</a></dt>
+      <dd><p>What kind of value a gene holds (GENE-02): a sentence or a number.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.AnimalSet.html">AnimalSet</a></dt>
+      <dd><p>A set of species resolved from the food web (SPEC-12): whom an animal flees, hunts or follows.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.CapRule.Mode.html">CapRule.Mode</a></dt>
+      <dd><p>How the cap is kept (POP-01).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.EatMethod.html">EatMethod</a></dt>
+      <dd><p>How something edible is eaten (SPEC-10).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.EdibleTargetKind.html">EdibleTargetKind</a></dt>
+      <dd><p>What a diet entry points at (SPEC-15).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.InteractionKind.html">InteractionKind</a></dt>
+      <dd><p>The contact effects of 07 §3 (ACT-11), plus custom ones.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.RunSpeed.html">RunSpeed</a></dt>
+      <dd><p>How fast a running world advances (02 §4, run controls). Results never depend on it (SPACE-11).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.RunState.html">RunState</a></dt>
+      <dd><p>The World's run loop states (brief, chapter B §13).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Severity.html">Severity</a></dt>
+      <dd><p>How serious a validation message is (21 §2): an error (E) blocks Play and the run; a warning (W) and an
+information (I) don't.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.TextStyle.html">TextStyle</a></dt>
+      <dd><p>The style of situation texts (SENSE-11): V1 terse (&quot;Energy: low.&quot;), V2 first person (&quot;I am hungry and weak.&quot;).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.WaitMode.html">WaitMode</a></dt>
+      <dd><p>How a tick waits for brain answers and mutations (SPACE-14). Both give the same events hash.</p>
+</dd>
+    </dl>
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

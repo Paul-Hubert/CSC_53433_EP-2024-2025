@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class SenseContext | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class SenseContext | EvoSim ">
+      
+      <meta name="description" content="What a sense may read at a decision: the world state at the start of the tick (SENSE-04), through the same queries as actions, so hidden and killed animals are never reported (SENSE-06).">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_SenseContext.md&amp;value=---%0Auid%3A%20EvoSim.SenseContext%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.SenseContext">
+
+
+
+  <h1 id="EvoSim_SenseContext" data-uid="EvoSim.SenseContext" class="text-break">
+Class SenseContext  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L17"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Runtime.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>What a sense may read at a decision: the world state at the start of the tick (SENSE-04), through the same
+queries as actions, so hidden and killed animals are never reported (SENSE-06).</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class SenseContext</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">SenseContext</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="EvoSim_SenseContext_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>The sense phase makes one context per world and passes it to every <a class="xref" href="EvoSim.Sense.html#EvoSim_Sense_Read_EvoSim_Animal_EvoSim_SenseContext_">Read(Animal, SenseContext)</a> of the tick; the
+ask-brains phase reuses it for attachments. It runs first in the tick, so what the context reports is the state
+before anyone acts.</p>
+<p>The queries wrap <a class="xref" href="EvoSim.WorldQueries.html">WorldQueries</a>: never the animal itself, never a killed animal, never one hidden
+in cover from the asking species, diets checked, ties broken by id (SPACE-08). Pass the animal's vision as the
+radius (<a class="xref" href="EvoSim.SenseContext.html#EvoSim_SenseContext_Vision_EvoSim_Animal_">Vision(Animal)</a>) so the sense sees what its actions can reach (ACT-05).</p>
+</div>
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="EvoSim_SenseContext__ctor_" data-uid="EvoSim.SenseContext.#ctor*"></a>
+
+  <h3 id="EvoSim_SenseContext__ctor_EvoSim_World_" data-uid="EvoSim.SenseContext.#ctor(EvoSim.World)">
+  SenseContext(World)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L43"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Makes a context for a world, with an empty ray batch. The sense phase makes one in its Initialize.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SenseContext(World world)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>world</code> <a class="xref" href="EvoSim.World.html">World</a></dt>
+    <dd><p>The world to sense.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="EvoSim_SenseContext_GrazeReach_" data-uid="EvoSim.SenseContext.GrazeReach*"></a>
+
+  <h3 id="EvoSim_SenseContext_GrazeReach" data-uid="EvoSim.SenseContext.GrazeReach">
+  GrazeReach
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Within this distance, in meters, an item counts as &quot;here&quot;: the act phase's graze reach, 0.5 m without an act
+phase. The food sense says &quot;here&quot; within it, because eating needs no walk then.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float GrazeReach { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SenseContext_Ground_" data-uid="EvoSim.SenseContext.Ground*"></a>
+
+  <h3 id="EvoSim_SenseContext_Ground" data-uid="EvoSim.SenseContext.Ground">
+  Ground
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L26"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The world's ground (terrain heights, walkability, water…), or null when the world has none.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Ground Ground { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Ground.html">Ground</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SenseContext_Rays_" data-uid="EvoSim.SenseContext.Rays*"></a>
+
+  <h3 id="EvoSim_SenseContext_Rays" data-uid="EvoSim.SenseContext.Rays">
+  Rays
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L49"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The rays of the batched senses, cast once per sense phase by <a class="xref" href="EvoSim.SenseContext.html#EvoSim_SenseContext_CastRays_System_Collections_Generic_IReadOnlyList_EvoSim_Animal__">CastRays(IReadOnlyList&lt;Animal&gt;)</a> (SENSE-30). A
+<a class="xref" href="EvoSim.BatchedSense.html">BatchedSense</a> reads its results with <a class="xref" href="EvoSim.RayBatch.html#EvoSim_RayBatch_Hit_EvoSim_Animal_EvoSim_Sense_System_Int32_UnityEngine_RaycastHit__">Hit(Animal, Sense, int, out RaycastHit)</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public RayBatch Rays { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.RayBatch.html">RayBatch</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SenseContext_Tick_" data-uid="EvoSim.SenseContext.Tick*"></a>
+
+  <h3 id="EvoSim_SenseContext_Tick" data-uid="EvoSim.SenseContext.Tick">
+  Tick
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L23"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The current tick, counted from 0.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Tick { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SenseContext_World_" data-uid="EvoSim.SenseContext.World*"></a>
+
+  <h3 id="EvoSim_SenseContext_World" data-uid="EvoSim.SenseContext.World">
+  World
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L20"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The world being sensed: its services, species and settings.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public World World { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.World.html">World</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_SenseContext_CastRays_" data-uid="EvoSim.SenseContext.CastRays*"></a>
+
+  <h3 id="EvoSim_SenseContext_CastRays_System_Collections_Generic_IReadOnlyList_EvoSim_Animal__" data-uid="EvoSim.SenseContext.CastRays(System.Collections.Generic.IReadOnlyList{EvoSim.Animal})">
+  CastRays(IReadOnlyList&lt;Animal&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L58"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Collects the rays of every batched sense for these animals and casts them in one batch (SENSE-30).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void CastRays(IReadOnlyList&lt;Animal&gt; animals)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>animals</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="EvoSim.Animal.html">Animal</a>&gt;</dt>
+    <dd><p>The animals that decide this tick, of every species.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_SenseContext_CastRays_System_Collections_Generic_IReadOnlyList_EvoSim_Animal___remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Called by the sense phase before any sense reads. It clears the previous rays, calls
+<a class="xref" href="EvoSim.BatchedSense.html#EvoSim_BatchedSense_RequestRays_EvoSim_Animal_EvoSim_RayBatch_">RequestRays(Animal, RayBatch)</a> for each animal and each of its batched senses, then casts them all. A
+context whose rays were never cast for an animal reports each of its rays as a miss.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_SenseContext_CurrentTarget_" data-uid="EvoSim.SenseContext.CurrentTarget*"></a>
+
+  <h3 id="EvoSim_SenseContext_CurrentTarget_EvoSim_Animal_" data-uid="EvoSim.SenseContext.CurrentTarget(EvoSim.Animal)">
+  CurrentTarget(Animal)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L170"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gives the animal another animal's action was about at the start of this tick (its target last tick), or null
+(22 §13, the &quot;chased&quot; sense).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Animal CurrentTarget(Animal other)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>other</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal looked at, such as the nearest threat.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>Its target, which may since have died or been killed, or null when it had none or was busy.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_SenseContext_CurrentTarget_EvoSim_Animal__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>The act phase sets the target; the sense phase runs before it, so this is last tick's target (SENSE-04).
+It searches every living animal: fine for one sense, slow if called for many animals per tick.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_SenseContext_InCover_" data-uid="EvoSim.SenseContext.InCover*"></a>
+
+  <h3 id="EvoSim_SenseContext_InCover_EvoSim_Animal_" data-uid="EvoSim.SenseContext.InCover(EvoSim.Animal)">
+  InCover(Animal)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L154"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Tells whether the animal stands in cover, of any cover layer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool InCover(Animal a)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that senses.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True when it stands in cover; false otherwise, and always without a cover layer.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SenseContext_IsReady_" data-uid="EvoSim.SenseContext.IsReady*"></a>
+
+  <h3 id="EvoSim_SenseContext_IsReady_EvoSim_Animal_" data-uid="EvoSim.SenseContext.IsReady(EvoSim.Animal)">
+  IsReady(Animal)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L160"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Tells whether another animal is ready to mate, by its species' mating rule (REPRO-01).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsReady(Animal other)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>other</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal looked at, usually one found by
+<a class="xref" href="EvoSim.SenseContext.html#EvoSim_SenseContext_NearestAnimal_EvoSim_Animal_EvoSim_AnimalSet_System_Single_System_Collections_Generic_IReadOnlyList_EvoSim_Species__">NearestAnimal(Animal, AnimalSet, float, IReadOnlyList&lt;Species&gt;)</a>.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True when it is ready; always false when its species has no mating rule.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SenseContext_NearestAnimal_" data-uid="EvoSim.SenseContext.NearestAnimal*"></a>
+
+  <h3 id="EvoSim_SenseContext_NearestAnimal_EvoSim_Animal_EvoSim_AnimalSet_System_Single_System_Collections_Generic_IReadOnlyList_EvoSim_Species__" data-uid="EvoSim.SenseContext.NearestAnimal(EvoSim.Animal,EvoSim.AnimalSet,System.Single,System.Collections.Generic.IReadOnlyList{EvoSim.Species})">
+  NearestAnimal(Animal, AnimalSet, float, IReadOnlyList&lt;Species&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L107"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Finds the nearest visible animal of a set (threats, prey, kin or listed species, from the food web) within a
+radius (hidden and killed excluded, SENSE-06).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public AnimalHit? NearestAnimal(Animal a, AnimalSet set, float radius, IReadOnlyList&lt;Species&gt; listed = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that senses; never found itself.</p>
+</dd>
+    <dt><code>set</code> <a class="xref" href="EvoSim.AnimalSet.html">AnimalSet</a></dt>
+    <dd><p>Which species, seen from the animal's species: <a class="xref" href="EvoSim.AnimalSet.html#EvoSim_AnimalSet_Threats">Threats</a>,
+<a class="xref" href="EvoSim.AnimalSet.html#EvoSim_AnimalSet_Prey">Prey</a>, <a class="xref" href="EvoSim.AnimalSet.html#EvoSim_AnimalSet_Kin">Kin</a> or <a class="xref" href="EvoSim.AnimalSet.html#EvoSim_AnimalSet_Listed">Listed</a>.</p>
+</dd>
+    <dt><code>radius</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>How far to look, in meters: usually the animal's vision.</p>
+</dd>
+    <dt><code>listed</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="EvoSim.Species.html">Species</a>&gt;</dt>
+    <dd><p>The species for <a class="xref" href="EvoSim.AnimalSet.html#EvoSim_AnimalSet_Listed">Listed</a>; ignored by the other sets.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.AnimalHit.html">AnimalHit</a>?</dt>
+    <dd><p>The animal found and its distance in meters, or null when none is in range.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_SenseContext_NearestAnimal_EvoSim_Animal_EvoSim_AnimalSet_System_Single_System_Collections_Generic_IReadOnlyList_EvoSim_Species___examples">Examples</h4>
+  <p>In the <code>Read</code> of a <a class="xref" href="EvoSim.BandedSense.html">BandedSense</a>, as <a class="xref" href="EvoSim.NearestAnimalSense.html">NearestAnimalSense</a> does:</p>
+<pre><code class="lang-csharp">float vision = a.Trait(Vision);
+var nearest = s.NearestAnimal(a, AnimalSet.Threats, vision);
+if (nearest == null) return NoneToken;
+return TokenFor(nearest.Value.Distance, vision);</code></pre>
+
+
+
+
+
+
+  <a id="EvoSim_SenseContext_NearestAnimal_" data-uid="EvoSim.SenseContext.NearestAnimal*"></a>
+
+  <h3 id="EvoSim_SenseContext_NearestAnimal_EvoSim_Animal_System_Collections_Generic_IReadOnlyList_EvoSim_Species__System_Single_" data-uid="EvoSim.SenseContext.NearestAnimal(EvoSim.Animal,System.Collections.Generic.IReadOnlyList{EvoSim.Species},System.Single)">
+  NearestAnimal(Animal, IReadOnlyList&lt;Species&gt;, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L86"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Finds the nearest visible animal of these species within a radius (hidden and killed excluded, SENSE-06).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public AnimalHit? NearestAnimal(Animal a, IReadOnlyList&lt;Species&gt; among, float radius)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that senses; never found itself.</p>
+</dd>
+    <dt><code>among</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="EvoSim.Species.html">Species</a>&gt;</dt>
+    <dd><p>The species to look for; empty finds nothing.</p>
+</dd>
+    <dt><code>radius</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>How far to look, in meters: usually the animal's vision.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.AnimalHit.html">AnimalHit</a>?</dt>
+    <dd><p>The animal found and its distance in meters, or null when none is in range.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SenseContext_NearestCarcass_" data-uid="EvoSim.SenseContext.NearestCarcass*"></a>
+
+  <h3 id="EvoSim_SenseContext_NearestCarcass_EvoSim_Animal_System_Single_" data-uid="EvoSim.SenseContext.NearestCarcass(EvoSim.Animal,System.Single)">
+  NearestCarcass(Animal, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L124"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Finds the nearest carcass the animal may eat from (06 §4): its diet scavenges it, portions are left, it is not its
+own kill and it has not eaten from it yet.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public EntityHit&lt;Carcass&gt;? NearestCarcass(Animal a, float radius)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that senses.</p>
+</dd>
+    <dt><code>radius</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>How far to look, in meters.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.EntityHit-1.html">EntityHit</a>&lt;<a class="xref" href="EvoSim.Carcass.html">Carcass</a>&gt;?</dt>
+    <dd><p>The carcass and its distance in meters, or null when none is in range or the world has no carcass system.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SenseContext_NearestCover_" data-uid="EvoSim.SenseContext.NearestCover*"></a>
+
+  <h3 id="EvoSim_SenseContext_NearestCover_EvoSim_Animal_System_Single_" data-uid="EvoSim.SenseContext.NearestCover(EvoSim.Animal,System.Single)">
+  NearestCover(Animal, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L149"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Finds the nearest cover within a radius; distance 0 when the animal stands in it (ENV-10, ENV-12).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public CoverHit? NearestCover(Animal a, float radius)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that senses.</p>
+</dd>
+    <dt><code>radius</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>How far to look, in meters.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.CoverHit.html">CoverHit</a>?</dt>
+    <dd><p>The nearest cover point and its distance in meters, or null when there is none in range or no cover layer.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SenseContext_NearestEgg_" data-uid="EvoSim.SenseContext.NearestEgg*"></a>
+
+  <h3 id="EvoSim_SenseContext_NearestEgg_EvoSim_Animal_EvoSim_Species_System_Single_" data-uid="EvoSim.SenseContext.NearestEgg(EvoSim.Animal,EvoSim.Species,System.Single)">
+  NearestEgg(Animal, Species, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L131"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Finds the nearest egg the animal's diet eats, within a radius (REPRO-23).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public EntityHit&lt;Egg&gt;? NearestEgg(Animal a, Species of, float radius)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that senses.</p>
+</dd>
+    <dt><code>of</code> <a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd><p>Whose eggs, or null for any species the diet eats.</p>
+</dd>
+    <dt><code>radius</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>How far to look, in meters.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.EntityHit-1.html">EntityHit</a>&lt;<a class="xref" href="EvoSim.Egg.html">Egg</a>&gt;?</dt>
+    <dd><p>The egg and its distance in meters, or null when none is in range or the world has no egg system.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SenseContext_NearestEntity_" data-uid="EvoSim.SenseContext.NearestEntity*"></a>
+
+  <h3 id="EvoSim_SenseContext_NearestEntity__1_EvoSim_Animal_System_Single_System_Func___0_EvoSim_Animal_System_Boolean__" data-uid="EvoSim.SenseContext.NearestEntity``1(EvoSim.Animal,System.Single,System.Func{``0,EvoSim.Animal,System.Boolean})">
+  NearestEntity&lt;T&gt;(Animal, float, Func&lt;T, Animal, bool&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L142"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Finds the nearest entity of a kind of your own (fruit, nests…) within a radius, across every entity system of
+that type, passing the filter; ties by id (see <a class="xref" href="EvoSim.WorldQueries.html#EvoSim_WorldQueries_NearestEntity__1_EvoSim_Animal_System_Single_System_Func___0_EvoSim_Animal_System_Boolean__">NearestEntity&lt;T&gt;(Animal, float, Func&lt;T, Animal, bool&gt;)</a>).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public EntityHit&lt;T&gt;? NearestEntity&lt;T&gt;(Animal a, float radius, Func&lt;T, Animal, bool&gt; filter = null) where T : Entity</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that senses.</p>
+</dd>
+    <dt><code>radius</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>How far to look, in meters.</p>
+</dd>
+    <dt><code>filter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func</a>&lt;T, <a class="xref" href="EvoSim.Animal.html">Animal</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd><p>Which entities count, given the entity and the animal that senses; null for all.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.EntityHit-1.html">EntityHit</a>&lt;T&gt;?</dt>
+    <dd><p>The entity and its distance in meters, or null when none is in range.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd><p>The kind of entity to look for.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SenseContext_NearestResource_" data-uid="EvoSim.SenseContext.NearestResource*"></a>
+
+  <h3 id="EvoSim_SenseContext_NearestResource_EvoSim_Animal_System_String_System_Single_" data-uid="EvoSim.SenseContext.NearestResource(EvoSim.Animal,System.String,System.Single)">
+  NearestResource(Animal, string, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L115"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Finds the nearest food item of a layer the animal's diet grazes, within a radius.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ResourceItem? NearestResource(Animal a, string layerName, float radius)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that senses.</p>
+</dd>
+    <dt><code>layerName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The layer's name (&quot;Grass&quot;…), or empty for every layer the diet grazes.</p>
+</dd>
+    <dt><code>radius</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>How far to look, in meters.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.ResourceItem.html">ResourceItem</a>?</dt>
+    <dd><p>The item and its distance in meters, or null when none is in range or the species has no diet.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SenseContext_Vision_" data-uid="EvoSim.SenseContext.Vision*"></a>
+
+  <h3 id="EvoSim_SenseContext_Vision_EvoSim_Animal_" data-uid="EvoSim.SenseContext.Vision(EvoSim.Animal)">
+  Vision(Animal)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/SenseContext.cs/#L79"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gives an animal's vision in meters: its &quot;vision&quot; trait, or the reference 20 m without one (SENSE-22).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float Vision(Animal a)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal that senses.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>How far it sees, in meters.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

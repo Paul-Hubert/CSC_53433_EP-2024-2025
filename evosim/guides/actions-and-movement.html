@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Actions and movement | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Actions and movement | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/actions-and-movement.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="guide-actions-and-movement">
+<h1 id="actions-and-movement">Actions and movement</h1>
+
+<p>The brain only picks an action. The action then does the work, every tick until the animal's next decision: it looks
+for its target, says where the animal wants to go and what to do on arrival. The species' <strong>locomotion</strong> moves the
+animal, an <strong>interaction</strong> (graze, strike, scavenge) happens if the target is within reach, and the <strong>metabolism</strong>
+charges the tick. This split keeps actions short and readable, and lets each species move in its own way (07).</p>
+<h2 id="one-animals-act-step">One animal's act step</h2>
+<p>The act phase (<a class="xref" href="../api/EvoSim.ActPhase.html">ActPhase</a>) runs these steps for every living animal, in the act order:</p>
+<pre><code class="lang-mermaid">flowchart TD
+    B{Busy, or no action?} --&gt;|yes| ST[Stay, no interaction]
+    B --&gt;|no| P[The action plans: an intent and an interaction]
+    P --&gt; M[The locomotion moves it: speed, stamina, ground]
+    M --&gt; R{Within reach, and the diet allows it?}
+    R --&gt;|yes| I[The interaction applies]
+    R --&gt;|no| S
+    I --&gt; S[Metabolism and stamina settle the tick]
+    ST --&gt; S
+    S --&gt; C[Busy countdown]
+</code></pre>
+<ol>
+<li><strong>Plan.</strong> The animal's action receives an <a class="xref" href="../api/EvoSim.ActContext.html">ActContext</a> and calls its methods. Nothing moves yet.</li>
+<li><strong>Move.</strong> The species' <a class="xref" href="../api/EvoSim.Locomotion.html">Locomotion</a> turns the intent into a movement and reports the meters moved.</li>
+<li><strong>Interact.</strong> The <a class="xref" href="../api/EvoSim.InteractionResolver.html">InteractionResolver</a> applies the planned interaction if the target is within reach,
+still there, and allowed by the eater's diet.</li>
+<li><strong>Settle.</strong> <a class="xref" href="../api/EvoSim.Metabolism.html">Metabolism</a> charges energy for what the animal did, and <a class="xref" href="../api/EvoSim.Stamina.html">Stamina</a> pays the
+meters or recovers. A busy animal's countdown drops by one.</li>
+</ol>
+<h2 id="planning-with-the-act-context">Planning with the act context</h2>
+<p>An action never moves an animal and never changes another one (ACT-06). It only asks questions and states a plan:</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Methods</th>
+<th>What they do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Queries</td>
+<td><code>NearestAnimal</code>, <code>NearestReadyPartner</code>, <code>NearestResource</code>, <code>NearestCarcass</code>, <code>NearestEgg</code>, <code>NearestEntity&lt;T&gt;</code>, <code>NearestCover</code>, <code>InCover</code>, <code>IsReady</code>, <code>Vision</code></td>
+<td>Return only what the animal's senses could report: within its vision (20 m in the reference), never itself, never a killed animal, never an animal hidden from it in cover (ACT-05). <code>null</code> means nothing in sight.</td>
+</tr>
+<tr>
+<td>Intents</td>
+<td><code>WalkTo</code>, <code>RunTo</code> (a point or an animal, with a stop distance), <code>RunAwayFrom</code>, <code>WalkAwayFrom</code>, <code>Stay</code>, <code>Wander</code>, <code>Search</code></td>
+<td>Say where to go this tick. Running uses the species' running speed.</td>
+</tr>
+<tr>
+<td>Arrival</td>
+<td><code>OnArrival(Interaction)</code>, <code>OnArrival(IInteraction)</code></td>
+<td>Say what to do once within reach: graze, strike, scavenge, eat an egg, or a custom effect.</td>
+</tr>
+</tbody>
+</table>
+<p>Before each action runs, the context is reset to <em>stay, no interaction</em>. The intent methods replace each other: <strong>the
+last call wins</strong>. The same goes for <code>OnArrival</code>. An action that calls nothing makes the animal stay.</p>
+<p><code>WalkTo</code> and <code>RunTo</code> stop at the given distance and never overshoot it (MOVE-04). An animal already within that
+distance stays. The action looks its target up again every tick, so it follows a moving target (ACT-02).</p>
+<h2 id="the-reference-actions">The reference actions</h2>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Class</th>
+<th>Target</th>
+<th>Intent</th>
+<th>On arrival</th>
+<th>Searches when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>eat</td>
+<td><a class="xref" href="../api/EvoSim.EatAction.html">EatAction</a></td>
+<td>nearest food item of a layer its diet grazes</td>
+<td>walk to it (stop 0); stay if already on it</td>
+<td>graze, on the tick of arrival too</td>
+<td>no food in sight</td>
+</tr>
+<tr>
+<td>flee</td>
+<td><a class="xref" href="../api/EvoSim.FleeAction.html">FleeAction</a></td>
+<td>nearest threat</td>
+<td>run straight away from it</td>
+<td>—</td>
+<td>no threat in sight</td>
+</tr>
+<tr>
+<td>hide</td>
+<td><a class="xref" href="../api/EvoSim.HideAction.html">HideAction</a></td>
+<td>nearest cover</td>
+<td>walk (or run) into it; stay once inside</td>
+<td>—</td>
+<td>no cover in sight, or no cover module</td>
+</tr>
+<tr>
+<td>follow</td>
+<td><a class="xref" href="../api/EvoSim.FollowAction.html">FollowAction</a></td>
+<td>nearest animal of its own species</td>
+<td>walk toward it, stop at 1 m</td>
+<td>—</td>
+<td>no kin in sight</td>
+</tr>
+<tr>
+<td>rest</td>
+<td><a class="xref" href="../api/EvoSim.RestAction.html">RestAction</a></td>
+<td>—</td>
+<td>stay</td>
+<td>—</td>
+<td>never</td>
+</tr>
+<tr>
+<td>mate</td>
+<td><a class="xref" href="../api/EvoSim.MateAction.html">MateAction</a></td>
+<td>nearest ready partner</td>
+<td>walk toward it, stop at 1 m</td>
+<td>— (the breed phase breeds it)</td>
+<td>no ready partner in sight</td>
+</tr>
+<tr>
+<td>hunt</td>
+<td><a class="xref" href="../api/EvoSim.HuntAction.html">HuntAction</a></td>
+<td>the nearer of the nearest prey and the nearest carcass it may eat; a carcass wins a tie</td>
+<td>run toward it, stop at 1 m</td>
+<td>strike the prey, or scavenge the carcass</td>
+<td>neither in sight</td>
+</tr>
+</tbody>
+</table>
+<p>The prey has eat, flee, hide, follow, rest and mate; the predator has hunt, follow, rest and mate (04 §5). Flee has
+an option from the prototype, <strong>Flee Into Cover</strong> (off in the reference): an animal already in cover stays, and cover
+within <strong>Cover Seek</strong> meters (6) is run into instead of running away. Mating itself is not an interaction: the mate
+action only brings the animal next to a partner, and the breed phase does the rest (ACT-13).</p>
+<h2 id="searching">Searching</h2>
+<p>When an action has nothing to act on, it calls <code>Search()</code> (ACT-04). The animal <strong>wanders</strong>: it keeps its heading, and
+each tick turns by ±45° or ±90° with probability <strong>Wander Turn P</strong> (0.25 on the locomotion). Blocked by a border or an
+obstacle, it picks a new random heading. It walks.</p>
+<p>The first search after a decision sets the animal's <code>Searching</code> flag and counts one <em>invalid</em> choice for its species
+(the prototype's name). The next decision clears the flag. The <code>&lt;species&gt;_invalid</code> column of <code>stats.csv</code> counts them.</p>
+<h2 id="busy-animals">Busy animals</h2>
+<p>A busy animal (<a class="xref" href="../api/EvoSim.Animal.html#EvoSim_Animal_BusyTicks">BusyTicks</a> above 0) doesn't decide and doesn't move: the act phase gives it a
+stay plan with no interaction. It pays the rest cost and recovers stamina. The counter drops by one at the end of
+each tick that started busy. When it reaches 0, the animal has no action and decides at the start of the next tick
+(ANIM-30). In the reference only digestion makes animals busy: see <a href="animals-and-stats.html">Animals, stats and death</a>.</p>
+<h2 id="moving">Moving</h2>
+<p>Each species has exactly one locomotion component (MOVE-01, V-13). The reference <a class="xref" href="../api/EvoSim.KinematicLocomotion.html">KinematicLocomotion</a>
+moves in straight lines, without physics (MOVE-04):</p>
+<ol>
+<li>The distance is the smallest of the speed (the animal's <code>speed.walk</code> or <code>speed.run</code> trait), its <strong>stamina budget</strong>
+and the intent's maximum distance. A stop distance is therefore never overshot.</li>
+<li><a class="xref" href="../api/EvoSim.Ground.html#EvoSim_Ground_SlideTo_UnityEngine_Vector3_UnityEngine_Vector3_">SlideTo(Vector3, Vector3)</a> moves along that line as far as walkable
+ground allows. Blocked by a border or an obstacle, the animal slides along it.</li>
+<li>If that made no progress, <a class="xref" href="../api/EvoSim.Ground.html#EvoSim_Ground_SideStep_UnityEngine_Vector3_System_Single_EvoSim_RandomStream_">SideStep(Vector3, float, RandomStream)</a>
+takes a step of the same length in a random direction, drawn from the species' <code>actions</code> stream.</li>
+<li>The locomotion sets the position and returns the meters moved (MOVE-06).</li>
+</ol>
+<p>The stamina budget is the animal's stamina in meters (ANIM-21): an exhausted animal can't move, whatever it chose. A
+species without a stamina module has no limit. Whatever the locomotion does is the tick's result (MOVE-01); after it,
+the act phase turns the animal toward where it moved (a wandering animal keeps its own heading). If a locomotion ever
+leaves an animal on non-walkable ground, the act phase puts it back and logs a warning (MOVE-02).</p>
+<p>Speeds are traits, so number genes can change them (MOVE-03). Reference: prey walk and run 1 m per tick, predators
+walk 1 and run 2. A predator outruns a prey over short chases; the prey has twice the stamina (07 §4).</p>
+<h2 id="interactions-and-reach">Interactions and reach</h2>
+<p>After moving, in the same tick, the planned interaction applies if the target is within reach (ACT-10) and both
+sides allow it: the target has an <a class="xref" href="../api/EvoSim.Edible.html">Edible</a> component and the eater's <a class="xref" href="../api/EvoSim.Diet.html">Diet</a> lists it
+(SPEC-13). See <a href="food-web.html">The food web</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Interaction</th>
+<th>Built with</th>
+<th>Reach (reference)</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>graze</td>
+<td><code>Interaction.Graze(item)</code></td>
+<td>0.5 m from the item</td>
+<td>the item is consumed (an item goes to the first animal that reaches it); the eater gains its energy</td>
+</tr>
+<tr>
+<td>strike</td>
+<td><code>Interaction.Strike(animal)</code></td>
+<td>1 m</td>
+<td>with the hunter's kill chance, the prey is killed; the hunter eats it and digests; a carcass may appear</td>
+</tr>
+<tr>
+<td>scavenge</td>
+<td><code>Interaction.Scavenge(carcass)</code></td>
+<td>1 m</td>
+<td>one portion is eaten; the eater gains its energy and digests</td>
+</tr>
+<tr>
+<td>eat egg</td>
+<td><code>Interaction.EatEgg(egg)</code></td>
+<td>0.5 m</td>
+<td>the egg is eaten and never hatches (REPRO-23)</td>
+</tr>
+<tr>
+<td>custom</td>
+<td><code>OnArrival(IInteraction)</code></td>
+<td>its own <code>Reach</code>, from the point the intent was heading to</td>
+<td>whatever its <code>Apply</code> does</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Kills.</strong> A hunter strikes at most once per tick (ACT-12); a miss uses that strike too. The chance that a strike
+kills is the hunter's <code>kill.chance</code> trait (<strong>Kill Chance</strong> on its diet, 0.5 in the reference), drawn from the hunter
+species' <code>actions</code> stream. An animal standing in cover that hides it from the hunter is never struck (ENV-11). A
+killed animal is marked at once: for the rest of the tick it is not sensed, not targeted, doesn't act and doesn't
+breed. It is removed in the death phase (ANIM-41). A prey that survives a strike can be struck again by another
+hunter in the same tick.</p>
+<h2 id="act-order">Act order</h2>
+<p>The act order is the <strong>Order</strong> setting of the act phase (ACT-30). The random orders come from the <code>act-order</code>
+stream, so a seed repeats them (ACT-32).</p>
+<table>
+<thead>
+<tr>
+<th>Order</th>
+<th>How animals take turns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Species In Turn (reference)</td>
+<td>species in the World's order; within a species, a fresh random order each tick. Each animal plans, moves, interacts and settles before the next one starts, so prey move before predators strike.</td>
+</tr>
+<tr>
+<td>All Mixed</td>
+<td>every animal of every species in one fresh random order each tick, one after another.</td>
+</tr>
+<tr>
+<td>Simultaneous</td>
+<td>every action plans from the state at the start of the phase; each locomotion moves its animals as a group; interactions apply in a fresh random order (a contested item goes to the first one drawn); then every animal that was not killed settles.</td>
+</tr>
+</tbody>
+</table>
+<p>In the two sequential orders an animal acts on the state left by those before it: positions, eaten items, kills
+(ACT-31). Reference numbers are measured with <em>Species In Turn</em> (ACT-33).</p>
+<h2 id="after-the-move-the-metabolism">After the move: the metabolism</h2>
+<p>Each living animal then pays for its tick, once (ANIM-20): a base cost plus a cost per meter moved, or a lower rest
+cost when it stood still resting or busy, plus any extra cost its locomotion reports (slopes, mud). Then its stamina
+pays the meters moved, or recovers. The numbers are in <a href="animals-and-stats.html">Animals, stats and death</a>.</p>
+<h2 id="the-main-types">The main types</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.AnimalAction.html">AnimalAction</a></td>
+<td>A behaviour the brain can choose; plans one tick through the context</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.ActContext.html">ActContext</a></td>
+<td>What an action may ask and plan; reused for every animal</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Intent.html">Intent</a></td>
+<td>Where the animal wants to go: direction, walk or run, farthest distance</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Interaction.html">Interaction</a></td>
+<td>What to do on arrival: graze, strike, scavenge, eat an egg, or custom</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Locomotion.html">Locomotion</a></td>
+<td>How a species moves; <a class="xref" href="../api/EvoSim.KinematicLocomotion.html">KinematicLocomotion</a> is the reference</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.MoveContext.html">MoveContext</a></td>
+<td>What a locomotion gets: ground, distance, random streams, stamina budget</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.InteractionResolver.html">InteractionResolver</a></td>
+<td>Applies interactions after moving: reach, diet, kill chance</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.ActPhase.html">ActPhase</a></td>
+<td>Runs the whole act step in the act order</td>
+</tr>
+</tbody>
+</table>
+<h2 id="settings">Settings</h2>
+<table>
+<thead>
+<tr>
+<th>Where</th>
+<th>Field</th>
+<th>Reference</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Act phase</td>
+<td>Order</td>
+<td>Species In Turn</td>
+<td>the act order</td>
+</tr>
+<tr>
+<td>Act phase</td>
+<td>Graze Reach, Strike Reach, Scavenge Reach</td>
+<td>0.5, 1, 1 m</td>
+<td>how close an interaction needs the animal; eggs use the graze reach</td>
+</tr>
+<tr>
+<td>Locomotion</td>
+<td>Walk Speed, Run Speed</td>
+<td>prey 1 and 1, predator 1 and 2 m per tick</td>
+<td>defaults of the <code>speed.walk</code> and <code>speed.run</code> traits</td>
+</tr>
+<tr>
+<td>Locomotion</td>
+<td>Wander Turn P</td>
+<td>0.25</td>
+<td>chance per tick that a wandering animal turns</td>
+</tr>
+<tr>
+<td>Diet</td>
+<td>Kill Chance</td>
+<td>0.5</td>
+<td>default of the hunter's <code>kill.chance</code> trait</td>
+</tr>
+<tr>
+<td>Follow, Mate, Hunt</td>
+<td>Stop At</td>
+<td>1 m</td>
+<td>stop this far from the target</td>
+</tr>
+<tr>
+<td>Eat</td>
+<td>Target</td>
+<td>empty</td>
+<td>a layer name, empty for every layer the diet grazes, or <code>egg:&lt;species&gt;</code></td>
+</tr>
+<tr>
+<td>Flee</td>
+<td>From, Listed</td>
+<td>Threats</td>
+<td>whom to flee: the species' threats, or listed species by id or name</td>
+</tr>
+<tr>
+<td>Hide</td>
+<td>Run</td>
+<td>off</td>
+<td>run into cover instead of walking</td>
+</tr>
+</tbody>
+</table>
+<h2 id="in-the-editor">In the editor</h2>
+<ul>
+<li><strong>Scene view</strong>, in Play mode: select an animal to see its vision, a line to its target and a circle coloured by its
+action. The EvoSim overlay can write each animal's action letter above it.</li>
+<li><strong>Animal Inspector</strong> (<em>Window ▸ EvoSim ▸ Animal Inspector</em>): the selected animal's current action and target, its
+busy reason, its stats.</li>
+</ul>
+<h2 id="go-further">Go further</h2>
+<ul>
+<li><a href="../extending/action.html">Add an action or an interaction</a>, <a href="../extending/locomotion.html">Add a locomotion</a>.</li>
+<li><a href="food-web.html">The food web</a>: who may eat whom, and what a meal gives.</li>
+<li><a href="the-tick.html">A tick, phase by phase</a>: where the act phase sits in the tick.</li>
+<li>Specification: <a href="../spec/07-actions-and-locomotion.html">07 — Actions and locomotion</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

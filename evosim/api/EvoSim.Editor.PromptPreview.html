@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class PromptPreview | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class PromptPreview | EvoSim ">
+      
+      <meta name="description" content="The species inspector&#39;s prompt preview (21 &#167;3, PROMPT-06): built by the same code as the Ask brains phase, so it is exactly what the brain receives — for JEV, its whole input text (T-PROMPT-05).">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_Editor_PromptPreview.md&amp;value=---%0Auid%3A%20EvoSim.Editor.PromptPreview%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.Editor.PromptPreview">
+
+
+
+  <h1 id="EvoSim_Editor_PromptPreview" data-uid="EvoSim.Editor.PromptPreview" class="text-break">
+Class PromptPreview  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/PromptPreview.cs/#L12"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a>.<a class="xref" href="EvoSim.Editor.html">Editor</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Editor.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>The species inspector's prompt preview (21 §3, PROMPT-06): built by the same code as the Ask brains phase, so it
+is exactly what the brain receives — for JEV, its whole input text (T-PROMPT-05).</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class PromptPreview</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">PromptPreview</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="EvoSim_Editor_PromptPreview_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>The <a class="xref" href="EvoSim.Editor.SpeciesInspector.html">SpeciesInspector</a> calls it (and the editor tests, which check that it matches what the brains are
+sent). Nothing here changes the world except <a class="xref" href="EvoSim.Editor.PromptPreview.html#EvoSim_Editor_PromptPreview_FounderGenome_EvoSim_World_EvoSim_Species_System_Int32_">FounderGenome(World, Species, int)</a>, which registers the founder alleles it uses
+in the world's allele registry.</p>
+</div>
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_Editor_PromptPreview_For_" data-uid="EvoSim.Editor.PromptPreview.For*"></a>
+
+  <h3 id="EvoSim_Editor_PromptPreview_For_EvoSim_Species_EvoSim_Genome_EvoSim_Observation_EvoSim_TextStyle_EvoSim_Brain_" data-uid="EvoSim.Editor.PromptPreview.For(EvoSim.Species,EvoSim.Genome,EvoSim.Observation,EvoSim.TextStyle,EvoSim.Brain)">
+  For(Species, Genome, Observation, TextStyle, Brain)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/PromptPreview.cs/#L22"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The text a brain receives for a genome and an observation of a species.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string For(Species s, Genome genome, Observation o, TextStyle style, Brain brain)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>s</code> <a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd><p>The species whose prompt template, senses and genes are used.</p>
+</dd>
+    <dt><code>genome</code> <a class="xref" href="EvoSim.Genome.html">Genome</a></dt>
+    <dd><p>The genome whose brain-visible sentences fill the genes block, or null for no genes.</p>
+</dd>
+    <dt><code>o</code> <a class="xref" href="EvoSim.Observation.html">Observation</a></dt>
+    <dd><p>The situation: one token per sense.</p>
+</dd>
+    <dt><code>style</code> <a class="xref" href="EvoSim.TextStyle.html">TextStyle</a></dt>
+    <dd><p>The situation text style (V1 tokens or V2 sentences).</p>
+</dd>
+    <dt><code>brain</code> <a class="xref" href="EvoSim.Brain.html">Brain</a></dt>
+    <dd><p>The brain that would answer: an HTTP brain gives the text it would send (JEV writes its own
+input), any other brain the filled prompt with its answer instruction; null leaves the answer instruction empty.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The full prompt text.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Editor_PromptPreview_FounderGenome_" data-uid="EvoSim.Editor.PromptPreview.FounderGenome*"></a>
+
+  <h3 id="EvoSim_Editor_PromptPreview_FounderGenome_EvoSim_World_EvoSim_Species_System_Int32_" data-uid="EvoSim.Editor.PromptPreview.FounderGenome(EvoSim.World,EvoSim.Species,System.Int32)">
+  FounderGenome(World, Species, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/PromptPreview.cs/#L42"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>A founder genome for the preview: the first founder of each gene (or the one at the given index).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Genome FounderGenome(World w, Species s, int which = 0)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>w</code> <a class="xref" href="EvoSim.World.html">World</a></dt>
+    <dd><p>The world whose allele registry records the founder alleles.</p>
+</dd>
+    <dt><code>s</code> <a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd><p>The species whose genes are read, in locus order.</p>
+</dd>
+    <dt><code>which</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The index in each gene's founder pool; a gene with fewer founders takes its last one.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Genome.html">Genome</a></dt>
+    <dd><p>A genome with one founder allele per locus.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Editor_PromptPreview_Query_" data-uid="EvoSim.Editor.PromptPreview.Query*"></a>
+
+  <h3 id="EvoSim_Editor_PromptPreview_Query_EvoSim_Species_EvoSim_Genome_EvoSim_Observation_EvoSim_TextStyle_" data-uid="EvoSim.Editor.PromptPreview.Query(EvoSim.Species,EvoSim.Genome,EvoSim.Observation,EvoSim.TextStyle)">
+  Query(Species, Genome, Observation, TextStyle)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/PromptPreview.cs/#L34"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The query the Ask brains phase would build (DEC-10).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DecisionQuery Query(Species s, Genome genome, Observation o, TextStyle style)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>s</code> <a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd><p>The species of the deciding animal.</p>
+</dd>
+    <dt><code>genome</code> <a class="xref" href="EvoSim.Genome.html">Genome</a></dt>
+    <dd><p>The genome to read, or null: no genes, and the species id as the genome key.</p>
+</dd>
+    <dt><code>o</code> <a class="xref" href="EvoSim.Observation.html">Observation</a></dt>
+    <dd><p>The situation: one token per sense.</p>
+</dd>
+    <dt><code>style</code> <a class="xref" href="EvoSim.TextStyle.html">TextStyle</a></dt>
+    <dd><p>The situation text style (V1 or V2).</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.DecisionQuery.html">DecisionQuery</a></dt>
+    <dd><p>A query as a brain receives it, with no animal id (-1).</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Editor_PromptPreview_Tokens_" data-uid="EvoSim.Editor.PromptPreview.Tokens*"></a>
+
+  <h3 id="EvoSim_Editor_PromptPreview_Tokens_System_String_" data-uid="EvoSim.Editor.PromptPreview.Tokens(System.String)">
+  Tokens(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/PromptPreview.cs/#L57"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The token estimate shown next to the preview (PROMPT-06).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int Tokens(string text)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>text</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>A prompt text.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>About one token per four characters, as <a class="xref" href="EvoSim.Brain.html#EvoSim_Brain_EstimateTokens_System_String_">EstimateTokens(string)</a> counts.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

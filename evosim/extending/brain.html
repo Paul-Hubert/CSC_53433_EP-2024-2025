@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>A brain | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="A brain | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/brain.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-brain">
+<h1 id="a-brain">A brain</h1>
+
+<p>A brain turns each deciding animal's query into one probability per action. Derive from <a class="xref" href="../api/EvoSim.Brain.html">Brain</a> to decide
+in C#: with rules, a small network, or a model you run yourself. For a model behind a web API, derive from
+<a class="xref" href="../api/EvoSim.HttpBrain.html">HttpBrain</a> instead: see <a href="http-brains.html">An HTTP brain or mutator server</a>. To change <em>when</em> animals decide,
+you need no brain: see <a href="#decision-timing">Decision timing</a>. How decisions, the memo and the cache work is in
+<a href="../guides/brains-and-decisions.html">Decisions and brains</a>.</p>
+<h2 id="the-base-class">The base class</h2>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th></th>
+<th>What it does, and when it is called</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_Id">Id</a></td>
+<td>must implement</td>
+<td>a short name (&quot;random&quot;, &quot;keyword-v1&quot;), part of memo and cache keys and the name of its cache file</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_Ask_System_Collections_Generic_IReadOnlyList_EvoSim_DecisionQuery__">Ask</a></td>
+<td>must implement</td>
+<td>answers a batch of queries with a <a class="xref" href="../api/EvoSim.BrainAnswer.html">BrainAnswer</a>; called by the ask-brains phase once per tick and batch, on the main thread</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_Memoizable">Memoizable</a></td>
+<td>may override</td>
+<td>false for a brain with memory: every query then reaches it (<a href="#brains-with-memory">below</a>)</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_MaxActions">MaxActions</a></td>
+<td>may override</td>
+<td>the most actions a species may have with this brain (DEC-14, V-11); no limit by default</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_MaxPromptTokens">MaxPromptTokens</a></td>
+<td>may override</td>
+<td>the longest prompt it takes, in estimated tokens (V-11); 0 = no limit</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_AcceptsAttachments">AcceptsAttachments</a></td>
+<td>may override</td>
+<td>true if it reads attachments such as images (V-51); false by default</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_CanMixSpecies">CanMixSpecies</a></td>
+<td>may override</td>
+<td>false to get one batch per species (DEC-13); true by default</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_AnswerInstruction">AnswerInstruction</a></td>
+<td>may override</td>
+<td>the line that ends the prompt, <code>{ask}</code> (PROMPT-07); empty by default</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_ModelIdentity">ModelIdentity</a>, <a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_Mode">Mode</a></td>
+<td>may override</td>
+<td>the model with its revision, and the brain's mode: parts of the cache key (DEC-33)</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.WorldModule.html#EvoSim_WorldModule_Initialize">Initialize</a>, <a class="xref" href="../api/EvoSim.WorldModule.html#EvoSim_WorldModule_Validate_EvoSim_ValidationReport_">Validate</a></td>
+<td>may override</td>
+<td>set up before the run; report configuration problems</td>
+</tr>
+</tbody>
+</table>
+<p>Two helpers make rows: <a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_Uniform_System_Int32_">Uniform</a> and
+<a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_Normalize_System_Double___">Normalize</a>, which turns non-negative weights into a valid row. What a
+query holds is listed in <a href="../guides/brains-and-decisions.html#the-query">Decisions and brains</a>.</p>
+<h2 id="a-complete-example">A complete example</h2>
+<p>A small rule-based brain, in the spirit of the prototype's keyword brain (08 §6). Each action starts with weight 1; its
+gene's wording pushes it up or down, and fleeing gets more likely when a predator is in sight.</p>
+<pre><code class="lang-csharp">using System.Collections.Generic;
+using EvoSim;
+
+public class KeywordBrain : Brain
+{
+    public override string Id =&gt; &quot;keyword-v1&quot;;
+
+    public override BrainAnswer Ask(IReadOnlyList&lt;DecisionQuery&gt; batch)
+    {
+        var rows = new float[batch.Count][];
+        for (int i = 0; i &lt; batch.Count; i++)
+        {
+            var q = batch[i];
+            string threat = new ObservationView(q.Species, q.Observation).Token(&quot;Predator&quot;);
+            var weights = new double[q.Species.Actions.Count];
+            for (int k = 0; k &lt; weights.Length; k++)
+            {
+                string action = q.Species.Actions[k].Name;
+                weights[k] = Push(SentenceOf(q, action));
+                if (action == &quot;flee&quot; &amp;&amp; threat != null &amp;&amp; threat != &quot;none&quot;) weights[k] *= 4.0;
+            }
+            rows[i] = Normalize(weights);                    // weights ≥ 0 → a row that sums to 1
+        }
+        return BrainAnswer.Now(rows);                        // answered at once: nothing to wait for
+    }
+
+    // An action's gene is labelled with the action's name (PROMPT-02).
+    static string SentenceOf(DecisionQuery q, string label)
+    {
+        foreach (var g in q.Genes) if (g.Key == label) return g.Value.ToLowerInvariant();
+        return &quot;&quot;;
+    }
+
+    static double Push(string gene) =&gt;
+        gene.Contains(&quot;never&quot;) || gene.Contains(&quot;avoid&quot;) ? 0.2 :
+        gene.Contains(&quot;always&quot;) || gene.Contains(&quot;whenever&quot;) ? 3.0 : 1.0;
+}
+</code></pre>
+<p><strong>Where to put it.</strong></p>
+<ol>
+<li><em>Assets ▸ Create ▸ EvoSim ▸ Script ▸ Brain</em> writes <code>Assets/Student/&lt;Name&gt;.cs</code> (a uniform brain) and its test.</li>
+<li>Add the component on a child of the World's <code>Brains</code> object: a world service, enabled, not under a species (V-10).</li>
+<li>Select it as the World's <strong>Default Brain</strong>, or as one species' <strong>Brain</strong>. Validation checks your limits against every
+species that uses it.</li>
+</ol>
+<h2 id="answering-now-or-later">Answering now or later</h2>
+<p><a class="xref" href="../api/EvoSim.BrainAnswer.html">BrainAnswer</a> has two forms. <a class="xref" href="../api/EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Now_System_Single_____">Now</a> takes every row at
+once. <a class="xref" href="../api/EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Later_System_Int32_">Later</a> returns an empty answer that you fill from another thread
+with <a class="xref" href="../api/EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_SetRow_System_Int32_System_Single___">SetRow</a> or
+<a class="xref" href="../api/EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Fail_System_Int32_System_String_">Fail</a>, then close with
+<a class="xref" href="../api/EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Complete">Complete</a>. The choose-actions phase waits until then. This is the pattern
+<a class="xref" href="../api/EvoSim.HttpBrain.html">HttpBrain</a> follows:</p>
+<pre><code class="lang-csharp">public override BrainAnswer Ask(IReadOnlyList&lt;DecisionQuery&gt; batch)
+{
+    var answer = BrainAnswer.Later(batch.Count);
+    var prompts = new string[batch.Count];
+    var actions = new int[batch.Count];
+    for (int i = 0; i &lt; batch.Count; i++)                    // main thread: read what you need now
+    {
+        prompts[i] = batch[i].Prompt(this);
+        actions[i] = batch[i].Species.Actions.Count;
+    }
+    Task.Run(() =&gt;
+    {
+        try { for (int i = 0; i &lt; prompts.Length; i++) answer.SetRow(i, Score(prompts[i], actions[i])); }
+        catch (Exception e) { for (int i = 0; i &lt; prompts.Length; i++) if (answer.Row(i) == null) answer.Fail(i, e.Message); }
+        finally { answer.Complete(); }                       // always, exactly once
+    });
+    return answer;
+}
+
+static float[] Score(string prompt, int actions) =&gt; Uniform(actions);   // your model here
+</code></pre>
+<p>Read every Unity object (species, action names, prompts) in <code>Ask</code>, on the main thread; the background code touches only
+plain data.</p>
+<h2 id="brains-with-memory">Brains with memory</h2>
+<p>The memo assumes that the same query always gets the same row (DEC-12). A brain that remembers or learns breaks that
+assumption: override <a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_Memoizable">Memoizable</a> to return false. Its queries are then never memoised,
+shared within a tick or cached, and each carries the animal's id in
+<a class="xref" href="../api/EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_AnimalId">AnimalId</a>. The test brain <a class="xref" href="../api/EvoSim.Testing.MemoryBrain.html">MemoryBrain</a> does this:</p>
+<pre><code class="lang-csharp">public override string Id =&gt; &quot;memory&quot;;
+public override bool Memoizable =&gt; false;    // every deciding animal's query reaches Ask, with its AnimalId
+</code></pre>
+<h2 id="strict-mode-and-the-cache">Strict mode and the cache</h2>
+<p><strong>Strict</strong> stops the run cleanly when a query fails or a row is malformed; off, the animal draws from a uniform row and
+the failure is counted (DEC-40). <strong>Use Cache</strong> stores good rows in the World's <a class="xref" href="../api/EvoSim.AnswerCache.html">AnswerCache</a> for later runs
+(DEC-33). Both are off by default, and on for HTTP brains. The cache trusts your keys: change
+<a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_Id">Id</a> (<code>keyword-v2</code>) whenever the answers change, and put every setting that changes an answer in
+<a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_ModelIdentity">ModelIdentity</a> or <a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_Mode">Mode</a>. Otherwise a later run replays old
+answers.</p>
+<h2 id="rules-your-brain-keeps">Rules your brain keeps</h2>
+<ol>
+<li><strong>One valid row per query</strong> (DEC-11): in query order; one entry per action of that query's species, in the species'
+action order; every entry ≥ 0; the sum 1 ± 10⁻⁶. <code>Normalize</code> and <code>Uniform</code> make such rows.</li>
+<li><strong>The same query gives the same row</strong> (DEC-12): no random draws, no clock, no state, unless <code>Memoizable</code> is false.</li>
+<li><strong>Read only the queries.</strong> A brain never moves an animal or changes the world (CORE-06).</li>
+<li><strong>Fail rather than invent</strong>: mark a query you can't answer with <code>Fail</code>. A failure is never stored (DEC-34).</li>
+<li><strong>Complete a later answer exactly once</strong>, also when everything failed. The tick waits for it.</li>
+<li><strong>State your limits</strong> (DEC-14): if a species can't fit, validation says so before the run instead of a failure during it.</li>
+</ol>
+<h2 id="test-it">Test it</h2>
+<p>The brain conformance suite, <code>DecisionTests.BrainConformance</code>, asks each brain of the EvoSim assemblies 20 queries twice,
+and checks every row and that both answers are equal. A brain in <code>Assets/Student</code> is not in its list: add the same two
+checks to the test written with your script.</p>
+<pre><code class="lang-csharp">[Test]
+public void RowsAreValidAndRepeat()
+{
+    var w = New().Ecology(prey: s =&gt; s.Population(0), predator: s =&gt; s.Population(0))
+                 .ReferencePhases().DefaultBrain&lt;KeywordBrain&gt;().Build();
+    var prey = w.FindSpecies(&quot;prey&quot;);
+    var a = Place.Animal(prey, Place.At(10, 10));
+    w.Space.Rebuild();
+    var o = prey.Observe(a, new SenseContext(w));
+    var q = new DecisionQuery(prey, DecisionQuery.BrainGenes(prey, a.Genome), o, prey.Describe(o, TextStyle.V1),
+                              TextStyle.V1, a.Genome.BrainKey);
+    var first = w.DefaultBrain.Ask(new[] { q });
+    first.Pending.Wait();
+    var again = w.DefaultBrain.Ask(new[] { q });
+    again.Pending.Wait();
+    Assert.IsNull(BrainAnswer.Check(first.Row(0), prey.Actions.Count), &quot;a valid row&quot;);
+    CollectionAssert.AreEqual(first.Row(0), again.Row(0), &quot;the same query, the same row&quot;);
+}
+</code></pre>
+<p>The test class derives from <a class="xref" href="../api/EvoSim.Testing.WorldFixture.html">WorldFixture</a>. To test a phase or an action against chosen answers, use
+the test brain <a class="xref" href="../api/EvoSim.Testing.ScriptedBrain.html">ScriptedBrain</a>. More in <a href="testing-your-module.html">Testing your module</a>.</p>
+<h2 id="decision-timing">Decision timing</h2>
+<p>When animals decide is set per species by a <a class="xref" href="../api/EvoSim.DecisionSchedule.html">DecisionSchedule</a>, with no code. Add one under the species (the
+reference species have one in their <code>Life</code> group):</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Reference</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Period</strong></td>
+<td>0</td>
+<td>ticks between two decisions of this species; 0 = the World's <strong>Decision Period</strong> (4)</td>
+</tr>
+<tr>
+<td><strong>Staggered</strong></td>
+<td>on</td>
+<td>an animal decides when <code>(tick + id) % period == 0</code>, so the decisions spread over the period</td>
+</tr>
+</tbody>
+</table>
+<p>Without a schedule, a species decides all together every World period. Both settings change behaviour (DEC-04). Whatever
+the schedule says, a busy animal never decides (DEC-02), and an animal without an action decides on the next tick
+(DEC-01).</p>
+<p>For other timing, derive from <code>DecisionSchedule</code> and override
+<a class="xref" href="../api/EvoSim.DecisionSchedule.html#EvoSim_DecisionSchedule_IsDue_EvoSim_Animal_System_Int32_EvoSim_World_">IsDue</a>. The sense phase calls it at the
+start of every tick for each living, not busy animal. It must depend only on the tick and the animal's state, and draw no
+random number, so a seed still repeats the run. Keep one schedule per species: replace the reference one rather than
+adding a second.</p>
+<pre><code class="lang-csharp">[RequiresModule(typeof(Energy))]
+public class HungryDecideOften : DecisionSchedule
+{
+    Energy energy;
+    public override void Initialize() =&gt; energy = Species.Module&lt;Energy&gt;();
+
+    // Hungry animals decide every 2 ticks; the others follow the usual schedule.
+    public override bool IsDue(Animal a, int tick, World w) =&gt;
+        a[energy.Value] &lt; 30f ? tick % 2 == 0 : base.IsDue(a, tick, w);
+}
+</code></pre>
+<h2 id="read-next">Read next</h2>
+<ul>
+<li>Prompt hooks: a text brain adds only its <code>AnswerInstruction</code>; rule lines come from <code>WritePromptRules</code> on species modules
+and world services (<a href="../guides/senses-and-prompts.html#how-the-prompt-is-written">How the prompt is written</a>).</li>
+<li><a class="xref" href="../api/EvoSim.RandomBrain.html">RandomBrain</a>, the null model; rewrite it from its stub (exercise 13): <a href="exercises.html">the teaching path</a>.</li>
+<li><a class="xref" href="../api/EvoSim.Testing.MemoryBrain.html">MemoryBrain</a> and <a class="xref" href="../api/EvoSim.Testing.ScriptedBrain.html">ScriptedBrain</a>, the test brains.</li>
+<li><a class="xref" href="../api/EvoSim.HttpBrain.html">HttpBrain</a>, <a class="xref" href="../api/EvoSim.JevBrain.html">JevBrain</a>, <a class="xref" href="../api/EvoSim.OllamaPointsBrain.html">OllamaPointsBrain</a>: <a href="http-brains.html">An HTTP brain or mutator
+server</a>.</li>
+<li><a href="../guides/brains-and-decisions.html">Decisions and brains</a> and <a href="../guides/senses-and-prompts.html">Senses and prompts</a>.</li>
+<li>Specification: <a href="../spec/08-decisions-brains-and-prompts.html">08 — Decisions, brains and prompts</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

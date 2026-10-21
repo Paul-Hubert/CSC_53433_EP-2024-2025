@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>32 — Integrity prompts and CI | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="32 — Integrity prompts and CI | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/32-integrity-prompts-and-ci.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="32--integrity-prompts-and-ci">32 — Integrity prompts and CI</h1>
+
+<p>Two kinds of integrity, both checked in CI and usable by hand:</p>
+<ol>
+<li><strong>The models do what the contract assumes</strong>: genes steer the brain the way
+they say, random text doesn't, prompts fit, mutations stay meaningful. These
+checks send prompts to the real brain and mutator (§2).</li>
+<li><strong>The implementation keeps the contract</strong>: a coding agent audits the Unity
+code against these documents with the prompts of §3.</li>
+</ol>
+<p>The owner's guidance: CI may call real LLMs, and its duration is not a concern.</p>
+<h2 id="1-where-each-check-runs">1. Where each check runs</h2>
+<p>All tiers run on the owner's machine (the one that ran the prototype: Windows
+11, a 16 GB RTX GPU, Docker for the JEV server, Ollama for the mutator) as a
+self-hosted GitHub Actions runner (owner decision).</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Content</th>
+<th>Trigger</th>
+<th>Blocks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T0–T1</td>
+<td>validation, static checks, EditMode tests</td>
+<td>every push</td>
+<td>merge</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>PlayMode tests, short scenarios with the random brain, scripted brains and fakes</td>
+<td>every push</td>
+<td>merge</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>regression with the random and scripted brains: hashes, soak, performance, mechanics scenarios</td>
+<td>nightly, before a release</td>
+<td>release</td>
+</tr>
+<tr>
+<td>T4</td>
+<td>JEV (the default brain) and the mutator on the owner's computer: integrity (§2), behavioural scenarios S02, S04, S06, S07, S09, S10, S12, S13, S15, S16, S19, S20, S22, S26, S27, S28; reference ranges R-02 and R-03 before a release</td>
+<td>nightly, manual</td>
+<td>B-01 blocks; gates are tracked as trends</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>coding-agent audit (§3, prompt P1)</td>
+<td>weekly, before a release</td>
+<td>a report a person reviews</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-brain-and-mutator-integrity-checks">2. Brain and mutator integrity checks</h2>
+<p>Each check writes a JSON and a Markdown report with the model names, digests or
+pinned revisions, prompt ids and the date, so that results can be compared over
+time.</p>
+<table>
+<thead>
+<tr>
+<th>Id</th>
+<th>Check</th>
+<th>Pass</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>B-01</strong></td>
+<td><strong>Smoke</strong>: one query per species with founder genes and three situations; valid rows; latency recorded</td>
+<td>every row valid (blocking)</td>
+</tr>
+<tr>
+<td><strong>B-02</strong></td>
+<td><strong>G1 directed</strong>: every contrast pair (pro / anti, neutral elsewhere) × the relevant observations of the 48-situation set</td>
+<td>sign accuracy ≥ 85 % and mean ΔP ≥ 0.25</td>
+</tr>
+<tr>
+<td><strong>B-03</strong></td>
+<td><strong>G2 information</strong>: 10 founder genomes, 10 random-text genomes, the neutral genome × 24 situations</td>
+<td>MI_G(founders) ≥ 2 × MI_G(random text); full thresholds reported</td>
+</tr>
+<tr>
+<td><strong>B-04</strong></td>
+<td><strong>G3 locality</strong> (needs the mutator): 10 parents × 4 single mutations</td>
+<td>locality ratio ≤ 0.5, Spearman ρ ≥ 0.3</td>
+</tr>
+<tr>
+<td><strong>B-05</strong></td>
+<td><strong>Option order</strong> (multiple-choice brains): the same queries with options permuted</td>
+<td>report the share of changed top answers (JEV: 11.5 % on 16 options); requests always use the species' order</td>
+</tr>
+<tr>
+<td><strong>B-06</strong></td>
+<td><strong>Prompt length</strong>: the longest founder genome of every species with its longest situation</td>
+<td>under the brain's limit; the run's too-long counter stays 0</td>
+</tr>
+<tr>
+<td><strong>B-07</strong></td>
+<td><strong>Points sanity</strong> (Ollama): share of answers summing to 100, share of all-zero answers, by genome kind</td>
+<td>reported; all-zero answers on founder genes fail</td>
+</tr>
+<tr>
+<td><strong>B-08</strong></td>
+<td><strong>Names</strong>: S26 (a renamed species)</td>
+<td>P(flee) drops for &quot;Run from any wolf you see.&quot; when wolves are renamed</td>
+</tr>
+<tr>
+<td><strong>B-09</strong></td>
+<td><strong>Repeatability</strong>: the same 50 queries twice with the cache off</td>
+<td>identical answers (Ollama: temperature 0 and a seed); JEV: reported differences above 1e-3</td>
+</tr>
+<tr>
+<td><strong>B-10</strong></td>
+<td><strong>Mutator</strong>: the 9 × 4 founder sentences through the deck, then 10 mutations in a row without selection, judged by the judge prompt below</td>
+<td>guards pass ≥ 70 % of first answers; ≥ 80 % usable after one mutation; usable share after 10 reported (prototype: 50 %)</td>
+</tr>
+<tr>
+<td><strong>B-11</strong></td>
+<td><strong>Blindness</strong>: the mutator's received prompts</td>
+<td>contain only the context line, one instruction, the sentence and the reply line (MUT-11)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Gate policy.</strong> G2 stays a gate even though gemma and JEV fail it (owner
+decision, 2026-10-09). A gate that a model is known to fail is not blocking; it fails CI only when its value drops below the last
+accepted value by more than its bootstrap margin. A new model or prompt is
+accepted by a person, who records the new values.</p>
+<p><strong>The judge prompt</strong> (from the prototype, used by B-10 and S13):</p>
+<pre><code class="lang-text">Animals in a simulation act on short English rules called genes. Each gene sits in a slot. The slot &quot;{slot}&quot; is about {topic}.
+
+The gene in the slot &quot;{slot}&quot; is: &quot;{text}&quot;
+
+Does this gene still give the animal a usable rule about {topic}? A usable rule is understandable and could guide what the animal does, even if it is odd or unwise. Nonsense, or a sentence about something else, is not a usable rule.
+
+Answer yes or no.
+</code></pre>
+<p><strong>Brain prompts.</strong> The checks use each species' real prompt (<a href="08-decisions-brains-and-prompts.html#7-the-prompt">08 §7</a>),
+assembled or frozen, exactly as the world sends it; the reports store the prompt
+ids.</p>
+<h2 id="3-prompts-for-coding-agents">3. Prompts for coding agents</h2>
+<p>Written in the style of the owner's prompts in <code>Docs/prompts/</code>: context, rules,
+what to check, what to deliver. Paste them into a Claude Code session at the root
+of the Unity project (T5 runs P1 on a schedule).</p>
+<h3 id="p1--audit-the-implementation-against-the-contract">P1 — Audit the implementation against the contract</h3>
+<pre><code class="lang-text">You are auditing the Unity implementation of the evolving-animals system against its
+contract. Work in two phases. Phase 1: find and prove problems, change nothing.
+Phase 2: fix them, only after I approve the list.
+
+Context
+- Contract: Docs/Interface/ (README first; rules are numbered, e.g. SENSE-03, and each
+  MUST rule names the tests that cover it in 30-tests.md).
+- Implementation: Assets/EvoSim/ (Runtime, Editor, Tests). Architecture: 20-unity-architecture.md.
+- Run tests with the Unity Test Framework in batch mode (EditMode and PlayMode).
+
+Rules
+- Phase 1 is read-only for the repository; throwaway code goes in a scratch folder.
+- Prove every finding: a failing test, a small script and its output, or a file:line with a
+  concrete input that goes wrong. If you can't make it fail, call it a risk, not a bug.
+- No real LLM calls unless I say so; use ScriptedBrain and FakeMutator.
+- Summaries of at most 20 lines per command; details to files.
+
+What to check
+1. Every MUST rule: is there a test citing it, does the test really check the rule, does it pass?
+2. Discovery and ownership (ARCH-04/05/06): nested species, disabled modules, gene binding,
+   order and signature.
+3. Determinism (RAND-01..13): global randomness, unordered iteration, wait modes, ticks per
+   frame, rendering; run the same seed twice and compare hashes.
+4. Animals as data (CORE-05, ARCH-03): no per-animal MonoBehaviour logic, no per-animal state
+   hidden in modules, no statics (ARCH-07).
+5. The brain boundary (CORE-06, ACT-20) and blind mutation (CORE-07, MUT-11).
+6. Tick order (TICK-04) and the act order policies (ACT-30/31).
+7. Outputs (OUT-01..05): rebuild genomes from the events; no secrets anywhere (OUT-04).
+8. Validation (EDIT-01): every validator has a triggering fixture.
+
+Deliver
+A table: rule id | finding | evidence | severity (bug / risk / doc) | proposed fix.
+Then the list of MUST rules with no real test. Stop and wait for my approval.
+</code></pre>
+<h3 id="p2--review-a-students-extension">P2 — Review a student's extension</h3>
+<pre><code class="lang-text">Review this change, which adds a module to the evolving-animals system (a sense, an action,
+a gene kind, a stat, a brain, a mutation operator or a phase).
+
+Check, with evidence:
+- It derives from the right base class and overrides only what the recipe in
+  Docs/Interface/22-extending-recipes.md says.
+- The conformance suite of its kind (Docs/Interface/30-tests.md §4) passes, and the student
+  added the tests the recipe asks for.
+- No per-animal state inside the module (CORE-05); no global randomness (RAND-01); actions
+  only produce intents (ACT-06); a sense returns declared tokens (SENSE-01) and the
+  observation space stays reasonable (SENSE-05).
+- Validation is green; if the species' signature changed, the change is intended.
+- The prompt preview reads well and stays under the brain's limit (PROMPT-06).
+
+Deliver: what works, what breaks a rule (rule id, file:line), what to improve, in that order.
+Be kind and concrete: this is a student's work.
+</code></pre>
+<h3 id="p3--investigate-a-regression">P3 — Investigate a regression</h3>
+<pre><code class="lang-text">A regression test failed: &lt;R-01 pinned hash for &lt;scene&gt;/&lt;seed&gt; | R-02 range &lt;metric&gt;&gt;.
+Find why, without changing the pinned values.
+
+1. Reproduce it locally; record the old and new values.
+2. Find the first tick and the first event where the two runs differ (dump both events
+   files and compare); name the phase and the module that wrote it.
+3. Find the commit that introduced it (bisect if needed).
+4. Classify: an intended behaviour change (then say which rules and documents must change
+   and propose the re-pin with its justification), or a bug (then propose a fix and a test
+   that would have caught it).
+Deliver a short report with the evidence.
+</code></pre>
+<h3 id="p4--keep-the-contract-in-step-with-the-prototype">P4 — Keep the contract in step with the prototype</h3>
+<pre><code class="lang-text">The Python prototype (prototype/) changed since the commit the contract was written
+against (see Docs/Interface/README.md, &quot;Status&quot;). List every behaviour change between
+that commit and HEAD that touches a rule of Docs/Interface/ or a reference value of
+14-configuration-reference.md. For each: the commit, the old and new behaviour, the
+affected rule ids, and the proposed new wording. Ignore refactors that don't change
+behaviour. Change nothing until I approve.
+</code></pre>
+<h3 id="p5--write-the-tests-for-a-rule-or-a-module">P5 — Write the tests for a rule or a module</h3>
+<pre><code class="lang-text">Write tests for &lt;rule id(s) | module class&gt;, following Docs/Interface/30-tests.md: the
+naming (T-&lt;AREA&gt;-NN), the helpers of EvoSim.Testing (WorldBuilder, ScriptedBrain,
+FakeMutator, Place, Stat, Golden), fixed seeds, statistical asserts within 4 standard
+errors, and a citation of the rules in each test's description. Add each new test to the
+list in 30-tests.md. Run the tests and show that each fails when the behaviour is broken
+on purpose (then restore it).
+</code></pre>
+<h3 id="p6--investigate-a-brain-gate-that-moved">P6 — Investigate a brain gate that moved</h3>
+<pre><code class="lang-text">Brain integrity check &lt;B-02 | B-03 | B-04&gt; changed from &lt;old&gt; to &lt;new&gt; for &lt;model, prompt id&gt;.
+Break the result down by locus and by observation tag; list the 10 queries whose answers
+changed most, with their prompts and both answers; say whether the prompt, the model
+revision, the situation texts or the founder pools changed (compare prompt ids and
+digests in the two reports). Propose the smallest change that would restore the gate, and
+the cost of measuring it (model calls).
+</code></pre>
+<h2 id="4-the-ci-pipeline">4. The CI pipeline</h2>
+<pre><code class="lang-yaml"># .github/workflows/evosim.yml (sketch). Every job runs on the owner's machine.
+on:
+  push:
+  schedule: [{ cron: &quot;17 2 * * *&quot; }, { cron: &quot;17 3 * * 1&quot; }]   # nightly T3 + T4; weekly T5
+  workflow_dispatch:
+env:
+  UNITY: C:\Program Files\Unity\Hub\Editor\6000.3.x\Editor\Unity.exe
+jobs:
+  editmode:                                   # T0 + T1
+    runs-on: [self-hosted, windows, unity]
+    steps:
+      - uses: actions/checkout@v4
+        with: { clean: false }                # keeps Library/ between runs
+      - run: '&amp; $env:UNITY -batchmode -nographics -projectPath . -runTests -testPlatform EditMode -testResults results/editmode.xml'
+  playmode:                                   # T2
+    needs: editmode
+    runs-on: [self-hosted, windows, unity]
+    steps:
+      - uses: actions/checkout@v4
+        with: { clean: false }
+      - run: '&amp; $env:UNITY -batchmode -nographics -projectPath . -runTests -testPlatform PlayMode -testResults results/playmode.xml'
+  regression:                                 # T3
+    if: github.event_name != 'push'
+    runs-on: [self-hosted, windows, unity]
+    steps:
+      - uses: actions/checkout@v4
+        with: { clean: false }
+      - run: '&amp; $env:UNITY -batchmode -nographics -projectPath . -executeMethod EvoSim.Batch.RunRegression -quit'
+  llm-integrity:                              # T4
+    if: github.event_name != 'push'
+    needs: regression                         # the GPU belongs to JEV while this runs
+    runs-on: [self-hosted, windows, unity, gpu]
+    steps:
+      - uses: actions/checkout@v4
+        with: { clean: false }
+      - run: docker compose -f prototype/docker/compose.yaml up -d   # JEV on vLLM; wait for /health
+      - run: ollama pull qwen3.5:0.8b; ollama pull gemma4:12b
+      - run: '&amp; $env:UNITY -batchmode -nographics -projectPath . -executeMethod EvoSim.Batch.RunIntegrity -quit'          # B-01..B-11
+      - run: '&amp; $env:UNITY -batchmode -nographics -projectPath . -executeMethod EvoSim.Batch.RunScenarios -tier T4 -quit'
+      - uses: actions/upload-artifact@v4
+        with: { name: integrity-reports, path: Reports/ }
+  agent-audit:                                # T5, weekly
+    if: github.event.schedule == '17 3 * * 1'
+    runs-on: [self-hosted, windows, unity]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: anthropics/claude-code-action     # prompt P1, read-only phase 1
+        with: { anthropic_api_key: &quot;${{ secrets.ANTHROPIC_API_KEY }}&quot; }
+</code></pre>
+<p>Notes:</p>
+<ul>
+<li><strong>Unity</strong> is installed and licensed on the machine, so no license secret is
+needed. <code>-nographics</code> keeps tests off the GPU, which JEV needs almost entirely.</li>
+<li><strong>Secrets</strong> (<code>ANTHROPIC_API_KEY</code> for T5, <code>OLLAMA_API_KEY</code> only for a cloud
+model) live in the repository's secret store or the machine's environment and
+reach the code as environment variables (OUT-04). T-OUT-03 checks that none
+leaks into outputs.</li>
+<li><strong>Answer caches</strong> are local JSON-lines files that stay on the machine between
+runs, keyed by model revision and prompt id, so a nightly T4 run only pays
+for what changed. A weekly run moves them aside to measure the models afresh.</li>
+<li><strong>Determinism</strong> is checked on this machine only; pinned hashes are this
+machine's (RAND-12).</li>
+<li><strong>Pinned models</strong>: JEV by repository revision, Ollama models by digest; the
+reports record both. A digest change is reported as such, so a moved gate can
+be traced to the model rather than the code.</li>
+<li><strong>Duration</strong>: T4 with JEV (S27 at 500 ticks ≈ 25 min, gates ≈ 1 h) and the
+mutator checks fit a nightly window; long evolution runs (G4) stay manual.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

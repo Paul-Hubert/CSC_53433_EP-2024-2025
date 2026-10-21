@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>31 — Scenarios | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="31 — Scenarios | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/31-scenarios.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="31--scenarios">31 — Scenarios</h1>
+
+<p>A scenario is a world plus a set of overrides (CFG-02), seeds, a length, a brain
+and a list of expectations. Scenarios serve three purposes: regression tests
+(T2–T4, <a href="30-tests.html">30</a>), lab activities, and evidence that the system bends in
+the directions the owner asked for (any number of species, hide versus flee,
+number genes, asynchronous mutation, runtime species).</p>
+<p>Expectations are of three kinds:</p>
+<ul>
+<li><strong>Invariants</strong>: always checked (30 §5); any violation fails.</li>
+<li><strong>Exact</strong>: reproducibility facts (same hash twice, zero model calls on replay).</li>
+<li><strong>Directional</strong>: &quot;A has fewer kills than B in at least 4 of 5 seeds&quot;. Never a
+precise population number, which would break at every retuning.</li>
+</ul>
+<h2 id="1-scenario-asset">1. Scenario asset</h2>
+<pre><code class="lang-yaml"># Scenarios/S06_HideVsFlee.asset (shown as YAML)
+name: S06 Hide versus flee
+scene: Scenes/Lab1_Full
+variants:
+  hide-and-flee:  {}                                                       # the reference prey
+  flee-only:      { remove: [prey/Actions/hide, prey/Senses/Cover] }
+  prototype:      { remove: [prey/Actions/hide, prey/Senses/Cover],
+                    set: { prey/Actions/flee/FleeAction/fleeIntoCover: true } }
+seeds: [1234, 7, 42, 99, 2026]
+ticks: 5000
+brain: JEV                                   # answers cached locally; a scripted policy in T3
+expect:
+  - invariants
+  - deterministic                              # each variant and seed twice → same hash
+  - &quot;kills(hide-and-flee) &lt; kills(flee-only) in &gt;= 4/5 seeds&quot;
+  - &quot;share(prey, hide) &gt; 0.02 in hide-and-flee&quot;
+tier: T4
+</code></pre>
+<p>The scenario runner window (<a href="21-editor-tooling.html">21</a>) and the batch-mode entry
+point <code>EvoSim.Batch.RunScenario</code> both read these assets.</p>
+<h2 id="2-the-scenario-matrix">2. The scenario matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Id</th>
+<th>Scenario</th>
+<th>Varies</th>
+<th>Brain</th>
+<th>Tier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S00</td>
+<td>Empty world</td>
+<td>no species</td>
+<td>—</td>
+<td>T2</td>
+</tr>
+<tr>
+<td>S01</td>
+<td>Lone grazer</td>
+<td>1 species, food only</td>
+<td>scripted</td>
+<td>T2</td>
+</tr>
+<tr>
+<td>S02</td>
+<td>Lab 1 reference (full)</td>
+<td>the reference ecology</td>
+<td>JEV</td>
+<td>T4</td>
+</tr>
+<tr>
+<td>S03</td>
+<td>Lab 1 small</td>
+<td>48 × 48</td>
+<td>random (T2), JEV (T4)</td>
+<td>T2 / T4</td>
+</tr>
+<tr>
+<td>S04</td>
+<td>Null brain</td>
+<td>random brain against S02</td>
+<td>random</td>
+<td>T4</td>
+</tr>
+<tr>
+<td>S05</td>
+<td>Controls</td>
+<td>C2, C3, C4, C7</td>
+<td>random</td>
+<td>T2</td>
+</tr>
+<tr>
+<td>S06</td>
+<td>Hide versus flee</td>
+<td>actions, senses, genes</td>
+<td>scripted, then JEV</td>
+<td>T3 / T4</td>
+</tr>
+<tr>
+<td>S07</td>
+<td>No cover</td>
+<td>environment module removed</td>
+<td>JEV</td>
+<td>T4</td>
+</tr>
+<tr>
+<td>S08</td>
+<td>Cannibals</td>
+<td>diet includes own species</td>
+<td>scripted</td>
+<td>T2</td>
+</tr>
+<tr>
+<td>S09</td>
+<td>Food chain of three</td>
+<td>3 species, multiple threats</td>
+<td>scripted, then JEV</td>
+<td>T3 / T4</td>
+</tr>
+<tr>
+<td>S10</td>
+<td>Six-species web</td>
+<td>6 species, a pure scavenger</td>
+<td>scripted, then JEV</td>
+<td>T3 / T4</td>
+</tr>
+<tr>
+<td>S11</td>
+<td>A species added during a run</td>
+<td><code>World.AddSpecies</code> at a given tick</td>
+<td>random</td>
+<td>T2</td>
+</tr>
+<tr>
+<td>S12</td>
+<td>Number genes</td>
+<td>stamina gene with and without a cost</td>
+<td>JEV</td>
+<td>T4</td>
+</tr>
+<tr>
+<td>S13</td>
+<td>Mutation operators</td>
+<td>LLM deck, intensity ladder, none</td>
+<td>fake mutator, then real</td>
+<td>T2 / T4</td>
+</tr>
+<tr>
+<td>S14</td>
+<td>Eggs and slow mutators</td>
+<td>incubation × mutator delay</td>
+<td>random + fake mutator</td>
+<td>T2</td>
+</tr>
+<tr>
+<td>S15</td>
+<td>Observation wording</td>
+<td>V1 / V2</td>
+<td>LLM</td>
+<td>T4</td>
+</tr>
+<tr>
+<td>S16</td>
+<td>Water and thirst</td>
+<td>new stat, sense, action, gene</td>
+<td>scripted, then JEV</td>
+<td>T3 / T4</td>
+</tr>
+<tr>
+<td>S17</td>
+<td>Terrain and locomotion</td>
+<td>ground module, locomotion subclasses</td>
+<td>scripted</td>
+<td>T3</td>
+</tr>
+<tr>
+<td>S18</td>
+<td>Moving carcasses</td>
+<td>an entity that moves</td>
+<td>scripted</td>
+<td>T2</td>
+</tr>
+<tr>
+<td>S19</td>
+<td>Act orders</td>
+<td>species in turn, all mixed, simultaneous</td>
+<td>random (T3), JEV (T4)</td>
+<td>T3 / T4</td>
+</tr>
+<tr>
+<td>S20</td>
+<td>Cap rules</td>
+<td>migrate, block</td>
+<td>JEV</td>
+<td>T4</td>
+</tr>
+<tr>
+<td>S21</td>
+<td>Brain failure</td>
+<td>dead host, strict and not</td>
+<td>fake transport</td>
+<td>T2</td>
+</tr>
+<tr>
+<td>S22</td>
+<td>Resume by replay</td>
+<td>stop and rerun</td>
+<td>fakes, then JEV</td>
+<td>T2 / T4</td>
+</tr>
+<tr>
+<td>S23</td>
+<td>Scale</td>
+<td>2 000 animals</td>
+<td>random</td>
+<td>T3</td>
+</tr>
+<tr>
+<td>S24</td>
+<td>Camera sense</td>
+<td>attachments</td>
+<td>fake image brain</td>
+<td>T2</td>
+</tr>
+<tr>
+<td>S25</td>
+<td>Decision timing</td>
+<td>period 1 / 4 / 8, staggered</td>
+<td>random</td>
+<td>T2</td>
+</tr>
+<tr>
+<td>S26</td>
+<td>Names in genes</td>
+<td>a species renamed</td>
+<td>LLM</td>
+<td>T4</td>
+</tr>
+<tr>
+<td>S27</td>
+<td>Lab 1 with an LLM</td>
+<td>JEV and Ollama, short run</td>
+<td>JEV, gemma</td>
+<td>T4</td>
+</tr>
+<tr>
+<td>S28</td>
+<td>Egg eaters</td>
+<td>eggs made edible by components</td>
+<td>scripted, then JEV</td>
+<td>T2 / T4</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-scenarios-in-detail">3. Scenarios in detail</h2>
+<h3 id="s00-empty-world">S00 Empty world</h3>
+<p>A world with ground, environment and phases, no species. <strong>Expect</strong>: 1 000 ticks
+without error; food regrows to saturation; no events but none required.</p>
+<h3 id="s01-lone-grazer">S01 Lone grazer</h3>
+<p>One species (eat, rest, mate; energy, stamina; food layer), no hunters, with a
+scripted policy (eat when food is in sight, mate when a ready partner is,
+otherwise rest). <strong>Expect</strong>: population reaches the cap within 3 000 ticks in 5/5 seeds; deaths
+only by starvation, old age or migration; food count settles (its mean over
+ticks 2 000–3 000 varies by less than 20 % between halves).</p>
+<h3 id="s02-lab-1-reference">S02 Lab 1 reference</h3>
+<p>The reference ecology of <a href="04-species-and-food-web.html#5-reference-the-lab-1-ecology">04 §5</a>:
+<code>prey</code> (eat, flee, hide, follow, rest, mate; a cover sense; <em>flee into cover</em>
+off), <code>predator</code> (hunt, follow, rest, mate), the prototype's parameters, hungry
+cover, carcasses, litters, migration, no incubation, 192 × 192, JEV for both
+species. <strong>Expect</strong> (T4): R-02 ranges; no newcomer in 10 000 ticks (R-03); prey
+deaths split between killed, starved and migrated, none of them above 70 % of
+the total. Its random-brain twin gives the R-01 pinned hashes (T3).</p>
+<h3 id="s03-lab-1-small">S03 Lab 1 small</h3>
+<p>S02 at 48 × 48 with the small populations. <strong>Expect</strong> with the random brain (T2):
+invariants and reproducibility, the smoke test of the whole system; with JEV
+(T4): as S02, faster.</p>
+<h3 id="s04-null-brain">S04 Null brain</h3>
+<p>S02 with the random brain for both species. <strong>Expect</strong>: predators need newcomers
+(their floor) in 5/5 seeds, unlike S02; prey populations not lower than in S02.
+Shows that behaviour, not the world alone, keeps hunters alive.</p>
+<h3 id="s05-controls">S05 Controls</h3>
+<p>S03 with the random brain, four times: C2 (no mutation: the number of alleles stays at the founders'),
+C3 (shuffled: queries carry other animals' genes), C4 (random founders: founders
+use control sentences), C7 (asexual: one parent per birth). <strong>Expect</strong>: each
+control's defining fact, and every run reproducible.</p>
+<h3 id="s06-hide-versus-flee">S06 Hide versus flee</h3>
+<p>The owner's competition between running and hiding, three prey variants (see
+the asset above). <strong>Expect</strong> with a scripted policy that hides when a threat is
+close and cover is near (T3, the mechanics): fewer kills with hide than
+flee-only in ≥ 4/5 seeds. With JEV (T4, the behaviour): hide chosen mostly when
+a threat is close and cover is in sight; the hide gene's contrast pair moves P(hide) the right
+way (G1 on the new locus), and over a long run the hide and flee genes'
+frequencies are reported by the gene pool tools.</p>
+<h3 id="s07-no-cover">S07 No cover</h3>
+<p>S02 without the cover module, the hide action and the cover sense. <strong>Expect</strong>:
+validation reports no error (all three removed together); more prey killed than in S02 in
+≥ 4/5 seeds.</p>
+<h3 id="s08-cannibals">S08 Cannibals</h3>
+<p>One species that grazes and also strikes its own kin (<code>kill chance</code> 0.1).
+<strong>Expect</strong>: an animal never targets itself; killed animals have killers of the
+same species; the flee action's threat set contains the species itself.</p>
+<h3 id="s09-food-chain-of-three">S09 Food chain of three</h3>
+<p>Rabbit (grazes), fox (strikes rabbits), wolf (strikes foxes and rabbits).
+<strong>Expect</strong>: derived threats Rabbit {Fox, Wolf}, Fox {Wolf}, Wolf {}; the rabbit's
+threat sense reports the nearer of a fox and a wolf; prompts and situation texts
+name the species; 5 000 ticks without error. Survival of all three is reported,
+not required.</p>
+<h3 id="s10-six-species-web">S10 Six-species web</h3>
+<p>Two grazers, two mid hunters, one apex hunter, one pure scavenger (scavenge only).
+<strong>Expect</strong>: one batch per brain per tick; the scavenger lives only on carcasses
+(its meals are all portions); the food web window shows every edge; tick time
+within twice S02's.</p>
+<h3 id="s11-a-species-added-during-a-run">S11 A species added during a run</h3>
+<p>S03 with a test script that calls <code>World.AddSpecies</code> at tick 1 000, moving the
+prey of the west half into a new species cloned from the prey (deciding <em>when</em>
+to split, speciation, is left for later). <strong>Expect</strong>: a <code>species_created</code> event; the new species has a new
+id, its own cap, floor and streams; it is hunted by the predators (inherited
+relation); events of other species before tick 1 000 are unchanged.</p>
+<h3 id="s12-number-genes">S12 Number genes</h3>
+<p>S03 with a stamina gene (founders 45 / 60 / 75, Gaussian σ 5, range 20–120) in two
+variants: no cost, and a base cost that grows with maximum stamina. <strong>Expect</strong>:
+without the cost, mean <code>stamina.max</code> rises toward the upper bound in ≥ 4/5 seeds;
+with the cost, it ends below the no-cost value in ≥ 4/5 seeds. Teaches why number
+genes need trade-offs.</p>
+<h3 id="s13-mutation-operators">S13 Mutation operators</h3>
+<p>S03 with three operators for text genes: the LLM deck (a <code>FakeMutator</code> that makes
+a scripted small edit in T2, the real mutator in T4), the intensity ladder, none.
+<strong>Expect</strong> (T2): mutant counts follow the rate; the ladder only changes intensity
+words; &quot;none&quot; adds no allele. <strong>Expect</strong> (T4): rejection rates by reason are
+recorded; on 100 mutated founder sentences, the judge prompt
+(<a href="32-integrity-prompts-and-ci.html#2-brain-and-mutator-integrity-checks">32 §2</a>)
+finds at least 80 % still usable rules after one mutation.</p>
+<h3 id="s14-eggs-and-slow-mutators">S14 Eggs and slow mutators</h3>
+<p>S03 with incubation 0 (the reference), 3 and 10, and a <code>FakeMutator</code> answering
+after 0, 2 or 5 <code>Advance</code> calls. <strong>Expect</strong>: for one incubation value, the same hash whatever the
+delay; with incubation ≥ the delay, the world never waits on the mutator (wait
+counter 0); with incubation 0, it waits at each birth tick.</p>
+<h3 id="s15-observation-wording">S15 Observation wording</h3>
+<p>The gate's observation set with V1 and V2 (distances in meters). <strong>Expect</strong>
+(T4): G1 holds in both; differences in action shares between V1 and V2
+are reported (Lab activity F).</p>
+<h3 id="s16-water-and-thirst">S16 Water and thirst</h3>
+<p>Terrain preview with lakes; the prey get the thirst stat, the water sense, the
+drink action and its gene (the recipes of <a href="22-extending-recipes.html">22</a>).
+<strong>Expect</strong>: deaths by thirst occur when drink is removed and almost vanish
+(fewer than 10 % of deaths) with it, with a scripted policy (T3); with JEV (T4),
+drink is chosen mostly when thirst is high.</p>
+<h3 id="s17-terrain-and-locomotion">S17 Terrain and locomotion</h3>
+<p>Terrain preview (15 % water, 10 % mountains) with the kinematic locomotion for
+both species, then a slope locomotion (<a href="22-extending-recipes.html#14-a-locomotion-slopes-cost-more">22 §14</a>)
+for the predator only, then (once written) a NavMesh locomotion. <strong>Expect</strong>:
+invariants (no animal on water or mountain); with slopes, the predator never
+climbs past its limit and pays more energy on hills; with the NavMesh, fewer
+hunts end in &quot;stuck&quot; sidesteps; all deterministic on one machine.</p>
+<h3 id="s18-moving-carcasses">S18 Moving carcasses</h3>
+<p>Hunters get a &quot;drag&quot; action that moves a carcass 1 m per tick toward cover.
+<strong>Expect</strong>: carcass positions change only in the act and environment phases;
+scavengers' carcass sense follows the moved carcass; the view follows.</p>
+<h3 id="s19-act-orders">S19 Act orders</h3>
+<p>S02 with each act order. <strong>Expect</strong>: each reproducible; with &quot;species in turn&quot;
+the R-02 ranges hold; the other two are reported side by side (kills, food
+contention), not judged.</p>
+<h3 id="s20-cap-rules">S20 Cap rules</h3>
+<p>S02 with migrate and block. <strong>Expect</strong>: with block, populations sit at the cap
+and generations per 1 000 ticks are fewer than with migrate in ≥ 4/5 seeds (the
+prototype's history).</p>
+<h3 id="s21-brain-failure">S21 Brain failure</h3>
+<p>An HTTP brain with a fake transport that fails after tick 100. <strong>Expect</strong>: strict
+→ the run stops cleanly at tick 100 with every file written and <code>summary.json</code>
+saying why; non-strict → it goes on with uniform answers, failures counted, none
+cached.</p>
+<h3 id="s22-resume-by-replay">S22 Resume by replay</h3>
+<p>S03 stopped at tick 300 by a stop file, then run again. <strong>Expect</strong>: the first 300
+ticks replay with 0 model calls (fakes in T2; JEV in T4) and the same events.</p>
+<h3 id="s23-scale">S23 Scale</h3>
+<p>S02 with caps × 6 (about 2 000 animals). <strong>Expect</strong>: tick time under 12 ms with
+the random brain (the brain's own time excluded); memo hit rate reported; no allocation per tick in the act phase.</p>
+<h3 id="s24-camera-sense">S24 Camera sense</h3>
+<p>A species with a camera sense (64 × 64 image) and a fake brain that accepts
+images. <strong>Expect</strong>: attachments reach the brain; those queries are never memoised;
+with a brain that doesn't accept images, validation fails (V-51).</p>
+<h3 id="s25-decision-timing">S25 Decision timing</h3>
+<p>S03 with decision period 1, 4, 8 and with staggering. <strong>Expect</strong>: brain queries per
+tick follow the period; with staggering, the largest batch is below half the
+unstaggered one.</p>
+<h3 id="s26-names-in-genes">S26 Names in genes</h3>
+<p>The predator species named &quot;wolf&quot; in one run and &quot;shadow&quot; in another, its
+threat-sense label following the name, with the prey gene &quot;Run from any wolf you
+see.&quot;. <strong>Expect</strong> (T4, LLM): P(flee) when a &quot;shadow&quot; is close is lower than when
+a &quot;wolf&quot; is; the editor flags the gene
+(V-23). Shows that names are part of what the brain reads.</p>
+<h3 id="s27-lab-1-with-an-llm">S27 Lab 1 with an LLM</h3>
+<p>S02 for 500 ticks with JEV for both species (and with gemma4:12b on S03).
+<strong>Expect</strong> (T4): no failed call; queries per tick, memo hit rate and time per
+tick recorded and compared with the prototype's (JEV ≈ 2.8 s per tick in the
+full world); no species needs newcomers.</p>
+<h3 id="s28-egg-eaters">S28 Egg eaters</h3>
+<p>S03 with incubation 20, an <code>Edible</code> on the egg kind and a third species whose
+diet is <code>egg:prey</code> (<a href="22-extending-recipes.html#15-food-make-eggs-edible">22 §15</a>).
+<strong>Expect</strong> (T2, scripted egg eaters): eaten eggs never hatch and are recorded as
+lost; without the <code>Edible</code>, V-24 fires and no egg is eaten. With JEV (T4): the
+prey's births drop compared with S03 at incubation 20 without egg eaters.</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

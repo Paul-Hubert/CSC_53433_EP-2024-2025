@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class VisualPlayerBuild | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class VisualPlayerBuild | EvoSim ">
+      
+      <meta name="description" content="Builds a Windows player that draws a run (07 real-time test): Windows 64-bit, Mono, the reference scenes (HideVsFlee first) given here, not in the Build Settings, into Builds/EvoSim/&amp;lt;date&amp;gt;/EvoSim.exe. Project and Player settings are left as they are. Batch: -executeMethod EvoSim.Editor.VisualPlayerBuild.BuildFromCommandLine [-scenes HideVsFlee,Lab1_Full] [-out folder]. Run it: EvoSim.exe -scene HideVsFlee -seed 1234 -ticks 600 -speed 5 -brain JEV -capture 10 -quitAtEnd -screen-fullscreen 0 -logFile player.log (PlayerArgs).">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_Editor_VisualPlayerBuild.md&amp;value=---%0Auid%3A%20EvoSim.Editor.VisualPlayerBuild%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.Editor.VisualPlayerBuild">
+
+
+
+  <h1 id="EvoSim_Editor_VisualPlayerBuild" data-uid="EvoSim.Editor.VisualPlayerBuild" class="text-break">
+Class VisualPlayerBuild  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/VisualPlayerBuild.cs/#L26"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a>.<a class="xref" href="EvoSim.Editor.html">Editor</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Editor.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Builds a Windows player that draws a run (07 real-time test): Windows 64-bit, Mono, the reference scenes
+(HideVsFlee first) given here, not in the Build Settings, into Builds/EvoSim/&lt;date&gt;/EvoSim.exe. Project and
+Player settings are left as they are. Batch: -executeMethod EvoSim.Editor.VisualPlayerBuild.BuildFromCommandLine
+[-scenes HideVsFlee,Lab1_Full] [-out folder]. Run it: EvoSim.exe -scene HideVsFlee -seed 1234 -ticks 600
+-speed 5 -brain JEV -capture 10 -quitAtEnd -screen-fullscreen 0 -logFile player.log (PlayerArgs).</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class VisualPlayerBuild</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">VisualPlayerBuild</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="EvoSim_Editor_VisualPlayerBuild_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>From the menu: <code>EvoSim ▸ Build ▸ Visual Player</code> (a dialog shows the result). Batch, editor closed:
+<code>Unity.exe -batchmode -nographics -projectPath . -executeMethod EvoSim.Editor.VisualPlayerBuild.BuildFromCommandLine
+[-scenes HideVsFlee,Lab1_Full] [-out Builds/EvoSim/2026-10-11]</code>. From the open editor with the unity CLI:
+<a class="xref" href="EvoSim.Editor.VisualPlayerBuild.html#EvoSim_Editor_VisualPlayerBuild_BuildLater_System_String_System_String_">BuildLater(string, string)</a>, or <a class="xref" href="EvoSim.Editor.VisualPlayerBuild.html#EvoSim_Editor_VisualPlayerBuild_CompilePlayerScriptsLater">CompilePlayerScriptsLater()</a> to check that the player scripts compile.</p>
+<p>The Standalone scripting backend must be Mono: the build refuses otherwise rather than change Player settings
+(RAND-12 compares Mono runs). The player writes its run files and captures next to the exe, under
+<code>Logs/EvoSim/</code>, and keeps its answer cache in <code>Library/EvoSim/AnswerCache</code>.</p>
+</div>
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="EvoSim_Editor_VisualPlayerBuild_DefaultScenes" data-uid="EvoSim.Editor.VisualPlayerBuild.DefaultScenes">
+  DefaultScenes
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/VisualPlayerBuild.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The reference scenes in the build, by name in <a class="xref" href="EvoSim.Editor.ReferenceScenes.html#EvoSim_Editor_ReferenceScenes_ScenesFolder">ScenesFolder</a>; the first is the player's
+start scene.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly string[] DefaultScenes</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_Editor_VisualPlayerBuild_Build_" data-uid="EvoSim.Editor.VisualPlayerBuild.Build*"></a>
+
+  <h3 id="EvoSim_Editor_VisualPlayerBuild_Build_System_Collections_Generic_IEnumerable_System_String__System_String_" data-uid="EvoSim.Editor.VisualPlayerBuild.Build(System.Collections.Generic.IEnumerable{System.String},System.String)">
+  Build(IEnumerable&lt;string&gt;, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/VisualPlayerBuild.cs/#L128"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Builds the player; returns &quot;Succeeded: …&quot; or &quot;Failed: …&quot;.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string Build(IEnumerable&lt;string&gt; sceneNames, string folder)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>sceneNames</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd><p>Scene names in <a class="xref" href="EvoSim.Editor.ReferenceScenes.html#EvoSim_Editor_ReferenceScenes_ScenesFolder">ScenesFolder</a>, without <code>.unity</code>; the first
+is the player's default scene.</p>
+</dd>
+    <dt><code>folder</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The output folder, relative to the project or absolute; <code>EvoSim.exe</code> is written in it.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The build result with the exe's full path, scene count, size (MB), time (s), errors and warnings; or
+<code>Failed: …</code> when a scene is missing or the scripting backend isn't Mono.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Editor_VisualPlayerBuild_BuildFromCommandLine_" data-uid="EvoSim.Editor.VisualPlayerBuild.BuildFromCommandLine*"></a>
+
+  <h3 id="EvoSim_Editor_VisualPlayerBuild_BuildFromCommandLine" data-uid="EvoSim.Editor.VisualPlayerBuild.BuildFromCommandLine">
+  BuildFromCommandLine()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/VisualPlayerBuild.cs/#L52"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The -executeMethod entry point; exits with 0 when the build succeeded.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void BuildFromCommandLine()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_Editor_VisualPlayerBuild_BuildFromCommandLine_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p><code>Unity.exe -batchmode -nographics -projectPath . -executeMethod EvoSim.Editor.VisualPlayerBuild.BuildFromCommandLine
+[-scenes A,B] [-out folder]</code>: <code>-scenes</code> lists scene names of <a class="xref" href="EvoSim.Editor.ReferenceScenes.html#EvoSim_Editor_ReferenceScenes_ScenesFolder">ScenesFolder</a>
+(default <a class="xref" href="EvoSim.Editor.VisualPlayerBuild.html#EvoSim_Editor_VisualPlayerBuild_DefaultScenes">DefaultScenes</a>), <code>-out</code> the output folder (default <a class="xref" href="EvoSim.Editor.VisualPlayerBuild.html#EvoSim_Editor_VisualPlayerBuild_DefaultFolder">DefaultFolder()</a>). The
+result line is logged as <code>EvoSim visual player: …</code>; exit code 1 on failure.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_Editor_VisualPlayerBuild_BuildFromMenu_" data-uid="EvoSim.Editor.VisualPlayerBuild.BuildFromMenu*"></a>
+
+  <h3 id="EvoSim_Editor_VisualPlayerBuild_BuildFromMenu" data-uid="EvoSim.Editor.VisualPlayerBuild.BuildFromMenu">
+  BuildFromMenu()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/VisualPlayerBuild.cs/#L38"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p><code>EvoSim ▸ Build ▸ Visual Player</code>: builds the player with the six default scenes into today's folder,
+<code>Builds/EvoSim/&lt;yyyy-MM-dd&gt;/EvoSim.exe</code>, and shows the result in a dialog.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[MenuItem(&quot;EvoSim/Build/Visual Player&quot;)]
+public static void BuildFromMenu()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Editor_VisualPlayerBuild_BuildLater_" data-uid="EvoSim.Editor.VisualPlayerBuild.BuildLater*"></a>
+
+  <h3 id="EvoSim_Editor_VisualPlayerBuild_BuildLater_System_String_System_String_" data-uid="EvoSim.Editor.VisualPlayerBuild.BuildLater(System.String,System.String)">
+  BuildLater(string, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/VisualPlayerBuild.cs/#L75"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>For the unity CLI's eval in the open editor: starts the build after the call returns (a long synchronous call
+outlives the pipeline's timer) and writes the result to Logs/EvoSim/visual-player-build.txt.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string BuildLater(string sceneList = null, string folder = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>sceneList</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>Comma-separated scene names, or null for <a class="xref" href="EvoSim.Editor.VisualPlayerBuild.html#EvoSim_Editor_VisualPlayerBuild_DefaultScenes">DefaultScenes</a>.</p>
+</dd>
+    <dt><code>folder</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The output folder, or null for <a class="xref" href="EvoSim.Editor.VisualPlayerBuild.html#EvoSim_Editor_VisualPlayerBuild_DefaultFolder">DefaultFolder()</a>.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>A line saying the build is scheduled and where its result will be written.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_Editor_VisualPlayerBuild_BuildLater_System_String_System_String__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p><code>unity command --result-only eval --code 'return EvoSim.Editor.VisualPlayerBuild.BuildLater();'</code>, then read the
+result file: it says <code>building</code> until the build ends.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_Editor_VisualPlayerBuild_CompilePlayerScriptsLater_" data-uid="EvoSim.Editor.VisualPlayerBuild.CompilePlayerScriptsLater*"></a>
+
+  <h3 id="EvoSim_Editor_VisualPlayerBuild_CompilePlayerScriptsLater" data-uid="EvoSim.Editor.VisualPlayerBuild.CompilePlayerScriptsLater">
+  CompilePlayerScriptsLater()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/VisualPlayerBuild.cs/#L98"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>For the unity CLI: compiles every script of the project for the Windows player, without building, after the call
+returns; the result goes to Logs/EvoSim/player-scripts.txt, the compiler's errors to the console.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string CompilePlayerScriptsLater()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>A line saying the compilation is scheduled and where its result will be written.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_Editor_VisualPlayerBuild_CompilePlayerScriptsLater_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>A quick check that no editor-only code leaked into the runtime assemblies (EDIT-03); the compiled
+assemblies go to <code>Temp/EvoSimPlayerScripts</code>.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_Editor_VisualPlayerBuild_DefaultFolder_" data-uid="EvoSim.Editor.VisualPlayerBuild.DefaultFolder*"></a>
+
+  <h3 id="EvoSim_Editor_VisualPlayerBuild_DefaultFolder" data-uid="EvoSim.Editor.VisualPlayerBuild.DefaultFolder">
+  DefaultFolder()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/VisualPlayerBuild.cs/#L62"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Today's build folder, relative to the project: <code>Builds/EvoSim/&lt;yyyy-MM-dd&gt;</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string DefaultFolder()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The folder path; a second build on the same day replaces the first.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

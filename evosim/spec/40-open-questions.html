@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>40 — Open questions | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="40 — Open questions | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/40-open-questions.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="40--open-questions">40 — Open questions</h1>
+
+<p>The questions of the first draft were answered by the owner on 2026-10-09 and
+2026-10-10 (the README's second- and third-round tables list every decision). This page keeps what those
+answers settled, where it landed in the documents, and what is still open or
+deferred.</p>
+<h2 id="1-settled-in-the-second-round">1. Settled in the second round</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Decision</th>
+<th>Now in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reference values in continuous space</td>
+<td>the prototype's values unchanged; Euclidean distances, straight-line movement; the first accepted Unity runs become the new reference numbers</td>
+<td>README, 02, 07, 14, 30 R-02</td>
+</tr>
+<tr>
+<td>Speed</td>
+<td>set per species, on its locomotion component</td>
+<td>07 MOVE-03, 20 §3.7</td>
+</tr>
+<tr>
+<td>Unit word in texts</td>
+<td>&quot;meters&quot;</td>
+<td>06 SENSE-12/13, 08 §7</td>
+</tr>
+<tr>
+<td>Prompts</td>
+<td>the answer instruction is hard-coded in each brain; header, action lines and rule lines are inspector fields</td>
+<td>08 PROMPT-07</td>
+</tr>
+<tr>
+<td>Observation wording</td>
+<td>in each sense's code; labels and thresholds in the inspector</td>
+<td>06 SENSE-10</td>
+</tr>
+<tr>
+<td>Act order</td>
+<td>species in turn by default; simultaneous: random winner</td>
+<td>07 ACT-30</td>
+</tr>
+<tr>
+<td>Breeding</td>
+<td>its own phase, after the act phase</td>
+<td>12 TICK-06</td>
+</tr>
+<tr>
+<td>Eggs</td>
+<td>no incubation by default; a few ticks may hide the mutator's latency</td>
+<td>10 MUT-33, 11 REPRO-21</td>
+</tr>
+<tr>
+<td>Number genes</td>
+<td>none in the reference; traits keep the prototype's values</td>
+<td>05 §3, 09</td>
+</tr>
+<tr>
+<td>Species names</td>
+<td><code>prey</code> and <code>predator</code></td>
+<td>04 §5, 20 §2</td>
+</tr>
+<tr>
+<td>Cannibals</td>
+<td>flee from their own kind; &quot;is a cannibal chasing me?&quot; is a student sense</td>
+<td>04 SPEC-11, 22 §13</td>
+</tr>
+<tr>
+<td>Hide and flee</td>
+<td>separate actions, genes and senses</td>
+<td>03, 04 §5, 07 §4, 08 §6</td>
+</tr>
+<tr>
+<td>G2</td>
+<td>stays a gate, tracked rather than blocking</td>
+<td>15 §3, 32 §2</td>
+</tr>
+<tr>
+<td>Neutral gene, founder pools, caps</td>
+<td>configured on their components</td>
+<td>09 GENE-24, 10 MUT-22, 11</td>
+</tr>
+<tr>
+<td>Platform and teaching</td>
+<td>Unity; reference modules written like student modules; students reimplement them first, then invent</td>
+<td>20 ARCH-11, 22 §0, 30 §4</td>
+</tr>
+<tr>
+<td>Real time</td>
+<td>not by default</td>
+<td>02 SPACE-15</td>
+</tr>
+<tr>
+<td>Physics</td>
+<td>kinematic by default; an action gives only a direction and the locomotion decides</td>
+<td>07 §2, 20 §3.7</td>
+</tr>
+<tr>
+<td>Floating-point determinism</td>
+<td>per machine only</td>
+<td>12 RAND-12, 30 R-04, 32</td>
+</tr>
+<tr>
+<td>Answer cache</td>
+<td>a local JSON file</td>
+<td>14, 20 §3.11</td>
+</tr>
+<tr>
+<td>Python golden fixtures</td>
+<td>dropped</td>
+<td>30 (R-08 removed, snapshots pinned from Unity runs instead)</td>
+</tr>
+<tr>
+<td>Unity version</td>
+<td>the owner moves the project to 6000.3 before starting</td>
+<td>README, 20 ARCH-10</td>
+</tr>
+<tr>
+<td>CI hardware</td>
+<td>the owner's machine as a self-hosted runner</td>
+<td>32 §1, §4</td>
+</tr>
+<tr>
+<td>Default brain, where things run (3rd round)</td>
+<td>all local on the owner's computer; JEV is the default brain</td>
+<td>README, 14, 20 §2</td>
+</tr>
+<tr>
+<td>Keyword brain (3rd round)</td>
+<td>not part of the Unity system; documented as the prototype's brain and a student exercise; fast tests use the random brain and a test-only scripted brain</td>
+<td>06 SENSE-50, 08 §6, 22 §7, 30, 31</td>
+</tr>
+<tr>
+<td>Edibility (3rd round)</td>
+<td>by components: an edible component on what can be eaten, a diet on the eater; eggs not edible until a student adds one</td>
+<td>03 ENV-23, 04 SPEC-10/15, 11 REPRO-23, 20 §3.12, 22 §15</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-still-open">2. Still open</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Question</th>
+<th>Default until decided</th>
+<th>Affects</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Founder pools</strong> (H1), including the new draft hide sentences (&quot;Hide when a predator is close.&quot;, &quot;Stay in cover when danger is near.&quot;, &quot;Hide only when you are tired.&quot;, &quot;Leave cover to find food when hungry.&quot;) and the hide contrast pair</td>
+<td>use them as they are</td>
+<td>09</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Situation texts V1/V2 of both species (Tests/Golden/situations.tsv), pinned from the first Unity run</td>
+<td>as pinned</td>
+<td>06, T-SENSE-08</td>
+</tr>
+<tr>
+<td>3</td>
+<td>JEV's question line: one per species, the prototype's (&quot;Which action does this predator take now?&quot; for predators) where 08 §6 shows one line</td>
+<td>per species, as the prototype</td>
+<td>08 §6</td>
+</tr>
+<tr>
+<td>4</td>
+<td>JEV requests: one /v1/completions per batch and option count with the list of texts (64 per request at most), where the prototype sent one per text</td>
+<td>batched</td>
+<td>08 §6, DEC-15</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Client back-off (DEC-42): waits of 1 and 2 s between 3 tries, none after the last</td>
+<td>as implemented</td>
+<td>08 §5</td>
+</tr>
+<tr>
+<td>6</td>
+<td>The kill cause is &quot;killed&quot; in Unity events; the compatibility mode writes the prototype's &quot;predator&quot;</td>
+<td>&quot;killed&quot;</td>
+<td>05, 13</td>
+</tr>
+<tr>
+<td>7</td>
+<td>A new world from the menu (21 §6) has the random brain as default (JEV present, one click away), so it runs without a server</td>
+<td>random</td>
+<td>21 §6</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Scenario T2 variants (S03 default) run with C2 (no mutation) so they make no model call; mutation is covered by the fake-mutator tests and R-01</td>
+<td>C2 in T2</td>
+<td>31</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Integrity reports go to Logs/EvoSim/Reports (gitignored), where 32 §4 says Reports/</td>
+<td>Logs/EvoSim/Reports</td>
+<td>32 §4</td>
+</tr>
+<tr>
+<td>11</td>
+<td>The decision memo keeps at most 262 144 keys (World.memoCapacity, about 10 MB); beyond, queries go to the brain again (and to its answer cache), with the same answers (DEC-12) — so R-06's memory bound holds in long runs</td>
+<td>capacity 262 144</td>
+<td>08 DEC-30, 30 R-06</td>
+</tr>
+<tr>
+<td>12</td>
+<td>gene_timeline (prototype) draws its action chart from a fixed colour table without &quot;hide&quot;: a Unity run with the hide action fails at the HTML step; R-08 uses a prototype-shaped world</td>
+<td>prototype-shaped</td>
+<td>13 OUT-05, 30 R-08</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Teaching-path stubs for Stamina and Litter: other modules look them up by their concrete type, so an &quot;empty class of the same base class&quot; isn't found</td>
+<td>the stubs derive from the reference (MyStamina : Stamina, MyLitter : Litter) and override its now-virtual methods (Budget, Settle, Size)</td>
+<td>22 §0</td>
+</tr>
+<tr>
+<td>13</td>
+<td>B-10 (32 §2), judge gemma4:12b with the prototype's slot topics (&quot;hide&quot; added). <strong>Owner, 2026-10-10: a better mutator on the CPU</strong>: gemma4:26b (T 1.2) passes the guards on 97.5 % of first answers; 72.5 % usable after one mutation (gate 80 %), 62.5 % after ten (the prototype measured 50 %); qwen3.5:0.8b on the same run 90 % / 67.5 % / 17.5 %. The judge rates 92.5 % of the founders themselves usable (step 0, the baseline)</td>
+<td>gemma4:26b is the reference mutator; B-10 reported, not blocking: keep the 80 % bar, or set it relative to the founders' 92.5 %</td>
+<td>32 §2 B-10, 10</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Teaching-path grading (22 §0)</td>
+<td><strong>Owner, 2026-10-10: no grading.</strong> There is no criterion to reach: students can do whatever they want and should be able to make anything with the system. TeachingPathGradingTests is removed; the stubs and the menu stay as a way in. 22 §0 should read &quot;its unit tests and the conformance suite of its kind help the student&quot; instead of &quot;grade the student's version&quot;</td>
+<td>22 §0, 30 §4</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Contract wording the P1 audit asks for; the code already does this. OUT-02: <code>species_created</code> has no animal id (its <code>name</code> is the new id) and <code>egg_lost.id</code> is an egg's entity id, a counter of its own. GENE-12/MUT-03: <code>llm#n</code> counts the deck's lines from 0. SPEC-05: nesting is checked both ways. ANIM-31: the busy reason is &quot;kept on the animal's record and shown in the inspector&quot;, not logged. POP-01: litters are cut to cap − living at each conception, so several conceptions in one tick can overshoot the cap until the next deaths. RAND-20: an exception in a phase stops mid-tick; a strict mutator failure stops at the end of its tick. RAND-03: one <code>act-order</code> stream for all species, an exception to &quot;adding a species doesn't change the others' draws&quot; (per-species streams would change every pinned hash)</td>
+<td>as implemented</td>
+<td>04, 05, 09, 10, 11, 12, 13</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Validation codes added to 21 §2: V-15 W a world module under a species; V-16 E a World inside a World; V-17 E two senses of a species with the same label; V-18 E two layers or brains with the same name, or a reserved layer name (&quot;world&quot;, &quot;act-order&quot;, or containing &quot;/&quot;); V-26 W a missing companion module (a mating rule or metabolism without Energy, breeding without Litter or crossover, a module's <code>[RequiresModule]</code>), fix: add it; V-37 E a ground smaller than 1 × 1 m (fix: clamp) or a cover without noise octaves; V-38 W a stat or trait declared twice with different values; V-49 E an LLM mutation's context line on several lines or with a placeholder, fix: keep the first line; V-63 W an LLM mutation with a rate above 0 and no MutatorService, or a service without a client. Changed: V-07 also for an id that is another species' display name and for an id with &quot;.&quot;; V-09 also for Breed without Hatch and a recorder without a Record phase; V-35 also for the World's settings (an override bypasses the inspector's limits); V-36 checks every trait default against its range; V-60 only on demand (<em>Test connection</em>); V-61 scans every serialized string of the World's components</td>
+<td>as implemented</td>
+<td>21 §2</td>
+</tr>
+<tr>
+<td>17</td>
+<td>The open system's seams (owner 2026-10-10: students should be able to make anything): <code>OnBorn</code>/<code>OnDied</code> on species and world modules, <code>IStatsColumns</code>, <code>[RequiresModule]</code>, <code>Diet.KillChanceAgainst</code>/<code>EnergyFrom</code>, <code>InteractionContext.Feed</code>, <code>Brain.Memoizable</code> with <code>DecisionQuery.AnimalId</code>, several Cover services, <code>NearestEntity&lt;T&gt;</code>, <code>AnimalView.OnShow</code>, property placeholders and <code>{{ }}</code> escapes, <code>AnimalAction.Hunts</code>, <code>MutationOperator.UsesMutatorService</code> (51, M12.5). 20 §3 and 22 could list them</td>
+<td>as implemented</td>
+<td>20 §3, 22</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-deferred-by-the-owner-later">3. Deferred by the owner (&quot;later&quot;)</h2>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>What is ready for it now</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Speciation (when to split a species)</td>
+<td><code>World.AddSpecies</code> and the relation inheritance rules (SPEC-30/31), scenario S11</td>
+</tr>
+<tr>
+<td>Names of species created during a run</td>
+<td>species ids are never reused (SPEC-32)</td>
+</tr>
+<tr>
+<td>Camera senses</td>
+<td>the attachment rules (SENSE-40/41) and scenario S24 with a fake brain</td>
+</tr>
+<tr>
+<td>A real-time mode</td>
+<td>SPACE-15 keeps it outside the measurements</td>
+</tr>
+<tr>
+<td>Physics, slopes, NavMesh, learned locomotion</td>
+<td>the inheritable <code>Locomotion</code> base class (20 §3.7) and the slope recipe (22 §14)</td>
+</tr>
+<tr>
+<td>Directions and angles in observations</td>
+<td>senses are free to add tokens; the observation-space warning (V-50)</td>
+</tr>
+<tr>
+<td>Scale beyond a few hundred animals</td>
+<td>the seams of 20 §10</td>
+</tr>
+<tr>
+<td>A shared answer cache for a class</td>
+<td>the cache key (DEC-33) doesn't depend on where the file lives</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-rules-to-revisit-after-the-first-unity-runs">4. Rules to revisit after the first Unity runs</h2>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Why it may change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ACT-10 reaches (0.5 m graze, 1 m strike)</td>
+<td>continuous movement at 2 m per tick may need larger reaches to avoid near-misses</td>
+</tr>
+<tr>
+<td>REPRO-03 (nearest partner)</td>
+<td>the prototype took the first ready partner in its list; nearest may change breeding rates</td>
+</tr>
+<tr>
+<td>SENSE-05 threshold (100 000 situations)</td>
+<td>the memo's real hit rate with 29 160 prey situations</td>
+</tr>
+<tr>
+<td>R-02 ranges</td>
+<td>measured afresh on the first accepted runs</td>
+</tr>
+</tbody>
+</table>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

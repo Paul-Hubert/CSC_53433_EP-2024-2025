@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class IntegrityGates | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class IntegrityGates | EvoSim ">
+      
+      <meta name="description" content="The brain and mutator gates of 32 &#167;2 (B-02…B-10), measured as the prototype measured them (e1_sensitivity): genomes from texts (founders, control sentences, the neutral genome, contrast pairs, single edits) &#215; the reference situations (15 &#167;2), through the scene&#39;s real prompt and brain. Queries are built from texts only: nothing is registered in the world. Each writes a report (IntegrityReport).">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_IntegrityGates.md&amp;value=---%0Auid%3A%20EvoSim.IntegrityGates%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.IntegrityGates">
+
+
+
+  <h1 id="EvoSim_IntegrityGates" data-uid="EvoSim.IntegrityGates" class="text-break">
+Class IntegrityGates  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/IntegrityGates.cs/#L24"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Editor.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>The brain and mutator gates of 32 §2 (B-02…B-10), measured as the prototype measured them (e1_sensitivity):
+genomes from texts (founders, control sentences, the neutral genome, contrast pairs, single edits) × the
+reference situations (15 §2), through the scene's real prompt and brain. Queries are built from texts only:
+nothing is registered in the world. Each writes a report (IntegrityReport).</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class IntegrityGates</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">IntegrityGates</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="EvoSim_IntegrityGates_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Each gate opens the scene additively, makes the named brain the default with no mutation, initialises the world
+(for its species, prompts and texts), asks the brain directly, and writes its report under <code>Logs/EvoSim/Reports</code>.
+None is blocking: a failed gate is a finding to track (32 §2). Run them through <a class="xref" href="EvoSim.Integrity.html#EvoSim_Integrity_RunIntegrity">RunIntegrity()</a>
+(<code>-checks B-02,B-03…</code>) or <a class="xref" href="EvoSim.Integrity.html#EvoSim_Integrity_RunNamed_System_String_System_String_System_String_System_Boolean_">RunNamed(string, string, string, bool)</a>.</p>
+<p>The reference situations come from <code>Data/Observations/prey_observations_v2.jsonl</code> for prey and from
+<code>ObservationSet.PredatorReference</code> for a species that senses prey.</p>
+</div>
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="EvoSim_IntegrityGates_JudgePrompt" data-uid="EvoSim.IntegrityGates.JudgePrompt">
+  JudgePrompt
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/IntegrityGates.cs/#L628"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The judge prompt of 32 §2 (the prototype's judge_sense_v1), used by B-10.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string JudgePrompt = &quot;Animals in a simulation act on short English rules called genes. Each gene sits in a slot. The slot \&quot;{slot}\&quot; is about {topic}.\n\nThe gene in the slot \&quot;{slot}\&quot; is: \&quot;{text}\&quot;\n\nDoes this gene still give the animal a usable rule about {topic}? A usable rule is understandable and could guide what the animal does, even if it is odd or unwise. Nonsense, or a sentence about something else, is not a usable rule.\n\nAnswer yes or no.&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_IntegrityGates_LocalityRatio" data-uid="EvoSim.IntegrityGates.LocalityRatio">
+  LocalityRatio
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/IntegrityGates.cs/#L31"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The pass thresholds of 32 §2: B-02 sign accuracy ≥ 0.85 (<code>SignAccuracy</code>) and mean ΔP ≥ 0.25 (<code>MeanDeltaP</code>);
+B-03 MI_G(founders) ≥ 2 × MI_G(random text) (<code>MiMargin</code>); B-04 locality ratio ≤ 0.5 (<code>LocalityRatio</code>) and
+Spearman ρ ≥ 0.3 (<code>Rho</code>).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const double LocalityRatio = 0.5</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_IntegrityGates_MeanDeltaP" data-uid="EvoSim.IntegrityGates.MeanDeltaP">
+  MeanDeltaP
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/IntegrityGates.cs/#L31"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The pass thresholds of 32 §2: B-02 sign accuracy ≥ 0.85 (<code>SignAccuracy</code>) and mean ΔP ≥ 0.25 (<code>MeanDeltaP</code>);
+B-03 MI_G(founders) ≥ 2 × MI_G(random text) (<code>MiMargin</code>); B-04 locality ratio ≤ 0.5 (<code>LocalityRatio</code>) and
+Spearman ρ ≥ 0.3 (<code>Rho</code>).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const double MeanDeltaP = 0.25</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_IntegrityGates_MiMargin" data-uid="EvoSim.IntegrityGates.MiMargin">
+  MiMargin
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/IntegrityGates.cs/#L31"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The pass thresholds of 32 §2: B-02 sign accuracy ≥ 0.85 (<code>SignAccuracy</code>) and mean ΔP ≥ 0.25 (<code>MeanDeltaP</code>);
+B-03 MI_G(founders) ≥ 2 × MI_G(random text) (<code>MiMargin</code>); B-04 locality ratio ≤ 0.5 (<code>LocalityRatio</code>) and
+Spearman ρ ≥ 0.3 (<code>Rho</code>).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const double MiMargin = 2</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_IntegrityGates_Rho" data-uid="EvoSim.IntegrityGates.Rho">
+  Rho
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/IntegrityGates.cs/#L31"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The pass thresholds of 32 §2: B-02 sign accuracy ≥ 0.85 (<code>SignAccuracy</code>) and mean ΔP ≥ 0.25 (<code>MeanDeltaP</code>);
+B-03 MI_G(founders) ≥ 2 × MI_G(random text) (<code>MiMargin</code>); B-04 locality ratio ≤ 0.5 (<code>LocalityRatio</code>) and
+Spearman ρ ≥ 0.3 (<code>Rho</code>).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const double Rho = 0.3</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_IntegrityGates_SignAccuracy" data-uid="EvoSim.IntegrityGates.SignAccuracy">
+  SignAccuracy
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/IntegrityGates.cs/#L31"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The pass thresholds of 32 §2: B-02 sign accuracy ≥ 0.85 (<code>SignAccuracy</code>) and mean ΔP ≥ 0.25 (<code>MeanDeltaP</code>);
+B-03 MI_G(founders) ≥ 2 × MI_G(random text) (<code>MiMargin</code>); B-04 locality ratio ≤ 0.5 (<code>LocalityRatio</code>) and
+Spearman ρ ≥ 0.3 (<code>Rho</code>).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const double SignAccuracy = 0.85</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_IntegrityGates_Directed_" data-uid="EvoSim.IntegrityGates.Directed*"></a>
+
+  <h3 id="EvoSim_IntegrityGates_Directed_System_String_System_String_" data-uid="EvoSim.IntegrityGates.Directed(System.String,System.String)">
+  Directed(string, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/IntegrityGates.cs/#L269"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>B-02 G1 directed: every contrast pair (pro / anti, neutral elsewhere) × the relevant situations → sign accuracy and mean ΔP.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IntegrityReport Directed(string scene, string brainName)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>scene</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The scene, relative to the project; it must not be open in the editor.</p>
+</dd>
+    <dt><code>brainName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The brain under test: a GameObject name or a brain id.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.IntegrityReport.html">IntegrityReport</a></dt>
+    <dd><p>The written report: one row per species and locus with its mean ΔP and sign accuracy.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_IntegrityGates_Directed_System_String_System_String__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>ΔP is P(the gene's action | pro) − P(the same action | anti) in one situation. Passes with a sign accuracy
+≥ 0.85 and a mean ΔP ≥ 0.25. A hide gene's situations get cover in sight (see WithCoverInSight).</p>
+</div>
+
+
+
+
+  <a id="EvoSim_IntegrityGates_Information_" data-uid="EvoSim.IntegrityGates.Information*"></a>
+
+  <h3 id="EvoSim_IntegrityGates_Information_System_String_System_String_" data-uid="EvoSim.IntegrityGates.Information(System.String,System.String)">
+  Information(string, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/IntegrityGates.cs/#L341"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>B-03 G2 information: 10 founder genomes, 10 random-text genomes, the neutral genome × 24 situations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IntegrityReport Information(string scene, string brainName)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>scene</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The scene, relative to the project; it must not be open in the editor.</p>
+</dd>
+    <dt><code>brainName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The brain under test: a GameObject name or a brain id.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.IntegrityReport.html">IntegrityReport</a></dt>
+    <dd><p>The written report: one row per species.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_IntegrityGates_Information_System_String_System_String__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Passes when, for every species, MI_G(founders) ≥ 2 × MI_G(random text): real genes must carry more
+information than random sentences. Also reports MI_O and the distances of founders and random texts to the neutral
+genome.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_IntegrityGates_Locality_" data-uid="EvoSim.IntegrityGates.Locality*"></a>
+
+  <h3 id="EvoSim_IntegrityGates_Locality_System_String_System_String_" data-uid="EvoSim.IntegrityGates.Locality(System.String,System.String)">
+  Locality(string, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/IntegrityGates.cs/#L375"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>B-04 G3 locality: 10 parents × 4 single mutations by the scene's mutator; locality ratio ≤ 0.5, Spearman ρ ≥ 0.3.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IntegrityReport Locality(string scene, string brainName)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>scene</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The scene, relative to the project; it needs a mutator service, a client and an LLM mutation.</p>
+</dd>
+    <dt><code>brainName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The brain under test: a GameObject name or a brain id.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.IntegrityReport.html">IntegrityReport</a></dt>
+    <dd><p>The written report, with the ratio, ρ and the number of edits in its facts.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_IntegrityGates_Locality_System_String_System_String__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>On the first species only. The locality ratio is the median behaviour distance parent → child over the
+median distance between unrelated parents: a small edit should change behaviour less than a new genome. ρ
+correlates text distance with behaviour distance. Needs the mutator server.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_IntegrityGates_MiGenome_" data-uid="EvoSim.IntegrityGates.MiGenome*"></a>
+
+  <h3 id="EvoSim_IntegrityGates_MiGenome_System_Single_______" data-uid="EvoSim.IntegrityGates.MiGenome(System.Single[][][])">
+  MiGenome(float[][][])
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/IntegrityGates.cs/#L150"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>MI_G = mean over situations of H(mean over genomes p) − mean over genomes H(p).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static double MiGenome(float[][][] P)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>P</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>[][][]</dt>
+    <dd><p>The probability rows, indexed [genome][situation][action]; at least one genome and one situation.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>The mutual information between genome and action, in bits.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_IntegrityGates_MiGenome_System_Single________remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>How much the genome changes the answer, in bits: 0 when every genome gives the same rows (B-03).</p>
+</div>
+
+
+
+
+  <a id="EvoSim_IntegrityGates_MiObs_" data-uid="EvoSim.IntegrityGates.MiObs*"></a>
+
+  <h3 id="EvoSim_IntegrityGates_MiObs_System_Single_______" data-uid="EvoSim.IntegrityGates.MiObs(System.Single[][][])">
+  MiObs(float[][][])
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/IntegrityGates.cs/#L168"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>MI_O = mean over genomes of H(mean over situations p) − mean over situations H(p).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static double MiObs(float[][][] P)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>P</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>[][][]</dt>
+    <dd><p>The probability rows, indexed [genome][situation][action]; at least one genome and one situation.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>The mutual information between situation and action, in bits.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_IntegrityGates_MiObs_System_Single________remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>How much the situation changes the answer, in bits: 0 when the brain ignores what the animal senses.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_IntegrityGates_MutatorQuality_" data-uid="EvoSim.IntegrityGates.MutatorQuality*"></a>
+
+  <h3 id="EvoSim_IntegrityGates_MutatorQuality_System_String_System_String_System_Int32_" data-uid="EvoSim.IntegrityGates.MutatorQuality(System.String,System.String,System.Int32)">
+  MutatorQuality(string, string, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/IntegrityGates.cs/#L658"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>B-10 mutator: every founder sentence through the deck once (guards pass ≥ 70 %), then 10 mutations in a row
+without selection; a judge model says whether each gene is still a usable rule (≥ 80 % after one mutation),
+and rates the founders first, as the baseline.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IntegrityReport MutatorQuality(string scene, string judgeModel, int chain = 10)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>scene</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The scene, relative to the project; it needs a mutator service and client.</p>
+</dd>
+    <dt><code>judgeModel</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The Ollama model that judges, such as <code>gemma4:12b</code>; empty = no judging.</p>
+</dd>
+    <dt><code>chain</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The number of mutations in a row.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.IntegrityReport.html">IntegrityReport</a></dt>
+    <dd><p>The written report: the guard pass rate, the usable shares (founders, after 1 and after
+<code class="paramref">chain</code> mutations) and the first 12 sentences after the chain.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_IntegrityGates_MutatorQuality_System_String_System_String_System_Int32__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>The world runs with its <code>Random</code> brain; the judge is asked through the scene's Ollama points brain
+connection (without one, nothing is judged). Needs the mutator and judge models in Ollama.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_IntegrityGates_Names_" data-uid="EvoSim.IntegrityGates.Names*"></a>
+
+  <h3 id="EvoSim_IntegrityGates_Names_System_String_System_String_" data-uid="EvoSim.IntegrityGates.Names(System.String,System.String)">
+  Names(string, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/IntegrityGates.cs/#L556"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>B-08 names: the predator named &quot;wolf&quot; or &quot;shadow&quot;; the prey gene &quot;Run from any wolf you see.&quot; → P(flee) lower for &quot;shadow&quot;.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IntegrityReport Names(string scene, string brainName)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>scene</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The scene, relative to the project; it needs species <code>prey</code> (with a <code>flee</code> gene) and
+<code>Predator</code>.</p>
+</dd>
+    <dt><code>brainName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The brain under test: a GameObject name or a brain id.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.IntegrityReport.html">IntegrityReport</a></dt>
+    <dd><p>The written report, with both P(flee) in its facts.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_IntegrityGates_Names_System_String_System_String__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>The scene is run twice, the predator's display name set by a field override; the mean P(flee) is taken over
+the situations with a predator present. Passes when it is lower for &quot;shadow&quot;: the brain reads the names.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_IntegrityGates_OptionOrder_" data-uid="EvoSim.IntegrityGates.OptionOrder*"></a>
+
+  <h3 id="EvoSim_IntegrityGates_OptionOrder_System_String_System_String_" data-uid="EvoSim.IntegrityGates.OptionOrder(System.String,System.String)">
+  OptionOrder(string, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/IntegrityGates.cs/#L432"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>B-05 option order (JEV): the same queries with the options reversed → the share of changed top answers (reported).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IntegrityReport OptionOrder(string scene, string brainName)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>scene</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The scene, relative to the project; it must not be open in the editor.</p>
+</dd>
+    <dt><code>brainName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The brain under test; it must be a <a class="xref" href="EvoSim.JevBrain.html">JevBrain</a>.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.IntegrityReport.html">IntegrityReport</a></dt>
+    <dd><p>The written report, with the share of changed top answers in its facts.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_IntegrityGates_OptionOrder_System_String_System_String__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>On the first species, 5 founder genomes × 20 situations. Reported only: it fails only when the brain isn't
+JEV.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_IntegrityGates_PointsSanity_" data-uid="EvoSim.IntegrityGates.PointsSanity*"></a>
+
+  <h3 id="EvoSim_IntegrityGates_PointsSanity_System_String_System_String_System_Boolean_" data-uid="EvoSim.IntegrityGates.PointsSanity(System.String,System.String,System.Boolean)">
+  PointsSanity(string, string, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/IntegrityGates.cs/#L511"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>B-07 points sanity (Ollama points brain): shares of answers summing to 100 and of all-zero answers, by genome kind.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IntegrityReport PointsSanity(string scene, string brainName, bool cpuOnly)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>scene</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The scene, relative to the project; it must not be open in the editor.</p>
+</dd>
+    <dt><code>brainName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The brain under test; it must be an <a class="xref" href="EvoSim.OllamaPointsBrain.html">OllamaPointsBrain</a> (Integrity passes
+<code>Ollama points</code>).</p>
+</dd>
+    <dt><code>cpuOnly</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True to run the model on the CPU.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.IntegrityReport.html">IntegrityReport</a></dt>
+    <dd><p>The written report: one row per genome kind.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_IntegrityGates_PointsSanity_System_String_System_String_System_Boolean__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>On the first species: 2 founder genomes, 2 random-text genomes and the neutral genome × 3 situations. Fails
+when a founder genome gets an all-zero answer.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_IntegrityGates_PromptLength_" data-uid="EvoSim.IntegrityGates.PromptLength*"></a>
+
+  <h3 id="EvoSim_IntegrityGates_PromptLength_System_String_System_String_" data-uid="EvoSim.IntegrityGates.PromptLength(System.String,System.String)">
+  PromptLength(string, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/IntegrityGates.cs/#L485"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>B-06 prompt length: the longest founder genome with the longest situation, for every species, under the brain's limit.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IntegrityReport PromptLength(string scene, string brainName)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>scene</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The scene, relative to the project; it must not be open in the editor.</p>
+</dd>
+    <dt><code>brainName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The brain under test: a GameObject name or a brain id.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.IntegrityReport.html">IntegrityReport</a></dt>
+    <dd><p>The written report: one row per species with its estimated tokens and the brain's limit.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_IntegrityGates_Repeatability_" data-uid="EvoSim.IntegrityGates.Repeatability*"></a>
+
+  <h3 id="EvoSim_IntegrityGates_Repeatability_System_String_System_String_" data-uid="EvoSim.IntegrityGates.Repeatability(System.String,System.String)">
+  Repeatability(string, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/IntegrityGates.cs/#L605"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>B-09 repeatability: the same 50 queries twice (no cache) → identical rows; differences above 1e-3 reported.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IntegrityReport Repeatability(string scene, string brainName)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>scene</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The scene, relative to the project; it must not be open in the editor.</p>
+</dd>
+    <dt><code>brainName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The brain under test: a GameObject name or a brain id.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.IntegrityReport.html">IntegrityReport</a></dt>
+    <dd><p>The written report, with the number of differing rows and the largest difference in its facts.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_IntegrityGates_Repeatability_System_String_System_String__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>On the first species: 5 founder genomes × 10 situations. Fails on a difference unless the brain is JEV,
+whose small differences are only reported.</p>
+</div>
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

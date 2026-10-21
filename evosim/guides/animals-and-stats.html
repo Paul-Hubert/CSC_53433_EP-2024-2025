@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Animals, stats and death | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Animals, stats and death | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/animals-and-stats.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="guide-animals-and-stats">
+<h1 id="animals-stats-and-death">Animals, stats and death</h1>
+
+<p>An animal is plain data: an <a class="xref" href="../api/EvoSim.Animal.html">Animal</a> record owned by its species, not a GameObject. It holds where the
+animal is, what it is doing, and its numbers: <strong>stats</strong> that change during its life (energy, stamina) and <strong>traits</strong>
+fixed at birth (speeds, maximum stamina). Modules declare the stats and traits they need, so a species without a
+stamina module has no stamina at all (ANIM-11). This page covers the record, the reference stats, what a tick costs,
+busy states and how animals die.</p>
+<h2 id="the-animal-record">The animal record</h2>
+<table>
+<thead>
+<tr>
+<th>Fields</th>
+<th>Meaning</th>
+<th>Written by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Id</code>, <code>Species</code></td>
+<td>unique id in the run, never reused (ANIM-02); its species for life</td>
+<td>creation</td>
+</tr>
+<tr>
+<td><code>Origin</code>, <code>Generation</code>, <code>Parents</code>, <code>BornTick</code>, <code>Genome</code></td>
+<td><code>&quot;founder&quot;</code>, <code>&quot;immigrant&quot;</code> or <code>&quot;birth&quot;</code>; 0 for founders and newcomers, else one more than the larger of its parents' generations</td>
+<td>creation</td>
+</tr>
+<tr>
+<td><code>Age</code></td>
+<td>ticks since birth or hatching</td>
+<td>the death phase, +1 per tick</td>
+</tr>
+<tr>
+<td><code>Position</code>, <code>Heading</code></td>
+<td>where it stands; the direction it faces, in degrees</td>
+<td>the locomotion; the act phase and wandering</td>
+</tr>
+<tr>
+<td><code>Action</code>, <code>Searching</code>, <code>BredThisPeriod</code></td>
+<td>index of its current action (-1: none); whether it searches; whether it bred since its last decision</td>
+<td>the choose-actions phase; <code>ActContext.Search</code>; the breed phase</td>
+</tr>
+<tr>
+<td><code>BusyTicks</code>, <code>BusyReason</code></td>
+<td>ticks left busy, and why</td>
+<td>a module such as <a class="xref" href="../api/EvoSim.Digestion.html">Digestion</a>; the act phase counts down</td>
+</tr>
+<tr>
+<td><code>Killed</code>, <code>KilledBy</code></td>
+<td>struck dead this tick, and by whom</td>
+<td>the interaction resolver</td>
+</tr>
+<tr>
+<td><code>Meals</code>, <code>Offspring</code></td>
+<td>items grazed, kills and portions eaten; babies parented</td>
+<td>every meal; the breed phase</td>
+</tr>
+<tr>
+<td><code>IsGone</code></td>
+<td>dead or migrated; the record stays readable</td>
+<td><a class="xref" href="../api/EvoSim.World.html#EvoSim_World_RecordDeath_EvoSim_Animal_System_String_">RecordDeath(Animal, string)</a></td>
+</tr>
+<tr>
+<td><code>MetersMoved</code>, <code>TargetId</code>, <code>TargetPoint</code></td>
+<td>this tick's movement, and what its action was about</td>
+<td>the act phase</td>
+</tr>
+<tr>
+<td><code>LastObservation</code>, <code>LastSituation</code>, <code>LastProbabilities</code></td>
+<td>its last decision, for the inspector</td>
+<td>the choose-actions phase</td>
+</tr>
+<tr>
+<td><code>a[stat]</code>, <code>a.Trait(trait)</code></td>
+<td>the values of the declared stats and traits</td>
+<td>the modules that use them</td>
+</tr>
+</tbody>
+</table>
+<p>Modules may add stats and traits, never untyped fields (ANIM-01): what belongs to one animal goes in its stats.</p>
+<h2 id="stats-and-traits">Stats and traits</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Stat</th>
+<th>Trait</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What</td>
+<td>a number that changes during life</td>
+<td>a number fixed at birth</td>
+</tr>
+<tr>
+<td>Examples</td>
+<td><code>energy</code>, <code>stamina</code>, <code>thirst</code></td>
+<td><code>speed.walk</code>, <code>speed.run</code>, <code>stamina.max</code>, <code>stamina.regen</code>, <code>kill.chance</code>, <code>maturity</code>, <code>vision</code></td>
+</tr>
+<tr>
+<td>Declared with</td>
+<td><code>DeclareStat(name, start, min, max)</code></td>
+<td><code>DeclareTrait(name, default, min, max)</code></td>
+</tr>
+<tr>
+<td>Id</td>
+<td><a class="xref" href="../api/EvoSim.StatId.html">StatId</a></td>
+<td><a class="xref" href="../api/EvoSim.TraitId.html">TraitId</a></td>
+</tr>
+<tr>
+<td>Read</td>
+<td><code>a[id]</code></td>
+<td><code>a.Trait(id)</code></td>
+</tr>
+<tr>
+<td>Write</td>
+<td><code>a[id] = v</code>, clamped to its range (ANIM-22)</td>
+<td>only at creation, unless declared changeable (ANIM-17)</td>
+</tr>
+</tbody>
+</table>
+<p>Each module declares what it needs in <code>Declare</code>, on the species' <a class="xref" href="../api/EvoSim.SpeciesBuilder.html">SpeciesBuilder</a>, before any animal
+exists. The ids it gets back are how it reads and writes the values later. Declaring a name that already exists
+returns the first declaration (V-38 warns if they differ). Anyone can look a declaration up by name on
+<code>Species.Declarations</code>.</p>
+<p>A stat starts at a fixed value (<a class="xref" href="../api/EvoSim.StatStart.html#EvoSim_StatStart_Fixed_System_Single_">Fixed(float)</a>) or full, at a trait's value
+(<a class="xref" href="../api/EvoSim.StatStart.html#EvoSim_StatStart_FullTrait_EvoSim_TraitId_">FullTrait(TraitId)</a>). Its maximum can be a trait: stamina is capped by each animal's
+own <code>stamina.max</code>. A trait starts at its default, the module's setting; a number gene may replace or scale it
+(ANIM-15). Modules always read the trait, never their own setting, so a gene changes behaviour with no extra code
+(ANIM-16). See <a href="genes-and-mutation.html">Genes and mutation</a>.</p>
+<h2 id="energy-and-stamina">Energy and stamina</h2>
+<p><a class="xref" href="../api/EvoSim.Energy.html">Energy</a> declares the stat <code>energy</code>. Founders and newcomers start at <strong>60</strong>, babies get the energy their
+parents pay for them (<strong>40</strong>, the litter's <strong>Child Energy</strong>), and the maximum is <strong>100</strong>: a meal never raises it
+higher. It has no minimum. At 0 or below, the animal starves at the next death check.</p>
+<p><a class="xref" href="../api/EvoSim.Stamina.html">Stamina</a> is the number of meters an animal can still move. It declares the traits <code>stamina.max</code> (prey
+<strong>60</strong>, predators <strong>30</strong>) and <code>stamina.regen</code> (<strong>2</strong> per tick), and the stat <code>stamina</code>, which starts full. Each meter
+moved costs one point; the locomotion never moves an animal farther than its stamina (ANIM-21). A tick without
+movement (less than 1 mm, ANIM-23) brings back <code>stamina.regen</code> points, up to the maximum, and costs <strong>0.3</strong> energy
+while stamina is below full.</p>
+<h2 id="metabolism-what-a-tick-costs">Metabolism: what a tick costs</h2>
+<p><a class="xref" href="../api/EvoSim.Metabolism.html">Metabolism</a> charges every living animal once per tick, right after it acted (ANIM-20), from what it did:
+the meters its locomotion reported, its action, and whether it was busy at the start of the tick.</p>
+<table>
+<thead>
+<tr>
+<th>Situation (reference values, prey and predators)</th>
+<th>Energy</th>
+<th>Stamina</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>moved <em>d</em> meters</td>
+<td>−0.7 − 0.5 × <em>d</em></td>
+<td>−<em>d</em></td>
+</tr>
+<tr>
+<td>still, with the rest action</td>
+<td>−0.2</td>
+<td>+2, up to the maximum</td>
+</tr>
+<tr>
+<td>still, any other action</td>
+<td>−0.7</td>
+<td>+2, up to the maximum</td>
+</tr>
+<tr>
+<td>still and busy (digesting)</td>
+<td>−0.2</td>
+<td>+2, up to the maximum</td>
+</tr>
+<tr>
+<td>while stamina recovers (still, not full)</td>
+<td>−0.3 more</td>
+<td>—</td>
+</tr>
+<tr>
+<td>graze one food item</td>
+<td>+25</td>
+<td>—</td>
+</tr>
+<tr>
+<td>a kill</td>
+<td>+60</td>
+<td>—</td>
+</tr>
+<tr>
+<td>a carcass portion</td>
+<td>+30</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>So walking 1 m costs 1.2 energy, a predator running 2 m costs 1.7, and a predator can run at full speed for 15 ticks
+from full stamina. A locomotion may add a cost of its own for the move (slopes, mud), and the metabolism may also
+charge a cost that grows with a trait (off in the reference; see
+<a href="../extending/stats-and-death.html">Stats, costs and death rules</a>).</p>
+<h2 id="busy-states-and-digestion">Busy states and digestion</h2>
+<p>While an animal is busy it doesn't decide and doesn't move; it pays the busy cost and recovers stamina (ANIM-30). A
+module that makes an animal busy sets <code>BusyTicks</code> and gives a reason, shown in the inspector (ANIM-31). The act
+phase counts down at the end of each busy tick. At 0 the animal has no action, and it decides at the start of the
+next tick.</p>
+<p>In the reference only <a class="xref" href="../api/EvoSim.Digestion.html">Digestion</a> does it, on the predator. After a kill or a carcass portion the eater is
+busy for <code>round(Digest Ticks × gain / Reference Gain)</code> ticks: <strong>50</strong> after a kill (+60), <strong>25</strong> after a portion (+30),
+with the reason <code>digesting</code>. Grazing never makes an animal busy, and the prey has no digestion module.</p>
+<h2 id="age-maturity-and-generations">Age, maturity and generations</h2>
+<p>Every living animal ages by one tick per tick, in the death phase, babies born that tick included (ANIM-35). An
+animal is an adult when its age reaches its <code>maturity</code> trait (<strong>150</strong> ticks, declared by the
+<a class="xref" href="../api/EvoSim.MatingRule.html">MatingRule</a>, ANIM-36); an adult with at least 50 energy is ready to mate. Founders and newcomers are
+generation 0; a baby is one generation more than the larger of its parents' generations. See
+<a href="reproduction-and-population.html">Reproduction and population</a>.</p>
+<h2 id="death">Death</h2>
+<p>The death phase (<a class="xref" href="../api/EvoSim.DeathPhase.html">DeathPhase</a>) runs once per tick:</p>
+<ol>
+<li>Animals killed this tick die, with the cause <code>killed</code> and the killer's id.</li>
+<li>Every living animal ages by one tick.</li>
+<li>Each <a class="xref" href="../api/EvoSim.DeathRule.html">DeathRule</a> of the species is asked about every living animal, in module order. The first rule
+that names a cause decides; later rules are not asked about that animal.</li>
+<li>Each death is recorded once (ANIM-42), and the dead leave their species before the next tick's decisions
+(ANIM-43).</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Cause</th>
+<th>Rule</th>
+<th>When (reference)</th>
+<th><code>stats.csv</code> column</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>starvation</code></td>
+<td><a class="xref" href="../api/EvoSim.Starvation.html">Starvation</a></td>
+<td>energy ≤ 0</td>
+<td><code>&lt;species&gt;_deaths_starve</code></td>
+</tr>
+<tr>
+<td><code>old_age</code></td>
+<td><a class="xref" href="../api/EvoSim.OldAge.html">OldAge</a></td>
+<td>age above <strong>Max Age</strong> (1 500 ticks)</td>
+<td><code>&lt;species&gt;_deaths_age</code></td>
+</tr>
+<tr>
+<td><code>killed</code></td>
+<td>a strike (ANIM-41)</td>
+<td>killed by a hunter</td>
+<td><code>&lt;species&gt;_deaths_pred</code></td>
+</tr>
+<tr>
+<td><code>migrated</code></td>
+<td>the cap rule (mode Migrate), in the migration phase</td>
+<td>the species is above its cap</td>
+<td><code>&lt;species&gt;_deaths_migrated</code></td>
+</tr>
+</tbody>
+</table>
+<p>Modules may add causes of their own, such as thirst; each gets a <code>&lt;species&gt;_deaths_&lt;cause&gt;</code> column (ANIM-40).</p>
+<h2 id="the-main-types">The main types</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Animal.html">Animal</a></td>
+<td>One animal: plain data, read and written by every module</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.SpeciesBuilder.html">SpeciesBuilder</a></td>
+<td>Collects the stats and traits a species' modules declare</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.StatId.html">StatId</a>, <a class="xref" href="../api/EvoSim.TraitId.html">TraitId</a></td>
+<td>The ids to read and write a stat or a trait</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Energy.html">Energy</a>, <a class="xref" href="../api/EvoSim.Stamina.html">Stamina</a></td>
+<td>The reference stats</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Metabolism.html">Metabolism</a></td>
+<td>What a tick costs</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Digestion.html">Digestion</a></td>
+<td>Makes an eater busy after a kill or a portion</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.DeathRule.html">DeathRule</a></td>
+<td>A cause of death; <a class="xref" href="../api/EvoSim.Starvation.html">Starvation</a> and <a class="xref" href="../api/EvoSim.OldAge.html">OldAge</a> in the reference</td>
+</tr>
+</tbody>
+</table>
+<h2 id="settings">Settings</h2>
+<p>In the reference scenes these modules sit on the species' <code>Stats</code> and <code>Life</code> children.</p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Field</th>
+<th>Reference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Energy</td>
+<td>Max, Start</td>
+<td>100, 60</td>
+</tr>
+<tr>
+<td>Stamina</td>
+<td>Max, Regen Per Tick, Regen Energy Cost</td>
+<td>prey 60, predators 30; 2; 0.3</td>
+</tr>
+<tr>
+<td>Metabolism</td>
+<td>Base Cost, Move Cost, Rest Cost</td>
+<td>0.7, 0.5 per meter, 0.2</td>
+</tr>
+<tr>
+<td>Metabolism</td>
+<td>Cost Trait, Cost Per Unit</td>
+<td>empty (none), 0.005</td>
+</tr>
+<tr>
+<td>Digestion (predators)</td>
+<td>Digest Ticks, Reference Gain</td>
+<td>50, 60</td>
+</tr>
+<tr>
+<td>Old Age</td>
+<td>Max Age</td>
+<td>1 500 ticks</td>
+</tr>
+<tr>
+<td>Mating Rule</td>
+<td>Mate Energy, Maturity</td>
+<td>50, 150 ticks</td>
+</tr>
+<tr>
+<td>Litter</td>
+<td>Child Energy</td>
+<td>40</td>
+</tr>
+</tbody>
+</table>
+<h2 id="in-the-editor">In the editor</h2>
+<ul>
+<li><strong>Animal Inspector</strong> (<em>Window ▸ EvoSim ▸ Animal Inspector</em>): in Play mode, click an animal in the Scene view to read
+its stats, traits, genome, current action, busy reason, parents and offspring.</li>
+<li><strong>Species inspector</strong>: select a species and press <strong>Show the computed tables</strong> to list every declared stat and
+trait, with its default, its range and the module that declared it.</li>
+<li><strong>Ecology Monitor</strong> (<em>Window ▸ EvoSim ▸ Ecology Monitor</em>): population and deaths by cause over time.</li>
+</ul>
+<h2 id="go-further">Go further</h2>
+<ul>
+<li><a href="../extending/stats-and-death.html">Add a stat, change costs, add a death rule</a>.</li>
+<li><a href="actions-and-movement.html">Actions and movement</a>: where moving and resting come from.</li>
+<li><a href="reproduction-and-population.html">Reproduction and population</a>: litters, caps and newcomers.</li>
+<li>Specification: <a href="../spec/05-animals-stats-and-life-cycle.html">05 — Animals, stats and life cycle</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

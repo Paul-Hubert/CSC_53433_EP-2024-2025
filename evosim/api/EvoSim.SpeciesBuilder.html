@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class SpeciesBuilder | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class SpeciesBuilder | EvoSim ">
+      
+      <meta name="description" content="Collects the stats and traits a species&#39; modules declare before any animal exists (ANIM-10, ANIM-15).">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_SpeciesBuilder.md&amp;value=---%0Auid%3A%20EvoSim.SpeciesBuilder%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.SpeciesBuilder">
+
+
+
+  <h1 id="EvoSim_SpeciesBuilder" data-uid="EvoSim.SpeciesBuilder" class="text-break">
+Class SpeciesBuilder  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpeciesBuilder.cs/#L24"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Runtime.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Collects the stats and traits a species' modules declare before any animal exists (ANIM-10, ANIM-15).</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class SpeciesBuilder</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">SpeciesBuilder</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+  <h2 id="EvoSim_SpeciesBuilder_examples">Examples</h2>
+  <p>The reference stamina (20 §3.4):</p>
+<pre><code class="lang-csharp">public override void Declare(SpeciesBuilder b)
+{
+    Max = b.DeclareTrait("stamina.max", max, 1f, 1000f);
+    Value = b.DeclareStat("stamina", StatStart.FullTrait(Max), 0f, float.MaxValue, Max);   // capped by stamina.max
+}</code></pre>
+
+
+  <h2 id="EvoSim_SpeciesBuilder_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>A <b>stat</b> is a per-animal number that changes during life (energy, stamina, thirst); a <b>trait</b> is a
+per-animal number fixed at birth (vision, stamina.max), which a number gene may set (ANIM-15). Each module
+declares what it needs in <a class="xref" href="EvoSim.SpeciesModule.html#EvoSim_SpeciesModule_Declare_EvoSim_SpeciesBuilder_">Declare(SpeciesBuilder)</a> and keeps the id it gets back; the animal stores
+the values in slots, read with <code>a[statId]</code> and <code>a.Trait(traitId)</code>.</p>
+<p>Two modules may declare the same name: they share one slot, and the first declaration counts.
+<a class="xref" href="EvoSim.Species.html#EvoSim_Species_Declarations">Declarations</a> keeps the result for the run.</p>
+</div>
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="EvoSim_SpeciesBuilder__ctor_" data-uid="EvoSim.SpeciesBuilder.#ctor*"></a>
+
+  <h3 id="EvoSim_SpeciesBuilder__ctor_EvoSim_Species_" data-uid="EvoSim.SpeciesBuilder.#ctor(EvoSim.Species)">
+  SpeciesBuilder(Species)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpeciesBuilder.cs/#L88"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Starts an empty set of declarations; the species makes one at each set-up.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SpeciesBuilder(Species species)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>species</code> <a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd><p>The species whose modules declare.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="EvoSim_SpeciesBuilder_Costs_" data-uid="EvoSim.SpeciesBuilder.Costs*"></a>
+
+  <h3 id="EvoSim_SpeciesBuilder_Costs" data-uid="EvoSim.SpeciesBuilder.Costs">
+  Costs
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpeciesBuilder.cs/#L142"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Traits some cost depends on (09 §5): a number gene on any other trait drifts to one end (V-47).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;string&gt; Costs { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SpeciesBuilder_Current_" data-uid="EvoSim.SpeciesBuilder.Current*"></a>
+
+  <h3 id="EvoSim_SpeciesBuilder_Current" data-uid="EvoSim.SpeciesBuilder.Current">
+  Current
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpeciesBuilder.cs/#L54"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The module currently declaring (set by the species while it calls Declare).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SpeciesModule Current { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.SpeciesModule.html">SpeciesModule</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SpeciesBuilder_Problems_" data-uid="EvoSim.SpeciesBuilder.Problems*"></a>
+
+  <h3 id="EvoSim_SpeciesBuilder_Problems" data-uid="EvoSim.SpeciesBuilder.Problems">
+  Problems
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpeciesBuilder.cs/#L84"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Declaration problems, reported by validation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;SpeciesBuilder.Problem&gt; Problems { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="EvoSim.SpeciesBuilder.html">SpeciesBuilder</a>.<a class="xref" href="EvoSim.SpeciesBuilder.Problem.html">Problem</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SpeciesBuilder_Species_" data-uid="EvoSim.SpeciesBuilder.Species*"></a>
+
+  <h3 id="EvoSim_SpeciesBuilder_Species" data-uid="EvoSim.SpeciesBuilder.Species">
+  Species
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpeciesBuilder.cs/#L52"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The species whose stats and traits these are.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Species Species { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SpeciesBuilder_Stats_" data-uid="EvoSim.SpeciesBuilder.Stats*"></a>
+
+  <h3 id="EvoSim_SpeciesBuilder_Stats" data-uid="EvoSim.SpeciesBuilder.Stats">
+  Stats
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpeciesBuilder.cs/#L57"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The declared stats, in declaration order: a stat's index is its place here.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;SpeciesBuilder.StatDeclaration&gt; Stats { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="EvoSim.SpeciesBuilder.html">SpeciesBuilder</a>.<a class="xref" href="EvoSim.SpeciesBuilder.StatDeclaration.html">StatDeclaration</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SpeciesBuilder_Traits_" data-uid="EvoSim.SpeciesBuilder.Traits*"></a>
+
+  <h3 id="EvoSim_SpeciesBuilder_Traits" data-uid="EvoSim.SpeciesBuilder.Traits">
+  Traits
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpeciesBuilder.cs/#L59"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The declared traits, in declaration order: a trait's index is its place here.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;SpeciesBuilder.TraitDeclaration&gt; Traits { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="EvoSim.SpeciesBuilder.html">SpeciesBuilder</a>.<a class="xref" href="EvoSim.SpeciesBuilder.TraitDeclaration.html">TraitDeclaration</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_SpeciesBuilder_DeclareCost_" data-uid="EvoSim.SpeciesBuilder.DeclareCost*"></a>
+
+  <h3 id="EvoSim_SpeciesBuilder_DeclareCost_System_String_" data-uid="EvoSim.SpeciesBuilder.DeclareCost(System.String)">
+  DeclareCost(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpeciesBuilder.cs/#L146"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Declares that a cost depends on this trait (for example a metabolism that grows with stamina.max).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void DeclareCost(string trait)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>trait</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The trait's name; null or empty is ignored.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SpeciesBuilder_DeclareStat_" data-uid="EvoSim.SpeciesBuilder.DeclareStat*"></a>
+
+  <h3 id="EvoSim_SpeciesBuilder_DeclareStat_System_String_EvoSim_StatStart_System_Single_System_Single_EvoSim_TraitId_" data-uid="EvoSim.SpeciesBuilder.DeclareStat(System.String,EvoSim.StatStart,System.Single,System.Single,EvoSim.TraitId)">
+  DeclareStat(string, StatStart, float, float, TraitId)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpeciesBuilder.cs/#L98"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Declares a stat; declaring the same name again returns the first declaration (V-38 if it differs).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public StatId DeclareStat(string name, StatStart start, float min = -3.4028235E+38, float max = 3.4028235E+38, TraitId capTrait = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The stat's name, e.g. <code>&quot;energy&quot;</code>; senses and other modules find it by this name.</p>
+</dd>
+    <dt><code>start</code> <a class="xref" href="EvoSim.StatStart.html">StatStart</a></dt>
+    <dd><p>Its value when an animal is created: <a class="xref" href="EvoSim.StatStart.html#EvoSim_StatStart_Fixed_System_Single_">Fixed(float)</a> or
+<a class="xref" href="EvoSim.StatStart.html#EvoSim_StatStart_FullTrait_EvoSim_TraitId_">FullTrait(TraitId)</a>.</p>
+</dd>
+    <dt><code>min</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The lowest value; writes below it are raised to it.</p>
+</dd>
+    <dt><code>max</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The highest value; gains never pass it (ANIM-22).</p>
+</dd>
+    <dt><code>capTrait</code> <a class="xref" href="EvoSim.TraitId.html">TraitId</a></dt>
+    <dd><p>A trait that caps the stat per animal (stamina ≤ stamina.max), or the default id for none.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.StatId.html">StatId</a></dt>
+    <dd><p>The stat's id, to keep in the module and use as <code>a[id]</code>.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SpeciesBuilder_DeclareTrait_" data-uid="EvoSim.SpeciesBuilder.DeclareTrait*"></a>
+
+  <h3 id="EvoSim_SpeciesBuilder_DeclareTrait_System_String_System_Single_System_Single_System_Single_System_Boolean_" data-uid="EvoSim.SpeciesBuilder.DeclareTrait(System.String,System.Single,System.Single,System.Single,System.Boolean)">
+  DeclareTrait(string, float, float, float, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpeciesBuilder.cs/#L123"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Declares a trait with its default and range; the same name again returns the first declaration.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TraitId DeclareTrait(string name, float defaultValue, float min = -3.4028235E+38, float max = 3.4028235E+38, bool changeable = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The trait's name, e.g. <code>&quot;vision&quot;</code>; number genes and other modules find it by this name.</p>
+</dd>
+    <dt><code>defaultValue</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>Its value when no gene sets it.</p>
+</dd>
+    <dt><code>min</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The lowest value a gene or a change may give it.</p>
+</dd>
+    <dt><code>max</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The highest value a gene or a change may give it.</p>
+</dd>
+    <dt><code>changeable</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True when it may change during life (ANIM-17); false for every reference trait.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.TraitId.html">TraitId</a></dt>
+    <dd><p>The trait's id, to keep in the module and use as <code>a.Trait(id)</code>.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_SpeciesBuilder_DeclareTrait_System_String_System_Single_System_Single_System_Single_System_Boolean__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>A default outside the range is a warning (V-36); a second declaration with another default or range
+is a warning too (V-38).</p>
+</div>
+
+
+
+
+  <a id="EvoSim_SpeciesBuilder_FindStat_" data-uid="EvoSim.SpeciesBuilder.FindStat*"></a>
+
+  <h3 id="EvoSim_SpeciesBuilder_FindStat_System_String_" data-uid="EvoSim.SpeciesBuilder.FindStat(System.String)">
+  FindStat(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpeciesBuilder.cs/#L159"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>A declared stat by name, or an invalid id.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public StatId FindStat(string name)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The stat's name.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.StatId.html">StatId</a></dt>
+    <dd><p>Its id, or the default id (<a class="xref" href="EvoSim.StatId.html#EvoSim_StatId_IsValid">IsValid</a> false) when no module declared it.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SpeciesBuilder_FindTrait_" data-uid="EvoSim.SpeciesBuilder.FindTrait*"></a>
+
+  <h3 id="EvoSim_SpeciesBuilder_FindTrait_System_String_" data-uid="EvoSim.SpeciesBuilder.FindTrait(System.String)">
+  FindTrait(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpeciesBuilder.cs/#L168"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>A declared trait by name, or an invalid id.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TraitId FindTrait(string name)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The trait's name.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.TraitId.html">TraitId</a></dt>
+    <dd><p>Its id, or the default id (<a class="xref" href="EvoSim.TraitId.html#EvoSim_TraitId_IsValid">IsValid</a> false) when no module declared it.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_SpeciesBuilder_HasCost_" data-uid="EvoSim.SpeciesBuilder.HasCost*"></a>
+
+  <h3 id="EvoSim_SpeciesBuilder_HasCost_System_String_" data-uid="EvoSim.SpeciesBuilder.HasCost(System.String)">
+  HasCost(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Core/SpeciesBuilder.cs/#L154"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Whether some module declared a cost on this trait.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool HasCost(string trait)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>trait</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The trait's name.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True when a cost depends on it; a number gene on a trait without one gets warning V-47.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

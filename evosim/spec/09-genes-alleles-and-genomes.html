@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>09 — Genes, alleles and genomes | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="09 — Genes, alleles and genomes | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/09-genes-alleles-and-genomes.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="09--genes-alleles-and-genomes">09 — Genes, alleles and genomes</h1>
+
+<p>In the prototype every gene is an English sentence, one per action. Here a gene
+is an interface: the reference kinds are <strong>text genes</strong> (sentences the brain
+reads) and <strong>number genes</strong> (values expressed into traits, such as maximum
+stamina). Both evolve the same way: inherited by crossover, changed by blind
+mutation, kept or lost by selection.</p>
+<h2 id="1-genes-loci">1. Genes (loci)</h2>
+<ul>
+<li><strong>GENE-01 (MUST)</strong> A gene has a locus id, unique in the world, a label (what
+the brain or the inspector shows), a kind and a founder pool.</li>
+<li><strong>GENE-02 (MUST)</strong> A gene kind defines how its alleles are stored, when two
+alleles are the same (GENE-10), how they are expressed, and which mutation
+operators accept them (<a href="10-mutation.html">10</a>).</li>
+<li><strong>GENE-03 (MUST)</strong> A <strong>text gene</strong> is expressed only through the brain: its
+sentence goes into the genes block of the prompt (PROMPT-02), and any brain
+that reads text reads it there. It has no other effect.</li>
+<li><strong>GENE-04 (MUST)</strong> A <strong>number gene</strong> is expressed into one trait (ANIM-15): it
+sets the trait, or multiplies its default, and the result is clamped to the
+trait's range. It does not enter the prompt unless it is configured to
+(MAY, e.g. &quot;Stamina: high.&quot;).</li>
+<li><strong>GENE-05 (MUST)</strong> By default each action has one text gene, bound to it and
+labelled with the action's name. Genes not bound to an action (<strong>free genes</strong>,
+e.g. a temperament) are allowed; they appear in the genes block under their
+own label.</li>
+<li><strong>GENE-06 (MUST)</strong> A genome holds exactly one allele per locus of its species,
+in the species' locus order. A genome of the wrong length or of another
+species is an error.</li>
+<li><strong>GENE-07 (MAY)</strong> Other kinds may exist: a choice among a few options, a small
+vector, the weights of a small neural network (the previous lab's genome).</li>
+</ul>
+<h2 id="2-alleles-and-the-registry">2. Alleles and the registry</h2>
+<ul>
+<li><strong>GENE-10 (MUST)</strong> Every allele seen in a run is registered once per
+<em>(locus, value)</em>: sentences are compared after collapsing whitespace, numbers
+at a declared precision (reference: 4 decimals). Registering a known value
+returns the existing allele and keeps its first origin.</li>
+<li><strong>GENE-11 (MUST)</strong> An allele id is <code>&lt;locus id&gt;:&lt;n&gt;</code>, n counting from 0 per
+locus in registration order. Reference locus ids: <code>&lt;species id&gt;.&lt;label&gt;</code>
+(<code>prey.eat</code>, <code>predator.hunt</code>); the prototype writes the prey's without the
+species prefix (<code>eat:3</code>, <code>predator.hunt:0</code>).</li>
+<li><strong>GENE-12 (MUST)</strong> An allele records: id, locus, value, origin (<code>founder</code>,
+<code>neutral</code>, <code>contrast</code>, <code>control</code>, <code>mutant</code>, <code>custom</code>), parent allele id,
+mutation operator (e.g. <code>llm#3</code> = instruction 3 of the deck, <code>gauss</code>), model,
+seed. Following parent ids gives the lineage of every gene.</li>
+<li><strong>GENE-13 (MUST)</strong> A <strong>genome key</strong> is a hash of the species id and the allele
+<em>values</em> in locus order, so the same genes give the same key in any run.
+The brain-visible key (DEC-31) uses only the alleles the brain reads.</li>
+</ul>
+<h2 id="3-founder-pools">3. Founder pools</h2>
+<ul>
+<li><strong>GENE-20 (MUST)</strong> Each gene has a founder pool: a list of alleles and, for
+text genes, a <strong>neutral</strong> allele (&quot;No preference.&quot;) that is part of the pool.
+A founder genome draws each locus independently and uniformly from its pool.</li>
+<li><strong>GENE-24 (MUST)</strong> The founder pool and the neutral allele are configured on
+the gene's component (owner decision): the founder values, whether a neutral
+allele exists, its text, and whether it may mutate (MUT-22). Founder lists
+may live in a shared asset that several gene components use.</li>
+<li><strong>GENE-21 (MUST)</strong> Founder pools are frozen for an experiment and shared by all
+its runs and seeds, so that runs start from the same origin.</li>
+<li><strong>GENE-22 (MUST)</strong> Founder sentences pass the same checks as mutated sentences
+(MUT-12): at most <code>maxWords</code> words (reference 12), allowed characters only.</li>
+<li><strong>GENE-23 (SHOULD)</strong> Each text gene also has a contrast pair (a &quot;pro&quot; and an
+&quot;anti&quot; sentence) used only to test brains, and the world has a list of control
+sentences (shuffled words, irrelevant facts) for controls and tests
+(<a href="15-controls-metrics-and-gates.html">15</a>). Neither is ever used as a founder
+except in the random-founders control.</li>
+</ul>
+<p><strong>Reference founder pools</strong> (drafts awaiting the owner's review; at most 12
+words, imperative, plain words, no numbers; plus the neutral &quot;No preference.&quot;):</p>
+<table>
+<thead>
+<tr>
+<th>Gene</th>
+<th>Founder sentences</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>prey eat</td>
+<td>Eat whenever food is close. · Only look for food when energy is low. · Always finish eating before doing anything else. · Eat quickly, then move on.</td>
+</tr>
+<tr>
+<td>prey flee</td>
+<td>Run from any predator you see. · Flee only when a predator is very close. · Stay calm unless danger is right next to you. · Run away from anything that attacks you.</td>
+</tr>
+<tr>
+<td>prey hide (Unity, new draft)</td>
+<td>Hide when a predator is close. · Stay in cover when danger is near. · Hide only when you are tired. · Leave cover to find food when hungry.</td>
+</tr>
+<tr>
+<td>prey follow</td>
+<td>Stay close to other animals. · Follow others when you are lost or hungry. · Keep your distance from other animals. · Follow the strongest animal nearby.</td>
+</tr>
+<tr>
+<td>prey rest</td>
+<td>Rest when you are tired. · Never stop moving. · Rest only when you feel safe. · Save energy by resting when food is far.</td>
+</tr>
+<tr>
+<td>prey mate</td>
+<td>Look for a partner when energy is high. · Mate with any nearby adult. · Mate only when food is plentiful. · Seek a partner before growing old.</td>
+</tr>
+<tr>
+<td>predator hunt</td>
+<td>Chase any prey you see. · Hunt only when you are hungry. · Attack only when prey is close. · Keep chasing until the prey is caught.</td>
+</tr>
+<tr>
+<td>predator follow</td>
+<td>Stay close to other predators. · Hunt as a pack. · Keep away from other predators. · Follow others when no prey is in sight.</td>
+</tr>
+<tr>
+<td>predator rest</td>
+<td>Rest when your belly is full. · Never stop moving. · Lie still and let prey come to you. · Rest when no prey is in sight.</td>
+</tr>
+<tr>
+<td>predator mate</td>
+<td>Look for a mate when well fed. · Mate with any nearby adult. · Hunt first, mate later. · Seek a partner before growing old.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reference contrast pairs.</strong> eat: &quot;Always eat, whatever happens.&quot; / &quot;Never eat
+unless starving.&quot;; flee: &quot;Always run away, whatever happens.&quot; / &quot;Never run away
+from anything.&quot;; follow: &quot;Always follow other animals.&quot; / &quot;Never go near other
+animals.&quot;; rest: &quot;Always rest and stay still.&quot; / &quot;Never rest, keep moving.&quot;;
+mate: &quot;Always try to mate.&quot; / &quot;Never mate.&quot;; hide (new): &quot;Always hide, whatever
+happens.&quot; / &quot;Never hide in cover.&quot;; hunt: &quot;Always hunt, whatever
+happens.&quot; / &quot;Never hunt unless starving.&quot;; predator follow: &quot;Always follow other
+predators.&quot; / &quot;Never go near other predators.&quot;</p>
+<p><strong>Reference control sentences.</strong> 20 shuffled-word sentences (&quot;Needs bakery green
+bread records nine attic.&quot;) and 20 irrelevant ones (&quot;Trains leave from the north
+platform.&quot;), length-matched to the founders.</p>
+<h2 id="4-crossover">4. Crossover</h2>
+<ul>
+<li><strong>GENE-30 (MUST)</strong> Sexual reproduction: for each locus independently the baby
+takes the allele of one parent or the other with probability ½, from a named
+stream. Loci are homologous: the eat gene only ever crosses with the eat gene.</li>
+<li><strong>GENE-31 (MUST)</strong> Asexual reproduction: the baby copies its parent's genome.</li>
+<li><strong>GENE-32 (MUST)</strong> Every baby of a litter gets its own crossover, so siblings
+usually differ.</li>
+<li><strong>GENE-33 (MAY)</strong> A number gene may declare a blending crossover (e.g. the mean
+of the parents' values) instead of picking one.</li>
+</ul>
+<h2 id="5-number-genes-an-example-and-a-warning">5. Number genes: an example and a warning</h2>
+<p>A <strong>stamina gene</strong>: trait <code>stamina.max</code>, founder values {45, 60, 75}, range
+[20, 120], mutated by a Gaussian rule (σ = 5), clamped. Without a cost, a number
+gene drifts to whichever end helps and stops being interesting: more stamina is
+always better. Pair it with a cost through the same trait, for example a base
+metabolism that grows with <code>stamina.max</code>, so that selection finds a balance.
+The editor warns about number genes whose trait no cost depends on
+(<a href="21-editor-tooling.html">21</a>).</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

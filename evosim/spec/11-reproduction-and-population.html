@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>11 — Reproduction and population | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="11 — Reproduction and population | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/11-reproduction-and-population.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="11--reproduction-and-population">11 — Reproduction and population</h1>
+
+<h2 id="1-mating">1. Mating</h2>
+<ul>
+<li><strong>REPRO-01 (MUST)</strong> An animal is <strong>ready to mate</strong> when it is an adult
+(ANIM-36) and its energy is at least <code>mateEnergy</code> (reference 50). Readiness is
+what kin senses report (06 §4).</li>
+<li><strong>REPRO-02 (MUST)</strong> Sexual reproduction (reference): in the breeding phase, an
+animal whose current action is mate, that is ready and hasn't bred in this
+decision period, breeds with a ready animal of its species within reach
+(1 m) that hasn't bred either. <strong>One partner's choice is enough</strong>: the
+partner's own action doesn't matter.</li>
+<li><strong>REPRO-03 (MUST)</strong> Each animal breeds at most once per decision period.
+Seekers are taken in a deterministic order (a named stream or by id), and each
+breeds with the nearest eligible partner (ties by id).</li>
+<li><strong>REPRO-04 (MUST)</strong> Asexual reproduction (a control, the previous lab's regime):
+a ready animal that chose mate reproduces alone and pays the whole cost.</li>
+<li><strong>REPRO-05 (MUST)</strong> Killed animals don't breed (ANIM-41).</li>
+</ul>
+<h2 id="2-litters">2. Litters</h2>
+<ul>
+<li><strong>REPRO-10 (MUST)</strong> A mating conceives a litter of k babies, k drawn uniformly
+from [<code>litterMin</code>, <code>litterMax</code>] (reference [2, 4]) with the litter stream. The
+litter is then cut so that no parent pays more energy than it has:
+with <code>share = childEnergy / number of parents</code>,
+<code>affordable = min over parents of floor(energy / share)</code>, and
+<code>k = max(litterMin, min(k, affordable))</code>. The litter never goes below
+<code>litterMin</code>, so a parent can be left with zero or less energy (and starve at
+the death check). With the <code>block</code> cap rule (POP-01) the litter is also cut to
+the places left under the cap, possibly to zero.</li>
+<li><strong>REPRO-11 (MUST)</strong> Each parent pays <code>share × k</code> energy, its offspring counter
+grows by k, and it is marked as having bred this period.</li>
+<li><strong>REPRO-12 (MUST)</strong> Each baby gets its own crossover (GENE-32) and its own
+mutations (MUT-01), starts with <code>childEnergy</code> energy (reference 40), full
+stamina, age 0, a random heading, generation = the larger parent generation + 1,
+and appears at the first parent's position.</li>
+<li><strong>REPRO-13 (MUST)</strong> A baby has no action until its first decision, at the start
+of the next tick (DEC-01).</li>
+</ul>
+<p><code>litterMin = litterMax = 1</code> gives the prototype's rule before 2026-10-09.
+Reference consequence: a parent at 50 energy pays for 2 babies (40) and keeps 10;
+a parent at 100 can pay for 4.</p>
+<h2 id="3-eggs-and-incubation">3. Eggs and incubation</h2>
+<ul>
+<li><strong>REPRO-20 (MUST)</strong> A conception produces one egg per baby, an entity at the
+first parent's position, holding: parents, generation, the genome after
+crossover, the pending mutations, the conception tick and the hatch tick
+(conception + <code>incubation</code> ticks).</li>
+<li><strong>REPRO-21 (MUST)</strong> <code>incubation</code> = 0 means the babies hatch in the same tick,
+as in the prototype. It is the reference value (owner decision); a few ticks
+MAY be set to hide the mutator's latency (MUT-33).</li>
+<li><strong>REPRO-22 (MUST)</strong> Eggs are not animals: they don't sense, decide, move, eat,
+breed or count toward caps. They hatch in the hatch phase, in conception order.</li>
+<li><strong>REPRO-23 (MAY)</strong> Eggs can be eaten when the egg kind carries an edible
+component and an eater's diet lists it (SPEC-10, SPEC-15), or be destroyed by
+an environment rule. A destroyed or eaten egg never hatches and is recorded.
+In the reference eggs have no edible component, so they can't be eaten (owner
+decision); a student may add one (eggs then need an incubation above 0 to
+exist long enough).</li>
+<li><strong>REPRO-24 (MUST)</strong> Hatching waits for the egg's genome to be complete
+(MUT-32), creates the animal as in REPRO-12, and records a birth event with
+the litter size and the mutations.</li>
+</ul>
+<h2 id="4-population-limits">4. Population limits</h2>
+<ul>
+<li><strong>POP-01 (MUST)</strong> Each species has a cap and a cap rule:
+<ul>
+<li><strong>migrate</strong> (reference): births go on at the cap. In the migration phase, if
+the species is above its cap, animals chosen uniformly at random leave the
+world (death cause <code>migrated</code>) until it is back at the cap. Animals born or
+hatched this tick are spared, unless too few older animals remain.</li>
+<li><strong>block</strong>: no conception while the species is at or above its cap; litters
+are cut to the places left.</li>
+</ul>
+</li>
+<li><strong>POP-02 (MUST)</strong> Migration chooses with its own stream and ignores genes,
+stats and position, so it favours no gene.</li>
+<li><strong>POP-03 (MUST)</strong> Each species has a floor. In the floor phase, while a species
+has fewer animals than its floor, a <strong>newcomer</strong> is added: a founder genome, a
+random walkable position, the founder energy, generation 0, recorded as an
+immigrant.</li>
+<li><strong>POP-04 (MUST)</strong> At tick 0 each species gets <code>initialPopulation</code> founders:
+founder genomes at random walkable positions, recorded as founders (not
+newcomers).</li>
+<li><strong>POP-05 (SHOULD)</strong> A world where a species needs newcomers is reported
+(count in the summary): newcomers bring founder genes and restart that species'
+evolution. The owner's aim is worlds that never need them.</li>
+</ul>
+<p><strong>Reference values.</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Prey (full / small)</th>
+<th>Predators (full / small)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Initial population</td>
+<td>136 / 24</td>
+<td>28 / 4</td>
+</tr>
+<tr>
+<td>Floor</td>
+<td>10 / 10</td>
+<td>3 / 3</td>
+</tr>
+<tr>
+<td>Cap</td>
+<td>270 / 40</td>
+<td>68 / 6</td>
+</tr>
+<tr>
+<td>Cap rule</td>
+<td>migrate</td>
+<td>migrate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Options tried and rejected</strong> (kept as examples of population-rule modules, off):</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Rule</th>
+<th>Outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Egg bank</td>
+<td>below the floor, a random egg laid in the last 2 000 ticks hatches (crossover and mutation at hatching, real parents) before any founder newcomer</td>
+<td>lineages survived crashes, crashes went on; &quot;not a valid idea&quot;</td>
+</tr>
+<tr>
+<td>Prey per predator</td>
+<td>hunters breed only while there are at least q prey per hunter in the whole world</td>
+<td>stopped crashes; rejected: no animal could know the head count</td>
+</tr>
+<tr>
+<td>Prey seen</td>
+<td>a hunter breeds only with at least m prey within its vision</td>
+<td>weak: hunters gather where prey still are</td>
+</tr>
+<tr>
+<td>One shared cap</td>
+<td>one cap for all species together, migration over the total</td>
+<td>crashes came back; one cap per species restored</td>
+</tr>
+<tr>
+<td>Block instead of migrate</td>
+<td>no births at the cap</td>
+<td>populations sat at the cap and births only filled free places</td>
+</tr>
+</tbody>
+</table>
+<p>History in one line: blocked births and single babies led to boom-and-bust
+crashes; litters of 2–4 and migration at the cap made both species last without
+newcomers (2026-10-09).</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

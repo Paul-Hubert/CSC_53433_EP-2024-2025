@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Reproduction and population | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Reproduction and population | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/reproduction-and-population.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="guide-reproduction-and-population">
+<h1 id="reproduction-and-population">Reproduction and population</h1>
+
+<p>Evolution needs births: an animal that eats well, escapes predators and finds a partner leaves babies, and its genes
+spread. This page follows a birth from the mate decision to the newborn, then explains the limits that keep each
+population in bounds: a cap above, a floor below. What happens to the genes on the way, mutation in particular, is in
+<a href="genes-and-mutation.html">Genes and mutation</a>.</p>
+<h2 id="how-a-birth-happens">How a birth happens</h2>
+<pre><code class="lang-mermaid">flowchart LR
+    D[Decision: mate] --&gt; B{Breed phase: ready partner within reach?}
+    B --&gt;|no| N[No litter]
+    B --&gt;|yes| L[Litter size; parents pay]
+    L --&gt; E[One egg per baby: crossover, mutations drawn]
+    E --&gt; H{Hatch phase: due and genome complete?}
+    H --&gt;|yes| A[Babies join the species]
+    A --&gt; M[Migration: back to the cap]
+    M --&gt; F[Floor: newcomers if too few]
+</code></pre>
+<h3 id="mating">Mating</h3>
+<p>An animal whose brain chose <em>mate</em> walks toward the nearest ready partner it sees. The breeding itself happens in the
+<strong>breed phase</strong>, after every animal has acted (TICK-06):</p>
+<ol>
+<li>The phase takes, in id order, each animal whose current action is mate, that is <strong>ready</strong> and hasn't bred in this
+decision period. Ready means alive, adult (age at least the <strong>Maturity</strong> trait, 150 ticks) and with at least
+<strong>Mate Energy</strong> (50 points) (<a class="xref" href="../api/EvoSim.MatingRule.html#EvoSim_MatingRule_IsReady_EvoSim_Animal_">IsReady(Animal)</a>, REPRO-01).</li>
+<li>It pairs it with the nearest ready animal of its species within <strong>Reach</strong> (1 m) that hasn't bred either; ties go to
+the lower id. <strong>One partner's choice is enough</strong>: the partner may be resting or eating (REPRO-02).</li>
+<li>Both are marked as having bred. Each animal breeds at most once per decision period: the mark is cleared at its next
+decision (REPRO-03).</li>
+</ol>
+<p>With <strong>Sexual</strong> off on the <a class="xref" href="../api/EvoSim.MatingRule.html">MatingRule</a>, or the World's <strong>Asexual</strong> control (C7) on, a ready animal that
+chose mate reproduces alone and pays the whole cost (REPRO-04). Killed animals never breed (REPRO-05).</p>
+<h3 id="litters-and-their-cost">Litters and their cost</h3>
+<p>The <a class="xref" href="../api/EvoSim.Litter.html">Litter</a> decides how many babies a mating makes (REPRO-10):</p>
+<ol>
+<li>k is drawn uniformly in [<strong>Min</strong>, <strong>Max</strong>] = [2, 4], from the species' <code>litter</code> stream.</li>
+<li>Each baby costs <strong>Child Energy</strong> (40 points), shared equally by the parents: with two parents, 20 each per baby.</li>
+<li>k is cut so that no parent pays more energy than it has, but <strong>never below Min</strong>. A poor parent can be left with zero
+energy or less, and starves at the death check. This is a choice of the contract, not an accident.</li>
+</ol>
+<p>Each parent then pays its share × k, its offspring counter grows by k, and it is marked as having bred (REPRO-11). With
+the reference values, a parent at 50 energy pays for 2 babies (40 points) and keeps 10; at 100 it can pay for 4.</p>
+<h3 id="crossover-and-eggs">Crossover and eggs</h3>
+<p>Each baby gets its <strong>own</strong> crossover, so siblings usually differ (GENE-32). The reference <a class="xref" href="../api/EvoSim.UniformCrossover.html">UniformCrossover</a>
+takes each locus from one parent or the other with probability ½, independently, from the species' <code>mutation</code> stream
+(GENE-30). A baby of a single parent copies its genome (GENE-31). The baby's mutations are then drawn, locus by locus
+(MUT-30).</p>
+<p>Each baby becomes an <a class="xref" href="../api/EvoSim.Egg.html">Egg</a>, laid at the first parent's position in the World's <a class="xref" href="../api/EvoSim.EggSystem.html">EggSystem</a>
+(REPRO-20). An egg holds the parents, the generation (the larger parent generation + 1), the alleles after crossover, the
+mutations still running, the conception tick and the hatch tick: conception + the species' <a class="xref" href="../api/EvoSim.Incubation.html">Incubation</a>
+<strong>Ticks</strong>. Eggs are not animals: they don't sense, decide, move, eat, breed or count toward caps (REPRO-22). In the
+reference nothing eats them; a species can be given a taste for eggs (REPRO-23, see
+<a href="../extending/reproduction.html#eggs-as-food">Reproduction and population</a>).</p>
+<h3 id="hatching">Hatching</h3>
+<p>The <strong>hatch phase</strong> runs right after the breed phase. Eggs due at this tick hatch in conception order (REPRO-22), but
+only once their genome is complete: if the mutator's answers aren't in, the tick waits (MUT-32, REPRO-24). With the
+reference incubation of 0 ticks, babies hatch in the tick they were conceived, as in the prototype (REPRO-21).</p>
+<p>Each baby starts with the litter's <strong>Child Energy</strong>, full stamina, age 0, the heading drawn at conception, at the egg's
+place (REPRO-12). It has no action until its first decision, at the start of the next tick (REPRO-13). A <code>birth</code> event
+records its parents, generation, genome, litter size and mutations.</p>
+<h2 id="caps-and-migration">Caps and migration</h2>
+<p>Each species has a <a class="xref" href="../api/EvoSim.CapRule.html">CapRule</a> with a <strong>Cap</strong> and a <strong>Mode</strong> (POP-01):</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>At the cap</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Migrate</strong> (reference)</td>
+<td>Births go on. In the <strong>migration phase</strong>, if the species is above its cap, animals chosen uniformly at random leave the world (death cause <code>migrated</code>) until it is back at the cap. Animals born this tick are spared, unless too few older animals remain.</td>
+</tr>
+<tr>
+<td><strong>Block</strong></td>
+<td>No conception while the species is at or above its cap; a litter is cut to the places left, possibly to zero.</td>
+</tr>
+</tbody>
+</table>
+<p>Migration draws from the species' own <code>migration</code> stream and ignores genes, stats and position, so it favours no gene
+(POP-02). Migrate was chosen over Block because blocked births led to boom-and-bust crashes (11 §4).</p>
+<h2 id="floors-and-newcomers">Floors and newcomers</h2>
+<p>Each species has a <a class="xref" href="../api/EvoSim.FloorRule.html">FloorRule</a>. In the <strong>floor phase</strong>, the last but one phase of the tick, while a species has
+fewer living animals than its <strong>Floor</strong>, a <strong>newcomer</strong> arrives (POP-03): a founder genome drawn from the founder pools,
+a random walkable position, the starting stats, generation 0, recorded as an <code>immigrant</code> event. It decides from the next
+tick (TICK-05). At tick 0 each species gets its <strong>Initial Population</strong> of founders the same way, recorded as <code>founder</code>
+events (POP-04).</p>
+<p>Newcomers bring founder genes back and restart that species' evolution, so a run that needs them is reported (POP-05).
+The aim is a world that never needs them: litters of 2 to 4 and migration at the cap made both reference species last
+without newcomers.</p>
+<h2 id="the-main-types">The main types</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.MatingRule.html">MatingRule</a></td>
+<td>who is adult and ready, the breeding reach, one or two parents</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Litter.html">Litter</a></td>
+<td>the litter size and the energy each baby costs</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Crossover.html">Crossover</a>, <a class="xref" href="../api/EvoSim.UniformCrossover.html">UniformCrossover</a></td>
+<td>how the parents' genomes mix</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Incubation.html">Incubation</a></td>
+<td>ticks from conception to hatching</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Egg.html">Egg</a>, <a class="xref" href="../api/EvoSim.EggSystem.html">EggSystem</a></td>
+<td>a conceived baby; the world's eggs, laid and hatched in order</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.CapRule.html">CapRule</a>, <a class="xref" href="../api/EvoSim.FloorRule.html">FloorRule</a></td>
+<td>the population's upper and lower limits</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.BreedPhase.html">BreedPhase</a>, <a class="xref" href="../api/EvoSim.HatchPhase.html">HatchPhase</a></td>
+<td>the phases that conceive and hatch</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.MigrationPhase.html">MigrationPhase</a>, <a class="xref" href="../api/EvoSim.FloorPhase.html">FloorPhase</a></td>
+<td>the phases that apply the cap and the floor</td>
+</tr>
+</tbody>
+</table>
+<h2 id="settings">Settings</h2>
+<p>The rules sit in each species' <code>Life</code> group; the egg system is the World's <code>Environment ▸ Eggs</code> object.</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Field</th>
+<th>Reference</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mating rule</td>
+<td><strong>Mate Energy</strong></td>
+<td>50 points</td>
+<td>energy needed to be ready</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Maturity</strong></td>
+<td>150 ticks</td>
+<td>adult age; a trait, so a number gene could set it</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Reach</strong></td>
+<td>1 m</td>
+<td>breeding distance</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Sexual</strong></td>
+<td>on</td>
+<td>two parents; off = one parent pays all</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Prompt Rule</strong></td>
+<td>&quot;Breeding needs only one of the two to choose mate…&quot;</td>
+<td>the rule line the brain reads</td>
+</tr>
+<tr>
+<td>Litter</td>
+<td><strong>Min</strong>, <strong>Max</strong></td>
+<td>2, 4</td>
+<td>litter size range, in babies</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Child Energy</strong></td>
+<td>40 points</td>
+<td>each baby's energy, paid by the parents</td>
+</tr>
+<tr>
+<td>Incubation</td>
+<td><strong>Ticks</strong></td>
+<td>0</td>
+<td>conception to hatching</td>
+</tr>
+<tr>
+<td>Cap rule</td>
+<td><strong>Cap</strong></td>
+<td>prey 270, predators 68 (<code>Lab1_Small</code>: 40 and 6)</td>
+<td>maximum population, in animals</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Mode</strong></td>
+<td>Migrate</td>
+<td>Migrate or Block</td>
+</tr>
+<tr>
+<td>Floor rule</td>
+<td><strong>Floor</strong></td>
+<td>prey 10, predators 3</td>
+<td>minimum population, in animals</td>
+</tr>
+<tr>
+<td>Species</td>
+<td><strong>Initial Population</strong></td>
+<td>prey 136, predators 28 (<code>Lab1_Small</code>: 24 and 4)</td>
+<td>founders at tick 0</td>
+</tr>
+</tbody>
+</table>
+<h2 id="in-the-editor">In the editor</h2>
+<ul>
+<li>The species inspector's <strong>Population</strong> foldout shows the initial population, the floor, the cap and its mode, and the
+living count in Play mode.</li>
+<li>In Play mode, the Scene view's EvoSim overlay draws a yellow circle under each egg (the <strong>Eggs</strong> toggle).</li>
+<li><em>Window ▸ EvoSim ▸ Event Log</em> lists <code>birth</code>, <code>immigrant</code>, <code>egg_lost</code> and <code>death</code> events as they happen; filter by kind,
+species or animal, and follow one animal's descendants.</li>
+<li><em>Window ▸ EvoSim ▸ Ecology Monitor</em> graphs the populations and counts births, founders and deaths by cause.</li>
+<li>Validation warns about a breeding species without an <code>EggSystem</code> (V-20), without a <code>Litter</code>, a crossover or an
+<code>Energy</code> module (V-26), a floor or initial population above the cap (V-32), a bad litter range (V-33), and a smallest
+litter that costs more than the mate energy (V-34).</li>
+</ul>
+<h2 id="go-further">Go further</h2>
+<ul>
+<li>Change who mates, how genes mix, litter sizes, incubation, caps or floors:
+<a href="../extending/reproduction.html">Reproduction and population</a>.</li>
+<li>Rewrite <code>Litter</code> and <code>UniformCrossover</code> from their stubs: <a href="../extending/exercises.html">the teaching path</a>.</li>
+<li>The contract: <a href="../spec/11-reproduction-and-population.html">11 — Reproduction and population</a>; the phase order:
+<a href="the-tick.html">A tick, phase by phase</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

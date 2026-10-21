@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>The world and its modules | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="The world and its modules | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/world-and-modules.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="guide-world-and-modules">
+<h1 id="the-world-and-its-modules">The world and its modules</h1>
+
+<p>A simulation is one GameObject with a <a class="xref" href="../api/EvoSim.World.html">World</a> component, and everything under it. Each feature is a
+component, a <strong>module</strong>: a sense, an action, a food layer, a brain, a tick phase. To add a feature you add a component; to
+switch it off you disable it. The World finds its modules, sets them up in a fixed order, checks the configuration, and
+then runs ticks. This page explains how the World reads its tree and what it calls, when.</p>
+<h2 id="the-tree-of-a-reference-scene">The tree of a reference scene</h2>
+<p><code>Assets/EvoSim/Scenes/HideVsFlee.unity</code>, as <em>EvoSim ▸ Build Reference Scenes</em> makes it (the other Lab 1 scenes differ
+only in sizes and numbers):</p>
+<pre><code>Lab1 World                  World
+├── Ground                  FlatGround, 64 × 64 m
+├── Environment
+│   ├── Grass               FoodGrid, Edible (grazed, 25 points per item)
+│   ├── Thickets            CoverLayer (30 % of the ground)
+│   ├── Carcasses           CarcassSystem
+│   └── Eggs                EggSystem
+├── Brains                  JEV (JevBrain, the default brain), Random, Ollama points,
+│                           Answer cache, Mutator (MutatorService), Mutator client
+├── Recording               RunRecorder, LiveStatistics
+├── Phases                  Sense, Ask brains, Choose actions, Act, Breed, Hatch,
+│                           Deaths, Migration, Environment, Floor, Record (one phase each)
+├── Prey                    Species (40 founders), SearchRule, Edible (struck), Body
+│   ├── Locomotion          KinematicLocomotion
+│   ├── Stats               Energy, Stamina, Metabolism
+│   ├── Senses              Energy, Stamina, Food, Predator, Cover, Animal, Age
+│   ├── Actions             eat, flee, hide, follow, rest, mate (each with its TextGene)
+│   ├── Food                Diet (Grass)
+│   ├── Life                MatingRule, Litter, UniformCrossover, Incubation, Starvation,
+│   │                       OldAge, CapRule, FloorRule, DecisionSchedule
+│   └── Mutation            LlmMutation
+└── Predator                the same groups: hunt, follow, rest, mate; Digestion; Diet (prey, carcass:prey)
+</code></pre>
+<p>The camera, the light and the <em>Run views</em> object sit beside the World, not under it: they only display
+(<a href="views-and-real-time.html">Views and real time</a>). <em>GameObject ▸ EvoSim ▸ New World</em> makes the same World tree with the
+random brain as default, and <em>GameObject ▸ EvoSim ▸ New Species</em> adds a species to it.</p>
+<h2 id="who-owns-a-module">Who owns a module</h2>
+<p>The World reads its tree with three rules (ARCH-05, ARCH-06):</p>
+<ol>
+<li><strong>A module belongs to the nearest owner above it.</strong> A <a class="xref" href="../api/EvoSim.SpeciesModule.html">SpeciesModule</a> belongs to the nearest
+<a class="xref" href="../api/EvoSim.Species.html">Species</a> above it (or on the same GameObject). A species inside another species is an error (V-01). A
+species module with no species above it is an error too (V-02).</li>
+<li><strong>Disabled means absent.</strong> A disabled component, or one on an inactive GameObject, is not part of the world. Disabling
+an action also removes the text gene on it or under it, from the genome, the prompt and the signature.</li>
+<li><strong>Order matters only within a kind.</strong> Groups such as <code>Senses</code> or <code>Life</code> are only folders. The modules of one kind are
+ordered depth first in the hierarchy: the n-th action found is action n (its place in the probabilities and the
+prompt), the n-th sense gives the n-th fragment of the situation text, the n-th gene is locus n.</li>
+</ol>
+<p>A text gene steers the nearest enabled action on its GameObject or above it. A text gene under no action is treated as
+free, with a warning (V-06) unless it is marked <em>free</em>.</p>
+<h2 id="world-modules-phases-and-services">World modules: phases and services</h2>
+<p>A <a class="xref" href="../api/EvoSim.WorldModule.html">WorldModule</a> sits under the World and outside every species (one under a species is ignored, V-15). There
+are two kinds:</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Base class</th>
+<th>What it is</th>
+<th>Found by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Phase</td>
+<td><a class="xref" href="../api/EvoSim.TickPhase.html">TickPhase</a></td>
+<td>one step of every tick</td>
+<td>the World runs every phase in hierarchy order</td>
+</tr>
+<tr>
+<td>Service</td>
+<td><a class="xref" href="../api/EvoSim.WorldService.html">WorldService</a></td>
+<td>something phases and modules use: the ground, food layers, cover, brains, the recorder</td>
+<td>type: <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Service_"><code>World.Service&lt;T&gt;()</code></a>; type and name: <code>World.Service&lt;FoodGrid&gt;(&quot;Grass&quot;)</code></td>
+</tr>
+</tbody>
+</table>
+<p>A service's name is its GameObject's name (<a class="xref" href="../api/EvoSim.WorldService.html#EvoSim_WorldService_ServiceName">ServiceName</a>). Modules find services by type or
+name when they initialise, never through a scene reference: that is what lets one prefab serve several scenes (ARCH-08).</p>
+<h2 id="initialisation-step-by-step">Initialisation, step by step</h2>
+<p><a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Initialize">Initialize</a> sets up a run. It is called by Play mode when <strong>Start On Play</strong> is on, by
+<a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Play">Play</a>, or by a test. Modules never set themselves up in <code>Awake</code> or <code>Start</code>, whose order Unity does
+not guarantee: the World calls them, always in this order (ARCH-04). The step numbers are those of 20 §4, which the API
+comments use too.</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>—</td>
+<td><strong>Reset</strong>: tick 0; new random streams and a new event log from the seed</td>
+</tr>
+<tr>
+<td>0</td>
+<td>a World inside another World is an error (V-16)</td>
+</tr>
+<tr>
+<td>1</td>
+<td><strong>species</strong>: every enabled species under the World, in hierarchy order</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>world modules</strong>: every enabled phase and service, in hierarchy order; the phase list is the tick's order (TICK-01)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>services</strong>: each service's <code>Initialize</code>, the ground first, then the others in hierarchy order</td>
+</tr>
+<tr>
+<td>4–5</td>
+<td><strong>species modules</strong>: each species collects the modules it owns, binds each text gene to its action, and builds its action, gene and sense orders; ids and display names must be unique (V-07)</td>
+</tr>
+<tr>
+<td>6</td>
+<td>every species module's <code>Declare</code> (stats and traits), then every species module's <code>Initialize</code> (look-ups), then every phase's <code>Initialize</code>; the founder alleles are registered</td>
+</tr>
+<tr>
+<td>7</td>
+<td>the food web is derived from the diets; each species is signed (SPEC-03) and its prompt template built</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>validation</strong>: the core checks, then every module's <code>Validate</code>; an error stops here, <code>Initialize</code> returns false and keeps the messages in <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_LastReport">LastReport</a></td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>views</strong>: a pool of views per species that has a <a class="xref" href="../api/EvoSim.Body.html">Body</a></td>
+</tr>
+<tr>
+<td>—</td>
+<td><strong>Begin</strong>: every world module's <code>Begin</code>, in hierarchy order, for initial content such as the first food items</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>founders</strong>: each species' <strong>Initial Population</strong>, at random walkable positions, genomes drawn from the founder pools (POP-04)</td>
+</tr>
+</tbody>
+</table>
+<p>The reset and steps 0 to 8 are <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Prepare_EvoSim_ValidationReport_">Prepare</a>, which creates no
+animal. The editor validates with it, so <code>Declare</code>, <code>Initialize</code> and <code>Validate</code> also run in Edit mode. They must not
+change the scene: put anything that creates content in <code>Begin</code>.</p>
+<h2 id="the-lifecycle-hooks">The lifecycle hooks</h2>
+<table>
+<thead>
+<tr>
+<th>Hook</th>
+<th>On</th>
+<th>Called</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Initialize</code></td>
+<td>services</td>
+<td>step 3, before the species' modules exist</td>
+</tr>
+<tr>
+<td><code>Declare</code></td>
+<td>species modules</td>
+<td>step 6, before any species module initialises</td>
+</tr>
+<tr>
+<td><code>Initialize</code></td>
+<td>species modules, then phases</td>
+<td>step 6, after every <code>Declare</code></td>
+</tr>
+<tr>
+<td><code>WritePromptRules</code></td>
+<td>species modules, services</td>
+<td>step 7, while each species' prompt is built</td>
+</tr>
+<tr>
+<td><code>Validate</code></td>
+<td>every module</td>
+<td>step 8; also by the <em>Validate</em> button, the play-mode gate, and when a species is added during the run</td>
+</tr>
+<tr>
+<td><code>Begin</code></td>
+<td>world modules</td>
+<td>once, after validation passed, before the founders; never in Edit mode</td>
+</tr>
+<tr>
+<td><code>OnBorn</code></td>
+<td>the species, its modules, then every world module</td>
+<td>each animal that joins the living, founders included</td>
+</tr>
+<tr>
+<td><code>OnDied</code></td>
+<td>the species, its modules, then every world module</td>
+<td>each death, once it is recorded</td>
+</tr>
+<tr>
+<td><code>OnSpeciesAdded</code></td>
+<td>world modules</td>
+<td>when <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_AddSpecies_EvoSim_Species_System_String_EvoSim_Species_System_Int32_">AddSpecies</a> adds a species during the run</td>
+</tr>
+<tr>
+<td><code>OnRunStopped</code></td>
+<td>world modules</td>
+<td>once, when the run stops, whatever the reason</td>
+</tr>
+</tbody>
+</table>
+<p>Within each line, modules are called in hierarchy order. The extension pages explain each hook from the module's side:
+<a href="../extending/species-modules.html">Species modules</a> and <a href="../extending/world-modules.html">Phases, services and world hooks</a>.</p>
+<h2 id="validation-and-the-play-mode-gate">Validation and the play-mode gate</h2>
+<p>One validation engine runs everywhere (EDIT-01): the <em>Validate</em> button of the World and Species inspectors, the
+play-mode gate, <code>Initialize</code>, and the tests. Each message has a validator id (V-01 to V-62, listed in 21 §2), a
+severity, the object at fault, and often a fix button.</p>
+<table>
+<thead>
+<tr>
+<th>Severity</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Error</td>
+<td>blocks Play and the run</td>
+</tr>
+<tr>
+<td>Warning</td>
+<td>the run starts; something is probably not what you meant</td>
+</tr>
+<tr>
+<td>Information</td>
+<td>worth knowing</td>
+</tr>
+</tbody>
+</table>
+<p>When you press Play, the gate (<a class="xref" href="../api/EvoSim.Editor.PlayModeGate.html">PlayModeGate</a>) validates every enabled World of the open scenes. An
+error cancels Play and logs <code>EvoSim: Play blocked — V-xx …</code>; clicking the line selects the object at fault. The
+inspectors' validation lists and fix buttons are described in <a href="editor-tooling.html#validation">Editor tooling</a>.</p>
+<h2 id="run-controls">Run controls</h2>
+<p>Once initialised, the World advances as its run controls say. In Play mode the World inspector shows them as buttons
+(<em>Play</em>, <em>Pause</em>, <em>Step</em>, <em>Run N</em>, <em>Stop</em>).</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Play">Play</a></td>
+<td>initialises if needed, then runs</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Pause">Pause</a>, <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Resume">Resume</a></td>
+<td>stops advancing, goes on again; a tick that waits for the brain stays where it is</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Step">Step</a></td>
+<td>runs one tick, then pauses</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.World.html#EvoSim_World_RunFor_System_Int32_">RunFor</a></td>
+<td>runs that many ticks, then pauses</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.World.html#EvoSim_World_RequestStop_System_String_">RequestStop</a></td>
+<td>ends the run at the next tick boundary (the inspector's <em>Stop</em>)</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Stop_System_String_">Stop</a></td>
+<td>ends the run now; for a tick boundary, or inside a tick before anything changed</td>
+</tr>
+</tbody>
+</table>
+<p>A stopped run is over: its files are complete, and a new run needs <code>Initialize</code> again. Leaving Play mode, or disabling
+the World, stops the run too. <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_State">State</a> says where the run is: <em>Idle</em>, <em>Running</em>, <em>Paused</em>,
+<em>Stepping</em>, <em>Waiting</em> or <em>Blocked</em> (a tick waits for answers), <em>Stopped</em>. Tests and batch runs skip the controls and call
+<a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Advance_System_Int32_">Advance</a> directly (<a href="the-tick.html">A tick, phase by phase</a>).</p>
+<h2 id="the-main-types">The main types</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.World.html">World</a></td>
+<td>the root: finds, sets up, validates and runs everything below it</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Species.html">Species</a></td>
+<td>a kind of animal; owns its modules and its living animals</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.SpeciesModule.html">SpeciesModule</a></td>
+<td>the base of every module under a species</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.WorldModule.html">WorldModule</a></td>
+<td>the base of phases and services</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.TickPhase.html">TickPhase</a>, <a class="xref" href="../api/EvoSim.WorldService.html">WorldService</a></td>
+<td>the two kinds of world module</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Ownership.html">Ownership</a></td>
+<td>the ownership rules above, as functions</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.ValidationReport.html">ValidationReport</a>, <a class="xref" href="../api/EvoSim.ValidationMessage.html">ValidationMessage</a>, <a class="xref" href="../api/EvoSim.ValidationFix.html">ValidationFix</a></td>
+<td>the messages of a validation pass</td>
+</tr>
+</tbody>
+</table>
+<h2 id="settings">Settings</h2>
+<p>The World's run settings (seed, wait mode, speed, stop conditions) are listed in
+<a href="running-and-building.html#the-worlds-run-settings">Running and building</a>. The others:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>What it does</th>
+<th>Reference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Separate World Seed</strong>, <strong>World Seed</strong></td>
+<td>give the map (terrain, cover, initial food) its own seed (RAND-04)</td>
+<td>off</td>
+</tr>
+<tr>
+<td><strong>Decision Period</strong></td>
+<td>ticks between two decisions of an animal (DEC-01)</td>
+<td>4</td>
+</tr>
+<tr>
+<td><strong>Sampling Temperature</strong></td>
+<td>sharpens (below 1) or flattens (above 1) the brain's probabilities before the draw (DEC-20)</td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>Memo Capacity</strong></td>
+<td>most answers the decision memo keeps (DEC-30); 0 = no limit</td>
+<td>262 144</td>
+</tr>
+<tr>
+<td><strong>Text Style</strong></td>
+<td>situation texts terse (V1) or in the first person (V2) (SENSE-11)</td>
+<td>V1</td>
+</tr>
+<tr>
+<td><strong>Default Brain</strong></td>
+<td>the brain of species that name none (DEC-13)</td>
+<td>JEV</td>
+</tr>
+<tr>
+<td><strong>Shuffled Genes</strong>, <strong>Random Founders</strong>, <strong>No Mutation</strong>, <strong>Asexual</strong></td>
+<td>the experimental controls C3, C4, C2, C7 (15 §1)</td>
+<td>off</td>
+</tr>
+<tr>
+<td><strong>Show Views</strong>, <strong>Interpolate Views</strong>, <strong>Views Outside Play Mode</strong></td>
+<td>what the views do; they never change a run</td>
+<td>on, on, off</td>
+</tr>
+</tbody>
+</table>
+<h2 id="go-further">Go further</h2>
+<ul>
+<li><a href="the-tick.html">A tick, phase by phase</a>: what happens once the run starts.</li>
+<li><a href="../extending/species-modules.html">Species modules</a> and <a href="../extending/world-modules.html">Phases, services and world hooks</a>:
+writing your own modules.</li>
+<li><a href="editor-tooling.html">Editor tooling</a>: the World and Species inspectors.</li>
+<li>Specification: <a href="../spec/20-unity-architecture.html">20 — Unity architecture</a> (a design proposal: the code is the
+reference where they differ) and <a href="../spec/21-editor-tooling.html">21 — Editor tooling</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class ObservationSet | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class ObservationSet | EvoSim ">
+      
+      <meta name="description" content="A fixed list of situations, written by sense label and token (15 &#167;2, &amp;quot;the 48 situations&amp;quot;): the prototype&#39;s rows ({&amp;quot;energy&amp;quot;: &amp;quot;low&amp;quot;, &amp;quot;food&amp;quot;: &amp;quot;close&amp;quot;, &amp;quot;animal&amp;quot;: &amp;quot;adjacent&amp;quot;, &amp;quot;animal_ready&amp;quot;: true, …}) are matched to a species&#39; senses by label; a sense the row doesn&#39;t name takes a default token.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_ObservationSet.md&amp;value=---%0Auid%3A%20EvoSim.ObservationSet%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.ObservationSet">
+
+
+
+  <h1 id="EvoSim_ObservationSet" data-uid="EvoSim.ObservationSet" class="text-break">
+Class ObservationSet  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/ObservationSet.cs/#L16"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Runtime.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>A fixed list of situations, written by sense label and token (15 §2, &quot;the 48 situations&quot;): the prototype's
+rows ({&quot;energy&quot;: &quot;low&quot;, &quot;food&quot;: &quot;close&quot;, &quot;animal&quot;: &quot;adjacent&quot;, &quot;animal_ready&quot;: true, …}) are matched to a
+species' senses by label; a sense the row doesn't name takes a default token.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class ObservationSet</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">ObservationSet</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="EvoSim_ObservationSet_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>The brain integrity gates and tests use it to ask a brain about the same situations whatever the species' sense
+order: <a class="xref" href="EvoSim.ObservationSet.html#EvoSim_ObservationSet_FromJsonLines_System_String_">FromJsonLines(string)</a> or <a class="xref" href="EvoSim.ObservationSet.html#EvoSim_ObservationSet_PredatorReference">PredatorReference()</a> gives the rows, <a class="xref" href="EvoSim.ObservationSet.html#EvoSim_ObservationSet_For_EvoSim_Species_">For(Species)</a> turns them
+into observations of one species.</p>
+</div>
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="EvoSim_ObservationSet_Defaults" data-uid="EvoSim.ObservationSet.Defaults">
+  Defaults
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/ObservationSet.cs/#L40"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Defaults by sense label for senses a row doesn't name: the prototype had no stamina and no cover sense. A sense
+with no default here takes its last token (usually &quot;none&quot;).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly Dictionary&lt;string, string&gt; Defaults</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="EvoSim_ObservationSet_Rows_" data-uid="EvoSim.ObservationSet.Rows*"></a>
+
+  <h3 id="EvoSim_ObservationSet_Rows" data-uid="EvoSim.ObservationSet.Rows">
+  Rows
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/ObservationSet.cs/#L34"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The situations, in the order they were read or added.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;ObservationSet.Row&gt; Rows { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="EvoSim.ObservationSet.html">ObservationSet</a>.<a class="xref" href="EvoSim.ObservationSet.Row.html">Row</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_ObservationSet_Add_" data-uid="EvoSim.ObservationSet.Add*"></a>
+
+  <h3 id="EvoSim_ObservationSet_Add_System_Collections_Generic_Dictionary_System_String_System_String__System_String_" data-uid="EvoSim.ObservationSet.Add(System.Collections.Generic.Dictionary{System.String,System.String},System.String)">
+  Add(Dictionary&lt;string, string&gt;, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/ObservationSet.cs/#L104"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds a row from label/token pairs.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Add(Dictionary&lt;string, string&gt; tokens, string source = &quot;custom&quot;)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>tokens</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd><p>Token by sense label, such as &quot;Energy&quot; → &quot;low&quot;; labels are stored in lower case.</p>
+</dd>
+    <dt><code>source</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>Where the row comes from, kept in <a class="xref" href="EvoSim.ObservationSet.Row.html#EvoSim_ObservationSet_Row_Source">Source</a>.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_ObservationSet_For_" data-uid="EvoSim.ObservationSet.For*"></a>
+
+  <h3 id="EvoSim_ObservationSet_For_EvoSim_Species_" data-uid="EvoSim.ObservationSet.For(EvoSim.Species)">
+  For(Species)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/ObservationSet.cs/#L141"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gives every row as an observation of the species.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;Observation&gt; For(Species species)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>species</code> <a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd><p>The species whose senses read the rows.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="EvoSim.Observation.html">Observation</a>&gt;</dt>
+    <dd><p>The observations in row order; rows the species can't express are skipped.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_ObservationSet_FromJsonLines_" data-uid="EvoSim.ObservationSet.FromJsonLines*"></a>
+
+  <h3 id="EvoSim_ObservationSet_FromJsonLines_System_String_" data-uid="EvoSim.ObservationSet.FromJsonLines(System.String)">
+  FromJsonLines(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/ObservationSet.cs/#L53"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads JSON lines in the prototype's format (prototype/data/observations_v2.jsonl, copied to
+<code>Assets/EvoSim/Data/Observations/prey_observations_v2.jsonl</code>).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ObservationSet FromJsonLines(string text)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>text</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>One JSON object per line. &quot;source&quot; and &quot;tags&quot; fill the row's fields, &quot;scale&quot; is skipped, a
+boolean &quot;animal_ready&quot; adds &quot;, ready&quot; or &quot;, not ready&quot; to the &quot;animal&quot; token, and every other key is a sense
+label with its token. Keys are used as written, so write them in lower case.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.ObservationSet.html">ObservationSet</a></dt>
+    <dd><p>The set, one row per non-empty line.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_ObservationSet_PredatorReference_" data-uid="EvoSim.ObservationSet.PredatorReference*"></a>
+
+  <h3 id="EvoSim_ObservationSet_PredatorReference" data-uid="EvoSim.ObservationSet.PredatorReference">
+  PredatorReference()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/ObservationSet.cs/#L83"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Builds the predator's 48 reference situations (15 §2): energy × prey band × carcass × another predator, with the
+tags the brain checks use (any, prey_present, carcass_present, animal_present, animal_near).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ObservationSet PredatorReference()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.ObservationSet.html">ObservationSet</a></dt>
+    <dd><p>A new set of 48 rows (3 energies × 4 prey bands × 2 carcass × 2 other predator), stamina &quot;medium&quot;.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_ObservationSet_ToObservation_" data-uid="EvoSim.ObservationSet.ToObservation*"></a>
+
+  <h3 id="EvoSim_ObservationSet_ToObservation_EvoSim_ObservationSet_Row_EvoSim_Species_" data-uid="EvoSim.ObservationSet.ToObservation(EvoSim.ObservationSet.Row,EvoSim.Species)">
+  ToObservation(Row, Species)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Senses/ObservationSet.cs/#L118"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gives the observation of a row for a species: each sense's token by its label (case-insensitive; the kin sense
+&quot;Other predator&quot; also answers to &quot;animal&quot;, a threat sense to &quot;predator&quot;), or the default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Observation ToObservation(ObservationSet.Row row, Species species)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>row</code> <a class="xref" href="EvoSim.ObservationSet.html">ObservationSet</a>.<a class="xref" href="EvoSim.ObservationSet.Row.html">Row</a></dt>
+    <dd><p>A row of this set.</p>
+</dd>
+    <dt><code>species</code> <a class="xref" href="EvoSim.Species.html">Species</a></dt>
+    <dd><p>The species whose senses read the row, in its sense order.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Observation.html">Observation</a></dt>
+    <dd><p>The observation, or null if a token is unknown to its sense (the species can't express the row).</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

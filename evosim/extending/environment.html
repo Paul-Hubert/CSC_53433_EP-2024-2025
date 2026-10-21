@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Food, cover, entities and ground | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Food, cover, entities and ground | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/environment.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-environment">
+<h1 id="food-cover-entities-and-ground">Food, cover, entities and ground</h1>
+
+<p>Four kinds of world services make up the environment, and each is a base class you can derive from. Add a
+<strong>resource layer</strong> for food that sits on cells and grows back (berries, mushrooms), a <strong>cover</strong> for hiding places, an
+<strong>entity system</strong> for objects that appear, move or rot (fruit, nests), or a <strong>ground</strong> for a different world shape.
+Making something edible needs no code at all: see <a href="#who-eats-what">Who eats what</a>. For how the reference modules behave,
+read <a href="../guides/environment.html">The environment</a> first.</p>
+<p>All four go under the World, outside any species: a layer, a cover or an entity system on its own GameObject under
+<code>Environment</code>, the ground on the World's <code>Ground</code> GameObject. There is no script template for them: create a C# file in
+<code>Assets/Student</code> and derive from the base class.</p>
+<h2 id="a-resource-layer">A resource layer</h2>
+<p><a class="xref" href="../api/EvoSim.ResourceLayer.html">ResourceLayer</a> holds edible items. Senses and actions find items through the eater's diet, and the act
+phase consumes them when an animal grazes.</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th></th>
+<th>What it does, when it is called</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Count</code></td>
+<td>must implement</td>
+<td>how many items the layer holds now (ENV-01)</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.ResourceLayer.html#EvoSim_ResourceLayer_Nearest_UnityEngine_Vector3_System_Single_EvoSim_ResourceItem__">Nearest</a></td>
+<td>must implement</td>
+<td>the nearest item within a radius, as a <a class="xref" href="../api/EvoSim.ResourceItem.html">ResourceItem</a>; called by senses and actions</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.ResourceLayer.html#EvoSim_ResourceLayer_Consume_EvoSim_ResourceItem_">Consume</a></td>
+<td>must implement</td>
+<td>removes the item at once; false if it is gone already (ENV-02); called when an animal grazes</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.ResourceLayer.html#EvoSim_ResourceLayer_Regrow_EvoSim_RandomStream_">Regrow</a></td>
+<td>may override</td>
+<td>once per tick, in the environment phase, with the layer's own stream (ENV-03); nothing by default</td>
+</tr>
+<tr>
+<td><code>StreamName</code></td>
+<td>may override</td>
+<td>the name of that stream; the layer's name by default</td>
+</tr>
+<tr>
+<td><code>WithinReach</code></td>
+<td>may override</td>
+<td>the nearest item within reach; <code>Nearest</code> by default</td>
+</tr>
+<tr>
+<td><code>Initialize</code></td>
+<td>may override</td>
+<td>build empty storage: the ground is ready, the cover may not be yet</td>
+</tr>
+<tr>
+<td><code>Begin</code></td>
+<td>may override</td>
+<td>place the first items: every module is ready, cover included</td>
+</tr>
+</tbody>
+</table>
+<p><code>LayerName</code> is the GameObject's name, and <code>Edible</code> the <a class="xref" href="../api/EvoSim.Edible.html">Edible</a> on the same GameObject.</p>
+<h3 id="example-berry-bushes">Example: berry bushes</h3>
+<p>Bushes grow in some cells of a 4 m grid, each with one berry that grows back. It reuses <a class="xref" href="../api/EvoSim.CellGrid.html">CellGrid</a>, the
+cell grid of the reference <a class="xref" href="../api/EvoSim.FoodGrid.html">FoodGrid</a>, which finds the nearest marked cell for you.</p>
+<pre><code class="lang-csharp">using EvoSim;
+using UnityEngine;
+
+public class BerryBushes : ResourceLayer
+{
+    [SerializeField, Range(0f, 1f), Tooltip(&quot;Share of walkable cells with a bush.&quot;)] float bushShare = 0.2f;
+    [SerializeField, Range(0f, 1f), Tooltip(&quot;Chance per tick that a bush regrows its berry.&quot;)] float regrowP = 0.01f;
+
+    CellGrid grid;
+    bool[] bush, berry;     // per cell: a bush grows here; its berry is ripe
+    int count;
+
+    public override int Count =&gt; count;
+
+    public override void Initialize()
+    {
+        grid = new CellGrid(World.Ground.Bounds, 4f);
+        bush = new bool[grid.Count];
+        berry = new bool[grid.Count];
+        count = 0;
+    }
+
+    public override void Begin()                                      // the map: from the world seed (RAND-04)
+    {
+        var rng = World.Random.Get(&quot;world/&quot; + ServiceName);
+        for (int c = 0; c &lt; grid.Count; c++)
+            if (World.Ground.IsWalkable(grid.Center(c)) &amp;&amp; rng.NextDouble() &lt; bushShare) { bush[c] = berry[c] = true; count++; }
+    }
+
+    public override bool Nearest(Vector3 p, float radius, out ResourceItem item)
+    {
+        int c = grid.Nearest(berry, p, radius, World.Ground, out float d);   // world distance, ties by cell index
+        item = c &gt;= 0 ? new ResourceItem(this, c, World.Ground.OnGround(grid.Center(c)), d) : default;
+        return c &gt;= 0;
+    }
+
+    public override bool Consume(ResourceItem item)
+    {
+        if (item.Layer != this || item.Cell &lt; 0 || !berry[item.Cell]) return false;   // gone already (ENV-02)
+        berry[item.Cell] = false;
+        count--;
+        return true;
+    }
+
+    public override void Regrow(RandomStream rng)                       // the layer's own stream, in cell order
+    {
+        for (int c = 0; c &lt; grid.Count; c++)
+            if (bush[c] &amp;&amp; !berry[c] &amp;&amp; rng.NextDouble() &lt; regrowP) { berry[c] = true; count++; }
+    }
+}
+</code></pre>
+<p>To use it:</p>
+<ol>
+<li>Add a GameObject <code>Berries</code> under the World's <code>Environment</code>, with <code>BerryBushes</code> and an <code>Edible</code> (<code>Energy</code>: the energy
+points of one berry).</li>
+<li>On each species that eats berries, add a diet entry <code>Berries</code>.</li>
+<li>Point the eater's actions and senses at it: an <a class="xref" href="../api/EvoSim.EatAction.html">EatAction</a> with <code>Target</code> <code>Berries</code> (or empty for every
+layer the diet grazes), a <a class="xref" href="../api/EvoSim.NearestResourceSense.html">NearestResourceSense</a> with <code>Layer Name</code> <code>Berries</code> if the brain should know.</li>
+</ol>
+<h3 id="rules">Rules</h3>
+<ul>
+<li><strong>Consume once</strong> (ENV-02): <code>Consume</code> removes the item before it returns true, and returns false for an item already
+eaten. The act order decides who gets a contested item.</li>
+<li><strong>Change only in your phase</strong> (ENV-03): the items change only in <code>Regrow</code> and <code>Consume</code>. <code>Regrow</code> draws only from
+the stream it is given, in a fixed order: loop over cells, never over a <code>Dictionary</code> (RAND-05).</li>
+<li><strong>The map from the world seed</strong> (RAND-04): draw the first items in <code>Begin</code> from <code>World.Random.Get(&quot;world/&quot; + ServiceName)</code>,
+so runs that share a world seed share the map.</li>
+<li><strong>Nearest by the world distance</strong> (SPACE-02), ties broken by a fixed key such as the cell index (SPACE-08).
+<a class="xref" href="../api/EvoSim.CellGrid.html">CellGrid</a>'s <code>Nearest</code> does both.</li>
+<li><strong>Items on walkable ground</strong>, so animals can reach them.</li>
+<li><strong>A unique name</strong>: diets, senses and the stream use the GameObject's name. It must differ from the other layers and
+must not be <code>world</code>, <code>act-order</code> or contain <code>/</code> (V-18).</li>
+</ul>
+<h2 id="a-cover">A cover</h2>
+<p><a class="xref" href="../api/EvoSim.Cover.html">Cover</a> answers where animals can hide. The World combines every cover: an animal is hidden when any cover
+hides it, and the hide action runs to the nearest cover point of all of them.</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th></th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Cover.html#EvoSim_Cover_InCover_UnityEngine_Vector3_">InCover</a></td>
+<td>must implement</td>
+<td>whether a point is in cover (ENV-10)</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Cover.html#EvoSim_Cover_NearestCover_UnityEngine_Vector3_System_Single_UnityEngine_Vector3__System_Single__">NearestCover</a></td>
+<td>must implement</td>
+<td>the nearest point in cover within a radius, and its distance; the point itself, at 0, when already in cover</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Cover.html#EvoSim_Cover_Hides_EvoSim_Species_EvoSim_Species_">Hides</a></td>
+<td>may override</td>
+<td>whether species <code>hidden</code> is hidden from species <code>from</code>: from its threats by default, limited by <code>Hiding Species</code></td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Cover.html#EvoSim_Cover_IsHiddenFrom_EvoSim_Animal_EvoSim_Species_">IsHiddenFrom</a></td>
+<td>may override</td>
+<td><code>Hides</code> and <code>InCover</code> at the animal's position</td>
+</tr>
+</tbody>
+</table>
+<p>A complete cover, from EvoSim's test probes, where a band of the world is in cover:</p>
+<pre><code class="lang-csharp">using EvoSim;
+using UnityEngine;
+
+public class SideCover : Cover
+{
+    public float MinX = float.NegativeInfinity, MaxX = float.PositiveInfinity;
+
+    public override bool InCover(Vector3 p) =&gt; p.x &gt;= MinX &amp;&amp; p.x &lt;= MaxX;
+
+    public override bool NearestCover(Vector3 p, float radius, out Vector3 point, out float distance)
+    {
+        point = new Vector3(Mathf.Clamp(p.x, MinX, MaxX), p.y, p.z);
+        distance = Mathf.Abs(point.x - p.x);
+        return distance &lt;= radius;
+    }
+}
+</code></pre>
+<p>To hide every species from every other one, not only from its threats:
+<code>public override bool Hides(Species hidden, Species from) =&gt; from != hidden;</code></p>
+<p><strong>Rules.</strong> The same point gets the same answer for the whole run, or the answer changes only in a phase. Build a map in
+<code>Initialize</code> from <code>World.Random.Get(&quot;world/&quot; + ServiceName)</code> and draw nothing afterwards (RAND-04). Return a walkable
+point from <code>NearestCover</code>, measured with the world distance. <code>Hides</code> gives the same answer for the same two species all
+run long, since senses, actions and strikes all ask it (ENV-11).</p>
+<h2 id="an-entity-kind">An entity kind</h2>
+<p>An <a class="xref" href="../api/EvoSim.Entity.html">Entity</a> is an object with a position that is not an animal. Its <a class="xref" href="../api/EvoSim.EntitySystem-1.html">EntitySystem&lt;T&gt;</a> keeps
+the entities of one kind in creation order and finds them like animals (ENV-20).</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th></th>
+<th>What it does, when it is called</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Entity.Kind</code>, <code>EntitySystem&lt;T&gt;.Kind</code></td>
+<td>must implement</td>
+<td>the kind's name, e.g. <code>&quot;apple&quot;</code></td>
+</tr>
+<tr>
+<td><code>Add(e)</code></td>
+<td>call</td>
+<td>adds an entity: it gets its id and creation tick</td>
+</tr>
+<tr>
+<td><code>Nearest(p, radius, viewer, filter, out found, out distance)</code></td>
+<td>call</td>
+<td>the nearest entity passing the filter, ties by id; used-up ones are skipped</td>
+</tr>
+<tr>
+<td><code>Move(e, t)</code></td>
+<td>may override</td>
+<td>moves one entity, each tick in the environment phase (ENV-21); nothing by default</td>
+</tr>
+<tr>
+<td><code>OnRemoved(e, reason, t)</code></td>
+<td>may override</td>
+<td>after an entity is removed, <code>&quot;used up&quot;</code> or <code>&quot;expired&quot;</code></td>
+</tr>
+<tr>
+<td><code>UpdateEntities(t)</code></td>
+<td>may override, call base</td>
+<td>the environment phase's call: <code>Move</code> each entity, count lifetimes down, remove used-up and expired ones (ENV-22)</td>
+</tr>
+<tr>
+<td><code>Initialize</code></td>
+<td>may override, call base</td>
+<td>empties the list for a new run</td>
+</tr>
+</tbody>
+</table>
+<p>An entity's <code>LifetimeLeft</code> counts down once per tick (-1 = never), and setting <code>UsedUp</code> removes it in this tick's
+environment phase.</p>
+<h3 id="example-apples-that-fall-and-rot">Example: apples that fall and rot</h3>
+<pre><code class="lang-csharp">using EvoSim;
+using UnityEngine;
+
+public class Apple : Entity
+{
+    public override string Kind =&gt; &quot;apple&quot;;
+}
+
+public class AppleSystem : EntitySystem&lt;Apple&gt;
+{
+    [SerializeField, Range(0f, 1f), Tooltip(&quot;Chance per tick that an apple falls.&quot;)] float fallP = 0.2f;
+    [SerializeField, Min(1), Tooltip(&quot;Ticks before an apple rots.&quot;)] int rotTicks = 200;
+
+    public override string Kind =&gt; &quot;apple&quot;;
+
+    public override void UpdateEntities(TickContext t)
+    {
+        base.UpdateEntities(t);                                   // the old ones age and go first (ENV-22)
+        var rng = t.Stream(ServiceName);                          // its own stream (RAND-02)
+        if (rng.Chance(fallP))
+            Add(new Apple { Position = World.Ground.RandomWalkable(rng), LifetimeLeft = rotTicks });
+    }
+}
+</code></pre>
+<p>Put <code>AppleSystem</code> on a GameObject <code>Apples</code> under <code>Environment</code>. Senses find apples with
+<code>s.NearestEntity&lt;Apple&gt;(a, vision)</code> on the <a class="xref" href="../api/EvoSim.SenseContext.html">SenseContext</a>, actions with <code>c.NearestEntity&lt;Apple&gt;(a)</code> on the
+<a class="xref" href="../api/EvoSim.ActContext.html">ActContext</a> (within the animal's vision). The run views show one grey cube per apple: the
+<a class="xref" href="../api/EvoSim.EntityMarkers.html">EntityMarkers</a> read every entity kind through <code>EntityAt</code>, which <code>EntitySystem&lt;T&gt;</code> provides.</p>
+<p>An apple is eaten through an action with an interaction of your own (<a href="action.html#interactions">An action</a>). The
+interaction marks the apple used up first, so a second animal reaching it in the same tick gets nothing:</p>
+<pre><code class="lang-csharp">using EvoSim;
+
+public class EatAppleAction : AnimalAction
+{
+    protected override string DefaultDescription =&gt; &quot;go to the nearest visible apple and eat it&quot;;
+
+    public override void Act(Animal a, ActContext c)
+    {
+        var apple = c.NearestEntity&lt;Apple&gt;(a);                  // within the animal's vision
+        if (apple == null) { c.Search(); return; }
+        c.WalkTo(apple.Value.Position, 0f);
+        c.OnArrival(new EatApple(apple.Value.Entity));
+    }
+
+    sealed class EatApple : IInteraction
+    {
+        readonly Apple apple;
+        public EatApple(Apple a) { apple = a; }
+        public float Reach =&gt; 0.5f;
+        public void Apply(Animal a, InteractionContext c)
+        {
+            if (apple.UsedUp) return;                           // eaten by an animal that acted earlier (ENV-02)
+            apple.UsedUp = true;                                // removed in this tick's environment phase
+            c.Feed(a, 20f);
+        }
+    }
+}
+</code></pre>
+<p><strong>Rules.</strong> Entities change only in phases and interactions, never from the views (ENV-21, SPACE-12). Keep them on
+walkable ground. Draw random numbers only from a named stream of <code>t</code> (RAND-02). Don't add or remove entities from
+<code>OnRemoved</code>: the list is being compacted.</p>
+<h2 id="a-ground">A ground</h2>
+<p><a class="xref" href="../api/EvoSim.Ground.html">Ground</a> gives every point its height and walkability, and owns the world's distance (SPACE-02, SPACE-04).</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th></th>
+<th>What it does, when it is called</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Bounds</code></td>
+<td>must implement</td>
+<td>the world rectangle (x, z), half-open; layers and covers lay their grids over it</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Ground.html#EvoSim_Ground_Height_UnityEngine_Vector3_">Height</a></td>
+<td>must implement</td>
+<td>the ground's height; animals and items follow it (SPACE-06)</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Ground.html#EvoSim_Ground_IsWalkable_UnityEngine_Vector3_">IsWalkable</a></td>
+<td>must implement</td>
+<td>whether an animal may stand there; checked after every move</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Ground.html#EvoSim_Ground_Distance_UnityEngine_Vector3_UnityEngine_Vector3_">Distance</a></td>
+<td>may override</td>
+<td>the world distance; every query uses it through <code>World.Distance</code></td>
+</tr>
+<tr>
+<td><code>IsWater</code>, <code>NearestWater</code></td>
+<td>may override</td>
+<td>water, for the food bonus, water senses and drinking</td>
+</tr>
+<tr>
+<td><code>SlopeDegrees</code></td>
+<td>may override</td>
+<td>the slope between two points, for locomotions</td>
+</tr>
+<tr>
+<td><code>SlideTo</code>, <code>SideStep</code></td>
+<td>may override</td>
+<td>how a straight move is blocked, and how a stuck animal is freed</td>
+</tr>
+<tr>
+<td><code>RandomWalkable</code></td>
+<td>may override</td>
+<td>where founders and newcomers appear</td>
+</tr>
+</tbody>
+</table>
+<p>The easiest start is a subclass of <a class="xref" href="../api/EvoSim.FlatGround.html">FlatGround</a>. This flat ground with a pond comes from EvoSim's test
+probes:</p>
+<pre><code class="lang-csharp">using EvoSim;
+using UnityEngine;
+
+public class PondGround : FlatGround
+{
+    public Vector3 PondCenter = new Vector3(10f, 0f, 10f);
+    public float PondRadius = 3f;
+
+    public override bool IsWater(Vector3 p) =&gt; Flat(p, PondCenter) &lt; PondRadius;
+    public override bool IsWalkable(Vector3 p) =&gt; base.IsWalkable(p) &amp;&amp; !IsWater(p);
+
+    public override WaterHit? NearestWater(Vector3 p, float radius)
+    {
+        float d = Mathf.Max(0f, Flat(p, PondCenter) - PondRadius);
+        if (d &gt; radius) return null;
+        var dir = new Vector3(p.x - PondCenter.x, 0f, p.z - PondCenter.z);
+        if (dir.sqrMagnitude &lt; 1e-6f) dir = Vector3.right;
+        dir.Normalize();
+        return new WaterHit(PondCenter + dir * (PondRadius - 0.01f), PondCenter + dir * (PondRadius + 0.01f), d);
+    }
+
+    static float Flat(Vector3 a, Vector3 b) =&gt; new Vector2(a.x - b.x, a.z - b.z).magnitude;
+}
+</code></pre>
+<p>Replace the <code>FlatGround</code> on the World's <code>Ground</code> GameObject with it: a World uses one ground.</p>
+<p><strong>Rules.</strong></p>
+<ul>
+<li><code>IsWalkable</code> is false outside <code>Bounds</code>: nothing ever leaves the rectangle (SPACE-03).</li>
+<li>The answers don't change during a run: layers and covers read them once, at initialisation.</li>
+<li>All walkable ground is connected, or animals get trapped in pockets (SPACE-05).</li>
+<li><code>Distance</code> is never shorter than the straight horizontal distance: the cell grids' nearest-cell search relies on it.</li>
+<li><code>SideStep</code> and <code>RandomWalkable</code> draw only from the stream they are given (RAND-02).</li>
+<li>The ground is initialised before every other service: don't look up layers or covers in its <code>Initialize</code>.</li>
+</ul>
+<h2 id="who-eats-what">Who eats what</h2>
+<p>Whether something is eaten is decided on both sides (SPEC-10, SPEC-13): the eaten thing carries an enabled
+<a class="xref" href="../api/EvoSim.Edible.html">Edible</a>, which says how much energy it gives, and the eater's <a class="xref" href="../api/EvoSim.Diet.html">Diet</a> lists it. The form of the
+<strong>diet entry</strong> decides how it is eaten:</p>
+<table>
+<thead>
+<tr>
+<th>Diet entry</th>
+<th>Eaten</th>
+<th>The Edible goes on</th>
+<th>Energy per meal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a layer's name: <code>Grass</code></td>
+<td>grazed, an item within <code>Graze Reach</code> (0.5 m)</td>
+<td>the layer's GameObject</td>
+<td><code>Energy</code> per item</td>
+</tr>
+<tr>
+<td>a species' id or display name: <code>prey</code></td>
+<td>struck within <code>Strike Reach</code> (1 m), killing with the hunter's <code>kill.chance</code></td>
+<td>the GameObject that holds the <a class="xref" href="../api/EvoSim.Species.html">Species</a></td>
+<td><code>Energy</code> per kill</td>
+</tr>
+<tr>
+<td><code>carcass:&lt;species&gt;</code>: <code>carcass:prey</code></td>
+<td>scavenged within <code>Scavenge Reach</code> (1 m), one portion per eater, never by the killer</td>
+<td>the killed species' GameObject, with <code>Carcass Portions</code> above 0; the world needs a <a class="xref" href="../api/EvoSim.CarcassSystem.html">CarcassSystem</a></td>
+<td><code>Carcass Energy</code> per portion</td>
+</tr>
+<tr>
+<td><code>egg:&lt;species&gt;</code>: <code>egg:prey</code></td>
+<td>eaten whole within <code>Graze Reach</code></td>
+<td>the <a class="xref" href="../api/EvoSim.EggSystem.html">EggSystem</a>'s GameObject</td>
+<td><code>Energy</code> per egg</td>
+</tr>
+</tbody>
+</table>
+<p>The energy is multiplied by the entry's <code>Energy Scale</code>, then passed through
+<a class="xref" href="../api/EvoSim.Diet.html#EvoSim_Diet_EnergyFrom_EvoSim_Animal_EvoSim_EdibleTarget_System_Single_">Diet.EnergyFrom</a>, which a subclass of
+<code>Diet</code> can override. Reaches are settings of the act phase. The Edible's <code>Method</code> field is only a label that the
+species inspector shows. Validation reports an entry that names nothing (V-20) and a target without an Edible (V-24,
+with a fix). Your own entity kinds, such as the apples above, are eaten through an interaction instead.</p>
+<h3 id="recipe-make-eggs-edible">Recipe: make eggs edible</h3>
+<p>No code (22 §15):</p>
+<ol>
+<li>Give the laying species an <a class="xref" href="../api/EvoSim.Incubation.html">Incubation</a> with <code>Ticks</code> above 0, for example 20. With 0, eggs hatch in the
+tick they are laid and nothing can reach them.</li>
+<li>Add an <code>Edible</code> to the World's <code>Eggs</code> GameObject, the one with the <code>EggSystem</code>, with <code>Energy</code> 15.</li>
+<li>On the egg eater, add the diet entry <code>egg:prey</code>.</li>
+<li>Give it a way to find eggs: an <code>EatAction</code> whose <code>Target</code> is <code>egg:prey</code>, and, if its brain should know, a
+<a class="xref" href="../api/EvoSim.NearestEntitySense.html">NearestEntitySense</a> with <code>Kind</code> <code>egg</code>, <code>Of Species</code> <code>prey</code> and the label <code>Eggs</code>.</li>
+</ol>
+<p>An eaten egg never hatches and is recorded as <code>egg_lost</code> with the reason <code>eaten</code> (REPRO-23).</p>
+<h3 id="carcasses">Carcasses</h3>
+<p>What a kill leaves is set on the <strong>killed</strong> species' Edible: <code>Carcass Portions</code> (reference 2, 0 = no carcass),
+<code>Carcass Energy</code> per portion (30) and <code>Carcass Ticks</code> before it rots (100). The hunter's diet lists <code>carcass:prey</code>. The
+carcass system's <code>Prompt Rule</code> is the line its prompt gets, <code>{portions}</code> replaced by the number of portions.</p>
+<p>On every kill, the act phase calls
+<a class="xref" href="../api/EvoSim.CarcassSystem.html#EvoSim_CarcassSystem_Create_EvoSim_Animal_System_Int32_">CarcassSystem.Create</a> on the World's first carcass
+system. It is virtual: override it to change what a kill leaves, and keep the base call, which fills the carcass in and
+adds it. The system reuses removed carcasses, so an override of <code>OnRemoved</code> must call the base too.</p>
+<pre><code class="lang-csharp">public class LeanCarcasses : CarcassSystem
+{
+    public override Carcass Create(Animal killed, int killerId)
+    {
+        var c = base.Create(killed, killerId);
+        if (c != null &amp;&amp; killed.Age &lt; 100) c.PortionsLeft = 1;     // a young animal feeds one eater
+        return c;
+    }
+}
+</code></pre>
+<h2 id="test-it">Test it</h2>
+<p>Every <code>ResourceLayer</code> class in the project, yours included, runs through the <strong>T-ENV layer template</strong> of the
+conformance suite (<em>Window ▸ General ▸ Test Runner</em>, EditMode, <code>ConformanceTests</code> ▸ <code>LayerConformance</code>). It puts your
+layer on a 30 × 30 m world as <code>Grass</code>, with an Edible, and checks that it starts with items, that <code>Nearest</code> finds one
+within the radius, and that an item is consumed once. A layer that starts empty fails it.</p>
+<p>For your own checks, build a small world in code (<a href="testing-your-module.html">Testing your module</a>):</p>
+<pre><code class="lang-csharp">using EvoSim;
+using EvoSim.Testing;
+using NUnit.Framework;
+
+public class BerryBushesTests : WorldFixture
+{
+    [Test]
+    public void BerriesAreEatenOnceAndGrowBack()
+    {
+        var w = New().Flat(40, 40).Phase&lt;EnvironmentPhase&gt;().Service&lt;BerryBushes&gt;(&quot;Berries&quot;).Build();
+        var bushes = w.Service&lt;ResourceLayer&gt;(&quot;Berries&quot;);
+        int start = bushes.Count;
+        Assert.IsTrue(bushes.Nearest(Place.At(20, 20), 100f, out var berry));
+        Assert.IsTrue(bushes.Consume(berry));
+        Assert.IsFalse(bushes.Consume(berry), &quot;eaten once (ENV-02)&quot;);
+        w.Advance(1000);
+        Assert.AreEqual(start, bushes.Count, &quot;the berry grew back&quot;);
+    }
+}
+</code></pre>
+<p><code>WorldBuilder.Ground&lt;T&gt;(width, depth)</code> builds a world on a <code>FlatGround</code> subclass of yours. The tests in
+<code>Assets/EvoSim/Tests/EditMode/Environment/EnvironmentTests.cs</code> check covers, carcasses and a replaced distance against
+brute-force searches: copy the one closest to your module.</p>
+<h2 id="read-next">Read next</h2>
+<ul>
+<li>Reference modules: <a class="xref" href="../api/EvoSim.FoodGrid.html">FoodGrid</a>, <a class="xref" href="../api/EvoSim.CoverLayer.html">CoverLayer</a>, <a class="xref" href="../api/EvoSim.CarcassSystem.html">CarcassSystem</a>,
+<a class="xref" href="../api/EvoSim.EggSystem.html">EggSystem</a>, <a class="xref" href="../api/EvoSim.TerrainGround.html">TerrainGround</a>.</li>
+<li><a href="samples.html">The samples</a>: seasons that slow the grass, water senses and drinking on a ground with water.</li>
+<li><a href="sense.html">A sense</a> and <a href="action.html">An action or an interaction</a>: let animals see and use what you added.</li>
+<li><a href="world-modules.html">Phases, services and world hooks</a>: services, <code>Initialize</code> and <code>Begin</code>.</li>
+<li>Specification: <a href="../spec/03-environment.html">03 — Environment</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Namespace EvoSim.Testing | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Namespace EvoSim.Testing | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.Testing">
+
+  <h1 id="EvoSim_Testing" data-uid="EvoSim.Testing" class="text-break">Namespace EvoSim.Testing</h1>
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="markdown level0 remarks"></div>
+
+    <h3 id="classes">
+Classes
+</h3>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.AdvancePending.html">AdvancePending</a></dt>
+      <dd><p>A wait that ends after a number of <a class="xref" href="EvoSim.World.html#EvoSim_World_Advance_System_Int32_">Advance(int)</a> calls: how the test fakes answer late (30 §2).
+In the Freeze wait mode the World calls <a class="xref" href="EvoSim.Testing.AdvancePending.html#EvoSim_Testing_AdvancePending_Wait">Wait()</a>, which ends it at once.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.AllLayersObstacleSense.html">AllLayersObstacleSense</a></dt>
+      <dd><p>A test batched sense that asks for its ray against every physics layer: even so, the views' layer is left out, so
+what is rendered never changes what animals sense (RAND-11).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.AllocationProbe.html">AllocationProbe</a></dt>
+      <dd><p>A test phase placed just before and just after another phase: the pair measures the bytes the main thread
+allocated in between, every tick (R-07: no allocation per tick in the act phase after warm-up).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.BatchProbeAction.html">BatchProbeAction</a></dt>
+      <dd><p>A test-only action that wanders and records the group sizes the act phase plans through ActAll (ARCH-12, 20 §10).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.BatchProbeLocomotion.html">BatchProbeLocomotion</a></dt>
+      <dd><p>A test-only locomotion that records the group sizes the act phase moves through MoveAll (ARCH-12, 20 §10).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.BatchProbeSense.html">BatchProbeSense</a></dt>
+      <dd><p>A test-only sense that records the group sizes the sense phase reads through ReadAll (ARCH-12, 20 §10).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.Blackboard.html">Blackboard</a></dt>
+      <dd><p>Shared state for test phases that change &quot;the world&quot; and read it (T-TICK-02): one blackboard is given to several
+<a class="xref" href="EvoSim.Testing.BlackboardPhase.html">BlackboardPhase</a>s, to see which phases see a change.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.BlackboardPhase.html">BlackboardPhase</a></dt>
+      <dd><p>A test phase that reads the blackboard (logging what it sees), then optionally writes it: only the phases after a
+writer see the new value in the same tick (T-TICK-02).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.CallbackPhase.html">CallbackPhase</a></dt>
+      <dd><p>A test-only phase that runs a callback at its place in the tick (to look at the state between two phases).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.CameraProbeSense.html">CameraProbeSense</a></dt>
+      <dd><p>A test sense that attaches an &quot;image&quot; (a byte array) to every query, with no cache key unless asked (T-SENSE-10,
+S24): such queries are never memoised or cached (SENSE-41), and a brain that takes no attachments fails validation
+(V-51).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.CountingCrossover.html">CountingCrossover</a></dt>
+      <dd><p>A test-only uniform crossover that counts its calls (GENE-32: one cross per baby).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.DelayedPhase.html">DelayedPhase</a></dt>
+      <dd><p>A test phase that waits, every <a class="xref" href="EvoSim.Testing.DelayedPhase.html#EvoSim_Testing_DelayedPhase_Every">Every</a> ticks, for an answer that arrives <a class="xref" href="EvoSim.Testing.DelayedPhase.html#EvoSim_Testing_DelayedPhase_DelayCalls">DelayCalls</a>
+Advance calls after it was asked (like a slow brain); in Freeze mode Wait() delivers it at once.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.DoubleDistanceGround.html">DoubleDistanceGround</a></dt>
+      <dd><p>A flat ground whose distance function is twice the Euclidean one: a replaced distance, which every sense and action
+must then use (T-SPACE-02, SPACE-06).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.ExerciseProbe.html">ExerciseProbe</a></dt>
+      <dd><p>A finished teaching-path exercise (22 §0) for the Exercises menu tests: a litter that keeps the reference's rule.
+Its name is not <code>MyLitter</code>, so the menu never takes it for a student's stub.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.FakeHttpTransport.html">FakeHttpTransport</a></dt>
+      <dd><p>A fake server for HTTP brains and mutators (30 §2): answers each request with a scripted function, records every
+request, can fail, hang until the time-out, or answer late; counts requests in flight at once.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.FakeMutator.html">FakeMutator</a></dt>
+      <dd><p>A test mutator client (30 §2): answers mutation prompts with a scripted function (by default it appends &quot;quickly&quot; to the
+sentence), records every prompt and batch, and can answer N Advance calls late or fail.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.FeedAction.html">FeedAction</a></dt>
+      <dd><p>A test-only action: stay, and eat a snack of <a class="xref" href="EvoSim.Testing.FeedAction.html#EvoSim_Testing_FeedAction_Energy">Energy</a> through a custom interaction that feeds the animal
+with <a class="xref" href="EvoSim.InteractionContext.html#EvoSim_InteractionContext_Feed_EvoSim_Animal_System_Single_System_Boolean_">Feed(Animal, float, bool)</a> (a meal counted like any other).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.Fruit.html">Fruit</a></dt>
+      <dd><p>A test-only entity of a kind of one's own: a fruit.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.FruitSystem.html">FruitSystem</a></dt>
+      <dd><p>A test-only entity system for fruit: nothing moves or rots. Several systems of one kind can live in a world
+(&quot;Apples&quot;, &quot;Pears&quot;), and actions find their entities with <code>NearestEntity&lt;Fruit&gt;</code>.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.GoToAction.html">GoToAction</a></dt>
+      <dd><p>A test action that walks or runs toward a fixed point, stopping at a distance (T-SPACE-01, T-MOVE-01).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.Golden.html">Golden</a></dt>
+      <dd><p>Golden files under Assets/EvoSim/Tests/Golden/ (30 §2): situation texts, prompts, hashes. A missing file is
+written from the current output (pinned from the first accepted run); an existing one must match exactly.
+Re-pinning is a deliberate commit that deletes or edits the file and says why.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.HookProbe.html">HookProbe</a></dt>
+      <dd><p>A test-only species module that counts the births and deaths it hears and adds two statistics columns
+(<code>probe_born</code>, <code>probe_died</code>, written with the species' prefix in <code>stats.csv</code>).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.InvariantPhase.html">InvariantPhase</a></dt>
+      <dd><p>A last phase for test worlds: fails the test on the first broken invariant (30 §5).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.Invariants.html">Invariants</a></dt>
+      <dd><p>The checks run after every tick in test worlds (30 §5): positions inside and walkable, no NaN, stats in range,
+unique ids, no dead or killed animal left, valid actions and rows, populations between floor and cap, carcass
+portions ≥ 0, genomes of the right length and species.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.Lab.html">Lab</a></dt>
+      <dd><p>The Lab 1 reference species and world as ready-made recipes for tests (04 §5, 08 §7, 09 §3, 14 §2): prey (eat, flee,
+hide, follow, rest, mate) and predator (hunt, follow, rest, mate) with the prototype's values, founder pools,
+contrast pairs and prompt texts.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.MemoryBrain.html">MemoryBrain</a></dt>
+      <dd><p>A test-only brain with memory: not memoizable, so every deciding animal's query reaches it with its id (even
+animals in the same situation), and it answers uniform rows.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.NeedsEnergyProbe.html">NeedsEnergyProbe</a></dt>
+      <dd><p>A test-only module that names a companion it needs with <a class="xref" href="EvoSim.RequiresModuleAttribute.html">RequiresModuleAttribute</a>: a species without an
+<a class="xref" href="EvoSim.Energy.html">Energy</a> module gets the warning V-26, whose fix adds one.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.ObstacleSense.html">ObstacleSense</a></dt>
+      <dd><p>A test batched sense: one ray along the heading; &quot;blocked&quot; if it hits a collider within 5 m (T-SENSE-09).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.OverlayProbeAction.html">OverlayProbeAction</a></dt>
+      <dd><p>A test-only overlay (ACT-07): done in passing, it plans a walk that must be ignored and a custom interaction that
+counts the times it applied, per animal.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.Place.html">Place</a></dt>
+      <dd><p>Puts animals, food items, cover and carcasses at exact positions in a built world (30 §2), so a test sets up the
+very situation it checks. Records no event.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.PondGround.html">PondGround</a></dt>
+      <dd><p>A test ground: flat, with a round pond (not walkable) whose shore animals can reach (samples 22 §2–§3). It answers
+the water queries that the water sense and the drink action ask.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.ProbeAction.html">ProbeAction</a></dt>
+      <dd><p>A test-only action defined outside the runtime assembly (T-CORE-02): it counts its calls and stays.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.ProbeSense.html">ProbeSense</a></dt>
+      <dd><p>A test-only sense with two tokens; it returns the animal's id parity (T-CORE-02).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.RampGround.html">RampGround</a></dt>
+      <dd><p>A test ground: flat for x &lt; RampStart, then a ramp rising at RampSlope (height per meter) (T-MOVE-07).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.RandomEventPhase.html">RandomEventPhase</a></dt>
+      <dd><p>A test phase that draws from a named stream every tick and records a &quot;probe&quot; event, so the hash depends on the draws.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.ScriptedBrain.html">ScriptedBrain</a></dt>
+      <dd><p>A test brain (30 §2): answers from a policy written in the test, or from given rows per (species, observation);
+counts calls and batches; can answer N Advance calls late, fail, or refuse to mix species.
+Test code only: the system ships no rule-based brain (owner decision).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.ShowProbeView.html">ShowProbeView</a></dt>
+      <dd><p>A test-only view that remembers what OnShow told it.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.SideCover.html">SideCover</a></dt>
+      <dd><p>A test-only cover: every point with x in [MinX, MaxX] is in cover. Several covers in one world combine (ENV-11).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.SlopeLimitLocomotion.html">SlopeLimitLocomotion</a></dt>
+      <dd><p>A kinematic locomotion that refuses slopes steeper than a limit (T-MOVE-07, after 22 §14).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.SnapshotPhase.html">SnapshotPhase</a></dt>
+      <dd><p>A test phase that keeps every living animal's genome texts at the end of each tick (T-OUT-02).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.SourceScan.html">SourceScan</a></dt>
+      <dd><p>Reads the EvoSim source files for static checks (T-RAND-01, T-CORE-08, T-ACT-09): comments removed, line numbers kept.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+      <dd><p>Adds modules to one species of a world being built: what <a class="xref" href="EvoSim.Testing.WorldBuilder.html#EvoSim_Testing_WorldBuilder_Species_System_String_System_Action_EvoSim_Testing_SpeciesSetup__System_String_">Species(string, Action&lt;SpeciesSetup&gt;, string)</a> hands to its
+<code>configure</code> callback.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.Stat.html">Stat</a></dt>
+      <dd><p>Statistical asserts: a proportion or a mean within k standard errors, a χ² uniformity test (30 §2).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.SureKillDiet.html">SureKillDiet</a></dt>
+      <dd><p>A test-only diet: every strike kills, and every meal gives exactly <a class="xref" href="EvoSim.Testing.SureKillDiet.html#EvoSim_Testing_SureKillDiet_Meal">Meal</a> energy.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.ThrowingPhase.html">ThrowingPhase</a></dt>
+      <dd><p>A test phase that throws, for the RAND-20 test: the World stops the run cleanly (&quot;exception in ThrowingPhase&quot;) and
+lets the exception through.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.TracePhase.html">TracePhase</a></dt>
+      <dd><p>A test phase that writes &quot;tick:name&quot; to a log each time it runs (T-TICK-01).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.TraitProbe.html">TraitProbe</a></dt>
+      <dd><p>A test module declaring one trait (default 60, range [1, 120]) and one capped stat (T-ANIM-02, T-ANIM-03).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.TurningLocomotion.html">TurningLocomotion</a></dt>
+      <dd><p>A test locomotion that ignores the intent's direction: it turns it by 30° and halves the distance (T-MOVE-06).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+      <dd><p>Builds a world in code, with no scene (30 §2): ground, food, cover, services, phases and species, each added by one
+chained call, then <a class="xref" href="EvoSim.Testing.WorldBuilder.html#EvoSim_Testing_WorldBuilder_Build">Build()</a>.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.WorldFixture.html">WorldFixture</a></dt>
+      <dd><p>The base class of tests that build worlds: every world started with <a class="xref" href="EvoSim.Testing.WorldFixture.html#EvoSim_Testing_WorldFixture_New_System_Int32_EvoSim_WaitMode_System_String_">New(int, WaitMode, string)</a> is destroyed after each test,
+so tests leave nothing in the scene.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="EvoSim.Testing.WorldHookProbe.html">WorldHookProbe</a></dt>
+      <dd><p>A test-only world service that counts every species' births and deaths and adds one statistics column
+(<code>world_born</code>, after the species' columns in <code>stats.csv</code>).</p>
+</dd>
+    </dl>
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

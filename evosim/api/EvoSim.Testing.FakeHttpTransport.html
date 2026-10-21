@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class FakeHttpTransport | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class FakeHttpTransport | EvoSim ">
+      
+      <meta name="description" content="A fake server for HTTP brains and mutators (30 &#167;2): answers each request with a scripted function, records every request, can fail, hang until the time-out, or answer late; counts requests in flight at once.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_Testing_FakeHttpTransport.md&amp;value=---%0Auid%3A%20EvoSim.Testing.FakeHttpTransport%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.Testing.FakeHttpTransport">
+
+
+
+  <h1 id="EvoSim_Testing_FakeHttpTransport" data-uid="EvoSim.Testing.FakeHttpTransport" class="text-break">
+Class FakeHttpTransport  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/FakeHttpTransport.cs/#L38"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a>.<a class="xref" href="EvoSim.Testing.html">Testing</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Testing.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>A fake server for HTTP brains and mutators (30 §2): answers each request with a scripted function, records every
+request, can fail, hang until the time-out, or answer late; counts requests in flight at once.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class FakeHttpTransport : IHttpTransport</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">FakeHttpTransport</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="EvoSim.IHttpTransport.html">IHttpTransport</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+  <h2 id="EvoSim_Testing_FakeHttpTransport_examples">Examples</h2>
+  <p>A server that is down, and one that answers every chat with fixed points:</p>
+<pre><code class="lang-csharp">var down = new FakeHttpTransport { FailWith = (path, body) =&gt; 503 };
+
+var fake = new FakeHttpTransport();
+fake.Respond = (method, path, body) =&gt; path == "/api/tags"
+    ? new JObject { ["models"] = new JArray(new JObject { ["name"] = "gemma4:12b", ["digest"] = "0123456789abcdef0123" }) }
+    : FakeHttpTransport.Chat("{\"eat\": 50, \"flee\": 30, \"hide\": 0, \"follow\": 10, \"rest\": 10, \"mate\": 0, \"hunt\": 60}");
+var w = New(9).Lab1(prey: 10, predators: 2, randomBrain: false)
+    .DefaultBrain&lt;OllamaPointsBrain&gt;(o =&gt;
+    {
+        o.Transport = fake;
+        o.ConfigureClient("http://ollama.test", 5f, 3, 0f, 2);
+    }).Build();
+w.Advance(1);
+Assert.LessOrEqual(fake.MaxInFlight, 2, "the parallel cap");</code></pre>
+
+
+  <h2 id="EvoSim_Testing_FakeHttpTransport_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Give it to an HTTP brain or mutator client through its <code>Transport</code> property, so tests never call a real
+server (30 §2). <a class="xref" href="EvoSim.Testing.FakeHttpTransport.html#EvoSim_Testing_FakeHttpTransport_Jev_System_Int32_">Jev(int)</a> and <a class="xref" href="EvoSim.Testing.FakeHttpTransport.html#EvoSim_Testing_FakeHttpTransport_OllamaPoints_System_Int32_">OllamaPoints(int)</a> make fakes that answer like the two reference servers,
+with deterministic numbers; <a class="xref" href="EvoSim.Testing.FakeHttpTransport.html#EvoSim_Testing_FakeHttpTransport_For_EvoSim_HttpBrain_">For(HttpBrain)</a> picks the right one for a brain.</p>
+<p>It may be called from several threads at once: <a class="xref" href="EvoSim.Testing.FakeHttpTransport.html#EvoSim_Testing_FakeHttpTransport_Requests">Requests</a> is filled under a lock.</p>
+</div>
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="EvoSim_Testing_FakeHttpTransport_DelayMs" data-uid="EvoSim.Testing.FakeHttpTransport.DelayMs">
+  DelayMs
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/FakeHttpTransport.cs/#L47"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The delay before each answer, in milliseconds; 0 = none.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int DelayMs</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_FakeHttpTransport_FailWith" data-uid="EvoSim.Testing.FakeHttpTransport.FailWith">
+  FailWith
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/FakeHttpTransport.cs/#L43"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>An HTTP status to fail with for (path, body), thrown as an <a class="xref" href="EvoSim.HttpFailure.html">HttpFailure</a>; 0 = answer normally.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;string, JObject, int&gt; FailWith</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <span class="xref">JObject</span>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_FakeHttpTransport_Hang" data-uid="EvoSim.Testing.FakeHttpTransport.Hang">
+  Hang
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/FakeHttpTransport.cs/#L45"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True for (path, body) of requests that never answer: they wait until the caller's time-out cancels them.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;string, JObject, bool&gt; Hang</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <span class="xref">JObject</span>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_FakeHttpTransport_Requests" data-uid="EvoSim.Testing.FakeHttpTransport.Requests">
+  Requests
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/FakeHttpTransport.cs/#L53"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Every request received, in arrival order: method, path, body (null for a GET) and API key.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly List&lt;(string Method, string Path, JObject Body, string ApiKey)&gt; Requests</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.string,newtonsoft.json.linq.jobject,system.string-.method">Method</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.string,newtonsoft.json.linq.jobject,system.string-.path">Path</a>, <span class="xref">JObject</span> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.string,newtonsoft.json.linq.jobject,system.string-.body">Body</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.string,newtonsoft.json.linq.jobject,system.string-.apikey">ApiKey</a>)&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_FakeHttpTransport_Respond" data-uid="EvoSim.Testing.FakeHttpTransport.Respond">
+  Respond
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/FakeHttpTransport.cs/#L41"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The answer's JSON for (method, path, body); body is null for a GET. The default answers <code>{}</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;string, string, JObject, JToken&gt; Respond</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-4">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <span class="xref">JObject</span>, <span class="xref">JToken</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="EvoSim_Testing_FakeHttpTransport_Count_" data-uid="EvoSim.Testing.FakeHttpTransport.Count*"></a>
+
+  <h3 id="EvoSim_Testing_FakeHttpTransport_Count" data-uid="EvoSim.Testing.FakeHttpTransport.Count">
+  Count
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/FakeHttpTransport.cs/#L59"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The number of requests received so far, read safely while requests are in flight.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Count { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_FakeHttpTransport_MaxInFlight_" data-uid="EvoSim.Testing.FakeHttpTransport.MaxInFlight*"></a>
+
+  <h3 id="EvoSim_Testing_FakeHttpTransport_MaxInFlight" data-uid="EvoSim.Testing.FakeHttpTransport.MaxInFlight">
+  MaxInFlight
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/FakeHttpTransport.cs/#L56"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The most requests that were in flight at the same time (to check a client's parallel cap).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int MaxInFlight { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_Testing_FakeHttpTransport_Chat_" data-uid="EvoSim.Testing.FakeHttpTransport.Chat*"></a>
+
+  <h3 id="EvoSim_Testing_FakeHttpTransport_Chat_System_String_" data-uid="EvoSim.Testing.FakeHttpTransport.Chat(System.String)">
+  Chat(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/FakeHttpTransport.cs/#L166"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>An Ollama chat answer whose message has the given content.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static JObject Chat(string content)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>content</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The assistant's text, e.g. a JSON object of points.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">JObject</span></dt>
+    <dd><p>The answer's JSON.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_FakeHttpTransport_Completions_" data-uid="EvoSim.Testing.FakeHttpTransport.Completions*"></a>
+
+  <h3 id="EvoSim_Testing_FakeHttpTransport_Completions_Newtonsoft_Json_Linq_JObject_System_Func_System_String_System_Int32_System_Double__" data-uid="EvoSim.Testing.FakeHttpTransport.Completions(Newtonsoft.Json.Linq.JObject,System.Func{System.String,System.Int32,System.Double})">
+  Completions(JObject, Func&lt;string, int, double&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/FakeHttpTransport.cs/#L149"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>A vLLM completions answer: for each prompt of the request, the log-probabilities of its allowed token ids, from a
+function of (prompt, slot); 100 prompt tokens are counted per prompt.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static JObject Completions(JObject body, Func&lt;string, int, double&gt; logProbability)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>body</code> <span class="xref">JObject</span></dt>
+    <dd><p>The request's body, with its <code>prompt</code> array and <code>allowed_token_ids</code>.</p>
+</dd>
+    <dt><code>logProbability</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd><p>The log-probability of slot k (the k-th allowed id) for a prompt.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">JObject</span></dt>
+    <dd><p>The answer's JSON.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_FakeHttpTransport_FakeLogProbability_" data-uid="EvoSim.Testing.FakeHttpTransport.FakeLogProbability*"></a>
+
+  <h3 id="EvoSim_Testing_FakeHttpTransport_FakeLogProbability_System_String_System_Int32_" data-uid="EvoSim.Testing.FakeHttpTransport.FakeLogProbability(System.String,System.Int32)">
+  FakeLogProbability(string, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/FakeHttpTransport.cs/#L112"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The fake JEV's log-probability of option slot <code class="paramref">k</code> for a text: from a hash of both, a multiple of 0.25
+between -2.25 and 0.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static double FakeLogProbability(string text, int k)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>text</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The prompt text.</p>
+</dd>
+    <dt><code>k</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The option slot (0 for A, 1 for B…).</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>The same number for the same text and slot, so a test can compute the expected rows itself.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_FakeHttpTransport_For_" data-uid="EvoSim.Testing.FakeHttpTransport.For*"></a>
+
+  <h3 id="EvoSim_Testing_FakeHttpTransport_For_EvoSim_HttpBrain_" data-uid="EvoSim.Testing.FakeHttpTransport.For(EvoSim.HttpBrain)">
+  For(HttpBrain)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/FakeHttpTransport.cs/#L140"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>A fake server for a known HTTP brain: <a class="xref" href="EvoSim.Testing.FakeHttpTransport.html#EvoSim_Testing_FakeHttpTransport_Jev_System_Int32_">Jev(int)</a> for a <a class="xref" href="EvoSim.JevBrain.html">JevBrain</a>, <a class="xref" href="EvoSim.Testing.FakeHttpTransport.html#EvoSim_Testing_FakeHttpTransport_OllamaPoints_System_Int32_">OllamaPoints(int)</a> for an
+<a class="xref" href="EvoSim.OllamaPointsBrain.html">OllamaPointsBrain</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static FakeHttpTransport For(HttpBrain brain)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>brain</code> <a class="xref" href="EvoSim.HttpBrain.html">HttpBrain</a></dt>
+    <dd><p>The brain to answer.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.FakeHttpTransport.html">FakeHttpTransport</a></dt>
+    <dd><p>A new fake, or null for any other brain.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_FakeHttpTransport_Jev_" data-uid="EvoSim.Testing.FakeHttpTransport.Jev*"></a>
+
+  <h3 id="EvoSim_Testing_FakeHttpTransport_Jev_System_Int32_" data-uid="EvoSim.Testing.FakeHttpTransport.Jev(System.Int32)">
+  Jev(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/FakeHttpTransport.cs/#L99"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>A fake JEV server: <code>/v1/completions</code> gets log-probabilities from <a class="xref" href="EvoSim.Testing.FakeHttpTransport.html#EvoSim_Testing_FakeHttpTransport_FakeLogProbability_System_String_System_Int32_">FakeLogProbability(string, int)</a>, any other path
+an empty model list.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static FakeHttpTransport Jev(int delayMs = 0)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>delayMs</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The delay before each answer, in milliseconds.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.FakeHttpTransport.html">FakeHttpTransport</a></dt>
+    <dd><p>A new fake.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_FakeHttpTransport_OllamaPoints_" data-uid="EvoSim.Testing.FakeHttpTransport.OllamaPoints*"></a>
+
+  <h3 id="EvoSim_Testing_FakeHttpTransport_OllamaPoints_System_Int32_" data-uid="EvoSim.Testing.FakeHttpTransport.OllamaPoints(System.Int32)">
+  OllamaPoints(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/FakeHttpTransport.cs/#L120"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>A fake Ollama server in points mode: <code>/api/chat</code> answers 0 to 100 points for each action the request's JSON
+schema requires, a hash of the prompt and the action; any other path an empty model list.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static FakeHttpTransport OllamaPoints(int delayMs = 0)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>delayMs</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The delay before each answer, in milliseconds.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.FakeHttpTransport.html">FakeHttpTransport</a></dt>
+    <dd><p>A new fake.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_FakeHttpTransport_Prompt_" data-uid="EvoSim.Testing.FakeHttpTransport.Prompt*"></a>
+
+  <h3 id="EvoSim_Testing_FakeHttpTransport_Prompt_Newtonsoft_Json_Linq_JObject_" data-uid="EvoSim.Testing.FakeHttpTransport.Prompt(Newtonsoft.Json.Linq.JObject)">
+  Prompt(JObject)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/FakeHttpTransport.cs/#L172"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The user message of a chat request: the prompt the brain or mutator sent.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string Prompt(JObject body)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>body</code> <span class="xref">JObject</span></dt>
+    <dd><p>The request's body.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The first message's content, or null when there is none.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_FakeHttpTransport_SendAsync_" data-uid="EvoSim.Testing.FakeHttpTransport.SendAsync*"></a>
+
+  <h3 id="EvoSim_Testing_FakeHttpTransport_SendAsync_System_String_System_String_System_String_System_String_System_Threading_CancellationToken_" data-uid="EvoSim.Testing.FakeHttpTransport.SendAsync(System.String,System.String,System.String,System.String,System.Threading.CancellationToken)">
+  SendAsync(string, string, string, string, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/FakeHttpTransport.cs/#L69"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Records the request, then hangs, waits, fails or answers as scripted by <a class="xref" href="EvoSim.Testing.FakeHttpTransport.html#EvoSim_Testing_FakeHttpTransport_Hang">Hang</a>, <a class="xref" href="EvoSim.Testing.FakeHttpTransport.html#EvoSim_Testing_FakeHttpTransport_DelayMs">DelayMs</a>,
+<a class="xref" href="EvoSim.Testing.FakeHttpTransport.html#EvoSim_Testing_FakeHttpTransport_FailWith">FailWith</a> and <a class="xref" href="EvoSim.Testing.FakeHttpTransport.html#EvoSim_Testing_FakeHttpTransport_Respond">Respond</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;string&gt; SendAsync(string method, string url, string json, string apiKey, CancellationToken cancel)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>method</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p><code>GET</code> or <code>POST</code>.</p>
+</dd>
+    <dt><code>url</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The full address: the host and the path.</p>
+</dd>
+    <dt><code>json</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The request body, or null for a GET.</p>
+</dd>
+    <dt><code>apiKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>Sent as a bearer token when not empty; never logged (OUT-04).</p>
+</dd>
+    <dt><code>cancel</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd><p>Cancelled by the caller at its time-out; the caller doesn't rely on the transport honouring it.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd><p>A task that gives the response body.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.HttpFailure.html">HttpFailure</a></dt>
+    <dd><p>The server answered with an error status, with whether another try may succeed.</p>
+</dd>
+  </dl>
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

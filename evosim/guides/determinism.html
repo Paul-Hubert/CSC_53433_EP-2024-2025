@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Determinism and replay | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Determinism and replay | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/determinism.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="guide-determinism">
+<h1 id="determinism-and-replay">Determinism and replay</h1>
+
+<p>The same scene, seed and brain answers give the same run, event for event, on the same machine and build (RAND-11). It
+doesn't matter how the run is driven: Responsive or Freeze, one tick per frame or a thousand, views on or off, in the
+editor, headless or in a player build. That is what makes a comparison between two gene pools fair, lets a long run with
+a language model be replayed without calling the model again, and turns &quot;it behaved oddly at tick 4 000&quot; into a bug you
+can reproduce. This page explains the mechanisms and the rules your code keeps so that it stays true.</p>
+<h2 id="random-streams">Random streams</h2>
+<p>Every random number of the simulation comes from a <a class="xref" href="../api/EvoSim.RandomStream.html">RandomStream</a>: a PCG32 generator whose starting state is
+the SHA-256 of the text <code>seed/name</code>, for example <code>1234/prey/sampling</code>. The World's
+<a class="xref" href="../api/EvoSim.RandomStreams.html">RandomStreams</a> hands out one stream per name. The same seed and name always give the same numbers, and draws
+from one stream never shift another stream's numbers (RAND-02).</p>
+<p>Streams are per purpose and, where a species is involved, per species (RAND-03):</p>
+<table>
+<thead>
+<tr>
+<th>Stream</th>
+<th>Used for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>world</code>, <code>world/&lt;layer&gt;</code></td>
+<td>the map: terrain, cover patches, initial food; they use the <strong>world seed</strong></td>
+</tr>
+<tr>
+<td><code>&lt;layer&gt;</code> (e.g. <code>Grass</code>)</td>
+<td>the regrowth of one food layer</td>
+</tr>
+<tr>
+<td><code>act-order</code></td>
+<td>the order animals act in (ACT-32)</td>
+</tr>
+<tr>
+<td><code>&lt;species&gt;/founders</code></td>
+<td>founder and newcomer genomes and positions</td>
+</tr>
+<tr>
+<td><code>&lt;species&gt;/sampling</code></td>
+<td>drawing actions from the brain's probabilities</td>
+</tr>
+<tr>
+<td><code>&lt;species&gt;/actions</code></td>
+<td>wandering, sidesteps, strike rolls</td>
+</tr>
+<tr>
+<td><code>&lt;species&gt;/litter</code></td>
+<td>litter sizes, babies' headings</td>
+</tr>
+<tr>
+<td><code>&lt;species&gt;/mutation</code></td>
+<td>crossover and mutation choices, drawn at conception</td>
+</tr>
+<tr>
+<td><code>&lt;species&gt;/migration</code></td>
+<td>who leaves above the cap</td>
+</tr>
+</tbody>
+</table>
+<p>So adding a species doesn't change the draws of the others, and adding a food layer doesn't change another layer's map.
+A purpose of your own is just a new name: <code>t.Stream(s, &quot;lightning&quot;)</code> makes <code>prey/lightning</code> on first use. The
+<strong>world seed</strong> is the run seed unless <strong>Separate World Seed</strong> is on: then many runs can share one map while everything
+else varies (RAND-04). The names <code>world</code> and <code>act-order</code> are reserved: no species id (V-07) or layer name (V-18) may take
+them.</p>
+<h2 id="the-events-hash">The events hash</h2>
+<p>Every event (a founder, a birth, a death, an immigrant, an egg lost, a new species) is one line of canonical JSON, keys
+sorted (RAND-10). The World's <a class="xref" href="../api/EvoSim.EventLog.html">EventLog</a> chains them into a running SHA-256: it starts from the hash of the
+two seeds, and each event's hash covers the previous hash and the event's line. The final hash identifies the run: two
+runs with the same hash recorded the same events in the same order, and two seeds never share a hash (RAND-13).</p>
+<table>
+<thead>
+<tr>
+<th>Where</th>
+<th>What</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.EventLog.html#EvoSim_EventLog_Hash">World.Events.Hash</a>, <a class="xref" href="../api/EvoSim.EventLog.html#EvoSim_EventLog_ShortHash">ShortHash</a></td>
+<td>64 hex digits, and the first 16</td>
+</tr>
+<tr>
+<td><code>summary.json</code> in the run folder</td>
+<td><code>events_hash</code>, <code>events_sha</code>, and <code>events</code> (the count)</td>
+</tr>
+<tr>
+<td>a headless run's result line, the player with <code>-quitAtEnd</code></td>
+<td>the hash at the end</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-a-replay-needs">What a replay needs</h2>
+<table>
+<thead>
+<tr>
+<th>Ingredient</th>
+<th>Where it lives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the configuration</td>
+<td>the scene; <code>run_info.json</code> lists every serialized setting of the World's tree under <code>settings</code></td>
+</tr>
+<tr>
+<td>the seed and the world seed</td>
+<td>the World's <strong>Seed</strong> and <strong>World Seed</strong>; <code>run_info.json</code></td>
+</tr>
+<tr>
+<td>the brain's answers</td>
+<td>within a run, the decision memo; across runs, the answer cache, <code>Library/EvoSim/AnswerCache</code> by default, which also keeps the mutator's answers</td>
+</tr>
+<tr>
+<td>the same machine and build</td>
+<td>floating-point results may differ across machines and scripting backends; hashes are compared on one machine only (RAND-12)</td>
+</tr>
+</tbody>
+</table>
+<p>A language model may not answer the same question twice in the same way. The answer cache removes that doubt: a live
+run writes every answer to it, and running the same command again replays from it with no model call (RAND-21, test
+T-RAND-06). To replay in a player build, give it the cache folder with <code>-cache</code>. A brain with a memory of its own is
+neither memoised nor cached: its runs repeat only if the brain itself does.</p>
+<h2 id="replay-a-player-run-in-the-editor">Replay a player run in the editor</h2>
+<p>A run watched in the player can be replayed headless in batch mode, to check its hash or to probe it, without calling the
+models again. Two things make this go wrong silently: the player writes its answer cache next to the exe by default,
+and <code>FromCommandLine</code> has no <code>-cache</code> option and no replay-only mode. It reads the project's
+<code>Library/EvoSim/AnswerCache</code>, and <strong>any answer missing there becomes a real model call, with no warning</strong>. So:</p>
+<ol>
+<li><p><strong>Run the player on the project's cache.</strong> Pass <code>-cache</code> with the absolute path of the project's cache (a relative
+path is taken from the build's folder), and the level's arguments (<a href="running-and-building.html#run-levels">Run levels</a>):</p>
+<pre><code class="lang-powershell">EvoSim.exe -scene HideVsFlee -seed 1234 -minutes 30 -run my-live -cache &quot;C:\path\to\project\Library\EvoSim\AnswerCache&quot; -quitAtEnd
+</code></pre>
+</li>
+<li><p><strong>Read the run's length.</strong> Open <code>Logs/EvoSim/runs/my-live/summary.json</code> next to the exe and note <code>ticks</code> and
+<code>events_hash</code>.</p>
+</li>
+<li><p><strong>Close the editor</strong>, then replay exactly that many ticks, at the same level, from the repository root:</p>
+<pre><code class="lang-powershell">&amp; $U -batchmode -nographics -projectPath . -executeMethod EvoSim.Editor.RealTimeRuns.FromCommandLine -do headless -scene HideVsFlee -seed 1234 -ticks 9000 -level L2 -run my-live-replay -quit
+</code></pre>
+<p>(<code>$U</code> is the Unity.exe path, as in <a href="running-and-building.html#batch-mode">Batch mode</a>; <code>9000</code> stands for the <code>ticks</code>
+of step 2.)</p>
+</li>
+<li><p><strong>Read the result line</strong>, the last line of <code>Logs/EvoSim/realtime-batch.txt</code>. Its <code>hash</code> must equal the live run's
+<code>events_hash</code>, and it must say <strong><code>brain calls 0</code></strong> and <strong><code>mutator calls 0</code></strong>: any other number means answers were
+missing from the cache and the models were asked again, so the replay is not a replay. Don't trust the exit code:
+<code>FromCommandLine</code> exits with 0 whatever happened, a failure included (the line then starts with <code>FAILED</code>).</p>
+</li>
+</ol>
+<p>A model server that was down when the live run started records the model as <code>@unknown</code>; the replay then misses the cache.
+Start the servers and check them in <em>Brain Health</em> before a live run you want to replay.</p>
+<h2 id="the-same-run-everywhere">The same run everywhere</h2>
+<p>The World makes the run independent of how it is driven:</p>
+<ul>
+<li>a decision always waits for its answers; it is never made on old observations (SPACE-13);</li>
+<li>every random draw happens in a phase, on the main thread, at a fixed point of the tick: mutation choices are drawn at
+conception, not when the mutator answers;</li>
+<li>the views, the camera and the overlays only read the simulation (SPACE-12); views have no collider and sit on a layer
+the sense rays ignore.</li>
+</ul>
+<p>The tests check it: Freeze and Responsive give the same hash with late answers (T-SPACE-07, R-04), one tick per call
+gives the same hash as ten (R-04), views shown or hidden give the same hash (T-SPACE-06), a late mutator changes nothing
+(T-MUT-10), the reference scenes keep their pinned hashes (R-01, <code>Tests/Golden/hashes.json</code>), and each scenario run twice
+gives one hash (<code>EvoSim.Batch.RunScenarios</code>).</p>
+<h2 id="the-rules-that-keep-it">The rules that keep it</h2>
+<ol>
+<li><strong>No other randomness</strong> (RAND-01): no <code>UnityEngine.Random</code>, no <code>System.Random</code>, no <code>Guid.NewGuid</code>, no clock used as a
+seed. Draw from the stream you are given, or ask the World for one by name.</li>
+<li><strong>One stream per purpose and species</strong> (RAND-02, RAND-03): a species' draws come from its own streams, so adding a
+species changes nothing for the others.</li>
+<li><strong>Ordered loops only</strong> (RAND-05): loop over lists, in creation or id order. Never decide by iterating a <code>Dictionary</code>
+or a <code>HashSet</code>, whose order is not defined; looking a key up in one is fine.</li>
+<li><strong>No time.</strong> Never read <code>Time.deltaTime</code>, <code>Time.time</code>, a frame count or the wall clock in simulation code: the tick is
+the only clock (SPACE-10).</li>
+<li><strong>Views only read</strong> (SPACE-12). A view never writes to an animal or to the world.</li>
+<li><strong>Asynchronous work doesn't leak its timing.</strong> Work on another thread never touches the World or a Unity object, and
+its result doesn't depend on when it finishes. The phase that needs it waits through <code>WaitsFor</code> (TICK-03).</li>
+<li><strong><code>WaitsFor</code> only looks.</strong> In Responsive mode it is asked again at every call while the tick waits: it must not draw
+random numbers or change the world.</li>
+<li><strong>No statics</strong> (ARCH-07). Two Worlds may run side by side, and a World runs again after <code>Initialize</code>: keep state in
+your module's fields and reset it in <code>Initialize</code>.</li>
+</ol>
+<h2 id="the-static-checks">The static checks</h2>
+<p><code>Tests/EditMode/Core/StaticChecks.cs</code> (tier T0, <em>Window ▸ General ▸ Test Runner</em>, EditMode) reads the source code
+instead of running it:</p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>What it looks for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NoGlobalRandomness</code> (T-RAND-01)</td>
+<td><code>UnityEngine.Random</code>, <code>new System.Random(</code>, <code>Guid.NewGuid</code>, <code>DateTime.Now.Ticks</code> and the like</td>
+</tr>
+<tr>
+<td><code>NoIterationOverHashCollections</code> (T-RAND-04)</td>
+<td>a <code>foreach</code> over a <code>Dictionary</code> or a <code>HashSet</code> (or their <code>Keys</code>, <code>Values</code>)</td>
+</tr>
+<tr>
+<td><code>ModulesKeepNoAnimalState</code> (T-CORE-05)</td>
+<td>a species module field that holds animals or maps animal ids</td>
+</tr>
+<tr>
+<td><code>CoreNamesNoSpecies</code> (T-CORE-08)</td>
+<td>a species or action name written in the core code</td>
+</tr>
+</tbody>
+</table>
+<p>They scan <code>Assets/EvoSim/Runtime</code>, <code>Http</code> and <code>Samples</code>, not your folder: in your own code the rules are yours to keep.
+The conformance suites check behaviour instead. A phase, for example, must run without animals and leave a populated
+world's hash unchanged when it is switched off and on (T-TICK). Add a test of your own that runs twice. This one tests
+the <code>LightningPhase</code> of <a href="the-tick.html#births-and-deaths-during-a-tick">A tick, phase by phase</a>:</p>
+<pre><code class="lang-csharp">public class LightningTests : WorldFixture
+{
+    [Test, Description(&quot;RAND-11: the same seed gives the same run&quot;)]
+    public void SameSeedSameRun()
+    {
+        string Run(string name)
+        {
+            var w = New(7, name: name).Lab1(prey: 20, predators: 3).Phase&lt;LightningPhase&gt;().Build();
+            w.Advance(300);
+            return w.Events.Hash;
+        }
+        Assert.AreEqual(Run(&quot;first&quot;), Run(&quot;second&quot;));
+    }
+}
+</code></pre>
+<h2 id="when-two-runs-disagree">When two runs disagree</h2>
+<ol>
+<li><p><strong>Compare the configurations.</strong> Diff the two <code>run_info.json</code> files: seed, world seed, wait mode, brain, controls and
+every serialized setting are there. A difference here is usually the whole story.</p>
+</li>
+<li><p><strong>Find the first differing event.</strong> Compare the two <code>events.jsonl</code> files line by line, for example with
+<code>git diff --no-index runA/events.jsonl runB/events.jsonl</code>. The <code>t</code> field of the first differing line is the first
+tick where the runs visibly part. Events are births and deaths, so the real cause can be a few ticks earlier.</p>
+</li>
+<li><p><strong>Find the first differing tick.</strong> Build both worlds in a test, advance them one tick at a time, and compare a
+fingerprint of every animal after each tick:</p>
+<pre><code class="lang-csharp">static string Fingerprint(World w) =&gt; string.Join(&quot;;&quot;, w.AllSpecies.SelectMany(s =&gt; s.Animals)
+    .Select(x =&gt; $&quot;{x.Id}:{x.Position.x:R},{x.Position.z:R},{x.Action}&quot;));
+
+for (int t = 0; t &lt; 300; t++)
+{
+    a.Advance(1); b.Advance(1);
+    Assert.AreEqual(Fingerprint(a), Fingerprint(b), $&quot;the runs part at tick {t}&quot;);
+}
+</code></pre>
+</li>
+<li><p><strong>Find the phase.</strong> Advance both worlds to the tick before, then run that tick's phases by hand, one by one, as the
+tests do with <code>w.Phases[i].Run(w.Context)</code>, and compare after each. This skips the waiting, so use a brain that
+answers at once, such as the random brain, and don't advance these worlds afterwards.</p>
+</li>
+<li><p><strong>Look for the usual causes</strong> in the code that runs there: an iteration over a <code>Dictionary</code> or <code>HashSet</code>, a draw
+from the wrong stream or in <code>WaitsFor</code>, a <code>static</code> field, state not reset in <code>Initialize</code>, a read of <code>Time</code>, or a
+result computed on another thread.</p>
+</li>
+</ol>
+<h2 id="go-further">Go further</h2>
+<ul>
+<li><a href="the-tick.html">A tick, phase by phase</a>: waiting, stop conditions, the tick context.</li>
+<li><a href="brains-and-decisions.html">Decisions and brains</a>: the memo and the answer cache.</li>
+<li><a href="running-and-building.html">Running and building</a>: headless runs, batch scenarios, the player's <code>-cache</code>.</li>
+<li><a href="recording-and-outputs.html">Recording and outputs</a>: the files of a run folder.</li>
+<li>Specification: <a href="../spec/12-tick-order-and-determinism.html">12 — Tick order and determinism</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

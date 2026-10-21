@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Views and real time | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Views and real time | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/views-and-real-time.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="guide-views-and-real-time">
+<h1 id="views-and-real-time">Views and real time</h1>
+
+<p>The simulation runs on plain C# objects: animals are not GameObjects. What you see in Play mode is drawn by <strong>views</strong>
+that read the World after each tick and never write to it. Animal views are bodies that follow their animals. Run views
+are a painted ground, markers for carcasses and eggs, an on-screen panel of numbers, a camera you can steer, and
+screenshots. Because nothing visual feeds back into the run, a run gives the same events hash whether it is drawn or not,
+at any frame rate (SPACE-12, RAND-11).</p>
+<h2 id="how-it-works">How it works</h2>
+<p>Each frame, Unity first runs the ticks the run speed allows, then the views read the result.</p>
+<pre><code class="lang-mermaid">flowchart LR
+    T[Ticks: FixedUpdate or Update] --&gt; S[(Animals, food, entities)]
+    S --&gt;|LateUpdate| V[World places the animal views]
+    S --&gt;|LateUpdate| G[GroundView and EntityMarkers]
+    S --&gt;|Update| O[RunOverlay reads the numbers]
+    V --&gt; C[WorldCamera, after the views]
+    C --&gt; F[Frame drawn, overlay on top]
+    F --&gt; P[RunCapture saves a PNG]
+</code></pre>
+<ol>
+<li><strong>Pools.</strong> When a run starts in Play mode, the World makes one <a class="xref" href="../api/EvoSim.ViewPool.html">ViewPool</a> per species that has a
+<a class="xref" href="../api/EvoSim.Body.html">Body</a>. The pools live under a <em>Views (runtime)</em> object under the World, which is never saved. Each pool
+makes <strong>Prewarm</strong> views ahead, by default as many as the species' initial population.</li>
+<li><strong>Take and return.</strong> In its <code>LateUpdate</code>, the World gives a view to each new animal
+(<a class="xref" href="../api/EvoSim.ViewPool.html#EvoSim_ViewPool_Take_System_Int32_">Take</a>) and takes back the view of each animal that is gone
+(<a class="xref" href="../api/EvoSim.ViewPool.html#EvoSim_ViewPool_Return_EvoSim_AnimalView_">Return</a>). A view is reused: it holds only the animal's id
+(<a class="xref" href="../api/EvoSim.AnimalView.html#EvoSim_AnimalView_AnimalId">AnimalId</a>).</li>
+<li><strong>Placing.</strong> The World puts each view between its animal's position at the previous tick and its position now, sets
+its height from the ground, and turns it toward where the animal moved (or its heading when it stood still).</li>
+<li><strong>OnShow.</strong> The World then calls <a class="xref" href="../api/EvoSim.AnimalView.html#EvoSim_AnimalView_OnShow_EvoSim_Animal_">OnShow</a> on the view, which may change
+colours or animations. The reference view, <a class="xref" href="../api/EvoSim.ActionView.html">ActionView</a>, colours a marker above the head by the current
+action and darkens the body as its energy drops.</li>
+</ol>
+<p>Views can't change what animals sense: every view part is on layer 2, <em>Ignore Raycast</em>
+(<a class="xref" href="../api/EvoSim.ViewPool.html#EvoSim_ViewPool_IgnoreRaycastLayer">IgnoreRaycastLayer</a>), which every sense ray leaves out, and every collider of a view is disabled.</p>
+<h3 id="interpolation">Interpolation</h3>
+<p>Ticks are discrete: an animal jumps from one position to the next. To make movement smooth, the World places each view
+at a fraction of the way between the two positions: <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_InterpolationFactor">InterpolationFactor</a>, the part of the next tick
+already elapsed.</p>
+<table>
+<thead>
+<tr>
+<th>Run speed</th>
+<th>Interpolation factor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>PerFixedUpdate</em></td>
+<td>the time since the last physics step, divided by the physics step</td>
+</tr>
+<tr>
+<td><em>RealTime</em></td>
+<td>the ticks the real-time clock owes, between 0 and 1, while running</td>
+</tr>
+<tr>
+<td><em>Fast</em></td>
+<td>1: many ticks per frame, nothing to smooth</td>
+</tr>
+<tr>
+<td>any, while the tick waits for a brain or the mutator</td>
+<td>1: views rest where the last tick left them</td>
+</tr>
+</tbody>
+</table>
+<p>Turn <strong>Interpolate Views</strong> off on the World to see the raw tick positions.</p>
+<h2 id="the-main-types">The main types</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Body.html">Body</a></td>
+<td>a species module: the view prefab (or a placeholder capsule), its colour and size</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.AnimalView.html">AnimalView</a></td>
+<td>the component on a body's root; the World calls <code>OnShow</code> on it every frame</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.ActionView.html">ActionView</a></td>
+<td>the reference view: marker coloured by action, body darker when hungry</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.ViewPool.html">ViewPool</a></td>
+<td>the reusable views of one species</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.ActionColors.html">ActionColors</a></td>
+<td>one colour per action name, shared by views and the overlay</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.GroundView.html">GroundView</a></td>
+<td>paints a flat world's ground, cover and food</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.EntityMarkers.html">EntityMarkers</a></td>
+<td>one small marker per carcass, egg or other entity</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.RunOverlay.html">RunOverlay</a></td>
+<td>the panels of numbers, drawn in the editor and in a build</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.RunNumbers.html">RunNumbers</a></td>
+<td>what the overlay shows, read from the World's own counters</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.WorldCamera.html">WorldCamera</a></td>
+<td>the camera: pan, zoom, orbit, follow an animal</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.RunCapture.html">RunCapture</a>, <a class="xref" href="../api/EvoSim.ContactSheet.html">ContactSheet</a></td>
+<td>screenshots of the run and a sheet of thumbnails</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-run-views">The run views</h2>
+<p>The reference scenes have a <em>Run views</em> object at the scene root, outside the World, with <a class="xref" href="../api/EvoSim.GroundView.html">GroundView</a>,
+<a class="xref" href="../api/EvoSim.EntityMarkers.html">EntityMarkers</a>, <a class="xref" href="../api/EvoSim.RunOverlay.html">RunOverlay</a> and <a class="xref" href="../api/EvoSim.RunCapture.html">RunCapture</a>, and a <a class="xref" href="../api/EvoSim.WorldCamera.html">WorldCamera</a> on
+the main camera. <em>EvoSim ▸ Views ▸ Add Run Views to Reference Scenes</em> adds whatever is missing to the six reference
+scenes (and rebuilds the two reference bodies). In a scene of your own,
+add the four components to any GameObject and the camera component to the camera. Each one finds the first World of the
+scene when its <strong>World</strong> field is empty.</p>
+<h3 id="ground">Ground</h3>
+<p><a class="xref" href="../api/EvoSim.GroundView.html">GroundView</a> draws a flat ground as one quad with a texture of one pixel per cell, the finest cell of the
+food and cover layers. A pixel is <strong>Food</strong> colour when its cell holds a food item, <strong>Cover</strong> colour when it is in cover,
+<strong>Soil</strong> colour otherwise. The texture is repainted once per tick and uploaded only when a pixel changed. <strong>Show Cover</strong>
+and <strong>Show Food</strong> switch the layers off. A terrain ground is not painted: the terrain shows itself.</p>
+<h3 id="entities">Entities</h3>
+<p><a class="xref" href="../api/EvoSim.EntityMarkers.html">EntityMarkers</a> places one marker per entity of every entity kind under the World: a dark red disc 0.8 m wide
+per carcass, an ivory ball per egg, a grey 0.3 m cube for any other kind. The colours are the <strong>Carcass</strong>, <strong>Egg</strong> and
+<strong>Other</strong> fields. Used-up entities get no marker.</p>
+<h3 id="action-colours">Action colours</h3>
+<p>Bodies and the overlay's legend share these colours (<a class="xref" href="../api/EvoSim.ActionColors.html">ActionColors</a>):</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Colour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>eat</td>
+<td>green</td>
+</tr>
+<tr>
+<td>flee</td>
+<td>yellow</td>
+</tr>
+<tr>
+<td>hide</td>
+<td>blue</td>
+</tr>
+<tr>
+<td>follow</td>
+<td>cyan</td>
+</tr>
+<tr>
+<td>rest</td>
+<td>grey</td>
+</tr>
+<tr>
+<td>mate</td>
+<td>pink</td>
+</tr>
+<tr>
+<td>hunt</td>
+<td>red</td>
+</tr>
+<tr>
+<td>searching (the action had nothing to act on, ACT-04)</td>
+<td>white</td>
+</tr>
+<tr>
+<td>no decision yet</td>
+<td>dark grey</td>
+</tr>
+<tr>
+<td>any other action name</td>
+<td>a colour made from the name's letters, the same on every run</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-overlay">The overlay</h3>
+<p><a class="xref" href="../api/EvoSim.RunOverlay.html">RunOverlay</a> draws two panels with Unity's immediate-mode GUI, so they also appear in a player build. <strong>Tab</strong>
+hides and shows them. The text scales with the window's height (<strong>Font Size</strong> 16 at 1080 lines).</p>
+<p>The run panel, top left:</p>
+<table>
+<thead>
+<tr>
+<th>Line</th>
+<th>Example</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tick and state</td>
+<td><code>Tick 412   running</code></td>
+<td>also <em>paused</em>, <em>stopped: tick limit</em>, or <em>waiting for JEV: 12 queries, 1.4 s</em></td>
+</tr>
+<tr>
+<td>pace</td>
+<td><code>Ticks/s 4.9 of 5   FPS 118</code></td>
+<td>ticks per second over the last second, against the target of the run speed</td>
+</tr>
+<tr>
+<td>one line per species</td>
+<td><code>Prey: 31 living, 40 born, 33 died, 2 eggs, gen 3</code></td>
+<td>kills and eggs appear when not zero; <em>gen</em> is the highest generation</td>
+</tr>
+<tr>
+<td>mutations</td>
+<td><code>Mutations 5 ok, 1 failed of 7</code></td>
+<td>new alleles, failed mutations, mutations started</td>
+</tr>
+<tr>
+<td>model calls</td>
+<td><code>Model calls: brain 245, mutator 5; cache 30, memo 400</code></td>
+<td>calls to the models, answers from the cache and the memo</td>
+</tr>
+</tbody>
+</table>
+<p>Under it, the legend shows each action name of the world once, plus <em>search</em>, in its colour. The animal panel, top
+right, appears when the camera follows an animal: its species and id, age, generation, action, stats, the probabilities
+of its last decision, and its genes. When it dies, the panel says it is gone.</p>
+<p>All the numbers come from <a class="xref" href="../api/EvoSim.RunNumbers.html">RunNumbers</a>, which reads the World's counters and nothing else; a play-mode test
+checks them against the event log.</p>
+<h3 id="the-camera">The camera</h3>
+<p><a class="xref" href="../api/EvoSim.WorldCamera.html">WorldCamera</a> frames the whole world when the run starts. It reads the keys and mouse in real time, so it
+works while the run is paused or waits for a brain.</p>
+<table>
+<thead>
+<tr>
+<th>Control</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>W A S D or the arrow keys</td>
+<td>pan (stops following)</td>
+</tr>
+<tr>
+<td>mouse wheel</td>
+<td>zoom, from 3 m to 2 000 m (not over a panel)</td>
+</tr>
+<tr>
+<td>right mouse button, held</td>
+<td>orbit left and right, tilt up and down (10° to 89°)</td>
+</tr>
+<tr>
+<td>Q, E</td>
+<td>orbit left, right</td>
+</tr>
+<tr>
+<td>middle mouse button, held</td>
+<td>drag the ground (stops following)</td>
+</tr>
+<tr>
+<td>F</td>
+<td>frame the whole world again (stops following)</td>
+</tr>
+<tr>
+<td>left click on an animal</td>
+<td>follow it</td>
+</tr>
+<tr>
+<td>Esc</td>
+<td>stop following</td>
+</tr>
+<tr>
+<td>Tab</td>
+<td>hide or show the overlay</td>
+</tr>
+</tbody>
+</table>
+<p>A click picks the living animal whose view is nearest on screen, within <strong>Pick Pixels</strong> (24 at 1080 lines). Views have
+no colliders, so picking compares screen positions, never rays. A click on an overlay panel doesn't pick: the overlay
+gives the camera its <a class="xref" href="../api/EvoSim.RunOverlay.html#EvoSim_RunOverlay_Covers_UnityEngine_Vector2_">Covers</a> test through
+<a class="xref" href="../api/EvoSim.WorldCamera.html#EvoSim_WorldCamera_Blocks">Blocks</a>. When you start following an animal, the camera comes as close as <strong>Follow Distance</strong>
+(15 m) and then keeps the animal in the centre. Other fields: <strong>Pitch</strong> (55°), <strong>Yaw</strong>, <strong>Pan Speed</strong> (0.8 camera distances per second), <strong>Orbit Speed</strong> (90° per
+second).</p>
+<h3 id="captures">Captures</h3>
+<p><a class="xref" href="../api/EvoSim.RunCapture.html">RunCapture</a> saves what the screen shows, overlay included, as PNG files: one when the run starts, one every
+<strong>Every Seconds</strong> of real time (10; 0 for the start and end only), and one when the run stops. Then it makes
+<code>contact_sheet.png</code>: up to 24 thumbnails, 4 per row, evenly spread over the run, the first and the last kept
+(<a class="xref" href="../api/EvoSim.ContactSheet.html">ContactSheet</a>).</p>
+<p>Files land in <strong>Folder</strong>/<em>run</em>/, by default <code>Logs/EvoSim/captures/&lt;run&gt;/</code>, where <em>run</em> is the name of the run folder
+the recorder writes under <code>Logs/EvoSim/runs/</code>. Without a recorder it is the World's name, seed and start time. Each
+file is named <code>NNN-tTTTTTT-label.png</code>: the capture number, the tick, and <em>start</em>, <em>t</em> or <em>end</em>. In a player build the
+folder is next to the exe; <code>-capture S</code> sets the seconds, <code>-capture off</code> turns captures off
+(<a href="running-and-building.html">Running and building</a>).</p>
+<div class="NOTE">
+<h5>Note</h5>
+<p>Captures need drawn frames. In batch mode with <code>-nographics</code> nothing is captured. In the editor, keep the Game view
+visible: a capture that gets no frame for 5 s is given up and counted in <a class="xref" href="../api/EvoSim.RunCapture.html#EvoSim_RunCapture_Skipped">Skipped</a>.</p>
+</div>
+<h2 id="watching-in-real-time">Watching in real time</h2>
+<p>The run speed decides how many ticks run per frame; the World's run settings are in
+<a href="running-and-building.html">Running and building</a>. To watch, use <em>RealTime</em> with <strong>Real Time Ticks Per Second</strong> at 5 or 20.</p>
+<p>When a tick needs answers from a model, it stops at the phase that needs them until every answer is in (SPACE-13).
+<em>waiting for JEV: 12 queries, 1.4 s</em> means that the <em>Choose actions</em> phase waits for 12 queries sent to the brain named
+JEV, for 1.4 s so far. <em>waiting for the mutator: 2 eggs</em> means the <em>Hatch</em> phase waits for the mutated genes of 2 eggs
+that are due to hatch. In the <em>Responsive</em> wait mode, Unity keeps drawing meanwhile: the views rest, the camera and the
+overlay still work. In <em>Freeze</em> mode the main thread blocks, so the window doesn't redraw until the answers arrive.
+Either way the run is the same (SPACE-14).</p>
+<p>So the pace you see is the slower of the target and the models. In the reference test of HideVsFlee with JEV and the
+mutator live, the overlay showed about 0.55 ticks per second for a target of 5; the same run replayed from the answer
+cache kept the target. After a wait the real-time clock doesn't catch up in a burst: it owes at most a tenth of a
+second of ticks (or one tick).</p>
+<h2 id="settings">Settings</h2>
+<table>
+<thead>
+<tr>
+<th>Where</th>
+<th>Field</th>
+<th>What it does</th>
+<th>Reference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>World</td>
+<td><strong>Show Views</strong></td>
+<td>draw the animals</td>
+<td>on</td>
+</tr>
+<tr>
+<td>World</td>
+<td><strong>Interpolate Views</strong></td>
+<td>place views between tick positions</td>
+<td>on</td>
+</tr>
+<tr>
+<td>World</td>
+<td><strong>Views Outside Play Mode</strong></td>
+<td>also make views outside Play mode (tests leave it off)</td>
+<td>off</td>
+</tr>
+<tr>
+<td>Body</td>
+<td><strong>Prefab</strong>, <strong>Color</strong>, <strong>Size</strong>, <strong>Prewarm</strong></td>
+<td>the view prefab or capsule colour, size in meters, views made ahead</td>
+<td>prey 0.6 m, predator 0.9 m</td>
+</tr>
+<tr>
+<td>ActionView</td>
+<td><strong>Hungry Brightness</strong></td>
+<td>brightness of the body at zero energy</td>
+<td>0.35</td>
+</tr>
+<tr>
+<td>RunOverlay</td>
+<td><strong>Font Size</strong>, <strong>Visible</strong></td>
+<td>text size at 1080 lines; panels shown</td>
+<td>16, on</td>
+</tr>
+<tr>
+<td>RunCapture</td>
+<td><strong>Every Seconds</strong>, <strong>Folder</strong>, <strong>Contact Sheet</strong></td>
+<td>capture period, folder, make the sheet</td>
+<td>10, <code>Logs/EvoSim/captures</code>, on</td>
+</tr>
+</tbody>
+</table>
+<h2 id="in-the-editor">In the editor</h2>
+<p>During Play mode the views are under <em>World ▸ Views (runtime)</em>. Select one in the Hierarchy or the Scene view, and
+<em>Window ▸ EvoSim ▸ Animal Inspector</em> shows its animal. See <a href="editor-tooling.html">Editor tooling</a> for the other windows.</p>
+<h2 id="go-further">Go further</h2>
+<ul>
+<li><a href="../extending/views.html">Views</a>: your own <a class="xref" href="../api/EvoSim.AnimalView.html">AnimalView</a>, a body prefab, markers for your entities, a panel
+of your own.</li>
+<li><a href="determinism.html">Determinism and replay</a>: why the hash doesn't depend on rendering.</li>
+<li>Specification: <a href="../spec/02-space-and-time.html">02 — Space and time</a> (SPACE-12 to SPACE-14).</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

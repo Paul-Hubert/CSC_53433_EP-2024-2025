@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Genes | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Genes | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/genes.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-genes">
+<h1 id="genes">Genes</h1>
+
+<p>Three changes need no code: a <strong>free text gene</strong> (a temperament the brain reads), a <strong>number gene</strong> that lets evolution
+tune a trait, and a shared <strong>allele pool</strong> of founder sentences. Write a <strong>gene kind</strong> only when a value must be stored
+or expressed in a new way: a number the brain reads as words, a choice among a few options, the weights of a small
+network (GENE-07). How genes work is explained in <a href="../guides/genes-and-mutation.html">Genes and mutation</a>.</p>
+<h2 id="a-free-text-gene">A free text gene</h2>
+<p>A free gene belongs to no action; it appears in the genes block under its own label.</p>
+<ol>
+<li>Under the species, outside its <code>Actions</code> group (a <code>Genes</code> group is a good place), create an object named
+<code>temperament</code> and add a <strong>Text Gene</strong>.</li>
+<li>Tick <strong>Free</strong>. Leave <strong>Label</strong> empty to use the object's name.</li>
+<li>Leave <strong>Pool</strong> empty and fill <strong>Founders</strong>: <em>&quot;Be bold.&quot;</em>, <em>&quot;Be careful.&quot;</em>. Keep <strong>Has Neutral</strong>: the pool also gets
+<em>&quot;No preference.&quot;</em>.</li>
+<li>Press Play. The species inspector's <strong>Genes</strong> foldout lists <code>prey.temperament</code>, and its <strong>Prompt preview</strong> shows the
+line <code>- temperament: &quot;Be bold.&quot;</code> in the genes block.</li>
+</ol>
+<p>The species' <code>LlmMutation</code> (with an empty <strong>Only These</strong>) mutates it like any other text gene. A text gene that is neither
+under an action nor free is treated as free, with a warning (V-06). Adding a gene changes the species' signature
+(SPEC-03): accept the new one with the fix V-12 offers.</p>
+<h2 id="a-number-gene">A number gene</h2>
+<p>A <a class="xref" href="../api/EvoSim.NumberGene.html">NumberGene</a> sets one trait at birth, and a <a class="xref" href="../api/EvoSim.GaussianMutation.html">GaussianMutation</a> moves it a little at each
+mutation.</p>
+<ol>
+<li>Select the species and choose <em>GameObject ▸ EvoSim ▸ Add Gene ▸ Stamina gene</em>. You get a <code>StaminaGene</code> object in the
+species' <code>Genes</code> group, with a Number Gene labelled <code>stamina</code> (<strong>Trait</strong> <code>stamina.max</code>, <strong>Min</strong> 20, <strong>Max</strong> 120,
+<strong>Founders</strong> 45, 60, 75) and a Gaussian Mutation (<strong>Sigma</strong> 5).</li>
+<li>For another trait, change <strong>Trait</strong> to a name a module of the species declares: the inspector's <strong>Stats and traits</strong>
+foldout lists them (<code>stamina.max</code>, <code>stamina.regen</code>, <code>speed.walk</code>, <code>speed.run</code>, <code>vision</code>, <code>maturity</code>…). Tick
+<strong>Multiply Default</strong> to scale the trait's default instead of replacing it: a <code>speed.run</code> gene with range 0.8 to 1.2
+and founders 0.9, 1, 1.1 makes some animals 10 % faster.</li>
+<li>Set <strong>Sigma</strong> in the gene's own unit. A Gaussian Mutation with an empty <strong>Only These</strong> is the species' default for
+every number gene; for a gene on another scale, add a second Gaussian Mutation and list the gene in its <strong>Only These</strong>
+(MUT-02).</li>
+<li>Give the trait a <strong>cost</strong>, or the gene drifts to whichever end helps (09 §5, V-47): on the species' <code>Metabolism</code>, set
+<strong>Cost Trait</strong> to <code>stamina.max</code> and <strong>Cost Per Unit</strong> to 0.005, so that 60 stamina costs 0.3 energy a tick.</li>
+</ol>
+<p><code>GaussianMutation</code> accepts any number gene that implements <a class="xref" href="../api/EvoSim.INumberRange.html">INumberRange</a> (<strong>Min</strong> and <strong>Max</strong>), so your own
+number gene kinds work with it too.</p>
+<h2 id="an-allele-pool">An allele pool</h2>
+<p>An <a class="xref" href="../api/EvoSim.AllelePool.html">AllelePool</a> is an asset of founder and contrast sentences that several text genes share, for example the
+same <code>follow</code> sentences in two species.</p>
+<ol>
+<li><em>Assets ▸ Create ▸ EvoSim ▸ Allele Pool</em>.</li>
+<li>Fill <strong>Founders</strong> (at most 12 words each, plain words, no numbers), and <strong>Contrast Pro</strong> and <strong>Contrast Anti</strong>, the
+two sentences brain tests use (GENE-23).</li>
+<li>Drag the asset into the <strong>Pool</strong> field of each text gene. Its founders replace the gene's own list; its contrast
+sentences do too, when not empty. The neutral allele stays a setting of each gene.</li>
+</ol>
+<p>The reference pools are in <code>Assets/EvoSim/Data/AllelePools</code> (<code>prey_eat.asset</code>…). Founder pools are frozen for an
+experiment (GENE-21): changing one starts a new experiment, and its new sentences make new prompts that the brain and
+mutator caches have never seen.</p>
+<h2 id="a-new-gene-kind">A new gene kind</h2>
+<p>Derive from <a class="xref" href="../api/EvoSim.Gene.html">Gene</a>. <em>Assets ▸ Create ▸ EvoSim ▸ Script ▸ Gene kind</em> writes a number gene template into
+<code>Assets/Student</code>, with a test in <code>Assets/Student/Tests</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th></th>
+<th>What it does, and when it is called</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Gene.html#EvoSim_Gene_Kind">Kind</a></td>
+<td>must implement</td>
+<td><code>Text</code> or <code>Number</code>. It decides which operators accept the gene: <code>LlmMutation</code> takes text, <code>GaussianMutation</code> takes numbers with a range.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Gene.html#EvoSim_Gene_FounderPool">FounderPool</a></td>
+<td>must implement</td>
+<td>The values founders draw from, each with its origin (<code>founder</code>, <code>neutral</code>). Read at the start of the run, registered before anything else.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Gene.html#EvoSim_Gene_Express_EvoSim_AlleleValue_EvoSim_Expression_">Express</a></td>
+<td>must implement</td>
+<td>Turns a value into a trait (<code>e.SetTrait</code>) or a genes-block line (<code>e.PromptGene</code>). Called at birth, and each time a decision's prompt is written.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Gene.html#EvoSim_Gene_ReadByBrain">ReadByBrain</a></td>
+<td>may override</td>
+<td>True: the gene enters the genes block and the brain key. Default: text genes only.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Gene.html#EvoSim_Gene_Check_EvoSim_AlleleValue_">Check</a></td>
+<td>may override</td>
+<td>Why a value is not allowed, or null. Every mutant is checked at hatching, whatever made it.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Gene.html#EvoSim_Gene_Decimals">Decimals</a></td>
+<td>may override</td>
+<td>The precision at which two numbers are the same allele (default 4).</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Gene.html#EvoSim_Gene_MayMutate_EvoSim_Allele_">MayMutate</a></td>
+<td>may override</td>
+<td>False keeps an allele from mutating, as <code>TextGene</code> does for the neutral allele (MUT-22).</td>
+</tr>
+<tr>
+<td><code>Initialize</code>, <code>Validate</code></td>
+<td>may override</td>
+<td>Reset caches; report bad settings before the run.</td>
+</tr>
+</tbody>
+</table>
+<p>A complete example: a number in [0, 1] that the brain reads as a word.</p>
+<pre><code class="lang-csharp">using System.Collections.Generic;
+using EvoSim;
+using UnityEngine;
+
+/// &lt;summary&gt;A boldness in [0, 1] that the brain reads as &quot;Be careful.&quot;, &quot;Be balanced.&quot; or &quot;Be bold.&quot;.&lt;/summary&gt;
+public class BoldnessGene : Gene, INumberRange
+{
+    [SerializeField, Tooltip(&quot;Founder values, in [0, 1].&quot;)]
+    List&lt;float&gt; founders = new List&lt;float&gt; { 0.2f, 0.5f, 0.8f };
+
+    public float Min =&gt; 0f;
+    public float Max =&gt; 1f;
+    public override AlleleKind Kind =&gt; AlleleKind.Number;
+    public override bool ReadByBrain =&gt; true;          // it enters the genes block
+    public override int Decimals =&gt; 2;                 // 0.501 and 0.502 are one allele
+
+    public override IReadOnlyList&lt;FounderAllele&gt; FounderPool
+    {
+        get
+        {
+            var pool = new List&lt;FounderAllele&gt;();
+            foreach (var f in founders) pool.Add(new FounderAllele(AlleleValue.OfNumber(f), &quot;founder&quot;));
+            return pool;
+        }
+    }
+
+    public override void Express(AlleleValue value, Expression e) =&gt;
+        e.PromptGene(Label, value.Number &lt; 0.33f ? &quot;Be careful.&quot; : value.Number &lt; 0.67f ? &quot;Be balanced.&quot; : &quot;Be bold.&quot;);
+
+    public override string Check(AlleleValue value) =&gt;
+        value.Number &lt; Min || value.Number &gt; Max ? $&quot;{value.Number} outside [0, 1]&quot; : null;
+}
+</code></pre>
+<p>Add the component under the species, on an object named <code>boldness</code>: its label, and so its locus id <code>prey.boldness</code>, comes
+from the object's name unless you set <strong>Label</strong>. A Gaussian Mutation with <strong>Sigma</strong> 5 would throw the value to 0 or 1 at
+every mutation, so add a Gaussian Mutation with <strong>Sigma</strong> 0.1 and list this gene in its <strong>Only These</strong>.</p>
+<p>Only <a class="xref" href="../api/EvoSim.TextGene.html">TextGene</a> and its subclasses are bound to actions. To make a text gene kind that binds, derive from
+<code>TextGene</code>; a text kind derived from <code>Gene</code> should return <code>SentenceGuards.Check(value.Text)</code> from <code>Check</code>.</p>
+<h2 id="rules-your-gene-kind-keeps">Rules your gene kind keeps</h2>
+<ul>
+<li><strong>Settings only.</strong> One component serves every animal of the species: nothing per animal in its fields.</li>
+<li><strong>A frozen pool</strong> (GENE-21). <code>FounderPool</code> returns the same values in the same order in every run, built from the
+settings alone. It is never empty: the reference kinds report an empty pool as V-41 in <code>Validate</code>; do the same.</li>
+<li><strong>Express through the expression only</strong> (GENE-03, GENE-04). It runs at birth with an animal, and for prompts without
+one: change nothing else, draw no random number, give the same output for the same value.</li>
+<li><strong>Check is the contract with every operator.</strong> A mutant it refuses leaves the inherited allele (MUT-04). Text founders
+and mutants pass the sentence guards (GENE-22).</li>
+<li><strong>A label unique in the species</strong>, so the locus id is unique in the world (GENE-11).</li>
+</ul>
+<h2 id="test-it">Test it</h2>
+<p>There is no conformance suite for gene kinds, but the operators' suite (T-MUT) mutates a number gene and a text gene and
+checks the results against the gene's <code>Check</code>. Test your expression the way T-GENE-01 does:</p>
+<pre><code class="lang-csharp">using System.Collections.Generic;
+using EvoSim;
+using EvoSim.Testing;
+using NUnit.Framework;
+
+public class BoldnessGeneTests : WorldFixture
+{
+    [Test]
+    public void BoldValuesSayBeBold()
+    {
+        var w = New().Flat(20, 20).Species(&quot;prey&quot;, s =&gt; s.Population(2).Action&lt;RestAction&gt;(&quot;rest&quot;).Module&lt;BoldnessGene&gt;()).Build();
+        var sp = w.FindSpecies(&quot;prey&quot;);
+        var lines = new List&lt;KeyValuePair&lt;string, string&gt;&gt;();
+        sp.Module&lt;BoldnessGene&gt;().Express(AlleleValue.OfNumber(0.9f), new Expression(null, sp.Declarations, lines));
+        Assert.AreEqual(&quot;Be bold.&quot;, lines[0].Value);
+    }
+}
+</code></pre>
+<p>See <a href="testing-your-module.html">Testing your module</a> for the test assembly and the runner.</p>
+<h2 id="read-next">Read next</h2>
+<ul>
+<li>The reference kinds: <a class="xref" href="../api/EvoSim.TextGene.html">TextGene</a> and <a class="xref" href="../api/EvoSim.NumberGene.html">NumberGene</a>; the API: <a class="xref" href="../api/EvoSim.Expression.html">Expression</a>,
+<a class="xref" href="../api/EvoSim.AlleleValue.html">AlleleValue</a>, <a class="xref" href="../api/EvoSim.SentenceGuards.html">SentenceGuards</a>.</li>
+<li>How your gene's values change: <a href="mutation.html">Mutation</a>.</li>
+<li>The contract: <a href="../spec/09-genes-alleles-and-genomes.html">09 — Genes, alleles and genomes</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

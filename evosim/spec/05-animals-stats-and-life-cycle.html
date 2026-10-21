@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>05 — Animals, stats and life cycle | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="05 — Animals, stats and life cycle | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/05-animals-stats-and-life-cycle.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="05--animals-stats-and-life-cycle">05 — Animals, stats and life cycle</h1>
+
+<h2 id="1-the-animal-record">1. The animal record</h2>
+<p>An animal is data. Every module reads and writes animals through this record.</p>
+<ul>
+<li><strong>ANIM-01 (MUST)</strong> An animal has: an id; its species; a position and a heading;
+its stats and traits; its genome; its generation and parent ids; its birth
+tick and age; its current action (or none) and whether that action is
+searching; whether it bred in the current decision period; a busy counter;
+whether it was killed this tick and by whom; and counters of meals and
+offspring. Modules MAY add stats and traits, never untyped fields.</li>
+<li><strong>ANIM-02 (MUST)</strong> Animal ids are unique within a run across all species,
+increase with each new animal, and are never reused.</li>
+<li><strong>ANIM-03 (MUST)</strong> An animal belongs to one species for its whole life.</li>
+</ul>
+<h2 id="2-stats">2. Stats</h2>
+<p>A stat is a per-animal number that changes during life.</p>
+<ul>
+<li><strong>ANIM-10 (MUST)</strong> A stat has a name, an initial value at birth (which may
+differ for founders, newcomers and babies) and an optional minimum and maximum.
+It is declared by a module; any module may read it.</li>
+<li><strong>ANIM-11 (MUST)</strong> Age is the only built-in stat: ticks since birth (or
+hatching). Energy, stamina and any other stat come from modules, so a species
+without a stamina module has no stamina.</li>
+<li><strong>ANIM-12 (SHOULD)</strong> A stat can be sensed as <strong>levels</strong> with thresholds:
+low &lt; <code>low</code> ≤ medium ≤ <code>high</code> &lt; high (<a href="06-senses-and-observations.html">06</a>).</li>
+</ul>
+<h2 id="3-traits">3. Traits</h2>
+<p>A trait is a per-animal number fixed at birth: a parameter that varies between
+individuals because genes set it.</p>
+<ul>
+<li><strong>ANIM-15 (MUST)</strong> A trait has a name and a default (the module's setting).
+At birth every trait takes its default, then number genes expressed into it
+replace or scale it (<a href="09-genes-alleles-and-genomes.html">09</a>).</li>
+<li><strong>ANIM-16 (MUST)</strong> Any parameter that a gene may change is read from the
+animal's trait, never from the module's setting directly. Without a gene the
+trait equals the setting, so the behaviour is the same.</li>
+<li><strong>ANIM-17 (MUST)</strong> Traits don't change during life unless their module
+declares them changeable.</li>
+<li><strong>ANIM-18 (SHOULD)</strong> A trait has a valid range. A gene that would set it
+outside is clamped, and the editor warns about genes whose founder values fall
+outside.</li>
+</ul>
+<p>Natural traits for number genes: maximum stamina, stamina recovery, walking and
+running speed, vision, maturity age, litter size, kill chance.</p>
+<p><strong>Reference.</strong> The reference species have no number genes, so every trait keeps
+the prototype's value (owner decision); number genes are an extension
+(scenario S12).</p>
+<h2 id="4-metabolism-energy-and-stamina-reference-modules">4. Metabolism: energy and stamina (reference modules)</h2>
+<ul>
+<li><strong>ANIM-20 (MUST)</strong> Each living animal pays its metabolism once per tick, after
+it acted, based on what it did that tick: the meters it actually moved (as
+reported by its locomotion, MOVE-06), the action chosen, whether it was busy.
+A locomotion component MAY add its own costs (slopes, terrain), <a href="07-actions-and-locomotion.html#2-locomotion">07 §2</a>.</li>
+<li><strong>ANIM-21 (MUST)</strong> With a stamina module, an animal never moves more meters in
+a tick than its stamina; each meter moved costs one point. An animal without
+stamina for any movement stays where it is, whatever it chose.</li>
+<li><strong>ANIM-22 (MUST)</strong> Gains never raise a stat above its maximum.</li>
+<li><strong>ANIM-23 (SHOULD)</strong> &quot;Did not move&quot; means moved less than a small epsilon
+(1 mm), so rounding never counts as moving.</li>
+</ul>
+<p><strong>Reference values</strong> (the same for prey and predators unless stated):</p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Energy</th>
+<th>Stamina</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Start: founder or newcomer</td>
+<td>60</td>
+<td>full</td>
+</tr>
+<tr>
+<td>Start: baby</td>
+<td>40 (paid by the parents, <a href="11-reproduction-and-population.html">11</a>)</td>
+<td>full</td>
+</tr>
+<tr>
+<td>Maximum</td>
+<td>100</td>
+<td>prey 60, predators 30</td>
+</tr>
+<tr>
+<td>Tick with movement</td>
+<td>−0.7 (base) − 0.5 per meter</td>
+<td>−1 per meter</td>
+</tr>
+<tr>
+<td>Tick without movement, action rest</td>
+<td>−0.2</td>
+<td>+2, up to the maximum</td>
+</tr>
+<tr>
+<td>Tick without movement, any other action</td>
+<td>−0.7</td>
+<td>+2, up to the maximum</td>
+</tr>
+<tr>
+<td>Extra while stamina recovers (not full, no movement)</td>
+<td>−0.3</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Busy tick (digesting)</td>
+<td>−0.2, plus −0.3 while stamina recovers</td>
+<td>+2</td>
+</tr>
+<tr>
+<td>Graze one food item (prey)</td>
+<td>+25</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Kill (predators)</td>
+<td>+60</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Carcass portion (predators)</td>
+<td>+30</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>So walking one meter costs 1.2 energy, a predator running 2 m costs 1.7, and a
+predator has 15 ticks of full-speed running from full stamina. Stamina is
+sensed as levels: prey low &lt; 20 ≤ medium ≤ 40 &lt; high; predators low &lt; 10 ≤
+medium ≤ 20 &lt; high. Energy levels: low &lt; 30 ≤ medium ≤ 70 &lt; high.</p>
+<h2 id="5-busy-states">5. Busy states</h2>
+<ul>
+<li><strong>ANIM-30 (MUST)</strong> While an animal is busy (busy counter &gt; 0) it doesn't decide
+and doesn't move. It pays the busy cost and recovers stamina. The counter
+drops by one per tick; when it reaches 0 the animal has no action and decides
+at the start of the next tick.</li>
+<li><strong>ANIM-31 (MUST)</strong> A module that makes an animal busy says why (the reason is
+logged and shown in the inspector).</li>
+</ul>
+<p><strong>Reference: digestion.</strong> After a kill or a carcass portion the eater is busy for
+<code>round(digestTicks × gain / killGain)</code> ticks: 50 after a kill (+60), 25 after a
+portion (+30). Grazing never makes an animal busy.</p>
+<h2 id="6-age-and-maturity">6. Age and maturity</h2>
+<ul>
+<li><strong>ANIM-35 (MUST)</strong> Every living animal ages by one tick per tick, in the death
+phase, babies born that tick included.</li>
+<li><strong>ANIM-36 (MUST)</strong> An animal is an adult when its age ≥ <code>maturity</code> (reference
+150 ticks, a trait).</li>
+</ul>
+<h2 id="7-death">7. Death</h2>
+<ul>
+<li><strong>ANIM-40 (MUST)</strong> Causes of death in the reference: <code>starvation</code> (energy ≤ 0
+at the death check), <code>old_age</code> (age &gt; <code>maxAge</code>, reference 1 500), <code>killed</code>
+(struck by a hunter; the prototype logs it as <code>predator</code>, with the killer's
+id), <code>migrated</code> (removed above the cap, <a href="11-reproduction-and-population.html">11</a>).
+Modules MAY add causes (thirst, disease, drowning) with their own names.</li>
+<li><strong>ANIM-41 (MUST)</strong> A killed animal is marked at the moment of the strike. From
+then on in that tick it is not sensed, not targeted, doesn't act and doesn't
+breed. It is removed in the death phase.</li>
+<li><strong>ANIM-42 (MUST)</strong> Every death is recorded once, with cause, age, generation,
+meals, offspring and, for a kill, the killer.</li>
+<li><strong>ANIM-43 (MUST)</strong> Dead animals are gone before the next tick's decisions.</li>
+</ul>
+<h2 id="8-counters">8. Counters</h2>
+<table>
+<thead>
+<tr>
+<th>Counter</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>meals</td>
+<td>items grazed, kills and carcass portions eaten (the prototype's <code>food</code>)</td>
+</tr>
+<tr>
+<td>offspring</td>
+<td>babies this animal parented (each baby of a litter counts)</td>
+</tr>
+<tr>
+<td>generation</td>
+<td>the larger parent generation + 1; founders and newcomers are 0</td>
+</tr>
+</tbody>
+</table>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

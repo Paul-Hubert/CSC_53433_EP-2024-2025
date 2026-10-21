@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>The environment | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="The environment | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/environment.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="guide-environment">
+<h1 id="the-environment">The environment</h1>
+
+<p>Everything in a world that is not an animal is part of the environment: the <strong>ground</strong> animals stand on, the <strong>food</strong>
+that grows on it, the <strong>cover</strong> they hide in, and <strong>entities</strong> such as carcasses and eggs. Each is a service, a
+component under the World's <code>Ground</code> and <code>Environment</code> objects. A world may have none, one or several of each kind
+(03 — Environment). This page explains the reference modules and their settings.</p>
+<h2 id="how-it-fits-together">How it fits together</h2>
+<pre><code class="lang-mermaid">flowchart LR
+    G[Ground: height, walkable, distance] --&gt; F[FoodGrid: cells that may hold food]
+    G --&gt; C[CoverLayer: thickets]
+    C --&gt;|no food in cover| F
+    K[Strike kills] --&gt; CS[CarcassSystem]
+    B[Breed phase] --&gt; ES[EggSystem]
+    EP[Environment phase] --&gt;|Regrow| F
+    EP --&gt;|UpdateEntities| CS
+    EP --&gt;|UpdateEntities| ES
+</code></pre>
+<ol>
+<li>When the World initialises, the <strong>ground</strong> comes first, since everything else is laid on it. The cover layer then
+builds its map of thickets.</li>
+<li>Once every module is ready (<code>Begin</code>), the food layer picks the cells that may hold food, outside water and cover, and
+places the first items.</li>
+<li>During a tick, senses and actions query the layers, the cover and the entities. The act phase removes eaten items at
+once, and a successful strike leaves a carcass.</li>
+<li>In the <strong>environment phase</strong>, the ninth phase of a tick, every resource layer regrows and every entity system ages
+its entities and removes the used-up ones. Nothing else changes the environment.</li>
+</ol>
+<h2 id="the-main-types">The main types</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Ground.html">Ground</a></td>
+<td>The world rectangle: height and walkability of every point, and the world's distance function</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.FlatGround.html">FlatGround</a></td>
+<td>Lab 1's ground: a flat rectangle, walkable everywhere</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.TerrainGround.html">TerrainGround</a></td>
+<td>A Unity Terrain: water, steep slopes and trees are not walkable</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.ResourceLayer.html">ResourceLayer</a></td>
+<td>Edible items spread over the ground; <a class="xref" href="../api/EvoSim.FoodGrid.html">FoodGrid</a> is the reference (&quot;Grass&quot;)</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Cover.html">Cover</a></td>
+<td>Places where animals hide from their hunters; <a class="xref" href="../api/EvoSim.CoverLayer.html">CoverLayer</a> is the reference (&quot;Thickets&quot;)</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.EntitySystem-1.html">EntitySystem&lt;T&gt;</a></td>
+<td>Objects with a position that are not animals: <a class="xref" href="../api/EvoSim.CarcassSystem.html">CarcassSystem</a>, <a class="xref" href="../api/EvoSim.EggSystem.html">EggSystem</a></td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Edible.html">Edible</a></td>
+<td>Makes a species, a layer or an entity kind edible, and says how much energy it gives</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.EnvironmentPhase.html">EnvironmentPhase</a></td>
+<td>Regrows the layers and updates the entities, once per tick</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-ground">The ground</h2>
+<p>The ground answers three questions for any point: its height, whether an animal may stand there, and how far it is
+from another point. Distances are measured on the horizontal plane, straight line, in meters (SPACE-02), and every
+module measures through <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_Distance_UnityEngine_Vector3_UnityEngine_Vector3_">World.Distance</a>. The
+world is a bounded rectangle with hard borders: nothing ever leaves it (SPACE-03).</p>
+<p><strong>FlatGround</strong> is a rectangle from (0, 0) to (<code>Width</code>, <code>Depth</code>) at height 0, walkable everywhere inside. The reference
+sizes are 192 × 192 m (Lab1_Full), 64 m (HideVsFlee) and 48 m (Lab1_Small).</p>
+<p><strong>TerrainGround</strong> reads a Unity Terrain on its GameObject or below it. Walkability is computed once, on a grid of
+<code>Cell Size</code> meters (1 m), from the centre of each cell:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Reference</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Water Level</td>
+<td>set per scene</td>
+<td>a cell at or below this world height is water: not walkable</td>
+</tr>
+<tr>
+<td>Max Steepness</td>
+<td>35°</td>
+<td>a steeper cell is not walkable</td>
+</tr>
+<tr>
+<td>Tree Footprint</td>
+<td>0.5 m</td>
+<td>cells around each tree instance are not walkable (0 = trees don't block)</td>
+</tr>
+<tr>
+<td>Keep Largest Region</td>
+<td>on</td>
+<td>walkable pockets cut off from the largest region become non-walkable (SPACE-05)</td>
+</tr>
+</tbody>
+</table>
+<p>Heights come from the heightmap itself, not from the grid. A terrain ground also finds water:
+<a class="xref" href="../api/EvoSim.Ground.html#EvoSim_Ground_NearestWater_UnityEngine_Vector3_System_Single_">NearestWater</a> returns a
+<a class="xref" href="../api/EvoSim.WaterHit.html">WaterHit</a> with the water point and a walkable <code>Shore</code> point next to it, where a drinking animal stands.</p>
+<h3 id="moving-on-the-ground">Moving on the ground</h3>
+<p>Locomotions never move an animal off walkable ground (MOVE-02). The kinematic locomotion uses two helpers:</p>
+<ul>
+<li><a class="xref" href="../api/EvoSim.Ground.html#EvoSim_Ground_SlideTo_UnityEngine_Vector3_UnityEngine_Vector3_">SlideTo</a> moves in a straight line. If a border,
+water or an obstacle is in the way, it slides along it: it tries the point clamped into the rectangle and the two
+one-axis moves, and keeps the one that gets farthest in the wanted direction. If none gets anywhere, it stops at the
+last walkable point of the line, checked every 0.25 m.</li>
+<li><a class="xref" href="../api/EvoSim.Ground.html#EvoSim_Ground_SideStep_UnityEngine_Vector3_System_Single_EvoSim_RandomStream_">SideStep</a> frees a stuck animal: it
+tries up to 8 random directions, drawn from the species' <code>actions</code> stream, and takes the first clear one.</li>
+</ul>
+<p>Founders and newcomers are placed at uniformly random walkable points, drawn from the species' <code>founders</code> stream.</p>
+<h2 id="food-resource-layers">Food: resource layers</h2>
+<p>A resource layer holds edible items. The reference <strong>FoodGrid</strong> keeps at most one item per cell, at the cell centre
+(03 §1):</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Reference</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cell Size</td>
+<td>1 m</td>
+<td>the side of a food cell</td>
+</tr>
+<tr>
+<td>Initial Fraction</td>
+<td>0.1</td>
+<td>share of eligible cells holding an item at the start</td>
+</tr>
+<tr>
+<td>Regrow P</td>
+<td>0.0015</td>
+<td>probability per empty eligible cell per tick of growing an item: about 670 ticks to regrow an eaten cell</td>
+</tr>
+<tr>
+<td>No Food In Cover</td>
+<td>on</td>
+<td>cover cells hold no food at the start and never regrow (&quot;hungry cover&quot;, ENV-04)</td>
+</tr>
+<tr>
+<td>Near Water Bonus</td>
+<td>2</td>
+<td>regrowth multiplier near water (terrain only)</td>
+</tr>
+<tr>
+<td>Near Water Radius</td>
+<td>3 m</td>
+<td>the distance to water that counts as near</td>
+</tr>
+</tbody>
+</table>
+<p>A cell is <strong>eligible</strong> when its centre is walkable and, with hungry cover, outside cover. Food appears uniformly at
+random over the eligible cells. The layer's <a class="xref" href="../api/EvoSim.Edible.html">Edible</a> gives 25 energy points per item in the reference.</p>
+<p>An animal grazes an item when it ends its move within the act phase's <code>Graze Reach</code> (0.5 m) of it. Eating removes the
+item at once: two animals never eat the same item, and the act order decides who gets a contested one (ENV-02).</p>
+<p>Another phase can change how fast food grows: <a class="xref" href="../api/EvoSim.FoodGrid.html#EvoSim_FoodGrid_RegrowFactor">RegrowFactor</a> multiplies the
+regrowth probability (1 by default). The seasons sample (<code>Assets/EvoSim/Samples/SeasonsPhase.cs</code>) sets it to 0.2 in
+winter, from a phase placed before the environment phase (<a href="../extending/samples.html">The samples</a>).</p>
+<h2 id="cover">Cover</h2>
+<p>The reference <strong>CoverLayer</strong> makes thickets: the top <code>Fraction</code> of walkable cells (20 %) of a value-noise map with two
+octaves, 8 m and 4 m, on cells of <code>Cell Size</code> (1 m). The thickets come in clustered patches. They never change during a
+run.</p>
+<p>An animal standing in cover is <strong>hidden from the species that hunt it</strong> (ENV-11): its hunters' senses don't report it,
+their actions can't target it, and a strike on it fails. Its own species and the species it hunts still see it.
+<code>Hiding Species</code> limits hiding to a list of species ids (empty = every species).</p>
+<p>A world may have several covers: an animal is hidden when any of them hides it, and the hide action runs to the nearest
+cover point of any of them. A world without cover behaves as if no point were in cover (ENV-12).</p>
+<h2 id="entities-carcasses-and-eggs">Entities: carcasses and eggs</h2>
+<p>An entity is an object with a position that is not an animal (ENV-20). Each has an id, a position and a lifetime in
+ticks (-1 = none). Its system removes it in the environment phase once it is used up or its lifetime runs out (ENV-22).</p>
+<p><strong>Carcasses.</strong> When a strike kills, the <a class="xref" href="../api/EvoSim.CarcassSystem.html">CarcassSystem</a> leaves a carcass at the killed animal's position.
+Everything about it comes from the killed species' own <a class="xref" href="../api/EvoSim.Edible.html">Edible</a>:</p>
+<table>
+<thead>
+<tr>
+<th>Edible setting</th>
+<th>Reference (prey)</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Carcass Portions</td>
+<td>2</td>
+<td>portions, one each for animals other than the killer (0 = no carcass)</td>
+</tr>
+<tr>
+<td>Carcass Energy</td>
+<td>30</td>
+<td>energy points per portion</td>
+</tr>
+<tr>
+<td>Carcass Ticks</td>
+<td>100</td>
+<td>ticks before it rots away, eaten or not</td>
+</tr>
+</tbody>
+</table>
+<p>The killer never eats from its own kill, and each eater takes at most one portion. A species eats carcasses when its
+diet lists <code>carcass:&lt;species&gt;</code>, and finds them with the &quot;Carcass&quot; sense
+(<a class="xref" href="../api/EvoSim.NearestEntitySense.html">NearestEntitySense</a>). Its prompt then gets the carcass system's <code>Prompt Rule</code>: <em>&quot;A kill leaves a carcass
+that up to {portions} other predators can eat from.&quot;</em></p>
+<p><strong>Eggs.</strong> Each conception lays one egg per baby in the <a class="xref" href="../api/EvoSim.EggSystem.html">EggSystem</a>. Eggs have no lifetime: they wait for
+the hatch phase. With no incubation they hatch in the same tick. In the reference, eggs carry no Edible, so nothing eats
+them (<a href="reproduction-and-population.html">Reproduction and population</a>).</p>
+<h2 id="random-streams">Random streams</h2>
+<p>Every draw comes from a named stream (RAND-02). The map uses the <strong>world seed</strong>, everything that happens during the run
+uses the <strong>run seed</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Stream</th>
+<th>Seed</th>
+<th>Used for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>world/&lt;cover name&gt;</code>, e.g. <code>world/Thickets</code></td>
+<td>world</td>
+<td>the cover map</td>
+</tr>
+<tr>
+<td><code>world/&lt;layer name&gt;</code>, e.g. <code>world/Grass</code></td>
+<td>world</td>
+<td>the first food items</td>
+</tr>
+<tr>
+<td><code>&lt;layer name&gt;</code>, e.g. <code>Grass</code></td>
+<td>run</td>
+<td>the layer's regrowth, each tick (ENV-03)</td>
+</tr>
+<tr>
+<td><code>&lt;species&gt;/actions</code></td>
+<td>run</td>
+<td>side steps, strike rolls</td>
+</tr>
+<tr>
+<td><code>&lt;species&gt;/founders</code></td>
+<td>run</td>
+<td>where founders and newcomers appear</td>
+</tr>
+</tbody>
+</table>
+<p>Turn on the World's <code>Separate World Seed</code> and set its <code>World Seed</code> to keep one map while the run seed varies (RAND-04).
+Carcasses, eggs and the terrain ground draw no random numbers.</p>
+<h2 id="in-the-editor">In the editor</h2>
+<ul>
+<li>The <strong>run views</strong> draw a flat ground with its food and cover cells, and a marker for each entity: a dark red disc per
+carcass, an ivory ball per egg (<a href="views-and-real-time.html">Views and real time</a>).</li>
+<li>The species inspector lists what a species eats and the energy of each target. <em>Window ▸ EvoSim ▸ Food Web</em> shows
+who eats whom (<a href="editor-tooling.html">Editor tooling</a>).</li>
+<li>Validation reports a fraction outside [0, 1] (V-35), a terrain ground without a terrain (V-20) and diet targets
+without an Edible (V-24).</li>
+</ul>
+<h2 id="go-further">Go further</h2>
+<ul>
+<li><a href="../extending/environment.html">Food, cover, entities and ground</a>: write your own layer, cover, entity kind or ground,
+and make anything edible.</li>
+<li><a href="food-web.html">The food web</a>: diets, threats and who hunts whom.</li>
+<li><a href="the-tick.html">A tick, phase by phase</a>: where the environment phase sits.</li>
+<li>Specification: <a href="../spec/03-environment.html">03 — Environment</a>, <a href="../spec/02-space-and-time.html">02 — Space and time</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

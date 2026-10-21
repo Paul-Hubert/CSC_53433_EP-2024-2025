@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Guides | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Guides | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/index.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="guide-index">
+<h1 id="guides">Guides</h1>
+
+<p>The guides explain how EvoSim works, one part at a time. Read <a href="getting-started.html">Getting started</a> and
+<a href="overview.html">How EvoSim works</a> first; the other pages can be read in any order.</p>
+<h2 id="the-simulation">The simulation</h2>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>What it explains</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="world-and-modules.html">The world and its modules</a></td>
+<td>the GameObject tree, how the World finds and sets up its modules, validation</td>
+</tr>
+<tr>
+<td><a href="the-tick.html">A tick, phase by phase</a></td>
+<td>the phases, the tick context, waiting for the brain, run speeds</td>
+</tr>
+<tr>
+<td><a href="animals-and-stats.html">Animals, stats and death</a></td>
+<td>the animal record, stats and traits, energy, stamina, metabolism, busy states, death rules</td>
+</tr>
+<tr>
+<td><a href="senses-and-prompts.html">Senses and prompts</a></td>
+<td>tokens, observations, situation texts, how the prompt is written</td>
+</tr>
+<tr>
+<td><a href="brains-and-decisions.html">Decisions and brains</a></td>
+<td>when animals decide, the memo and the cache, the brains, sampling, failures</td>
+</tr>
+<tr>
+<td><a href="actions-and-movement.html">Actions and movement</a></td>
+<td>intents, interactions, locomotion, stamina, act order</td>
+</tr>
+<tr>
+<td><a href="food-web.html">The food web</a></td>
+<td>diets, edible things, threats, carcasses</td>
+</tr>
+<tr>
+<td><a href="genes-and-mutation.html">Genes and mutation</a></td>
+<td>genes, alleles, genomes, expression, mutation operators, the mutator</td>
+</tr>
+<tr>
+<td><a href="reproduction-and-population.html">Reproduction and population</a></td>
+<td>mating, crossover, litters, eggs, caps and floors</td>
+</tr>
+<tr>
+<td><a href="environment.html">The environment</a></td>
+<td>the ground, food layers, cover, entities</td>
+</tr>
+</tbody>
+</table>
+<h2 id="running-and-checking">Running and checking</h2>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>What it explains</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="determinism.html">Determinism and replay</a></td>
+<td>random streams, the events hash, what breaks a replay</td>
+</tr>
+<tr>
+<td><a href="recording-and-outputs.html">Recording and outputs</a></td>
+<td>the run files, statistics, the run summary</td>
+</tr>
+<tr>
+<td><a href="views-and-real-time.html">Views and real time</a></td>
+<td>bodies and views, the run views, the camera, real-time speed, captures</td>
+</tr>
+<tr>
+<td><a href="editor-tooling.html">Editor tooling</a></td>
+<td>the inspectors, windows, menus and validation</td>
+</tr>
+<tr>
+<td><a href="running-and-building.html">Running and building</a></td>
+<td>Play mode, headless runs, batch mode, player builds and their arguments</td>
+</tr>
+<tr>
+<td><a href="testing.html">Testing</a></td>
+<td>the test suites and the tools to test a world</td>
+</tr>
+</tbody>
+</table>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

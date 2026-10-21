@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class Expression | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class Expression | EvoSim ">
+      
+      <meta name="description" content="What a gene expresses into (GENE-03/04): a trait of the animal being born, or a line of the prompt.  receives one and calls  or .">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_Expression.md&amp;value=---%0Auid%3A%20EvoSim.Expression%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.Expression">
+
+
+
+  <h1 id="EvoSim_Expression" data-uid="EvoSim.Expression" class="text-break">
+Class Expression  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Expression.cs/#L19"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Runtime.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>What a gene expresses into (GENE-03/04): a trait of the animal being born, or a line of the prompt.
+<a class="xref" href="EvoSim.Gene.html#EvoSim_Gene_Express_EvoSim_AlleleValue_EvoSim_Expression_">Express(AlleleValue, Expression)</a> receives one and calls <a class="xref" href="EvoSim.Expression.html#EvoSim_Expression_SetTrait_System_String_System_Single_System_Boolean_">SetTrait(string, float, bool)</a> or <a class="xref" href="EvoSim.Expression.html#EvoSim_Expression_PromptGene_System_String_System_String_">PromptGene(string, string)</a>.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class Expression</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">Expression</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="EvoSim_Expression_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Every gene is expressed in two situations, each with one target only:</p>
+<ul><li>at birth, by <a class="xref" href="EvoSim.Species.html#EvoSim_Species_CreateAnimal_System_String_UnityEngine_Vector3_System_Single_EvoSim_Genome_System_Int32_System_Int32___System_Action_EvoSim_Animal__">CreateAnimal(string, Vector3, float, Genome, int, int[], Action&lt;Animal&gt;)</a>: <a class="xref" href="EvoSim.Expression.html#EvoSim_Expression_Animal">Animal</a> is the newborn, traits are
+set, prompt lines are dropped;</li><li>when the genes block of a decision is written, by <a class="xref" href="EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_BrainGenes_EvoSim_Species_EvoSim_Genome_">BrainGenes(Species, Genome)</a>, for the
+genes the brain reads only: <a class="xref" href="EvoSim.Expression.html#EvoSim_Expression_Animal">Animal</a> is null, traits are dropped, prompt lines are collected.</li></ul>
+<p>So a gene's <a class="xref" href="EvoSim.Gene.html#EvoSim_Gene_Express_EvoSim_AlleleValue_EvoSim_Expression_">Express(AlleleValue, Expression)</a> must act only through this object.</p>
+</div>
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="EvoSim_Expression__ctor_" data-uid="EvoSim.Expression.#ctor*"></a>
+
+  <h3 id="EvoSim_Expression__ctor_EvoSim_Animal_EvoSim_SpeciesBuilder_System_Collections_Generic_List_System_Collections_Generic_KeyValuePair_System_String_System_String___" data-uid="EvoSim.Expression.#ctor(EvoSim.Animal,EvoSim.SpeciesBuilder,System.Collections.Generic.List{System.Collections.Generic.KeyValuePair{System.String,System.String}})">
+  Expression(Animal, SpeciesBuilder, List&lt;KeyValuePair&lt;string, string&gt;&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Expression.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Prepares an expression for one target: an animal's traits, or the lines of a genes block.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Expression(Animal animal, SpeciesBuilder declarations, List&lt;KeyValuePair&lt;string, string&gt;&gt; promptGenes = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>animal</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal being born, or null when only prompt lines are wanted.</p>
+</dd>
+    <dt><code>declarations</code> <a class="xref" href="EvoSim.SpeciesBuilder.html">SpeciesBuilder</a></dt>
+    <dd><p>The species' declarations, where traits are found by name.</p>
+</dd>
+    <dt><code>promptGenes</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2">KeyValuePair</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;&gt;</dt>
+    <dd><p>The list that collects (label, text) lines for the genes block, or null when no
+prompt line is wanted.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="EvoSim_Expression_Animal_" data-uid="EvoSim.Expression.Animal*"></a>
+
+  <h3 id="EvoSim_Expression_Animal" data-uid="EvoSim.Expression.Animal">
+  Animal
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Expression.cs/#L25"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The animal whose traits are being set, or null when only prompt lines are wanted.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Animal Animal { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_Expression_PromptGene_" data-uid="EvoSim.Expression.PromptGene*"></a>
+
+  <h3 id="EvoSim_Expression_PromptGene_System_String_System_String_" data-uid="EvoSim.Expression.PromptGene(System.String,System.String)">
+  PromptGene(string, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Expression.cs/#L56"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>A sentence for the genes block of the prompt (PROMPT-02); dropped at birth.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void PromptGene(string label, string text)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>label</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>What the brain sees before the sentence: the gene's <a class="xref" href="EvoSim.Gene.html#EvoSim_Gene_Label">Label</a>.</p>
+</dd>
+    <dt><code>text</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The sentence, or a number written as text.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Expression_SetTrait_" data-uid="EvoSim.Expression.SetTrait*"></a>
+
+  <h3 id="EvoSim_Expression_SetTrait_System_String_System_Single_System_Boolean_" data-uid="EvoSim.Expression.SetTrait(System.String,System.Single,System.Boolean)">
+  SetTrait(string, float, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Expression.cs/#L45"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets a trait, or multiplies its default; the result is clamped to the trait's range (GENE-04, ANIM-18).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetTrait(string trait, float value, bool multiplyDefault)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>trait</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The trait's name, as a module declared it, e.g. <code>stamina.max</code>.</p>
+</dd>
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The value, in the trait's unit, or a factor when <code class="paramref">multiplyDefault</code> is true.</p>
+</dd>
+    <dt><code>multiplyDefault</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>False: the value replaces the trait. True: the trait becomes its default times the value.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_Expression_SetTrait_System_String_System_Single_System_Boolean__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Does nothing when <a class="xref" href="EvoSim.Expression.html#EvoSim_Expression_Animal">Animal</a> is null, or when no module declares the trait (V-45 reports it
+before the run).</p>
+</div>
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

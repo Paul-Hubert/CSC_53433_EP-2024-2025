@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>20 — Unity architecture (proposal) | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="20 — Unity architecture (proposal) | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/20-unity-architecture.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="20--unity-architecture-proposal">20 — Unity architecture (proposal)</h1>
+
+<div class="NOTE">
+<h5>Note</h5>
+<p>This document is the design proposal written before the code. Its code sketches show the ideas, but some names and signatures differ from the code as it is now. For the real classes, see the <a href="../guides/index.html">guides</a> and the <a href="../api/index.html">API reference</a>.</p>
+</div>
+<p>A proposal for implementing the contract in Unity 6000.3, aimed at two readers:
+students, who should understand one behaviour by reading one small class and add
+one by writing one; and the course staff, who need runs that are fast,
+reproducible and testable.</p>
+<h2 id="1-principles">1. Principles</h2>
+<p>The <code>ARCH</code> rules bind the reference implementation (MUST for it) and are
+recommendations (SHOULD) for any other implementation of the contract.</p>
+<ul>
+<li><strong>ARCH-01</strong> <em>The scene is the configuration.</em> A world is a GameObject tree. Each
+feature is a component (a <strong>module</strong>) placed in it: drag a prefab in to add a
+feature, disable it to switch it off, delete it to remove it.</li>
+<li><strong>ARCH-02</strong> <em>One file per feature.</em> A sense, an action, a gene kind, a stat, a
+brain, a mutation operator, a phase: each is one class deriving from one base
+class, overriding one or two methods.</li>
+<li><strong>ARCH-03</strong> <em>Animals are data.</em> An animal is a plain C# object owned by its
+species. No animal has a MonoBehaviour with <code>Update</code>. Phases loop over all
+animals at once. The visible animal is a pooled <strong>view</strong> that only displays.</li>
+<li><strong>ARCH-04</strong> <em>The World initialises everything, in a fixed order.</em> Modules never
+set themselves up in <code>Awake</code>, <code>Start</code> or <code>OnEnable</code> (Unity doesn't guarantee
+their order). The World calls them.</li>
+<li><strong>ARCH-05</strong> <em>Modules belong to their nearest owner.</em> A module under a species
+belongs to the nearest <code>Species</code> above it; a gene belongs to the nearest action
+above it (or on its GameObject). A species inside a species is an error.</li>
+<li><strong>ARCH-06</strong> <em>Disabled means absent.</em> An inactive GameObject or a disabled
+component is not a module of the world.</li>
+<li><strong>ARCH-07</strong> <em>No statics, no singletons.</em> Everything is reached from the World,
+a species or a context object. Several worlds can live side by side (tests,
+parallel seeds), and &quot;Enter Play Mode&quot; without a domain reload stays safe.</li>
+<li><strong>ARCH-08</strong> <em>Prefabs never reference the scene.</em> A module prefab shared between
+species refers to world things by role or name (&quot;the threats of my species&quot;,
+&quot;the layer named Grass&quot;), resolved when the World initialises. A prefab can't
+hold a reference to a scene object, so this is what makes sharing work.</li>
+<li><strong>ARCH-09</strong> <em>Logic is testable without a scene.</em> Modules take their inputs from
+context objects that tests can build in code (<a href="30-tests.html">30</a>).</li>
+<li><strong>ARCH-10</strong> <em>Version-specific code is fenced.</em> HTTP, waiting and NavMesh calls
+live in a few files, so a later Unity upgrade touches little. (The owner moves
+the project to 6000.3 before work starts.)</li>
+<li><strong>ARCH-11</strong> <em>The reference modules are student code.</em> Every reference sense,
+action, gene, stat, locomotion, rule, brain and phase derives from the same
+public base classes a student uses, with no internal shortcut. The teaching
+path relies on it: students first reimplement existing components against
+their tests, then invent their own (<a href="22-extending-recipes.html">22</a>).</li>
+<li><strong>ARCH-12</strong> <em>Scale can change later without touching modules' meaning.</em> Phases
+call modules on lists of animals; storage, spatial queries and views sit
+behind interfaces (§10). Nothing is optimised now.</li>
+</ul>
+<h2 id="2-the-gameobject-tree">2. The GameObject tree</h2>
+<pre><code>Lab1 World                                [World]  seed, wait mode, act order, decision period
+├── Ground                                [FlatGround] | [TerrainGround]+Terrain | [NavMeshGround]
+├── Environment
+│   ├── Grass                             [FoodGrid]       initial 0.1, regrow 0.0015, no food in cover
+│   │                                     [Edible]         grazed, 25 per item
+│   ├── Thickets                          [CoverLayer]     20 %, hides prey from their threats
+│   ├── Carcasses                         [CarcassSystem]  carcasses as each species' edible component says
+│   └── Eggs                              [EggSystem]      no [Edible]: eggs can't be eaten
+├── Brains
+│   ├── JEV                               [JevBrain]       (world default) localhost, model revision, strict
+│   ├── Gemma (optional)                  [OllamaPointsBrain] localhost, gemma4:12b
+│   ├── Random                            [RandomBrain]    the null model
+│   ├── Answer cache                      [AnswerCache]    folder, read/write
+│   └── Mutator                           [MutatorService] host, model, temperature
+├── Recording                             [RunRecorder] [LiveStatistics]
+├── Phases                                (children run in this order every tick)
+│   ├── Sense                             [SensePhase]
+│   ├── Ask brains                        [AskBrainsPhase]
+│   ├── Choose actions                    [ChooseActionsPhase]
+│   ├── Act                               [ActPhase]
+│   ├── Breed                             [BreedPhase]
+│   ├── Hatch                             [HatchPhase]
+│   ├── Deaths                            [DeathPhase]
+│   ├── Migration                         [MigrationPhase]
+│   ├── Environment                       [EnvironmentPhase]
+│   ├── Floor                             [FloorPhase]
+│   └── Record                            [RecordPhase]
+├── Prey                                  [Species] id and name &quot;prey&quot;, brain: JEV
+│   ├── Body                              [Body] → prey view prefab
+│   ├── Locomotion                        [KinematicLocomotion] walk 1, run 1 m per tick
+│   ├── Stats                             [Energy] [Stamina] [Metabolism]
+│   ├── Senses                            (situation-text order = this order)
+│   │   ├── Energy                        [LevelSense] stat energy, 30 / 70
+│   │   ├── Stamina                       [LevelSense] stat stamina, 20 / 40
+│   │   ├── Food                          [NearestResourceSense] layer &quot;Grass&quot;
+│   │   ├── Predator                      [NearestAnimalSense] set Threats
+│   │   ├── Cover                         [NearestCoverSense]
+│   │   ├── Animal                        [NearestAnimalSense] set Kin, readiness on
+│   │   └── Age                           [AgeSense]
+│   ├── Actions                           (probability / prompt / option order = this order)
+│   │   ├── eat    (prefab Eat)           [EatAction]  [TextGene]
+│   │   ├── flee   (prefab Flee)          [FleeAction] [TextGene]   flee into cover: off
+│   │   ├── hide   (prefab Hide)          [HideAction] [TextGene]
+│   │   ├── follow (prefab Follow)        [FollowAction] [TextGene]
+│   │   ├── rest   (prefab Rest)          [RestAction] [TextGene]
+│   │   └── mate   (prefab Mate)          [MateAction] [TextGene]
+│   ├── Food                              [Diet] grass   [Edible] struck, 60 per kill, carcass 2 × 30, 100 ticks
+│   ├── Life                              [MatingRule] [Litter] [UniformCrossover] [Incubation 0]
+│   │                                     [Starvation] [OldAge] [CapRule] [FloorRule] [DecisionSchedule staggered]
+│   └── Mutation                          [LlmMutation] deck mutate_v4
+└── Predator                              [Species] id and name &quot;predator&quot;
+    ├── Locomotion                        [KinematicLocomotion] walk 1, run 2 m per tick
+    └── ...                               [HuntAction] [Diet: prey (strike), prey carcasses (scavenge)]; no [Edible] ...
+</code></pre>
+<p>The sub-GameObjects (&quot;Senses&quot;, &quot;Actions&quot;, &quot;Life&quot;) are only folders: discovery
+looks at the whole subtree. Order matters only <em>within a kind</em>: the n-th
+<code>AnimalAction</code> found depth-first is action n, wherever it sits. The inspector of
+the species shows the resulting orders (<a href="21-editor-tooling.html">21</a>).</p>
+<p>A sense may also travel inside its action's prefab (a Hide prefab carrying its
+Cover sense); it then takes its place in depth-first order, which moves it in
+the situation text. A number gene (a stamina gene, scenario S12) would sit under
+a <code>Genes</code> folder with a <code>GaussianMutation</code> beside the LLM mutation; the
+reference species have none (owner decision).</p>
+<h2 id="3-base-classes">3. Base classes</h2>
+<p>All runtime code lives in the namespace <code>EvoSim</code>. The sketches below are the
+public surface students meet; bodies are abbreviated.</p>
+<h3 id="31-world-level-modules">3.1 World-level modules</h3>
+<pre><code class="lang-csharp">/// A component under the World (not under a species): a phase or a service.
+public abstract class WorldModule : MonoBehaviour
+{
+    public World World { get; private set; }
+    /// Called by the World in a fixed order, before any animal exists.
+    public virtual void Initialize() { }
+    /// Report configuration problems (editor, and at the start of a run).
+    public virtual void Validate(ValidationReport report) { }
+}
+
+/// One step of a tick. The World runs its phases in hierarchy order (TICK-01).
+public abstract class TickPhase : WorldModule
+{
+    /// Work this phase must wait for (brain answers, mutations); null = none (TICK-03).
+    public virtual Pending WaitsFor(TickContext t) =&gt; null;
+    public abstract void Run(TickContext t);
+}
+
+/// Something phases and modules use: ground, layers, brains, recorder.
+public abstract class WorldService : WorldModule { }
+</code></pre>
+<h3 id="32-the-world">3.2 The World</h3>
+<pre><code class="lang-csharp">[DisallowMultipleComponent]
+public class World : MonoBehaviour
+{
+    [SerializeField] int seed = 1234;
+    [SerializeField] WaitMode waitMode = WaitMode.Responsive;   // or Freeze (SPACE-14)
+    [SerializeField, Min(1)] int ticksPerFixedUpdate = 1;
+    [SerializeField, Min(1)] int decisionPeriod = 4;
+    [SerializeField, Min(0.01f)] float samplingTemperature = 1f;
+    [SerializeField] TextStyle textStyle = TextStyle.V1;
+    [SerializeField] Brain defaultBrain;
+    [SerializeField] bool startOnPlay = true;
+
+    public int Tick { get; private set; }
+    public float SamplingTemperature =&gt; samplingTemperature;
+    public RandomStreams Random { get; private set; }
+    public IReadOnlyList&lt;Species&gt; AllSpecies =&gt; species;
+    public T Service&lt;T&gt;() where T : WorldService =&gt; ...;        // first enabled service of that type
+    public T Service&lt;T&gt;(string name) where T : WorldService =&gt; ...;
+
+    readonly List&lt;Species&gt; species = new();
+    readonly List&lt;TickPhase&gt; phases = new();
+    int nextPhase;                                               // where a waiting tick resumes
+
+    void Awake()       { if (startOnPlay) Initialize(); }
+    void FixedUpdate() { if (IsRunning) Advance(ticksPerFixedUpdate); }
+    void LateUpdate()  { views.Sync(InterpolationFactor); }      // visuals only (SPACE-12)
+
+    /// Discovery and set-up, in a fixed order (§4).
+    public void Initialize() { ... }
+
+    /// Runs up to maxTicks ticks. In Responsive mode it returns early when a phase must
+    /// wait, and the same tick continues at that phase on a later call (SPACE-13/14).
+    public void Advance(int maxTicks)
+    {
+        for (int done = 0; done &lt; maxTicks;)
+        {
+            var phase = phases[nextPhase];
+            var pending = phase.WaitsFor(context);
+            if (pending != null &amp;&amp; !pending.IsDone)
+            {
+                if (waitMode == WaitMode.Responsive) return;     // Unity keeps rendering
+                pending.Wait();                                  // Freeze: block until answered
+            }
+            phase.Run(context);                                  // inside a profiler marker
+            if (++nextPhase == phases.Count) { nextPhase = 0; Tick++; done++; }
+        }
+    }
+
+    /// A new species during a run (SPEC-30): clones a template under this World.
+    public Species AddSpecies(Species template, string name, Species parent = null) { ... }
+}
+</code></pre>
+<p><code>FixedUpdate</code> only <em>drives</em> the loop; simulation time is <code>Tick</code> (SPACE-10).
+With <code>Freeze</code>, a brain batch blocks <code>FixedUpdate</code> until it is answered, which is
+the owner's baseline. With <code>Responsive</code> (the default in the editor), the tick
+pauses at &quot;Choose actions&quot; and resumes when the answers are in, while Unity keeps
+drawing; both give the same events hash (RAND-11), and a test checks it.</p>
+<h3 id="33-species-and-species-modules">3.3 Species and species modules</h3>
+<pre><code class="lang-csharp">/// A kind of animal. Configure it with child components; subclass it only for hooks.
+public class Species : MonoBehaviour
+{
+    [SerializeField] string displayName = &quot;prey&quot;;               // what the brain reads (SPEC-01)
+    [SerializeField] Brain brain;                               // null = the World's default
+    [SerializeField, TextArea(2, 6)] string promptHeader =
+        &quot;You decide what a wild animal does next in a simple world.&quot;;
+    [SerializeField] TextAsset frozenPrompt;                    // optional (PROMPT-04)
+
+    public string Id { get; private set; }
+    public World World { get; private set; }
+    public IReadOnlyList&lt;AnimalAction&gt; Actions { get; private set; }
+    public IReadOnlyList&lt;Gene&gt; Genes { get; private set; }
+    public IReadOnlyList&lt;Sense&gt; Senses { get; private set; }
+    public IReadOnlyList&lt;Animal&gt; Animals =&gt; animals;
+    public string Signature { get; private set; }               // SPEC-03
+
+    public T Module&lt;T&gt;() where T : SpeciesModule =&gt; ...;         // the one Diet, Litter, CapRule...
+    public IEnumerable&lt;T&gt; ModulesOf&lt;T&gt;() where T : SpeciesModule =&gt; ...;
+
+    // Hooks for subclasses. Most species never need them.
+    protected internal virtual void OnBorn(Animal a) { }
+    protected internal virtual void OnDied(Animal a, string cause) { }
+}
+
+/// A component under a species: a gene, a sense, an action, a stat, a rule...
+public abstract class SpeciesModule : MonoBehaviour
+{
+    public Species Species { get; private set; }
+    public World World =&gt; Species.World;
+
+    /// Declare the stats and traits this module needs (before any animal exists).
+    public virtual void Declare(SpeciesBuilder b) { }
+    /// Look up other modules, layers and species (after every module declared).
+    public virtual void Initialize() { }
+    public virtual void Validate(ValidationReport report) { }
+    /// Lines this module adds to the prompt's rules (PROMPT-01, PROMPT-03).
+    public virtual void WritePromptRules(PromptWriter w) { }
+}
+</code></pre>
+<h3 id="34-animals-stats-and-traits">3.4 Animals, stats and traits</h3>
+<pre><code class="lang-csharp">/// One animal: plain data, owned by its species (ANIM-01).
+public sealed class Animal
+{
+    public readonly int Id;
+    public readonly Species Species;
+    public Vector3 Position, PreviousPosition;     // previous: for interpolating the view
+    public float Heading;                          // degrees, for wandering
+    public Genome Genome;
+    public int Generation, BornTick, Age;
+    public int[] Parents;
+    public int Action = -1;                        // index into Species.Actions; -1 = none
+    public bool Searching, BredThisPeriod, Killed;
+    public int KilledBy = -1, BusyTicks;
+    public string BusyReason;
+    public int Meals, Offspring;
+    public Observation LastObservation;            // for the inspector (DEC-21)
+    public float[] LastProbabilities;
+
+    public float this[StatId s] { get =&gt; stats[s.Index]; set =&gt; stats[s.Index] = s.Clamp(value); }
+    public float Trait(TraitId t) =&gt; traits[t.Index];
+    public bool IsBusy =&gt; BusyTicks &gt; 0;
+    readonly float[] stats, traits;
+}
+</code></pre>
+<p>A stamina module declares what it needs and reads only that:</p>
+<pre><code class="lang-csharp">public class Stamina : SpeciesModule
+{
+    [SerializeField] float max = 60f, regenPerTick = 2f, regenEnergyCost = 0.3f;
+    public StatId Value { get; private set; }
+    public TraitId Max { get; private set; }
+
+    public override void Declare(SpeciesBuilder b)
+    {
+        Max   = b.DeclareTrait(&quot;stamina.max&quot;, defaultValue: max, min: 1f, max: 1000f);
+        Value = b.DeclareStat(&quot;stamina&quot;, start: StatStart.FullTrait(Max));
+    }
+
+    /// How far the animal may move this tick (ANIM-21).
+    public float Budget(Animal a) =&gt; a[Value];
+
+    /// Called by the metabolism after the animal acted.
+    public void Settle(Animal a, float metersMoved, Energy energy)
+    {
+        if (metersMoved &gt; Units.Epsilon) { a[Value] -= metersMoved; return; }
+        if (a[Value] &lt; a.Trait(Max))
+        {
+            a[Value] = Mathf.Min(a.Trait(Max), a[Value] + regenPerTick);
+            a[energy.Value] -= regenEnergyCost;
+        }
+    }
+
+    public override void WritePromptRules(PromptWriter w) =&gt; w.Rule(
+        &quot;Every meter moved costs stamina. Standing still brings it back, which costs some &quot; +
+        &quot;energy until stamina is full. Without stamina an animal cannot move.&quot;);
+}
+</code></pre>
+<p>A number gene sets <code>stamina.max</code> for one animal; the module never knows a gene
+exists (ANIM-16).</p>
+<h3 id="35-senses">3.5 Senses</h3>
+<pre><code class="lang-csharp">public abstract class Sense : SpeciesModule
+{
+    [SerializeField] protected string label = &quot;Food&quot;;
+    public string Label =&gt; label;
+
+    /// Every token this sense can return, &quot;none&quot; included. Fixed before the run (SENSE-01).
+    public abstract IReadOnlyList&lt;string&gt; Tokens { get; }
+    /// Read one animal at a decision (SENSE-03).
+    public abstract int Read(Animal a, SenseContext s);
+    /// The text the brain reads for a token (SENSE-10).
+    public virtual string Write(int token, TextStyle style) =&gt; $&quot;{label}: {Tokens[token]}.&quot;;
+}
+
+/// For senses that cast rays: ask for rays first, read the results after one batch (SENSE-30).
+public abstract class BatchedSense : Sense
+{
+    public abstract void RequestRays(Animal a, RayBatch rays);
+}
+</code></pre>
+<pre><code class="lang-csharp">public class NearestAnimalSense : Sense
+{
+    [SerializeField] AnimalSet targets = AnimalSet.Threats;     // Threats | Prey | Kin | Listed
+    [SerializeField] List&lt;Species&gt; listed;
+    [SerializeField] Bands bands = Bands.Reference;             // 1, 4, 10 m and the vision trait
+    [SerializeField] bool reportReadiness;                      // &quot;…, ready to mate&quot;
+
+    public override IReadOnlyList&lt;string&gt; Tokens =&gt; tokens;     // built in Initialize
+    public override int Read(Animal a, SenseContext s)
+    {
+        var nearest = s.NearestAnimal(a, targets, bands.Vision(a));   // hidden and killed excluded
+        if (nearest == null) return NoneToken;
+        int band = bands.IndexOf(nearest.Distance);
+        return reportReadiness &amp;&amp; nearest.Distance &lt;= s.PartnerRange
+            ? TokenFor(band, s.IsReady(nearest.Animal))
+            : TokenFor(band);
+    }
+    public override string Write(int t, TextStyle style) =&gt; ...;  // &quot;Predator: 4-10 m away.&quot;
+}
+</code></pre>
+<h3 id="36-actions">3.6 Actions</h3>
+<pre><code class="lang-csharp">public abstract class AnimalAction : SpeciesModule
+{
+    [SerializeField, TextArea] string description = &quot;go to the nearest visible food and eat it&quot;;
+    public string Name =&gt; gameObject.name;                      // &quot;eat&quot;
+    public TextGene Gene { get; internal set; }                 // bound by the species (GENE-05)
+
+    /// Every tick while this action is chosen: say where to go, and what to do on arrival.
+    public abstract void Act(Animal a, ActContext c);
+
+    /// Directed tests: is this observation relevant for this action (CTRL-10)?
+    public virtual bool IsRelevant(ObservationView o) =&gt; true;
+
+    /// Done in passing (ACT-07): when drawn, a carrier is drawn from the rest of the row;
+    /// this action's intent is ignored and its interaction added, for OverlayTicks ticks.
+    public virtual bool Overlay =&gt; false;
+    public virtual int OverlayTicks =&gt; 1;                       // 0 = until the next decision
+
+    public override void WritePromptRules(PromptWriter w) =&gt; w.Action(Name, description);
+}
+</code></pre>
+<p><code>Animal.Overlay</code> (an action index, or -1) and <code>Animal.OverlayLeft</code> (ticks) hold an overlay; <code>Animal.Action</code> is then
+the carrier. <code>ChooseActionsPhase</code> draws the carrier with the same <code>sampling</code> stream (DEC-20); <code>ActPhase</code> plans the
+carrier, then the overlay in the same <code>ActContext</code>, keeps the overlay's interaction only and resolves both, carrier
+first, in every act order. <code>Animal.ActionLabel</code> (&quot;flee + alarm&quot;) is what the inspector and the run overlay show.</p>
+<p>The whole eat behaviour:</p>
+<pre><code class="lang-csharp">public class EatAction : AnimalAction
+{
+    [SerializeField] string layerName = &quot;&quot;;                     // empty = every layer the diet grazes
+
+    public override void Act(Animal a, ActContext c)
+    {
+        var food = c.NearestResource(a, layerName);             // within vision, diet-checked
+        if (food == null) { c.Search(); return; }               // ACT-04
+        c.WalkTo(food.Position, stopAt: 0f);                    // MOVE-04
+        c.OnArrival(Interaction.Graze(food));                   // ACT-10
+    }
+}
+</code></pre>
+<p>Hunting, with carcasses:</p>
+<pre><code class="lang-csharp">public class HuntAction : AnimalAction
+{
+    public override void Act(Animal a, ActContext c)
+    {
+        var prey    = c.NearestAnimal(a, AnimalSet.Prey);      // not killed, not hidden in cover
+        var carcass = c.NearestEntity&lt;Carcass&gt;(a, x =&gt; x.EdibleBy(a));
+        if (carcass != null &amp;&amp; (prey == null || carcass.Distance &lt;= prey.Distance))
+        {
+            c.RunTo(carcass.Position, stopAt: 1f);
+            c.OnArrival(Interaction.Scavenge(carcass.Entity));
+            return;
+        }
+        if (prey == null) { c.Search(); return; }
+        c.RunTo(prey.Position, stopAt: 1f);
+        c.OnArrival(Interaction.Strike(prey.Animal));
+    }
+}
+</code></pre>
+<p><code>ActContext</code> offers only intents (<code>WalkTo</code>, <code>RunTo</code>, <code>RunAwayFrom</code>, <code>Stay</code>,
+<code>Wander</code>, <code>Search</code>) and queries; it cannot move the animal or touch another one
+(ACT-06). Custom interactions implement <code>IInteraction { float Reach; void Apply(Animal actor, InteractionContext c); }</code>.</p>
+<h3 id="37-locomotion">3.7 Locomotion</h3>
+<p>Each species has one locomotion component. An action only gives a direction
+(and walk or run, and how far at most); the locomotion decides what happens,
+and whatever it does is the tick's result (MOVE-01).</p>
+<pre><code class="lang-csharp">/// How a species moves. Inherit it for terrain, NavMesh or physics movement.
+public abstract class Locomotion : SpeciesModule
+{
+    [SerializeField] protected float walkSpeed = 1f, runSpeed = 1f;    // meters per tick
+    public TraitId WalkSpeed { get; private set; }
+    public TraitId RunSpeed { get; private set; }
+
+    public override void Declare(SpeciesBuilder b)
+    {
+        WalkSpeed = b.DeclareTrait(&quot;speed.walk&quot;, walkSpeed, min: 0f, max: 100f);
+        RunSpeed  = b.DeclareTrait(&quot;speed.run&quot;,  runSpeed,  min: 0f, max: 100f);
+    }
+
+    /// Move one animal this tick; return the meters actually moved (MOVE-06).
+    public abstract float Move(Animal a, Intent intent, float staminaBudget, MoveContext c);
+
+    /// Extra energy this movement costs (slopes, mud). None in the reference.
+    public virtual float ExtraCost(Animal a, Vector3 from, Vector3 to) =&gt; 0f;
+
+    /// The act phase calls this for a group; override it to move many animals at once (ARCH-12).
+    public virtual void MoveAll(IReadOnlyList&lt;Animal&gt; group, IReadOnlyList&lt;Intent&gt; intents,
+                                MoveContext c, Span&lt;float&gt; moved)
+    {
+        for (int i = 0; i &lt; group.Count; i++)
+            moved[i] = Move(group[i], intents[i], c.StaminaBudget(group[i]), c);
+    }
+}
+
+/// The reference: straight lines, no physics (MOVE-04).
+public class KinematicLocomotion : Locomotion
+{
+    public override float Move(Animal a, Intent intent, float stamina, MoveContext c)
+    {
+        if (intent.IsStay) return 0f;
+        float speed = a.Trait(intent.Run ? RunSpeed : WalkSpeed);
+        float d = Mathf.Min(speed, stamina, intent.MaxDistance);
+        Vector3 reached = c.Ground.SlideTo(a.Position, a.Position + intent.Direction * d);
+        if (d &gt; 0f &amp;&amp; c.Distance(a.Position, reached) &lt; Units.Epsilon)          // stuck
+            reached = c.Ground.SideStep(a.Position, d, c.Stream(Species, &quot;actions&quot;));
+        float moved = c.Distance(a.Position, reached);
+        a.Position = reached;
+        return moved;
+    }
+}
+</code></pre>
+<p>Later subclasses (owner decision: not now): <code>TerrainLocomotion</code> (slower and
+costlier uphill, no steep slopes), <code>NavMeshLocomotion</code> (paths around
+obstacles), <code>PhysicsLocomotion</code> (a rigid body pushed toward the direction; it
+may not go exactly there, which is fine).</p>
+<h3 id="38-genes">3.8 Genes</h3>
+<pre><code class="lang-csharp">public abstract class Gene : SpeciesModule
+{
+    [SerializeField] protected string label;                    // empty = the action's name
+    public string Label =&gt; ...;
+    public string LocusId =&gt; $&quot;{Species.Id}.{Label}&quot;;            // GENE-11
+    public abstract AlleleKind Kind { get; }
+    public abstract IReadOnlyList&lt;AlleleValue&gt; FounderPool { get; }
+    /// Turn this gene's allele into what acts: a prompt line or a trait (GENE-03/04).
+    public abstract void Express(AlleleValue value, Expression e);
+}
+
+public class TextGene : Gene
+{
+    [SerializeField] AllelePool pool;                           // shared asset, or the lists below
+    [SerializeField] string neutral = &quot;No preference.&quot;;
+    [SerializeField, TextArea] List&lt;string&gt; founders = new();
+    [SerializeField] string contrastPro, contrastAnti;
+    public override AlleleKind Kind =&gt; AlleleKind.Text;
+    public override void Express(AlleleValue v, Expression e) =&gt; e.PromptGene(Label, v.Text);
+}
+
+public class NumberGene : Gene
+{
+    [SerializeField] string trait = &quot;stamina.max&quot;;
+    [SerializeField] bool multiplyDefault;                      // false: set the value
+    [SerializeField] float min = 20f, max = 120f;               // the gene's own range
+    [SerializeField] List&lt;float&gt; founders = new() { 45f, 60f, 75f };
+    public float Min =&gt; min;
+    public float Max =&gt; max;
+    public override AlleleKind Kind =&gt; AlleleKind.Number;
+    public override void Express(AlleleValue v, Expression e) =&gt;
+        e.SetTrait(trait, v.Number, multiplyDefault);           // clamped to the trait's range
+}
+</code></pre>
+<p>Founder sentences live in an <code>AllelePool</code> ScriptableObject when several species
+or prefabs share them; the inspector checks every sentence with the mutation
+guards (GENE-22).</p>
+<h3 id="39-mutation">3.9 Mutation</h3>
+<pre><code class="lang-csharp">public abstract class MutationOperator : SpeciesModule
+{
+    [Range(0f, 1f)] public float rate = 0.03f;
+    [SerializeField] List&lt;Gene&gt; onlyThese;                      // empty = every gene it accepts
+    public abstract bool Accepts(Gene g);
+    /// Draw every random choice now (MUT-30), then start the work; the job may finish later.
+    public abstract MutationJob Start(Gene gene, Allele parent, RandomStream rng);
+}
+
+public class GaussianMutation : MutationOperator
+{
+    [SerializeField] float sigma = 5f;
+    public override bool Accepts(Gene g) =&gt; g.Kind == AlleleKind.Number;
+    public override MutationJob Start(Gene g, Allele parent, RandomStream rng)
+    {
+        var gene = (NumberGene)g;
+        float v = Mathf.Clamp(parent.Number + sigma * rng.NextGaussian(), gene.Min, gene.Max);
+        return MutationJob.Done(v, &quot;gauss&quot;);                    // MUT-20
+    }
+}
+
+public class LlmMutation : MutationOperator
+{
+    [SerializeField] TextAsset deck;                            // one instruction per line (MUT-10)
+    [SerializeField] string contextLine = &quot;The sentence below is a rule that a wild animal follows.&quot;;
+    [SerializeField] int tries = 5, maxWords = 12;
+    List&lt;string&gt; instructions;                                  // read from the deck in Initialize
+    public override bool Accepts(Gene g) =&gt; g.Kind == AlleleKind.Text;
+    public override MutationJob Start(Gene g, Allele parent, RandomStream rng)
+    {
+        var plan = TryPlan.Draw(rng, tries, instructions.Count);  // (instruction, seed) per try
+        return World.Service&lt;MutatorService&gt;().Submit(parent.Text, plan, contextLine, instructions,
+                                                      MutationGuards.For(maxWords));
+    }
+}
+</code></pre>
+<h3 id="310-brains">3.10 Brains</h3>
+<pre><code class="lang-csharp">public abstract class Brain : WorldService
+{
+    public virtual int MaxActions =&gt; int.MaxValue;
+    public virtual bool AcceptsAttachments =&gt; false;
+    public abstract string Id { get; }                           // part of memo and cache keys
+    /// Answer a batch (DEC-11). Fast brains fill the answer at once; HTTP brains later.
+    public abstract BrainAnswer Ask(IReadOnlyList&lt;DecisionQuery&gt; batch);
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Brain</th>
+<th>Class</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Random</td>
+<td><code>RandomBrain</code></td>
+<td>uniform; the null model, and the brain of fast tests</td>
+</tr>
+<tr>
+<td>Ollama points</td>
+<td><code>OllamaPointsBrain : HttpBrain</code></td>
+<td>JSON schema per species, temperature 0, seed, <code>num_ctx</code>, <code>think: false</code>, parallel requests</td>
+</tr>
+<tr>
+<td>JEV choice</td>
+<td><code>JevBrain : HttpBrain</code></td>
+<td>one <code>/v1/completions</code> request with the list of prompts of the batch, <code>max_tokens</code> 1, allowed option tokens, log-probabilities, head bias, calibrated temperature</td>
+</tr>
+<tr>
+<td>Fake</td>
+<td><code>ScriptedBrain</code> (tests)</td>
+<td>returns given vectors, counts calls</td>
+</tr>
+</tbody>
+</table>
+<p><code>HttpBrain</code> holds the shared plumbing: a <code>System.Net.Http.HttpClient</code>, retries
+with back-off, time-outs, a cap on parallel requests, strict mode, and the answer
+cache. All of its <code>async</code> code uses <code>ConfigureAwait(false)</code> and never touches
+Unity objects, so the <code>Freeze</code> mode can block the main thread on it without a
+deadlock.</p>
+<h3 id="311-other-modules">3.11 Other modules</h3>
+<table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Module(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ground (SPACE-04)</td>
+<td><code>FlatGround</code>, <code>TerrainGround</code> (heightmap, water level, maximum steepness, tree footprints), <code>NavMeshGround</code></td>
+</tr>
+<tr>
+<td>Locomotion (MOVE-01), one per species</td>
+<td><code>KinematicLocomotion</code> (reference); later <code>TerrainLocomotion</code> (slope costs, steepness), <code>NavMeshLocomotion</code> (<code>NavMesh.Raycast</code>, <code>NavMesh.CalculatePath</code> toward far targets, paths cached per target for a few ticks), <code>PhysicsLocomotion</code></td>
+</tr>
+<tr>
+<td>Resource layers (ENV-01)</td>
+<td><code>FoodGrid</code>, <code>TerrainGrassFood</code> (the terrain's detail layer is the grid)</td>
+</tr>
+<tr>
+<td>Cover (ENV-10)</td>
+<td><code>CoverLayer</code> (noise patches), <code>TerrainCover</code> (from tree instances or a detail layer)</td>
+</tr>
+<tr>
+<td>Entities (ENV-20)</td>
+<td><code>EntitySystem&lt;T&gt;</code>; <code>CarcassSystem</code>, <code>EggSystem</code></td>
+</tr>
+<tr>
+<td>Food (SPEC-10, SPEC-15)</td>
+<td><code>Edible</code> on whatever can be eaten, <code>Diet</code> on the eater (§3.12); threats derived by the World</td>
+</tr>
+<tr>
+<td>Stats</td>
+<td><code>Energy</code>, <code>Stamina</code>, <code>Metabolism</code> (costs per tick)</td>
+</tr>
+<tr>
+<td>Busy (ANIM-30)</td>
+<td><code>Digestion</code> (makes eaters busy)</td>
+</tr>
+<tr>
+<td>Mating, litters, eggs</td>
+<td><code>MatingRule</code>, <code>Litter</code>, <code>UniformCrossover</code>, <code>Incubation</code></td>
+</tr>
+<tr>
+<td>Death</td>
+<td><code>Starvation</code>, <code>OldAge</code> (each a <code>DeathRule</code>: <code>string CauseOfDeath(Animal a)</code>)</td>
+</tr>
+<tr>
+<td>Population</td>
+<td><code>CapRule</code> (migrate or block), <code>FloorRule</code> (newcomers), <code>EggBankFloor</code> (rejected option, off)</td>
+</tr>
+<tr>
+<td>Prompt</td>
+<td><code>PromptWriter</code> (assembles header, actions, rules, genes, situation, ask), <code>FrozenPrompt</code></td>
+</tr>
+<tr>
+<td>Memo, cache</td>
+<td><code>DecisionMemo</code> (in memory), <code>AnswerCache</code> (append-only JSON lines per brain in a cache folder, loaded at start)</td>
+</tr>
+<tr>
+<td>Spatial queries</td>
+<td><code>SpatialIndex</code>: a uniform hash grid per species and per entity kind, rebuilt once per sense and act phase</td>
+</tr>
+<tr>
+<td>Randomness</td>
+<td><code>RandomStreams</code> → <code>RandomStream</code> (PCG32 seeded from SHA-256 of seed and name)</td>
+</tr>
+<tr>
+<td>Recording</td>
+<td><code>RunRecorder</code> (files of <a href="13-outputs-and-recording.html">13</a>, Newtonsoft JSON with sorted keys, running SHA-256), <code>LiveStatistics</code> (for the editor graphs)</td>
+</tr>
+<tr>
+<td>Views</td>
+<td><code>Body</code> (the view prefab of a species), <code>AnimalView</code> (holds the animal id; no <code>Update</code>), <code>ViewPool</code></td>
+</tr>
+<tr>
+<td>Species added during a run</td>
+<td><code>World.AddSpecies</code>; a speciation rule deciding when to split (a <code>TickPhase</code>) is left for later (owner decision)</td>
+</tr>
+<tr>
+<td>Controls</td>
+<td>settings on the World and on the evolution modules (<a href="15-controls-metrics-and-gates.html">15</a>)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="312-food-edible-and-diet">3.12 Food: edible and diet</h3>
+<p>Whether something can be eaten is a matter of components on both sides (owner
+decision): the eaten thing says <em>how</em> it is eaten and <em>how much</em> it gives; the
+eater says <em>what</em> it eats.</p>
+<pre><code class="lang-csharp">/// Makes what it sits on edible: a species' animals, a resource layer's items, an entity kind.
+public class Edible : MonoBehaviour
+{
+    public EatMethod method = EatMethod.Graze;      // Graze | Strike | Scavenge
+    public float energy = 25f;                       // per item, per kill or per portion
+    [Header(&quot;Strike only: what a kill leaves&quot;)]
+    public int carcassPortions = 0;
+    public float carcassEnergy = 30f;
+    public int carcassTicks = 100;
+}
+
+/// What a species eats (SPEC-15). Targets must carry an Edible component (V-24).
+public class Diet : SpeciesModule
+{
+    [Serializable] public class Entry
+    {
+        public string target = &quot;Grass&quot;;              // a layer, a species, &quot;carcass:prey&quot;, &quot;egg:prey&quot;...
+        public float energyScale = 1f;
+    }
+    public List&lt;Entry&gt; eats = new();
+
+    public bool Eats(IEdibleTarget t) =&gt; ...;        // listed here and the target is edible (SPEC-13)
+}
+</code></pre>
+<p>Making eggs edible is then two components and no code: an <code>Edible</code> on the
+<code>EggSystem</code> and a diet entry <code>egg:prey</code> on the egg eater
+(<a href="22-extending-recipes.html#15-food-make-eggs-edible">22 §15</a>).</p>
+<h2 id="4-initialisation-order">4. Initialisation order</h2>
+<p><code>World.Initialize()</code> does, in this order, and stops with a validation report at
+the first error:</p>
+<ol>
+<li><p><strong>Find species.</strong> <code>GetComponentsInChildren&lt;Species&gt;()</code>; a species with another
+species above it is an error (SPEC-05).</p>
+</li>
+<li><p><strong>Find world modules.</strong> Services and phases under the World but not under a
+species, in hierarchy order. Phases keep that order (TICK-01).</p>
+</li>
+<li><p><strong>Initialise services</strong>: random streams from the seed, ground, layers,
+entity systems, brains, cache, mutator, recorder.</p>
+</li>
+<li><p><strong>Collect each species' modules</strong>, keeping only those whose nearest <code>Species</code>
+is this one:</p>
+<pre><code class="lang-csharp">static List&lt;T&gt; Owned&lt;T&gt;(Species owner) where T : SpeciesModule =&gt;
+    owner.GetComponentsInChildren&lt;T&gt;(includeInactive: false)
+         .Where(m =&gt; m.enabled &amp;&amp; m.GetComponentInParent&lt;Species&gt;(true) == owner)
+         .ToList();
+</code></pre>
+</li>
+<li><p><strong>Bind</strong>: each text gene to the nearest action above it or on its GameObject;
+free genes stay free. Build the action, gene and sense orders and the
+signature.</p>
+</li>
+<li><p><strong>Declare</strong> stats and traits (<code>SpeciesModule.Declare</code>), then <strong>Initialize</strong>
+every module (look-ups by role or name, ARCH-08).</p>
+</li>
+<li><p><strong>Derive</strong> the food web (threats) and resolve every <code>AnimalSet</code>.</p>
+</li>
+<li><p><strong>Validate</strong> everything (<a href="21-editor-tooling.html">21</a>); errors stop here.</p>
+</li>
+<li><p><strong>Create view pools</strong> from each species' <code>Body</code>.</p>
+</li>
+<li><p><strong>Spawn founders</strong> (POP-04), express their genomes, record <code>founder</code> events.</p>
+</li>
+</ol>
+<h2 id="5-a-tick-in-code">5. A tick in code</h2>
+<pre><code class="lang-csharp">public class ActPhase : TickPhase
+{
+    [SerializeField] ActOrder order = ActOrder.SpeciesInTurn;   // ACT-30
+
+    public override void Run(TickContext t)
+    {
+        // SpeciesInTurn and AllMixed give one animal per group; Simultaneous gives one group.
+        foreach (var group in t.ActGroups(order))
+        {
+            foreach (var a in group) t.Plan(a);       // the action's Act → intent and interaction
+            foreach (var a in group) t.Move(a);       // the species' locomotion, speed and stamina
+            foreach (var a in group) t.Interact(a);   // within reach after moving, diet-checked
+            foreach (var a in group) t.Settle(a);     // metabolism, stamina, busy countdown
+        }
+    }
+}
+</code></pre>
+<pre><code class="lang-csharp">public class ChooseActionsPhase : TickPhase
+{
+    public override Pending WaitsFor(TickContext t) =&gt; t.Decisions.Pending;   // the brains
+
+    public override void Run(TickContext t)
+    {
+        foreach (var d in t.Decisions.Due)
+        {
+            var p = Sampling.Temper(d.Probabilities, t.World.SamplingTemperature);   // DEC-20
+            d.Animal.Action = t.Stream(d.Animal.Species, &quot;sampling&quot;).Choose(p);       // RAND-03
+            d.Animal.Searching = d.Animal.BredThisPeriod = false;                     // DEC-03
+        }
+    }
+}
+</code></pre>
+<h2 id="6-views">6. Views</h2>
+<ul>
+<li>A species' <code>Body</code> names a prefab (mesh, animator, maybe a collider for
+picking). At initialisation the World fills a pool of inactive instances under
+a hidden container; a new animal takes one, a dead one returns it.</li>
+<li><code>AnimalView</code> holds only the animal id. Nothing on a view has <code>Update</code>.</li>
+<li>In <code>LateUpdate</code> the World places every view between its animal's previous and
+current position (interpolation by the fraction of the next tick already
+elapsed), turns it toward its heading and sets the height from the ground.</li>
+<li>Above a few thousand animals, <code>GPU instancing</code> (<code>Graphics.RenderMeshInstanced</code>)
+can replace GameObject views without touching the simulation.</li>
+<li>Clicking a view selects its animal in the Animal inspector window.</li>
+</ul>
+<h2 id="7-folders-assemblies-packages">7. Folders, assemblies, packages</h2>
+<pre><code>Assets/EvoSim/
+  Runtime/          EvoSim.Runtime.asmdef        Core/ Phases/ Genes/ Senses/ Actions/ Stats/
+                                                 Reproduction/ Population/ Mutation/ Environment/
+                                                 Ground/ Locomotion/ Brains/ Recording/ Views/
+  Http/             EvoSim.Http.asmdef           HttpBrain, Ollama, JEV, mutator clients (ARCH-10)
+  Editor/           EvoSim.Editor.asmdef         inspectors, windows, validation UI (Editor only)
+  Testing/          EvoSim.Testing.asmdef        WorldBuilder, ScriptedBrain, FakeMutator, Golden
+  Tests/EditMode/   EvoSim.Tests.EditMode.asmdef
+  Tests/PlayMode/   EvoSim.Tests.PlayMode.asmdef
+  Modules/          prefabs: Eat, Flee, Hide, Follow, Rest, Mate, Hunt, Scavenge, StaminaGene, ...
+  Data/             AllelePools, mutation decks (TextAssets), frozen prompts, control sentences
+  Scenes/           Lab1_Full, Lab1_Small, HideVsFlee, ThreeSpecies, Terrain_Locomotion, Sandbox
+  Scenarios/        ScenarioAssets (overrides, CFG-02)
+</code></pre>
+<p>Packages: <code>com.unity.nuget.newtonsoft-json</code> (declared explicitly),
+<code>com.unity.ai.navigation</code> (NavMesh surfaces), <code>com.unity.test-framework</code>;
+optional <code>com.unity.collections</code> and <code>com.unity.burst</code> if spatial queries ever
+need jobs.</p>
+<h2 id="8-notes-for-unity-60003">8. Notes for Unity 6000.3</h2>
+<ul>
+<li><strong>Waiting.</strong> <code>Awaitable</code> exists, but services return <code>Task</code>s so that <code>Freeze</code>
+can block on them; phases stay synchronous and readable.</li>
+<li><strong>HTTP.</strong> <code>HttpClient</code> runs off the main thread and works in the editor and in
+standalone builds. <code>UnityWebRequest</code> would tie completion to the main loop and
+break <code>Freeze</code>.</li>
+<li><strong>NavMesh.</strong> Bake a <code>NavMeshSurface</code> on the terrain. Use the static queries
+(<code>NavMesh.SamplePosition</code>, <code>NavMesh.Raycast</code>, <code>NavMesh.CalculatePath</code>), not a
+<code>NavMeshAgent</code> per animal (a component per animal, its own update loop, and
+results that depend on frame timing).</li>
+<li><strong>Raycasts.</strong> <code>RaycastCommand.ScheduleBatch</code> with <code>QueryParameters</code>, one batch per
+sense phase (SENSE-30).</li>
+<li><strong>Enter Play Mode without domain reload.</strong> Safe because there are no statics
+(ARCH-07).</li>
+<li><strong>Profiling.</strong> One <code>ProfilerMarker</code> per phase and per brain call.</li>
+<li><strong>Upgrade.</strong> Everything version-specific sits in <code>EvoSim.Http</code>, <code>NavMeshGround</code>,
+<code>NavMeshLocomotion</code> and the ray batch helper.</li>
+</ul>
+<h2 id="9-performance-budget">9. Performance budget</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Target with the random brain (the brain's own time excluded), 340 animals</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One tick, all phases</td>
+<td>&lt; 2 ms (the prototype: 17 ms in Python)</td>
+</tr>
+<tr>
+<td>Sense phase</td>
+<td>spatial index rebuilt once; nearest-food search by expanding rings of cells, stopping at the first ring beyond the best distance</td>
+</tr>
+<tr>
+<td>Brain batch</td>
+<td>one HTTP request per brain per tick where the server accepts a list (vLLM does)</td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>no allocation per animal per tick in the hot loops (pooled lists, arrays reused)</td>
+</tr>
+</tbody>
+</table>
+<p>LLM brains dominate everything else: JEV answers about 12 queries per second, so
+the memo, the answer cache and batching matter far more than C# speed.</p>
+<h2 id="10-designed-to-scale-later">10. Designed to scale (later)</h2>
+<p>Nothing is optimised now: a few hundred animals and plain C# lists are enough,
+and the brain is the bottleneck. The seams below let a later version handle
+thousands of animals without changing what any module means (ARCH-12).</p>
+<table>
+<thead>
+<tr>
+<th>Seam</th>
+<th>Now</th>
+<th>Later, without touching module meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Batch entry points</td>
+<td>phases call <code>Sense.ReadAll</code>, <code>AnimalAction.ActAll</code>, <code>Locomotion.MoveAll</code>, <code>DeathRule.CheckAll</code>, whose defaults loop over the single-animal methods</td>
+<td>a module overrides the batch method with a Burst job; its single-animal method stays as the readable reference and the test oracle</td>
+</tr>
+<tr>
+<td>Animal storage</td>
+<td><code>Animal</code> objects in a list per species; stats and traits in small arrays reached through <code>StatId</code> and <code>TraitId</code></td>
+<td>struct-of-arrays storage in <code>Core</code>; <code>Animal</code> becomes a handle with the same accessors</td>
+</tr>
+<tr>
+<td>Spatial queries</td>
+<td><code>ISpatialIndex</code>: a uniform hash grid rebuilt per phase</td>
+<td>a k-d tree, or a Burst-built grid, behind the same interface</td>
+</tr>
+<tr>
+<td>Raycasts</td>
+<td>one <code>RaycastCommand</code> batch per sense phase</td>
+<td>unchanged</td>
+</tr>
+<tr>
+<td>Brains</td>
+<td>one request per brain per tick, answer cache, memo</td>
+<td>several servers per brain, requests split across them</td>
+</tr>
+<tr>
+<td>Views</td>
+<td>pooled GameObjects</td>
+<td>instanced rendering (<code>Graphics.RenderMeshInstanced</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>The single-animal methods stay the ones students write and read; batch versions
+are optional optimisations that must pass the same conformance suites
+(<a href="30-tests.html#4-conformance-suites-for-students-modules">30 §4</a>).</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

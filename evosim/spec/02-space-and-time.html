@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>02 — Space and time | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="02 — Space and time | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/02-space-and-time.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="02--space-and-time">02 — Space and time</h1>
+
+<p>The prototype lives on a grid of cells with 8-neighbour moves. The Unity system
+does not: positions are continuous and change through direction and speed
+vectors, on a flat plane or a Unity Terrain. Grids may still exist <em>inside</em>
+modules (a food layer stored per cell, a spatial index), but never constrain
+where an animal stands or how it moves.</p>
+<h2 id="1-space">1. Space</h2>
+<ul>
+<li><strong>SPACE-01 (MUST)</strong> An animal's position is a continuous point. Movement
+changes it by a velocity (direction × speed) over a tick, in a straight line
+in the reference. The speed belongs to the species (its locomotion
+component, <a href="07-actions-and-locomotion.html#2-locomotion">07 §2</a>). Nothing snaps
+positions to cells.</li>
+<li><strong>SPACE-02 (MUST)</strong> Distances are measured on the horizontal plane (x, z),
+Euclidean, through one world-level distance function that every module uses.
+A module MAY replace the function (e.g. path length on a NavMesh); no module
+computes distances its own way.</li>
+<li><strong>SPACE-03 (MUST)</strong> The world is a bounded rectangle with hard borders. No
+animal or entity ever leaves it; there is no wrap-around.</li>
+<li><strong>SPACE-04 (MUST)</strong> A <em>ground</em> module answers two questions for any point:
+its height, and whether it is walkable. No animal ever stands on a
+non-walkable point (water, too steep, an obstacle, outside the NavMesh).</li>
+<li><strong>SPACE-05 (SHOULD)</strong> All walkable ground is connected, so every animal can in
+principle reach every walkable point. A generator that produces isolated
+pockets either removes them (makes them non-walkable) or retries.</li>
+<li><strong>SPACE-06 (MUST)</strong> An animal's height follows the ground under it. Height
+does not count in distances (reference); slope MAY count in movement costs.</li>
+</ul>
+<h3 id="ground-modules">Ground modules</h3>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Walkable</th>
+<th>Height</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat ground (reference, Lab 1)</td>
+<td>everywhere inside the rectangle</td>
+<td>0</td>
+<td>the evolution lab</td>
+</tr>
+<tr>
+<td>Terrain</td>
+<td>above the water level, steepness below a maximum, outside obstacle footprints (trees, rocks)</td>
+<td>the terrain's heightmap</td>
+<td>terrain and foliage labs</td>
+</tr>
+<tr>
+<td>NavMesh</td>
+<td>on the NavMesh baked from the terrain</td>
+<td>the NavMesh surface</td>
+<td>terrain labs, path finding around obstacles</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reference (Python).</strong> Lab 1 is flat and fully walkable. A terrain preview
+exists: a value-noise heightmap (three octaves) whose lowest 15 % becomes water
+and highest 10 % mountain (both impassable); only the largest connected walkable
+region is kept, and the generator retries (up to 50 times) until it covers at
+least 60 % of the world. An option splits the world into k × k areas with
+one-meter ridges, each with a gap of a few meters (tried against population
+crashes, made them worse, off).</p>
+<h2 id="2-spatial-queries">2. Spatial queries</h2>
+<ul>
+<li><strong>SPACE-07 (MUST)</strong> &quot;The nearest X within r of an animal&quot; returns, among the
+candidates that pass the query's filter, the one at the smallest world
+distance, or nothing if none is within r. The animal itself is never a
+candidate.</li>
+<li><strong>SPACE-08 (MUST)</strong> Ties are broken deterministically (by a fixed key such as
+the animal id, or by a named random stream), never by the iteration order of
+an unordered collection.</li>
+<li><strong>SPACE-09 (SHOULD)</strong> Queries within one phase see one consistent state: either
+the state at the start of the phase, or the state after each animal's move if
+the act order is sequential (<a href="07-actions-and-locomotion.html#6-act-order">07 §6</a>).</li>
+</ul>
+<h2 id="3-time">3. Time</h2>
+<ul>
+<li><strong>SPACE-10 (MUST)</strong> Simulation time is the tick count, an integer starting at 0.
+Every duration (age, digestion, rot, incubation, decision period, stats
+interval) is in ticks.</li>
+<li><strong>SPACE-11 (MUST)</strong> A run's result does not depend on frame rate,
+<code>Time.deltaTime</code>, <code>Time.fixedDeltaTime</code>, or how many ticks run per frame.
+Speeds are in meters per tick.</li>
+<li><strong>SPACE-12 (MUST)</strong> Visuals (meshes, animation, interpolation between two tick
+states) read the simulation and never write to it.</li>
+</ul>
+<h2 id="4-waiting-for-the-brain-lockstep">4. Waiting for the brain: lockstep</h2>
+<p>A batch of LLM decisions takes seconds (JEV-9B: about 2.8 s per tick for about
+330 animals; Ollama gemma4:12b: about 4 decisions per second). The owner's choice:
+the simulation waits, so that a decision is never made on old observations.</p>
+<ul>
+<li><p><strong>SPACE-13 (MUST)</strong> A tick that needs answers from a service (decisions from a
+brain, mutated genes from the mutator) does not continue past the phase that
+needs them until they are all in. A decision always uses the observation made
+in its own tick.</p>
+</li>
+<li><p><strong>SPACE-14 (SHOULD)</strong> Two wait modes, with <strong>identical results</strong> (the same
+events hash):</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>What happens while waiting</th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Freeze</strong></td>
+<td>The main thread blocks until the answers arrive. Unity freezes.</td>
+<td>batch mode, tests, simplest code</td>
+</tr>
+<tr>
+<td><strong>Responsive</strong></td>
+<td>The tick stops at the phase that needs the answers. Unity keeps rendering and the editor stays usable; the tick resumes at that phase when the answers are in.</td>
+<td>the editor (default)</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p><strong>SPACE-15 (MAY)</strong> A real-time mode in which answers are applied when they
+arrive (on observations that are by then old) is outside the contract: it is
+not reproducible. If built, it is labelled as such and never used for
+measurements. Not planned for now (owner decision); the reference is lockstep.</p>
+</li>
+</ul>
+<h3 id="run-controls">Run controls</h3>
+<table>
+<thead>
+<tr>
+<th>Control</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pause / resume</td>
+<td>stops between ticks (or inside one, while waiting)</td>
+</tr>
+<tr>
+<td>Step</td>
+<td>one tick, then pause</td>
+</tr>
+<tr>
+<td>Run N</td>
+<td>N ticks, then pause</td>
+</tr>
+<tr>
+<td>Fast</td>
+<td>as many ticks per frame as fit in a time budget (e.g. 10 ms)</td>
+</tr>
+<tr>
+<td>Real time</td>
+<td>k ticks per second, for watching</td>
+</tr>
+<tr>
+<td>Stop condition</td>
+<td>a tick count, a wall-clock limit, a stop file or button, extinction of a species</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reference.</strong> One tick ≈ one step of one meter at walking speed. Without a
+model in the loop (its keyword brain) the prototype took about 17 ms per tick for
+about 330 animals in the 192 × 192 world (Python); a C# implementation should be
+well below that, the brain's own time excluded.</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>10 — Mutation | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="10 — Mutation | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/10-mutation.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="10--mutation">10 — Mutation</h1>
+
+<p>Mutation is blind: it changes a gene at random, without knowing what helps
+(CORE-07). Selection alone decides what stays. The prototype mutates sentences
+with a small LLM; the contract also covers number genes and rule-based text
+mutation, and lets mutation run asynchronously while eggs incubate.</p>
+<h2 id="1-when-and-what-mutates">1. When and what mutates</h2>
+<ul>
+<li><strong>MUT-01 (MUST)</strong> Each baby, after its crossover, mutates each locus
+independently with probability <code>rate</code> (reference 0.03 per gene per baby, so
+about one baby in seven of a five-gene species gets at least one attempt).</li>
+<li><strong>MUT-02 (MUST)</strong> Exactly one operator applies to a locus: the one configured
+for that gene, or else the species' default for the gene's kind (reference:
+the LLM instruction deck for text genes, a Gaussian rule for number genes).</li>
+<li><strong>MUT-03 (MUST)</strong> A successful mutation registers a new allele (origin
+<code>mutant</code>, parent allele, operator, model, seed; GENE-12) and is recorded in the
+baby's birth event: locus, parent allele, new allele, operator detail, new value.</li>
+<li><strong>MUT-04 (MUST)</strong> A mutation that fails (every try rejected, or the mutator
+unavailable in non-strict mode) leaves the inherited allele unchanged and is
+counted.</li>
+<li><strong>MUT-05 (MUST)</strong> Mutation statistics are kept per run: attempts, successes,
+model calls, rejections by reason.</li>
+</ul>
+<h2 id="2-the-llm-instruction-deck-reference-operator-for-text-genes">2. The LLM instruction deck (reference operator for text genes)</h2>
+<p>For each mutating gene, one instruction is drawn from a deck and sent to the
+mutator model with the sentence, after one fixed context line, and nothing
+else.</p>
+<ul>
+<li><p><strong>MUT-10 (MUST)</strong> The deck is data: one instruction per line, lines starting
+with <code>#</code> ignored. Adding a line adds an instruction; no code changes.</p>
+</li>
+<li><p><strong>MUT-11 (MUST)</strong> The prompt is exactly:</p>
+<pre><code class="lang-text">{context line}
+{instruction}
+
+&quot;{sentence}&quot;
+
+Reply with the new sentence only.
+</code></pre>
+<p>(without the first line when there is no context line). Reference context
+line: <em>The sentence below is a rule that a wild animal follows.</em></p>
+</li>
+<li><p><strong>MUT-12 (MUST)</strong> The answer is cleaned, then checked:</p>
+<ul>
+<li>cleaning: take the quoted part if there is one; strip quotes and backticks;
+drop a leading &quot;Here is …:&quot;, &quot;Modified …:&quot;, &quot;New …:&quot;, &quot;Rewritten …:&quot;; keep
+the first line, then the first sentence; collapse spaces; end with a period;
+capitalise the first letter;</li>
+<li>rejected as <strong>invalid</strong> if it has 0 words or more than <code>maxWords</code>
+(reference 12), equals the parent ignoring case, or contains characters
+other than letters, digits, spaces and <code>, . ' ’ ; : ! ? -</code>;</li>
+<li>rejected as <strong>unchanged</strong> if only punctuation differs from the parent.</li>
+</ul>
+</li>
+<li><p><strong>MUT-13 (MUST)</strong> A rejected answer is drawn again with a new instruction and a
+new seed, up to <code>tries</code> attempts (reference 5). If all are rejected the gene
+doesn't mutate.</p>
+</li>
+<li><p><strong>MUT-14 (MUST)</strong> Mutator answers are cached by (model, prompt, seed,
+temperature), so a repeated run produces the same mutants without model calls.</p>
+</li>
+</ul>
+<p><strong>Reference deck</strong> (v4, 2026-10-08, small edits to what the rule says):</p>
+<ol>
+<li>Make the rule in this sentence a little weaker.</li>
+<li>Change when this rule applies.</li>
+<li>Add a short condition to this rule.</li>
+<li>Remove a condition from this rule, or make it simpler.</li>
+<li>Change how near, how far or how much this rule is about.</li>
+<li>Make this rule say the opposite.</li>
+<li>Change one word of this rule into a related word.</li>
+</ol>
+<p><strong>Reference mutator.</strong> A small model on the CPU (qwen3.5:0.8b; gemma4:26b makes
+smaller, more meaningful edits but needs about 19 GB of RAM), temperature 1.2,
+thinking off. With litters, a 192 × 192 run makes about 400 mutation calls per
+1 300 ticks.</p>
+<p><strong>Measured, without selection</strong> (genes mutated again and again): after 10
+mutations 50 % of genes still give a usable rule (8 % with the earlier
+&quot;random change&quot; deck); after 30, 36 %; 72 % still mention something of the
+animal's world. Real examples: &quot;Run from any predator you see.&quot; → &quot;Run quickly
+from any predator you see.&quot;; &quot;Stay close to other animals.&quot; → &quot;Stay far from
+other animals.&quot;</p>
+<h2 id="3-other-operators">3. Other operators</h2>
+<ul>
+<li><strong>MUT-20 (MUST)</strong> Numeric operators draw from the mutation stream and clamp to
+the trait's range. Reference: Gaussian, v′ = clamp(v + N(0, σ)).</li>
+<li><strong>MUT-21 (MAY)</strong> Rule-based text operators work without a model: move along an
+intensity ladder (never, rarely, sometimes, often, always), negate, swap a
+condition, replace a word by a synonym from a table, bring back another founder
+sentence. The prototype used these until 2026-10-02 and dropped them as blunt
+(&quot;Rest when you are tired.&quot; → &quot;Rest when you are tired when tired.&quot;); they
+remain useful for runs without any model.</li>
+<li><strong>MUT-22 (MAY)</strong> An operator may be switched off for one gene. Whether a
+gene's neutral allele (&quot;No preference.&quot;) may mutate is a setting of the gene's
+component (GENE-24, owner decision); the reference lets it mutate, as the
+prototype did.</li>
+</ul>
+<h2 id="4-asynchronous-mutation-and-eggs">4. Asynchronous mutation and eggs</h2>
+<p>The mutator takes time. Instead of stopping the world at every birth, a mating
+lays eggs whose genomes are completed while they incubate
+(<a href="11-reproduction-and-population.html#3-eggs-and-incubation">11 §3</a>).</p>
+<ul>
+<li><strong>MUT-30 (MUST)</strong> The random choices of a baby's mutations (which loci mutate,
+and for each the instruction and seed of every try) are drawn at conception,
+in a fixed order: babies in conception order, loci in locus order, tries in
+order. They never depend on when answers arrive.</li>
+<li><strong>MUT-31 (MUST)</strong> Requests to the mutator are batched: all first tries of a
+tick together, then the redraws of the rejected ones as a second round, and so
+on.</li>
+<li><strong>MUT-32 (MUST)</strong> A baby hatches only with its genome complete. If the answers
+aren't in when it is due to hatch, the tick waits (SPACE-13).</li>
+<li><strong>MUT-33 (SHOULD)</strong> The reference has no incubation (owner decision): the
+birth waits for the mutator in the same tick, as in the prototype. Setting an
+incubation of a few ticks hides the mutator's latency: the answers are
+usually in before hatching, so the world doesn't wait.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

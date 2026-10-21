@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class Lab | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class Lab | EvoSim ">
+      
+      <meta name="description" content="The Lab 1 reference species and world as ready-made recipes for tests (04 &#167;5, 08 &#167;7, 09 &#167;3, 14 &#167;2): prey (eat, flee, hide, follow, rest, mate) and predator (hunt, follow, rest, mate) with the prototype&#39;s values, founder pools, contrast pairs and prompt texts.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_Testing_Lab.md&amp;value=---%0Auid%3A%20EvoSim.Testing.Lab%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.Testing.Lab">
+
+
+
+  <h1 id="EvoSim_Testing_Lab" data-uid="EvoSim.Testing.Lab" class="text-break">
+Class Lab  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L31"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a>.<a class="xref" href="EvoSim.Testing.html">Testing</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Testing.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>The Lab 1 reference species and world as ready-made recipes for tests (04 §5, 08 §7, 09 §3, 14 §2): prey (eat, flee,
+hide, follow, rest, mate) and predator (hunt, follow, rest, mate) with the prototype's values, founder pools,
+contrast pairs and prompt texts.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class Lab</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">Lab</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+  <h2 id="EvoSim_Testing_Lab_examples">Examples</h2>
+  <pre><code class="lang-csharp">var w = New(5, name: "hooks").Lab1(prey: 20, predators: 3).Build();
+w.Advance(800);
+var c = w.FindSpecies("prey").Counters;
+Assert.Greater(c.Births + c.DeathsTotal, 0, "something happened");</code></pre>
+
+
+  <h2 id="EvoSim_Testing_Lab_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Most members are extension methods on <a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a> and <a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a>, so they chain
+with the builder's own calls. From the smallest to the largest:</p>
+<ul><li><a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_PreyBody_EvoSim_Testing_SpeciesSetup_System_Single_System_Single_">PreyBody(SpeciesSetup, float, float)</a>, <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_PreySenses_EvoSim_Testing_SpeciesSetup_">PreySenses(SpeciesSetup)</a>, <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_PreyActionSet_EvoSim_Testing_SpeciesSetup_">PreyActionSet(SpeciesSetup)</a> (and the predator's):
+one part of a reference species;</li><li><a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_Ecology_EvoSim_Testing_WorldBuilder_System_Single_System_Single_System_Single_System_Action_EvoSim_Testing_SpeciesSetup__System_Action_EvoSim_Testing_SpeciesSetup__System_Single_">Ecology(WorldBuilder, float, float, float, Action&lt;SpeciesSetup&gt;, Action&lt;SpeciesSetup&gt;, float)</a>: ground, food, cover, carcasses, eggs and both species, with no phase and no
+brain;</li><li><a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_Lab1_EvoSim_Testing_WorldBuilder_System_Int32_System_Int32_System_Single_EvoSim_ActOrder_System_Boolean_System_Int32_System_Int32_System_Int32_">Lab1(WorldBuilder, int, int, float, ActOrder, bool, int, int, int)</a>: the whole Lab 1 small world (S03), ready to run.</li></ul>
+<p><a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_Choose_EvoSim_Animal_System_String_">Choose(Animal, string)</a>, <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_StatOf_EvoSim_Animal_System_String_">StatOf(Animal, string)</a> and <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_SetStat_EvoSim_Animal_System_String_System_Single_">SetStat(Animal, string, float)</a> help set up one animal after
+<a class="xref" href="EvoSim.Testing.Place.html#EvoSim_Testing_Place_Animal_EvoSim_Species_UnityEngine_Vector3_EvoSim_Genome_System_Single_System_String_System_Action_EvoSim_Animal__">Animal(Species, Vector3, Genome, float, string, Action&lt;Animal&gt;)</a>.</p>
+</div>
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="EvoSim_Testing_Lab_PredatorActions" data-uid="EvoSim.Testing.Lab.PredatorActions">
+  PredatorActions
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L36"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The reference predator's action names, in action order.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly string[] PredatorActions</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_Lab_PredatorFollow" data-uid="EvoSim.Testing.Lab.PredatorFollow">
+  PredatorFollow
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L56"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The founder sentences of the predator's follow gene (09 §3).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly string[] PredatorFollow</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_Lab_PredatorGenesIntro" data-uid="EvoSim.Testing.Lab.PredatorGenesIntro">
+  PredatorGenesIntro
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L83"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The line before the predator's genes block in its prompt (08 §7).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string PredatorGenesIntro = &quot;This predator&#39;s instincts (its genes). They define its personality: follow them\neven when they seem unwise. Instincts that are meaningless have no effect.&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_Lab_PredatorHeader" data-uid="EvoSim.Testing.Lab.PredatorHeader">
+  PredatorHeader
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L81"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The first line of the predator's prompt (08 §7).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string PredatorHeader = &quot;You decide what a predator does next in a simple world.&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_Lab_PredatorHunt" data-uid="EvoSim.Testing.Lab.PredatorHunt">
+  PredatorHunt
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L54"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The founder sentences of the predator's hunt gene (09 §3).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly string[] PredatorHunt</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_Lab_PredatorLocomotionRule" data-uid="EvoSim.Testing.Lab.PredatorLocomotionRule">
+  PredatorLocomotionRule
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L72"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The predator's locomotion rule line; its placeholders read the prey's speed and both stamina maxima (PROMPT-03).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string PredatorLocomotionRule = &quot;Predators run {runSpeed} meters per step when they hunt and walk {walkSpeed} meter otherwise.\nPrey animals move {prey.Locomotion.walkSpeed} meter per step but have {prey.Stamina.max} stamina against a predator&#39;s {Stamina.max}.&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_Lab_PredatorMate" data-uid="EvoSim.Testing.Lab.PredatorMate">
+  PredatorMate
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L60"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The founder sentences of the predator's mate gene (09 §3).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly string[] PredatorMate</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_Lab_PredatorRest" data-uid="EvoSim.Testing.Lab.PredatorRest">
+  PredatorRest
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L58"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The founder sentences of the predator's rest gene (09 §3).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly string[] PredatorRest</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_Lab_PredatorSearchRule" data-uid="EvoSim.Testing.Lab.PredatorSearchRule">
+  PredatorSearchRule
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L75"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The predator's search rule line: what happens when the chosen action has nothing in sight (ACT-04).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string PredatorSearchRule = &quot;If the chosen action has nothing to act on in sight (no prey, carcass, other\npredator or ready partner), the predator searches the surroundings instead.&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_Lab_PredatorStaminaRule" data-uid="EvoSim.Testing.Lab.PredatorStaminaRule">
+  PredatorStaminaRule
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L78"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The predator's stamina rule line (ANIM-21).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string PredatorStaminaRule = &quot;Every meter moved costs stamina. Standing still brings it back, which costs some\nenergy until stamina is full. Without stamina a predator cannot move.&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_Lab_PreyActions" data-uid="EvoSim.Testing.Lab.PreyActions">
+  PreyActions
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L34"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The reference prey's action names, in action order.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly string[] PreyActions</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_Lab_PreyEat" data-uid="EvoSim.Testing.Lab.PreyEat">
+  PreyEat
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L42"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The founder sentences of the prey's eat gene (09 §3).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly string[] PreyEat</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_Lab_PreyFlee" data-uid="EvoSim.Testing.Lab.PreyFlee">
+  PreyFlee
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L44"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The founder sentences of the prey's flee gene (09 §3).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly string[] PreyFlee</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_Lab_PreyFollow" data-uid="EvoSim.Testing.Lab.PreyFollow">
+  PreyFollow
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L48"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The founder sentences of the prey's follow gene (09 §3).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly string[] PreyFollow</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_Lab_PreyHide" data-uid="EvoSim.Testing.Lab.PreyHide">
+  PreyHide
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L46"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The founder sentences of the prey's hide gene (09 §3).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly string[] PreyHide</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_Lab_PreyLocomotionRule" data-uid="EvoSim.Testing.Lab.PreyLocomotionRule">
+  PreyLocomotionRule
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L67"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The prey's locomotion rule line; its placeholders read the predator's speed and both stamina maxima (PROMPT-03).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string PreyLocomotionRule = &quot;Animals move {walkSpeed} meter per step. Predators run {predator.Locomotion.runSpeed} meters per step when they hunt,\nbut they have {predator.Stamina.max} stamina against an animal&#39;s {Stamina.max}, so a long chase tires them first.&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_Lab_PreyMate" data-uid="EvoSim.Testing.Lab.PreyMate">
+  PreyMate
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L52"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The founder sentences of the prey's mate gene (09 §3).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly string[] PreyMate</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_Lab_PreyRest" data-uid="EvoSim.Testing.Lab.PreyRest">
+  PreyRest
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L50"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The founder sentences of the prey's rest gene (09 §3).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly string[] PreyRest</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Testing_Lab_StaminaWords" data-uid="EvoSim.Testing.Lab.StaminaWords">
+  StaminaWords
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L38"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The V2 sentences of the stamina level sense, for low, medium and high (SENSE-11).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly string[] StaminaWords</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="EvoSim_Testing_Lab_Deck_" data-uid="EvoSim.Testing.Lab.Deck*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_Deck" data-uid="EvoSim.Testing.Lab.Deck">
+  Deck
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L273"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The reference instruction deck v4 (<code>Assets/EvoSim/Data/Decks/mutate_v4.txt</code>), read from disk as a TextAsset.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static TextAsset Deck { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">TextAsset</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_Testing_Lab_CheckInvariants_" data-uid="EvoSim.Testing.Lab.CheckInvariants*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_CheckInvariants_EvoSim_Testing_WorldBuilder_" data-uid="EvoSim.Testing.Lab.CheckInvariants(EvoSim.Testing.WorldBuilder)">
+  CheckInvariants(WorldBuilder)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L238"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds an <a class="xref" href="EvoSim.Testing.InvariantPhase.html">InvariantPhase</a> after the phases added so far: the invariants of 30 §5 are checked at that
+point of every tick, and the test fails at the first broken one.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static WorldBuilder CheckInvariants(this WorldBuilder b)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>b</code> <a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>The world being built.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>The same builder, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_Testing_Lab_CheckInvariants_EvoSim_Testing_WorldBuilder__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Call it after <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_ReferencePhases_EvoSim_Testing_WorldBuilder_EvoSim_ActOrder_">ReferencePhases(WorldBuilder, ActOrder)</a>, so the checks run at the end of each tick.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_Testing_Lab_Choose_" data-uid="EvoSim.Testing.Lab.Choose*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_Choose_EvoSim_Animal_System_String_" data-uid="EvoSim.Testing.Lab.Choose(EvoSim.Animal,System.String)">
+  Choose(Animal, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L354"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets an animal's chosen action by name, as if its brain had chosen it; it runs from the next act phase on.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void Choose(this Animal a, string actionName)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal.</p>
+</dd>
+    <dt><code>actionName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The action's name in the animal's species (&quot;eat&quot;, &quot;hunt&quot;…).</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_Testing_Lab_Choose_EvoSim_Animal_System_String__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>A world with a brain and the decision phases may choose again at the next decision tick.</p>
+</div>
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></dt>
+    <dd><p>The species has no action of that name.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="EvoSim_Testing_Lab_Choose_" data-uid="EvoSim.Testing.Lab.Choose*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_Choose_EvoSim_Animal_System_String_System_String_" data-uid="EvoSim.Testing.Lab.Choose(EvoSim.Animal,System.String,System.String)">
+  Choose(Animal, string, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L368"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gives an animal a carrier and an overlay by name, as a decision that drew the overlay would (ACT-07): the overlay
+acts for its <a class="xref" href="EvoSim.AnimalAction.html#EvoSim_AnimalAction_OverlayTicks">OverlayTicks</a>, counting the next tick.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void Choose(this Animal a, string carrier, string overlay)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal.</p>
+</dd>
+    <dt><code>carrier</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The name of the action that moves it (&quot;flee&quot;, &quot;eat&quot;…).</p>
+</dd>
+    <dt><code>overlay</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The name of an overlay of its species (&quot;alarm&quot;).</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></dt>
+    <dd><p>The species has no action of one of those names, or the second is no overlay.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="EvoSim_Testing_Lab_Ecology_" data-uid="EvoSim.Testing.Lab.Ecology*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_Ecology_EvoSim_Testing_WorldBuilder_System_Single_System_Single_System_Single_System_Action_EvoSim_Testing_SpeciesSetup__System_Action_EvoSim_Testing_SpeciesSetup__System_Single_" data-uid="EvoSim.Testing.Lab.Ecology(EvoSim.Testing.WorldBuilder,System.Single,System.Single,System.Single,System.Action{EvoSim.Testing.SpeciesSetup},System.Action{EvoSim.Testing.SpeciesSetup},System.Single)">
+  Ecology(WorldBuilder, float, float, float, Action&lt;SpeciesSetup&gt;, Action&lt;SpeciesSetup&gt;, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L300"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds a square world with flat ground, food, cover, carcasses and eggs, and the two reference species with no
+founders, no phase and no brain: add those yourself, or use <a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_Lab1_EvoSim_Testing_WorldBuilder_System_Int32_System_Int32_System_Single_EvoSim_ActOrder_System_Boolean_System_Int32_System_Int32_System_Int32_">Lab1(WorldBuilder, int, int, float, ActOrder, bool, int, int, int)</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static WorldBuilder Ecology(this WorldBuilder b, float size = 48, float cover = 0.2, float food = 0.1, Action&lt;SpeciesSetup&gt; prey = null, Action&lt;SpeciesSetup&gt; predator = null, float regrow = 0.0015)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>b</code> <a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>The world being built.</p>
+</dd>
+    <dt><code>size</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The side of the square, in meters (reference 48).</p>
+</dd>
+    <dt><code>cover</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The share of ground in cover, 0 to 1; 0 = no cover layer.</p>
+</dd>
+    <dt><code>food</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The share of cells holding food at the start, 0 to 1.</p>
+</dd>
+    <dt><code>prey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a>&gt;</dt>
+    <dd><p>Called with the prey's setup, to add or change modules (e.g. <code>s =&gt; s.Population(10)</code>).</p>
+</dd>
+    <dt><code>predator</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a>&gt;</dt>
+    <dd><p>Called with the predator's setup, likewise.</p>
+</dd>
+    <dt><code>regrow</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The food's regrowth probability per empty cell per tick; 0 = no regrowth.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>The same builder, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_Lab_FakeMutation_" data-uid="EvoSim.Testing.Lab.FakeMutation*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_FakeMutation_EvoSim_Testing_WorldBuilder_System_Action_EvoSim_Testing_FakeMutator__" data-uid="EvoSim.Testing.Lab.FakeMutation(EvoSim.Testing.WorldBuilder,System.Action{EvoSim.Testing.FakeMutator})">
+  FakeMutation(WorldBuilder, Action&lt;FakeMutator&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L284"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds a mutator service whose client is a <a class="xref" href="EvoSim.Testing.FakeMutator.html">FakeMutator</a>: mutations are answered at once, by no model.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static WorldBuilder FakeMutation(this WorldBuilder b, Action&lt;FakeMutator&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>b</code> <a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>The world being built.</p>
+</dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="EvoSim.Testing.FakeMutator.html">FakeMutator</a>&gt;</dt>
+    <dd><p>Called at once with the fake, e.g. to script its <a class="xref" href="EvoSim.Testing.FakeMutator.html#EvoSim_Testing_FakeMutator_Answer">Answer</a>; null = it appends &quot;quickly&quot;.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>The same builder, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_Lab_Gene_" data-uid="EvoSim.Testing.Lab.Gene*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_Gene_EvoSim_Testing_SpeciesSetup_System_String_System_String_System_String_" data-uid="EvoSim.Testing.Lab.Gene(EvoSim.Testing.SpeciesSetup,System.String,System.String,System.String)">
+  Gene(SpeciesSetup, string, string, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L168"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets the contrast pair of an action's gene: two extreme sentences used only to test brains (GENE-23),
+keeping its founders and neutral allele.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static SpeciesSetup Gene(this SpeciesSetup s, string action, string pro, string anti)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>s</code> <a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>The species being set up.</p>
+</dd>
+    <dt><code>action</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The action's name; its GameObject carries the gene.</p>
+</dd>
+    <dt><code>pro</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The sentence that pushes toward the action (&quot;Always eat, whatever happens.&quot;).</p>
+</dd>
+    <dt><code>anti</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The sentence that pushes away from it (&quot;Never eat unless starving.&quot;).</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>The same setup, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_Lab_Lab1_" data-uid="EvoSim.Testing.Lab.Lab1*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_Lab1_EvoSim_Testing_WorldBuilder_System_Int32_System_Int32_System_Single_EvoSim_ActOrder_System_Boolean_System_Int32_System_Int32_System_Int32_" data-uid="EvoSim.Testing.Lab.Lab1(EvoSim.Testing.WorldBuilder,System.Int32,System.Int32,System.Single,EvoSim.ActOrder,System.Boolean,System.Int32,System.Int32,System.Int32)">
+  Lab1(WorldBuilder, int, int, float, ActOrder, bool, int, int, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L337"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds the Lab 1 small world (S03): 48 × 48 m, 24 prey (cap 40, floor 10), 4 predators (cap 6, floor 3), the
+reference phases, LLM mutation answered by a fake mutator, and the random brain as the world's default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static WorldBuilder Lab1(this WorldBuilder b, int prey = 24, int predators = 4, float size = 48, ActOrder order = ActOrder.SpeciesInTurn, bool randomBrain = true, int incubation = 0, int preyCap = 40, int predatorCap = 6)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>b</code> <a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>The world being built.</p>
+</dd>
+    <dt><code>prey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The prey founders.</p>
+</dd>
+    <dt><code>predators</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The predator founders.</p>
+</dd>
+    <dt><code>size</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The side of the square world, in meters.</p>
+</dd>
+    <dt><code>order</code> <a class="xref" href="EvoSim.ActOrder.html">ActOrder</a></dt>
+    <dd><p>The act phase's order (ACT-30).</p>
+</dd>
+    <dt><code>randomBrain</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>False: no default brain; the test adds its own with <a class="xref" href="EvoSim.Testing.WorldBuilder.html#EvoSim_Testing_WorldBuilder_DefaultBrain__1_System_Action___0__System_String_">DefaultBrain&lt;T&gt;(Action&lt;T&gt;, string)</a>.</p>
+</dd>
+    <dt><code>incubation</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The ticks eggs incubate; 0 = babies are born at once.</p>
+</dd>
+    <dt><code>preyCap</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The prey's cap.</p>
+</dd>
+    <dt><code>predatorCap</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The predators' cap.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>The same builder: call <a class="xref" href="EvoSim.Testing.WorldBuilder.html#EvoSim_Testing_WorldBuilder_Build">Build()</a> to run it.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_Lab_LifeRules_" data-uid="EvoSim.Testing.Lab.LifeRules*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_LifeRules_EvoSim_Testing_SpeciesSetup_System_Int32_System_Int32_System_Int32_" data-uid="EvoSim.Testing.Lab.LifeRules(EvoSim.Testing.SpeciesSetup,System.Int32,System.Int32,System.Int32)">
+  LifeRules(SpeciesSetup, int, int, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L249"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds the life rules of 11 with the reference values: litters of 2 to 4 babies of 40 energy, uniform crossover,
+incubation, a cap that migrates the excess and a floor that brings newcomers.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static SpeciesSetup LifeRules(this SpeciesSetup s, int cap, int floor, int incubation = 0)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>s</code> <a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>The species being set up.</p>
+</dd>
+    <dt><code>cap</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The most animals the species keeps (POP-01).</p>
+</dd>
+    <dt><code>floor</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The fewest animals: below it newcomers arrive (POP-03); 0 = none.</p>
+</dd>
+    <dt><code>incubation</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The ticks an egg incubates before it hatches; 0 = babies are born at once (REPRO-20).</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>The same setup, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_Lab_LlmMutation_" data-uid="EvoSim.Testing.Lab.LlmMutation*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_LlmMutation_EvoSim_Testing_SpeciesSetup_System_Single_" data-uid="EvoSim.Testing.Lab.LlmMutation(EvoSim.Testing.SpeciesSetup,System.Single)">
+  LlmMutation(SpeciesSetup, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L263"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds the LLM mutation with the reference deck v4 and context line (10 §2); the world needs a mutator, e.g.
+<a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_FakeMutation_EvoSim_Testing_WorldBuilder_System_Action_EvoSim_Testing_FakeMutator__">FakeMutation(WorldBuilder, Action&lt;FakeMutator&gt;)</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static SpeciesSetup LlmMutation(this SpeciesSetup s, float rate = 0.03)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>s</code> <a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>The species being set up.</p>
+</dd>
+    <dt><code>rate</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The probability per gene per baby that the gene mutates (reference 0.03, MUT-01).</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>The same setup, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_Lab_PredatorActionSet_" data-uid="EvoSim.Testing.Lab.PredatorActionSet*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_PredatorActionSet_EvoSim_Testing_SpeciesSetup_" data-uid="EvoSim.Testing.Lab.PredatorActionSet(EvoSim.Testing.SpeciesSetup)">
+  PredatorActionSet(SpeciesSetup)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L151"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds the predator's four actions in order (<a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_PredatorActions">PredatorActions</a>), with their genes (09 §3).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static SpeciesSetup PredatorActionSet(this SpeciesSetup s)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>s</code> <a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>The species being set up.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>The same setup, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_Lab_PredatorBody_" data-uid="EvoSim.Testing.Lab.PredatorBody*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_PredatorBody_EvoSim_Testing_SpeciesSetup_System_String_System_Single_" data-uid="EvoSim.Testing.Lab.PredatorBody(EvoSim.Testing.SpeciesSetup,System.String,System.Single)">
+  PredatorBody(SpeciesSetup, string, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L118"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds the reference predator's body: its prompt header, the search rule, kinematic locomotion (walk 1, run 2 m per
+tick), energy, stamina 30, metabolism, a diet that strikes the prey and scavenges its carcasses, digestion, the
+mating rule, starvation and old age.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static SpeciesSetup PredatorBody(this SpeciesSetup s, string preyName = &quot;prey&quot;, float killChance = 0.5)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>s</code> <a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>The species being set up.</p>
+</dd>
+    <dt><code>preyName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The species it hunts and whose carcasses it eats.</p>
+</dd>
+    <dt><code>killChance</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The probability that a strike kills, 0 to 1 (reference 0.5).</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>The same setup, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_Lab_PredatorSenses_" data-uid="EvoSim.Testing.Lab.PredatorSenses*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_PredatorSenses_EvoSim_Testing_SpeciesSetup_" data-uid="EvoSim.Testing.Lab.PredatorSenses(EvoSim.Testing.SpeciesSetup)">
+  PredatorSenses(SpeciesSetup)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L196"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds the predator's six senses in situation-text order (04 §5): energy and stamina levels, prey, carcass, other
+predator (with readiness), age.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static SpeciesSetup PredatorSenses(this SpeciesSetup s)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>s</code> <a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>The species being set up.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>The same setup, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_Lab_PreyActionSet_" data-uid="EvoSim.Testing.Lab.PreyActionSet*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_PreyActionSet_EvoSim_Testing_SpeciesSetup_" data-uid="EvoSim.Testing.Lab.PreyActionSet(EvoSim.Testing.SpeciesSetup)">
+  PreyActionSet(SpeciesSetup)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L140"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds the prey's six actions in order (<a class="xref" href="EvoSim.Testing.Lab.html#EvoSim_Testing_Lab_PreyActions">PreyActions</a>), each with its text gene, founder pool and contrast
+pair (09 §3).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static SpeciesSetup PreyActionSet(this SpeciesSetup s)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>s</code> <a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>The species being set up.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>The same setup, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_Lab_PreyBody_" data-uid="EvoSim.Testing.Lab.PreyBody*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_PreyBody_EvoSim_Testing_SpeciesSetup_System_Single_System_Single_" data-uid="EvoSim.Testing.Lab.PreyBody(EvoSim.Testing.SpeciesSetup,System.Single,System.Single)">
+  PreyBody(SpeciesSetup, float, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L95"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds the reference prey's body: edible by strike (60 energy, a carcass of 2 portions of 30), the search rule,
+kinematic locomotion (walk 1 m per tick), energy (max 100, start 60), stamina, metabolism, a diet of grass, the
+mating rule, starvation and old age (1 500 ticks).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static SpeciesSetup PreyBody(this SpeciesSetup s, float stamina = 60, float run = 1)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>s</code> <a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>The species being set up.</p>
+</dd>
+    <dt><code>stamina</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The maximum stamina, in meters (reference prey 60).</p>
+</dd>
+    <dt><code>run</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The running speed, in meters per tick (reference prey 1).</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>The same setup, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_Lab_PreySenses_" data-uid="EvoSim.Testing.Lab.PreySenses*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_PreySenses_EvoSim_Testing_SpeciesSetup_" data-uid="EvoSim.Testing.Lab.PreySenses(EvoSim.Testing.SpeciesSetup)">
+  PreySenses(SpeciesSetup)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L181"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds the prey's seven senses in situation-text order (04 §5): energy and stamina levels, food, predator, cover,
+other animal (with readiness), age.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static SpeciesSetup PreySenses(this SpeciesSetup s)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>s</code> <a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>The species being set up.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.SpeciesSetup.html">SpeciesSetup</a></dt>
+    <dd><p>The same setup, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_Lab_Recorder_" data-uid="EvoSim.Testing.Lab.Recorder*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_Recorder_EvoSim_Testing_WorldBuilder_System_Boolean_System_String_System_String_System_Boolean_" data-uid="EvoSim.Testing.Lab.Recorder(EvoSim.Testing.WorldBuilder,System.Boolean,System.String,System.String,System.Boolean)">
+  Recorder(WorldBuilder, bool, string, string, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L226"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds a run recorder and the live statistics; the recorder writes no files unless asked, so tests leave no folders.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static WorldBuilder Recorder(this WorldBuilder b, bool files = false, string root = &quot;Logs/EvoSim/test-runs&quot;, string name = &quot;&quot;, bool compatibility = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>b</code> <a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>The world being built.</p>
+</dd>
+    <dt><code>files</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True: write the run's files (events, stats, alleles…) to disk.</p>
+</dd>
+    <dt><code>root</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The folder runs are written under, relative to the project.</p>
+</dd>
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The run's folder name, where {world} and {seed} are filled in; empty = world, seed, date and time.</p>
+</dd>
+    <dt><code>compatibility</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True: write the prototype's file format too (OUT-05).</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>The same builder, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_Lab_ReferencePhases_" data-uid="EvoSim.Testing.Lab.ReferencePhases*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_ReferencePhases_EvoSim_Testing_WorldBuilder_EvoSim_ActOrder_" data-uid="EvoSim.Testing.Lab.ReferencePhases(EvoSim.Testing.WorldBuilder,EvoSim.ActOrder)">
+  ReferencePhases(WorldBuilder, ActOrder)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L211"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds the eleven reference phases in the order of TICK-04: sense, ask brains, choose actions, act, breed, hatch,
+death, migration, environment, floor, record.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static WorldBuilder ReferencePhases(this WorldBuilder b, ActOrder order = ActOrder.SpeciesInTurn)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>b</code> <a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>The world being built.</p>
+</dd>
+    <dt><code>order</code> <a class="xref" href="EvoSim.ActOrder.html">ActOrder</a></dt>
+    <dd><p>The act phase's order: species in turn (reference), all mixed, or simultaneous (ACT-30).</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Testing.WorldBuilder.html">WorldBuilder</a></dt>
+    <dd><p>The same builder, to chain more calls.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_Lab_SetStat_" data-uid="EvoSim.Testing.Lab.SetStat*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_SetStat_EvoSim_Animal_System_String_System_Single_" data-uid="EvoSim.Testing.Lab.SetStat(EvoSim.Animal,System.String,System.Single)">
+  SetStat(Animal, string, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L387"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets one of an animal's stats by name; the value is kept within the stat's range.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SetStat(this Animal a, string stat, float value)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal.</p>
+</dd>
+    <dt><code>stat</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The stat's name (&quot;energy&quot;, &quot;stamina&quot;…).</p>
+</dd>
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The new value, in the stat's unit.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Testing_Lab_StatOf_" data-uid="EvoSim.Testing.Lab.StatOf*"></a>
+
+  <h3 id="EvoSim_Testing_Lab_StatOf_EvoSim_Animal_System_String_" data-uid="EvoSim.Testing.Lab.StatOf(EvoSim.Animal,System.String)">
+  StatOf(Animal, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Testing/Lab.cs/#L381"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads one of an animal's stats by name.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static float StatOf(this Animal a, string stat)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>a</code> <a class="xref" href="EvoSim.Animal.html">Animal</a></dt>
+    <dd><p>The animal.</p>
+</dd>
+    <dt><code>stat</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The stat's name, as its module declares it (&quot;energy&quot;, &quot;stamina&quot;, &quot;thirst&quot;…).</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The stat's value now.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

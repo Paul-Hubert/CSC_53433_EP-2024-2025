@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Class ReferenceScenes | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class ReferenceScenes | EvoSim ">
+      
+      <meta name="description" content="Builds the reference content (20 &#167;2, &#167;7; 09 &#167;3): the allele pools from the prototype&#39;s pool files, the module prefabs (Modules/), placeholder bodies, and the scenes Lab1_Small, Lab1_Full, HideVsFlee, ThreeSpecies, Terrain_Locomotion and Sandbox. The scenes are then the configuration (ARCH-01): edit them, not this builder, unless the reference itself changes. Scenes are opened additively from an empty file, so the editor&#39;s own open scene is never touched.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_Editor_ReferenceScenes.md&amp;value=---%0Auid%3A%20EvoSim.Editor.ReferenceScenes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="EvoSim.Editor.ReferenceScenes">
+
+
+
+  <h1 id="EvoSim_Editor_ReferenceScenes" data-uid="EvoSim.Editor.ReferenceScenes" class="text-break">
+Class ReferenceScenes  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/ReferenceScenes.cs/#L25"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="EvoSim.html">EvoSim</a>.<a class="xref" href="EvoSim.Editor.html">Editor</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>EvoSim.Editor.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Builds the reference content (20 §2, §7; 09 §3): the allele pools from the prototype's pool files, the module
+prefabs (Modules/), placeholder bodies, and the scenes Lab1_Small, Lab1_Full, HideVsFlee, ThreeSpecies,
+Terrain_Locomotion and Sandbox. The scenes are then the configuration (ARCH-01): edit them, not this builder,
+unless the reference itself changes. Scenes are opened additively from an empty file, so the editor's own open
+scene is never touched.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class ReferenceScenes</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">ReferenceScenes</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="EvoSim_Editor_ReferenceScenes_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Menus: <code>EvoSim ▸ Build Reference Scenes</code> (<a class="xref" href="EvoSim.Editor.ReferenceScenes.html#EvoSim_Editor_ReferenceScenes_BuildAll">BuildAll()</a>) rebuilds everything and overwrites the
+six scenes, the pools, the module prefabs and the scenario assets; <code>EvoSim ▸ Reference ▸ Update Reference
+Scenes</code> (<a class="xref" href="EvoSim.Editor.ReferenceScenes.html#EvoSim_Editor_ReferenceScenes_UpdateReferenceScenes">UpdateReferenceScenes()</a>) only brings the saved scenes to the current reference settings.</p>
+<p>The same builder makes the World of <code>GameObject ▸ EvoSim ▸ New World</code> (<a class="xref" href="EvoSim.Editor.WorldFactory.html#EvoSim_Editor_WorldFactory_NewWorld_System_String_System_Single_">NewWorld(string, float)</a>),
+so a new world and the reference worlds have the same tree.</p>
+</div>
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="EvoSim_Editor_ReferenceScenes_BodiesFolder" data-uid="EvoSim.Editor.ReferenceScenes.BodiesFolder">
+  BodiesFolder
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/ReferenceScenes.cs/#L36"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The placeholder bodies' folder (prefabs and materials): <code>Assets/EvoSim/Modules/Bodies</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string BodiesFolder = &quot;Assets/EvoSim/Modules/Bodies&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Editor_ReferenceScenes_ModulesFolder" data-uid="EvoSim.Editor.ReferenceScenes.ModulesFolder">
+  ModulesFolder
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/ReferenceScenes.cs/#L34"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The module prefabs' folder: actions at its root, senses in <code>Senses/</code>, genes in <code>Genes/</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string ModulesFolder = &quot;Assets/EvoSim/Modules&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Editor_ReferenceScenes_PoolsFolder" data-uid="EvoSim.Editor.ReferenceScenes.PoolsFolder">
+  PoolsFolder
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/ReferenceScenes.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The allele pool assets' folder, one asset per locus: <code>Assets/EvoSim/Data/AllelePools</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string PoolsFolder = &quot;Assets/EvoSim/Data/AllelePools&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Editor_ReferenceScenes_ReferenceDecisionPeriod" data-uid="EvoSim.Editor.ReferenceScenes.ReferenceDecisionPeriod">
+  ReferenceDecisionPeriod
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/ReferenceScenes.cs/#L48"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Ticks between two decisions in the reference worlds (DEC-01; owner 2026-10-11: back to 4 after trying 20 and 10).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const int ReferenceDecisionPeriod = 4</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Editor_ReferenceScenes_Root" data-uid="EvoSim.Editor.ReferenceScenes.Root">
+  Root
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/ReferenceScenes.cs/#L28"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The EvoSim package folder, relative to the project.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string Root = &quot;Assets/EvoSim&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Editor_ReferenceScenes_ScenariosFolder" data-uid="EvoSim.Editor.ReferenceScenes.ScenariosFolder">
+  ScenariosFolder
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/ReferenceScenes.cs/#L38"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The scenario assets' folder: <code>Assets/EvoSim/Scenarios</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string ScenariosFolder = &quot;Assets/EvoSim/Scenarios&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="EvoSim_Editor_ReferenceScenes_ScenesFolder" data-uid="EvoSim.Editor.ReferenceScenes.ScenesFolder">
+  ScenesFolder
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/ReferenceScenes.cs/#L30"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The reference scenes' folder: <code>Assets/EvoSim/Scenes</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string ScenesFolder = &quot;Assets/EvoSim/Scenes&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="EvoSim_Editor_ReferenceScenes_BuildAll_" data-uid="EvoSim.Editor.ReferenceScenes.BuildAll*"></a>
+
+  <h3 id="EvoSim_Editor_ReferenceScenes_BuildAll" data-uid="EvoSim.Editor.ReferenceScenes.BuildAll">
+  BuildAll()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/ReferenceScenes.cs/#L81"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p><code>EvoSim ▸ Build Reference Scenes</code>: rebuilds the allele pools, the module prefabs and bodies, the six reference
+scenes and the scenario assets, overwriting them, then saves the assets.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[MenuItem(&quot;EvoSim/Build Reference Scenes&quot;)]
+public static void BuildAll()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_Editor_ReferenceScenes_BuildAll_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Course staff only, when the reference itself changes: the scenes are the configuration (ARCH-01), and a rebuild
+erases any edit made in them. Scenes open in the editor should be closed first.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_Editor_ReferenceScenes_BuildPools_" data-uid="EvoSim.Editor.ReferenceScenes.BuildPools*"></a>
+
+  <h3 id="EvoSim_Editor_ReferenceScenes_BuildPools" data-uid="EvoSim.Editor.ReferenceScenes.BuildPools">
+  BuildPools()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/ReferenceScenes.cs/#L615"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The allele pools of 09 §3, one asset per locus, from Data/Pools (the prototype's v2 pools) plus the Unity hide draft.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Dictionary&lt;string, AllelePool&gt; BuildPools()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="EvoSim.AllelePool.html">AllelePool</a>&gt;</dt>
+    <dd><p>The pools by <code>species.locus</code>, such as <code>prey.eat</code> or <code>predator.hunt</code>.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_Editor_ReferenceScenes_BuildPools_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Each pool is written to <a class="xref" href="EvoSim.Editor.ReferenceScenes.html#EvoSim_Editor_ReferenceScenes_PoolsFolder">PoolsFolder</a> as <code>&lt;species&gt;_&lt;locus&gt;.asset</code>, its founders and
+contrast pair (pro, anti) overwritten.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_Editor_ReferenceScenes_BuildScenarios_" data-uid="EvoSim.Editor.ReferenceScenes.BuildScenarios*"></a>
+
+  <h3 id="EvoSim_Editor_ReferenceScenes_BuildScenarios" data-uid="EvoSim.Editor.ReferenceScenes.BuildScenarios">
+  BuildScenarios()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/ReferenceScenes.cs/#L673"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The scenario assets whose scenes exist (31 §2); more come with the samples (M11).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void BuildScenarios()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_Editor_ReferenceScenes_BuildScenarios_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Each asset of <a class="xref" href="EvoSim.Editor.ReferenceScenes.html#EvoSim_Editor_ReferenceScenes_ScenariosFolder">ScenariosFolder</a> is created if missing, and its title, scene, length, brain, tier,
+seeds (1234, 7, 42 unless set after), expected facts and variants overwritten.</p>
+</div>
+
+
+
+
+  <a id="EvoSim_Editor_ReferenceScenes_ControlSentences_" data-uid="EvoSim.Editor.ReferenceScenes.ControlSentences*"></a>
+
+  <h3 id="EvoSim_Editor_ReferenceScenes_ControlSentences" data-uid="EvoSim.Editor.ReferenceScenes.ControlSentences">
+  ControlSentences()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/ReferenceScenes.cs/#L661"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The control sentences of GENE-23: 20 shuffled-word and 20 irrelevant ones (Data/Pools/control_alleles_v1.json).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;string&gt; ControlSentences()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd><p>The shuffled-word sentences, then the irrelevant ones.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="EvoSim_Editor_ReferenceScenes_UpdateReferenceScenes_" data-uid="EvoSim.Editor.ReferenceScenes.UpdateReferenceScenes*"></a>
+
+  <h3 id="EvoSim_Editor_ReferenceScenes_UpdateReferenceScenes" data-uid="EvoSim.Editor.ReferenceScenes.UpdateReferenceScenes">
+  UpdateReferenceScenes()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Editor/ReferenceScenes.cs/#L438"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Brings the saved reference scenes to the builder's reference without rebuilding them: the reference decision period
+(DEC-01, owner 2026-10-11) and a staggered DecisionSchedule in every species' Life group (DEC-04, owner 2026-10-10);
+a species that has a schedule keeps it.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[MenuItem(&quot;EvoSim/Reference/Update Reference Scenes&quot;)]
+public static string UpdateReferenceScenes()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>One line per scene: what changed, <code>nothing</code>, or <code>open in the editor, skipped</code>.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="EvoSim_Editor_ReferenceScenes_UpdateReferenceScenes_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p><code>EvoSim ▸ Reference ▸ Update Reference Scenes</code>. A scene open in the editor is skipped; the others are opened
+additively, changed, saved when something changed, and closed. The result is logged.</p>
+</div>
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

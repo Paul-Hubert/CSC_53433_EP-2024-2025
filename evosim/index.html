@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Evolving animals in Unity | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Evolving animals in Unity | EvoSim ">
+      
+      
+      <link rel="icon" href="favicon.ico">
+      <link rel="stylesheet" href="public/docfx.min.css">
+      <link rel="stylesheet" href="public/main.css">
+      <meta name="docfx:navrel" content="toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/index.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="index.html">
+            <img id="logo" class="svg" src="logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+
+      <div class="content">
+        <div class="actionbar">
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="home">
+<h1 id="evosim-evolving-animals-in-unity">EvoSim: evolving animals in Unity</h1>
+
+<p>Animals whose behaviour is written in English. Each gene is a short sentence, such as <em>&quot;Run from any predator you
+see.&quot;</em> At every decision, a language model reads an animal's genes together with what it senses, and gives a
+probability for each action it could take. Animals eat, flee, hide, hunt and mate. Their babies inherit a mix of their
+parents' sentences, and now and then a sentence mutates. Over generations, the sentences that keep animals alive spread.</p>
+<p><img src="images/hidevsflee-run.png" alt="HideVsFlee: prey graze between grass patches and thickets while predators hunt them"></p>
+<p><em>The HideVsFlee scene at tick 34. Light green cells are grass and dark green cells are thickets where prey can hide. The
+ball above each animal shows its current action: green eat, yellow flee, blue hide, red hunt, and so on. The panel
+counts living animals, births, deaths and model calls.</em></p>
+<h2 id="where-to-start">Where to start</h2>
+<table>
+<thead>
+<tr>
+<th>You want to…</th>
+<th>Read</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>open a scene and watch it run</td>
+<td><a href="guides/getting-started.html">Getting started</a></td>
+</tr>
+<tr>
+<td>understand the whole loop in one page</td>
+<td><a href="guides/overview.html">How EvoSim works</a></td>
+</tr>
+<tr>
+<td>learn one part in depth</td>
+<td>the <a href="guides/index.html">guides</a>: the world, a tick, senses, brains, actions, genes, mutation…</td>
+</tr>
+<tr>
+<td>add a sense, an action, a gene, a brain, a phase…</td>
+<td><a href="extending/index.html">Extending EvoSim</a>, then the page for your kind of module</td>
+</tr>
+<tr>
+<td>rewrite a reference module as an exercise</td>
+<td><a href="extending/exercises.html">The teaching path</a></td>
+</tr>
+<tr>
+<td>look up a class or a method</td>
+<td>the <a href="api/index.html">API reference</a>, grouped by folder</td>
+</tr>
+<tr>
+<td>know exactly what must hold (rule <code>SENSE-01</code>, <code>DEC-30</code>…)</td>
+<td>the <a href="spec/README.html">specification</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="three-ideas-to-keep-in-mind">Three ideas to keep in mind</h2>
+<ol>
+<li><strong>The scene is the configuration.</strong> A world is a tree of GameObjects. Every feature (a sense, an action, a gene, a
+tick phase, a brain) is a component in that tree. Add a component and its feature is in. Disable it and the feature
+is gone. No code changes needed.</li>
+<li><strong>Animals are data.</strong> An animal is a plain C# object, not a GameObject. Phases process all animals in batches, and the
+visible bodies only display them.</li>
+<li><strong>A seed replays a run exactly.</strong> Every random draw comes from a named stream seeded by the World. The same seed and
+the same answers from the brain give the same run, event for event. Your modules must keep this: see
+<a href="guides/determinism.html">Determinism and replay</a>.</li>
+</ol>
+<h2 id="about-this-site">About this site</h2>
+<p>The <a href="api/index.html">API reference</a> is generated from the documentation comments in the code (<code>///</code>). The
+<a href="spec/README.html">specification</a> is the contract the code implements (<code>Docs/Interface</code> in the repository). Each rule id
+in the text, such as SENSE-01, links to its rule. To document your own code the same way, see
+<a href="extending/documenting-your-code.html">Documenting your code</a>.</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>The food web | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="The food web | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/food-web.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="guide-food-web">
+<h1 id="the-food-web">The food web</h1>
+
+<p>Who eats whom is data, not code (04). Two components decide it together: the eaten thing carries an
+<a class="xref" href="../api/EvoSim.Edible.html">Edible</a>, which says how much energy it gives, and the eater's <a class="xref" href="../api/EvoSim.Diet.html">Diet</a> lists what it eats. A
+meal happens only if both sides allow it (SPEC-13). From the diets the World derives each species' <strong>prey</strong> and
+<strong>threats</strong>, which senses and actions use to find whom to hunt and whom to flee. Any number of species can share a
+world, and adding one changes no code.</p>
+<h2 id="how-it-works">How it works</h2>
+<ol>
+<li><strong>Edible.</strong> A resource layer, a species or an entity kind (eggs) becomes edible when its GameObject carries an
+<a class="xref" href="../api/EvoSim.Edible.html">Edible</a> component. Without one, nothing can eat it, whatever the diets say (SPEC-10).</li>
+<li><strong>Diet.</strong> Each species that eats has one <a class="xref" href="../api/EvoSim.Diet.html">Diet</a>. Its entries name what it eats, each with an energy
+scale (SPEC-15). A species with no diet eats nothing.</li>
+<li><strong>Resolution.</strong> When the world initializes, each diet resolves its entries by name into
+<a class="xref" href="../api/EvoSim.EdibleTarget.html">EdibleTarget</a>s (ARCH-08). Then the World derives the food web: a species whose diet strikes another is
+that species' threat, and the other is its prey (SPEC-12).</li>
+<li><strong>Use.</strong> Senses and actions look for &quot;threats&quot;, &quot;prey&quot; or &quot;kin&quot; through an <a class="xref" href="../api/EvoSim.AnimalSet.html">AnimalSet</a>. When an
+interaction applies, the resolver asks the eater's diet again whether this target may be eaten.</li>
+</ol>
+<h2 id="diet-entries">Diet entries</h2>
+<table>
+<thead>
+<tr>
+<th>Entry</th>
+<th>Eats</th>
+<th>How</th>
+<th>Energy of one meal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a layer's name, e.g. <code>Grass</code></td>
+<td>the layer's food items</td>
+<td>grazed: the item is consumed</td>
+<td>the layer's Edible <strong>Energy</strong> (25 for grass)</td>
+</tr>
+<tr>
+<td>a species' id or display name, e.g. <code>prey</code></td>
+<td>that species' living animals</td>
+<td>struck: killed with the hunter's kill chance</td>
+<td>the species' Edible <strong>Energy</strong> (60 for the prey)</td>
+</tr>
+<tr>
+<td><code>carcass:&lt;species&gt;</code>, e.g. <code>carcass:prey</code></td>
+<td>carcasses that species leaves</td>
+<td>scavenged: one portion at a time</td>
+<td>the species' Edible <strong>Carcass Energy</strong> (30)</td>
+</tr>
+<tr>
+<td><code>egg:&lt;species&gt;</code></td>
+<td>that species' eggs, while they incubate</td>
+<td>eaten whole</td>
+<td>the egg system's Edible <strong>Energy</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Each entry has an <strong>Energy Scale</strong> (default 1) that multiplies the energy of that food for this eater. A diet that
+strikes a species also declares the hunter's <code>kill.chance</code> trait; its default is the diet's <strong>Kill Chance</strong> (0.5).
+For the steps to make something edible or change a diet, see
+<a href="../extending/environment.html#who-eats-what">Food, cover, entities and ground</a>.</p>
+<h2 id="where-the-edible-goes">Where the Edible goes</h2>
+<table>
+<thead>
+<tr>
+<th>What is eaten</th>
+<th>The Edible sits on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a layer's items</td>
+<td>the layer's GameObject (<code>Environment/Grass</code> in the reference scenes)</td>
+</tr>
+<tr>
+<td>a species' animals</td>
+<td>the species' own GameObject, next to its <a class="xref" href="../api/EvoSim.Species.html">Species</a> component</td>
+</tr>
+<tr>
+<td>a species' carcasses</td>
+<td>the same Edible as its animals: <strong>Carcass Portions</strong> above 0 make it leave carcasses; the world also needs a <a class="xref" href="../api/EvoSim.CarcassSystem.html">CarcassSystem</a></td>
+</tr>
+<tr>
+<td>a species' eggs</td>
+<td>the <a class="xref" href="../api/EvoSim.EggSystem.html">EggSystem</a>'s GameObject (<code>Environment/Eggs</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>A disabled Edible counts as absent when the world starts (ARCH-06).</p>
+<h2 id="what-a-meal-gives">What a meal gives</h2>
+<p>The energy of a meal is the Edible's energy times the entry's <strong>Energy Scale</strong>. The diet's
+<a class="xref" href="../api/EvoSim.Diet.html#EvoSim_Diet_EnergyFrom_EvoSim_Animal_EvoSim_EdibleTarget_System_Single_">EnergyFrom</a> can then adjust it for
+the eater (the reference returns it as it is), and <a class="xref" href="../api/EvoSim.Energy.html">Energy</a> adds it, never above the maximum (ANIM-22).
+Every meal counts in the animal's <code>Meals</code> and its species' meal counter. After a kill or a carcass portion, a species
+with a <a class="xref" href="../api/EvoSim.Digestion.html">Digestion</a> module is busy digesting; grazing and eggs never make an animal busy.</p>
+<h2 id="threats-prey-and-kin">Threats, prey and kin</h2>
+<p>The World builds the relations from the diets, in species order, when it initializes and again whenever a species is
+added during a run. They are never configured twice (SPEC-12).</p>
+<table>
+<thead>
+<tr>
+<th>Set</th>
+<th>Means</th>
+<th>Used by (reference)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Threats</td>
+<td>species whose diet strikes this one</td>
+<td>the prey's &quot;Predator&quot; sense and its flee action</td>
+</tr>
+<tr>
+<td>Prey</td>
+<td>species this one's diet strikes</td>
+<td>the predator's &quot;Prey&quot; sense and its hunt action</td>
+</tr>
+<tr>
+<td>Kin</td>
+<td>this species</td>
+<td>the kin senses (&quot;Animal&quot;, &quot;Other predator&quot;), follow and mate</td>
+</tr>
+<tr>
+<td>Listed</td>
+<td>species named on the module, by id or display name</td>
+<td>a flee from wolves only, for example</td>
+</tr>
+</tbody>
+</table>
+<p><a class="xref" href="../api/EvoSim.World.html#EvoSim_World_ThreatsOf_EvoSim_Species_">ThreatsOf(Species)</a> and <a class="xref" href="../api/EvoSim.World.html#EvoSim_World_PreyOf_EvoSim_Species_">PreyOf(Species)</a> return these lists.
+An animal standing in cover is hidden from its threats: their senses don't report it, their actions can't target it,
+and they never strike it (ENV-11). Its kin and its own prey still see it.</p>
+<h2 id="carcasses">Carcasses</h2>
+<p>When a strike kills an animal whose Edible has <strong>Carcass Portions</strong> above 0, a carcass appears where it died
+(reference: 2 portions of 30 energy). The killer has already eaten: it may not eat from its own kill. Any other
+animal whose diet lists <code>carcass:&lt;species&gt;</code> may eat one portion each. The carcass is gone when its portions are
+eaten, or when it rots after <strong>Carcass Ticks</strong> (100); rotting happens in the environment phase.</p>
+<p>The reference hunt action runs to the nearer of the nearest prey and the nearest carcass it may eat, and a carcass
+wins a tie, being a sure meal. A diet that eats carcasses adds the carcass system's line to its species' prompt:
+<em>&quot;A kill leaves a carcass that up to 2 other predators can eat from.&quot;</em></p>
+<h2 id="cannibals">Cannibals</h2>
+<p>A species may list itself in its diet (SPEC-11). It is then among its own prey and its own threats: its hunt action
+chases its own kind, and its flee action runs from it, like from any threat. An animal never targets itself.</p>
+<h2 id="species-added-during-a-run">Species added during a run</h2>
+<p>A species cloned from another during a run (SPEC-30) inherits its relations in both directions (SPEC-31): it eats what
+its parent species eats, and the hunters of the parent hunt it too, through its own Edible. The World rebuilds the
+food web when the species is added (<a class="xref" href="../api/EvoSim.World.html#EvoSim_World_RebuildFoodWeb">RebuildFoodWeb()</a>).</p>
+<h2 id="the-reference-food-web">The reference food web</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>prey</code></th>
+<th><code>predator</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Edible</td>
+<td>yes: 60 per kill, carcass of 2 portions × 30, rots in 100 ticks</td>
+<td>no</td>
+</tr>
+<tr>
+<td>Diet</td>
+<td><code>Grass</code> (25 per item)</td>
+<td><code>prey</code> (kill chance 0.5), <code>carcass:prey</code></td>
+</tr>
+<tr>
+<td>Threats (derived)</td>
+<td>predator</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Prey (derived)</td>
+<td>none</td>
+<td>prey</td>
+</tr>
+<tr>
+<td>Eggs</td>
+<td>not edible</td>
+<td>not edible</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-main-types">The main types</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Edible.html">Edible</a></td>
+<td>Makes a layer's items, a species' animals or an entity kind edible, with their energy</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Diet.html">Diet</a></td>
+<td>What a species eats; resolves its entries and answers &quot;may I eat this?&quot;</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Diet.Entry.html">Diet.Entry</a></td>
+<td>One line of a diet: a target name and an energy scale</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.EdibleTarget.html">EdibleTarget</a></td>
+<td>One resolved entry: kind, target, its Edible, the scale</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.AnimalSet.html">AnimalSet</a></td>
+<td>Threats, prey, kin or listed species</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.CarcassSystem.html">CarcassSystem</a>, <a class="xref" href="../api/EvoSim.Carcass.html">Carcass</a></td>
+<td>Carcasses: portions, eaters, rotting</td>
+</tr>
+</tbody>
+</table>
+<h2 id="settings">Settings</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Field</th>
+<th>Reference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Edible</td>
+<td>Energy</td>
+<td>grass 25 per item, prey 60 per kill</td>
+</tr>
+<tr>
+<td>Edible</td>
+<td>Carcass Portions, Carcass Energy, Carcass Ticks</td>
+<td>prey 2, 30, 100 ticks</td>
+</tr>
+<tr>
+<td>Diet</td>
+<td>Eats (Target, Energy Scale)</td>
+<td>prey: Grass; predator: prey, carcass:prey; scale 1</td>
+</tr>
+<tr>
+<td>Diet</td>
+<td>Kill Chance</td>
+<td>0.5</td>
+</tr>
+<tr>
+<td>Flee action, Nearest Animal sense</td>
+<td>From, Targets (and Listed)</td>
+<td>Threats</td>
+</tr>
+</tbody>
+</table>
+<h2 id="in-the-editor">In the editor</h2>
+<ul>
+<li><strong>Food Web window</strong> (<em>Window ▸ EvoSim ▸ Food Web</em>): species and layers as a graph. Green edges graze, red strike,
+brown scavenge carcasses, yellow eat eggs. In Edit mode press <strong>Build the food web</strong>, which validates the world to
+resolve the diets. Below the graph: the derived threats of each species and the food-web messages.</li>
+<li><strong>Species inspector</strong>: <strong>Show the computed tables</strong> lists what the species eats with the energy of each, its own
+Edible, and its derived threats.</li>
+<li><strong>Validation</strong> reports a diet entry that names nothing (V-20), a flee, hunt or sense with nobody to look for (V-21), a
+species with no food (V-22), a diet target with no Edible (V-24, with a fix), and an Edible no diet lists (V-25).</li>
+</ul>
+<h2 id="go-further">Go further</h2>
+<ul>
+<li><a href="../extending/environment.html#who-eats-what">Food, cover, entities and ground</a>: make something edible, change a diet.</li>
+<li><a href="actions-and-movement.html">Actions and movement</a>: how grazing, strikes and scavenging happen on arrival.</li>
+<li><a href="environment.html">The environment</a>: food layers, cover, carcasses and eggs.</li>
+<li>Specification: <a href="../spec/04-species-and-food-web.html">04 — Species and the food web</a>.</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

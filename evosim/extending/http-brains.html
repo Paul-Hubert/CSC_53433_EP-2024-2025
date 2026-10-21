@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>An HTTP brain or mutator server | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="An HTTP brain or mutator server | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/http-brains.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-http-brains">
+<h1 id="an-http-brain-or-mutator-server">An HTTP brain or mutator server</h1>
+
+<p>Derive from <a class="xref" href="../api/EvoSim.HttpBrain.html">HttpBrain</a> to decide with a model behind a web API: a chat server, a classifier, a service of
+your own. The base class sends the requests off the main thread, with time-outs, retries and a cap on parallel requests;
+you only build each request and read each answer. A brain that needs no server is a plain <a class="xref" href="../api/EvoSim.Brain.html">Brain</a>
+(<a href="brain.html">A brain</a>). To mutate genes with another server, derive from <a class="xref" href="../api/EvoSim.HttpMutatorClient.html">HttpMutatorClient</a>; for a mutator
+without a server, from <a class="xref" href="../api/EvoSim.MutatorClient.html">MutatorClient</a>.</p>
+<h2 id="the-reference-servers">The reference servers</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Server</th>
+<th>Default <strong>Host</strong></th>
+<th>Calls</th>
+<th>Reference settings</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.JevBrain.html">JevBrain</a></td>
+<td>vLLM serving JEV-9B with its LoRA module <code>jev-decision</code></td>
+<td><code>http://localhost:8000</code></td>
+<td><code>POST /v1/completions</code>, <code>GET /v1/models</code></td>
+<td>time-out 60 s, 4 in flight, 64 texts per request</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.OllamaPointsBrain.html">OllamaPointsBrain</a></td>
+<td>Ollama</td>
+<td><code>http://localhost:11434</code></td>
+<td><code>POST /api/chat</code>, <code>GET /api/tags</code></td>
+<td><code>gemma4:12b</code>, context 4 096 tokens, seed 0, 2 in flight</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.OllamaMutatorClient.html">OllamaMutatorClient</a></td>
+<td>Ollama, the model on the CPU</td>
+<td><code>http://localhost:11434</code></td>
+<td><code>POST /api/chat</code>, <code>GET /api/tags</code></td>
+<td>the mutator service's model (<code>gemma4:26b</code>, temperature 1.2), context 1 024 tokens, 2 in flight</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.OpenAIMutatorClient.html">OpenAIMutatorClient</a></td>
+<td>an OpenAI-compatible server (vLLM)</td>
+<td><code>http://localhost:8001</code></td>
+<td><code>POST /v1/chat/completions</code>, <code>GET /v1/models</code></td>
+<td>answers of at most 64 tokens, thinking off</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>GET</code> path is the connection test: <em>Window ▸ EvoSim ▸ Brain Health</em> has a <strong>Test connection</strong> button for each
+brain and mutator client (V-60), and shows their tries, failures and latencies during a run.</p>
+<h2 id="client-settings">Client settings</h2>
+<p>Every HTTP brain and mutator client has these Inspector fields; <a class="xref" href="../api/EvoSim.HttpCaller.html">HttpCaller</a> applies them to each request.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>What it does</th>
+<th>HTTP brains</th>
+<th>Mutator clients</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Host</strong></td>
+<td>the server's address</td>
+<td>see above</td>
+<td>see above</td>
+</tr>
+<tr>
+<td><strong>Api Key Variable</strong></td>
+<td>the name of the environment variable that holds the API key; empty for none</td>
+<td>empty</td>
+<td>empty</td>
+</tr>
+<tr>
+<td><strong>Timeout Seconds</strong></td>
+<td>the time-out of one try, in seconds</td>
+<td>120 (JEV 60)</td>
+<td>60</td>
+</tr>
+<tr>
+<td><strong>Tries</strong></td>
+<td>tries per request, 1 to 10</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td><strong>Backoff Seconds</strong></td>
+<td>the wait before the second try; the waits between tries are Backoff × 1, 2, 4…</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>Max Parallel</strong></td>
+<td>requests in flight at once; the others wait their turn</td>
+<td>4 (Ollama brain 2)</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>A try that times out, gets no answer, or gets the status 408, 429 or 5xx is tried again after its wait: with the
+reference values, 1 s then 2 s. Any other error status fails at once. A request that still fails after its last try
+fails its query (DEC-42).</p>
+<h2 id="an-http-brain">An HTTP brain</h2>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Thread</th>
+<th>Done by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The <em>Ask brains</em> phase sends the queries the memo and the cache can't answer, one batch per brain (DEC-15)</td>
+<td>main</td>
+<td>the World</td>
+</tr>
+<tr>
+<td>Each query becomes a <a class="xref" href="../api/EvoSim.BrainRequest.html">BrainRequest</a>: index, text, action names</td>
+<td>main</td>
+<td><a class="xref" href="../api/EvoSim.HttpBrain.html#EvoSim_HttpBrain_Ask_System_Collections_Generic_IReadOnlyList_EvoSim_DecisionQuery__">Ask</a>, your <code>TextFor</code></td>
+</tr>
+<tr>
+<td>The requests are posted, the answers read, each row set or failed</td>
+<td>thread pool</td>
+<td>your <code>AnswerAsync</code></td>
+</tr>
+<tr>
+<td>The answer is completed; a request left without a row fails</td>
+<td>thread pool</td>
+<td><a class="xref" href="../api/EvoSim.HttpBrain.html">HttpBrain</a></td>
+</tr>
+<tr>
+<td>The tick waits (<em>Freeze</em> blocks the main thread, <em>Responsive</em> keeps Unity drawing, SPACE-14), stores the rows in the memo and the cache, draws the actions</td>
+<td>main</td>
+<td>the <em>Choose actions</em> phase</td>
+</tr>
+</tbody>
+</table>
+<p>What you write and what you use:</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>You</th>
+<th>What it does, when it is called</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.HttpBrain.html#EvoSim_HttpBrain_AnswerAsync_EvoSim_HttpCaller_System_Collections_Generic_IReadOnlyList_EvoSim_BrainRequest__EvoSim_BrainAnswer_">AnswerAsync</a></td>
+<td>must implement</td>
+<td>Once per batch, on the thread pool. Post with <code>c.PostAsync</code>, then call <code>answer.SetRow(r.Index, row)</code> or <code>answer.Fail(r.Index, reason)</code> for every request. Don't call <code>Complete</code></td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.HttpBrain.html#EvoSim_HttpBrain_HealthPath">HealthPath</a></td>
+<td>must implement</td>
+<td>the path the connection test reads</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_Id">Id</a></td>
+<td>must implement</td>
+<td>the brain's name in memo and cache keys</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_ModelIdentity">ModelIdentity</a>, <a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_Mode">Mode</a></td>
+<td>should override</td>
+<td>the model and how you use it: part of the cache key (below)</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_AnswerInstruction">AnswerInstruction</a></td>
+<td>may override</td>
+<td>the prompt's last line, fixed by the brain because its parsing depends on it (PROMPT-07)</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.HttpBrain.html#EvoSim_HttpBrain_TextFor_EvoSim_DecisionQuery_">TextFor</a></td>
+<td>may override</td>
+<td>the text sent for a query, built on the main thread; by default the full prompt</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_MaxActions">MaxActions</a>, <a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_MaxPromptTokens">MaxPromptTokens</a>, <a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_CanMixSpecies">CanMixSpecies</a>; <code>Initialize</code>, <code>Begin</code>, <code>Validate</code></td>
+<td>may override (call the base for the last three)</td>
+<td>limits checked before the run (DEC-13, DEC-14); the base drops its client at Initialize and checks <strong>Host</strong> (V-20) and keys (V-61)</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.HttpBrain.html#EvoSim_HttpBrain_Caller">Caller</a>, <a class="xref" href="../api/EvoSim.HttpBrain.html#EvoSim_HttpBrain_Stats">Stats</a>, <a class="xref" href="../api/EvoSim.HttpBrain.html#EvoSim_HttpBrain_Transport">Transport</a>, <a class="xref" href="../api/EvoSim.HttpBrain.html#EvoSim_HttpBrain_ConfigureClient_System_String_System_Single_System_Int32_System_Single_System_Int32_System_String_">ConfigureClient</a></td>
+<td>use</td>
+<td>the client, its counts, a fake server for tests, the settings from code</td>
+</tr>
+</tbody>
+</table>
+<p>To make a row, use <a class="xref" href="../api/EvoSim.PointsAnswer.html">PointsAnswer</a> for points answers (DEC-41), or
+<a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_Normalize_System_Double___">Brain.Normalize</a> for any non-negative weights.</p>
+<h3 id="example-points-from-an-openai-compatible-server">Example: points from an OpenAI-compatible server</h3>
+<p>A brain modelled on <a class="xref" href="../api/EvoSim.OllamaPointsBrain.html">OllamaPointsBrain</a>, for a server such as llama.cpp (port 8080) or vLLM:</p>
+<pre><code class="lang-csharp">using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using EvoSim;
+using Newtonsoft.Json.Linq;
+using UnityEngine;
+
+/// &lt;summary&gt;Points mode on an OpenAI-compatible server: one chat call per query.&lt;/summary&gt;
+public class ChatPointsBrain : HttpBrain
+{
+    [SerializeField, Tooltip(&quot;The model's name on the server.&quot;)] string model = &quot;my-model&quot;;
+
+    public ChatPointsBrain() { host = &quot;http://localhost:8080&quot;; maxParallel = 2; }
+
+    public override string Id =&gt; &quot;chat-points&quot;;
+    public override string Mode =&gt; &quot;points-v1&quot;;
+    public override string ModelIdentity =&gt; model;
+    public override string AnswerInstruction =&gt; OllamaPointsBrain.Instruction;
+    protected override string HealthPath =&gt; &quot;/v1/models&quot;;
+
+    protected override async Task AnswerAsync(HttpCaller c, IReadOnlyList&lt;BrainRequest&gt; requests, BrainAnswer answer)
+    {
+        var calls = new List&lt;Task&gt;(requests.Count);
+        foreach (var r in requests) calls.Add(One(c, r, answer));
+        await Task.WhenAll(calls).ConfigureAwait(false);
+    }
+
+    async Task One(HttpCaller c, BrainRequest r, BrainAnswer answer)
+    {
+        try
+        {
+            var body = new JObject
+            {
+                [&quot;model&quot;] = model, [&quot;temperature&quot;] = 0, [&quot;seed&quot;] = 0,
+                [&quot;messages&quot;] = new JArray(new JObject { [&quot;role&quot;] = &quot;user&quot;, [&quot;content&quot;] = r.Text }),
+                [&quot;response_format&quot;] = new JObject { [&quot;type&quot;] = &quot;json_object&quot; },
+            };
+            var response = await c.PostAsync(&quot;/v1/chat/completions&quot;, body).ConfigureAwait(false);
+            var row = PointsAnswer.ToRow((string)response[&quot;choices&quot;]?[0]?[&quot;message&quot;]?[&quot;content&quot;], r.Actions, out var problem);
+            if (row == null) answer.Fail(r.Index, problem);
+            else answer.SetRow(r.Index, row);
+        }
+        catch (Exception e) { answer.Fail(r.Index, e.Message); }
+    }
+}
+</code></pre>
+<p>Put the file in <code>Assets/Student</code>: <em>Assets ▸ Create ▸ EvoSim ▸ Script ▸ Brain</em> writes a plain brain and its test there;
+change its base class to <code>HttpBrain</code>. Add the component to a GameObject under the World's <em>Brains</em> object, then pick it
+in a species' <strong>Brain</strong> field or the World's <strong>Default Brain</strong>.</p>
+<h3 id="the-cache-key">The cache key</h3>
+<p>The answer cache replays rows without calling the model (DEC-33). Its key
+(<a class="xref" href="../api/EvoSim.AnswerCache.html#EvoSim_AnswerCache_KeyFor_EvoSim_Brain_EvoSim_DecisionQuery_System_String_">AnswerCache.KeyFor</a>) joins the
+brain's <code>Id</code>, <code>ModelIdentity</code> and <code>Mode</code> with the prompt's id, the text style, the genes and the situation. So
+<code>ModelIdentity</code> must change with the model: give its name and its revision or digest when the server tells them (JEV:
+<code>autotrust/JEV-9B@b63f651ce8ed:jev-decision</code>; Ollama: <code>gemma4:12b@&lt;digest&gt;</code>). <code>Mode</code> must change when you change how a
+prompt becomes a request or an answer a row: put a version in it (<code>points-v1</code>). Anything that changes answers and is
+missing from the key makes a replay return old answers.</p>
+<h3 id="strict-by-default-keys-from-the-environment">Strict by default, keys from the environment</h3>
+<p>An HTTP brain starts with <strong>Strict</strong> and <strong>Use Cache</strong> on. When a query still fails after its tries, a strict brain
+stops the run cleanly: every file is written and the run can be resumed (DEC-40). With <strong>Strict</strong> off, the query gets a
+uniform row instead, counted as a failure and never cached (DEC-34).</p>
+<p>Never type an API key in the Inspector. Put it in an environment variable of the environment Unity (or the player)
+starts from, and write the variable's name in <strong>Api Key Variable</strong>, for example <code>OLLAMA_API_KEY</code>. The key is read at
+each call and sent as a bearer token; it is never stored, logged or written (OUT-04). Validation reports any serialized
+field that looks like a key (V-61).</p>
+<h2 id="a-mutator-client">A mutator client</h2>
+<p>The <a class="xref" href="../api/EvoSim.MutatorService.html">MutatorService</a> sends each round of mutation prompts that its cache can't answer to the World's
+mutator client, then checks and caches the answers (MUT-14). An <a class="xref" href="../api/EvoSim.HttpMutatorClient.html">HttpMutatorClient</a> posts one chat call per
+prompt from the thread pool; <code>Body</code> and <code>Content</code> run there.</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>You</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.HttpMutatorClient.html#EvoSim_HttpMutatorClient_ChatPath">ChatPath</a>, <a class="xref" href="../api/EvoSim.HttpMutatorClient.html#EvoSim_HttpMutatorClient_HealthPath">HealthPath</a></td>
+<td>must implement</td>
+<td>the chat path and the connection test's path</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.HttpMutatorClient.html#EvoSim_HttpMutatorClient_Body_EvoSim_MutatorRequest_">Body</a></td>
+<td>must implement</td>
+<td>the request body for one <a class="xref" href="../api/EvoSim.MutatorRequest.html">MutatorRequest</a>: its <code>Prompt</code>, <code>Model</code>, <code>Seed</code>, <code>Temperature</code></td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.HttpMutatorClient.html#EvoSim_HttpMutatorClient_Content_Newtonsoft_Json_Linq_JToken_">Content</a></td>
+<td>must implement</td>
+<td>the answer text in a response, or null: the request then fails</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.MutatorClient.html#EvoSim_MutatorClient_ModelIdentity">ModelIdentity</a></td>
+<td>should override</td>
+<td>the model, recorded with every mutant allele (GENE-12)</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.HttpMutatorClient.html#EvoSim_HttpMutatorClient_UserMessage_System_String_">UserMessage</a></td>
+<td>use</td>
+<td>the <code>messages</code> array: the prompt as the only user message</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The body carries the prompt and nothing else</strong> (CORE-07, MUT-11): one user message, no system message, nothing about
+the animal. Send the request's own seed and temperature: the cache's key holds them (MUT-14). The integrity check B-11
+reads the bodies a real run sends and accepts only <code>model</code>, <code>messages</code>, <code>seed</code>, <code>temperature</code>, <code>max_tokens</code>, <code>options</code>,
+<code>stream</code>, <code>think</code> and <code>chat_template_kwargs</code>.</p>
+<pre><code class="lang-csharp">using EvoSim;
+using Newtonsoft.Json.Linq;
+
+/// &lt;summary&gt;A mutator behind a llama.cpp server (OpenAI-style chat).&lt;/summary&gt;
+public class LlamaCppMutatorClient : HttpMutatorClient
+{
+    public LlamaCppMutatorClient() { host = &quot;http://localhost:8080&quot;; }
+
+    public override string ModelIdentity =&gt;
+        World != null &amp;&amp; World.Service&lt;MutatorService&gt;() != null ? World.Service&lt;MutatorService&gt;().Model : &quot;&quot;;
+    protected override string ChatPath =&gt; &quot;/v1/chat/completions&quot;;
+    protected override string HealthPath =&gt; &quot;/health&quot;;
+
+    public override JObject Body(MutatorRequest r) =&gt; new JObject
+    {
+        [&quot;model&quot;] = r.Model, [&quot;messages&quot;] = UserMessage(r.Prompt), [&quot;max_tokens&quot;] = 64,
+        [&quot;seed&quot;] = r.Seed, [&quot;temperature&quot;] = HttpCaller.Number(r.Temperature),
+    };
+
+    protected override string Content(JToken response) =&gt; (string)response[&quot;choices&quot;]?[0]?[&quot;message&quot;]?[&quot;content&quot;];
+}
+</code></pre>
+<p>In the reference scenes the client sits on the <em>Mutator client</em> GameObject under the World's <em>Brains</em> object, next to
+the <em>Mutator</em> service: put yours there in place of <a class="xref" href="../api/EvoSim.OllamaMutatorClient.html">OllamaMutatorClient</a>. The model's name and the
+temperature are the service's fields.</p>
+<p>A mutator without a server derives from <a class="xref" href="../api/EvoSim.MutatorClient.html">MutatorClient</a>: its
+<a class="xref" href="../api/EvoSim.MutatorClient.html#EvoSim_MutatorClient_Send_System_Collections_Generic_IReadOnlyList_EvoSim_MutatorRequest__">Send</a> returns a
+<a class="xref" href="../api/EvoSim.MutatorReply.html">MutatorReply</a> filled with <code>SetAnswer</code> or <code>Fail</code>, then <code>Complete</code>. Read <a class="xref" href="../api/EvoSim.Testing.FakeMutator.html">FakeMutator</a>.</p>
+<h2 id="rules-your-brain-or-client-must-keep">Rules your brain or client must keep</h2>
+<ol>
+<li><strong>No Unity object off the main thread</strong>: read Unity objects in <code>TextFor</code> or <code>Initialize</code>, keep plain values.</li>
+<li><strong>Await with <code>ConfigureAwait(false)</code></strong>: in <em>Freeze</em> mode an await that needs the main thread never resumes.</li>
+<li><strong>A row or a failure for every request</strong> (DEC-11): one entry per action, in action order, each ≥ 0, summing to 1.</li>
+<li><strong>The same query gives the same row</strong> (DEC-12): temperature 0 and a fixed seed.</li>
+<li>Keys only from the environment (OUT-04), a complete cache key (DEC-33), a blind mutator (CORE-07).</li>
+</ol>
+<h2 id="test-it">Test it</h2>
+<p>Tests never call a model: they give the brain a <a class="xref" href="../api/EvoSim.Testing.FakeHttpTransport.html">FakeHttpTransport</a> through
+<a class="xref" href="../api/EvoSim.HttpBrain.html#EvoSim_HttpBrain_Transport">Transport</a>. Its <code>Respond</code> function answers each request; <code>FailWith</code>, <code>Hang</code> and <code>DelayMs</code> make it
+fail, time out or answer late; <code>Requests</code> and <code>MaxInFlight</code> show what it received.</p>
+<pre><code class="lang-csharp">using EvoSim;
+using EvoSim.Testing;
+using Newtonsoft.Json.Linq;
+using NUnit.Framework;
+
+public class ChatPointsBrainTests : WorldFixture
+{
+    [Test]
+    public void AnswersFromAFakeServer()
+    {
+        var choice = new JObject { [&quot;message&quot;] = new JObject { [&quot;content&quot;] = &quot;{\&quot;eat\&quot;: 80, \&quot;flee\&quot;: 20}&quot; } };
+        var fake = new FakeHttpTransport { Respond = (method, path, body) =&gt; new JObject { [&quot;choices&quot;] = new JArray(choice) } };
+        var w = New().Lab1(prey: 6, predators: 2, randomBrain: false)
+            .DefaultBrain&lt;ChatPointsBrain&gt;(b =&gt; { b.Transport = fake; b.ConfigureClient(&quot;http://fake.test&quot;, 5f, 1, 0f, 2); })
+            .Build();
+        w.Advance(8);
+        Assert.AreEqual(8, w.Tick, &quot;no failure stopped the strict brain&quot;);
+        Assert.Greater(fake.Count, 0, &quot;the brain called its server&quot;);
+    }
+}
+</code></pre>
+<p>The test uses Newtonsoft's <code>JObject</code>: add <code>Newtonsoft.Json.dll</code> to the <strong>Assembly References</strong> of
+<code>Assets/Student/Tests/Student.Tests.asmdef</code>. More in <code>Assets/EvoSim/Tests/EditMode/Http</code>: <code>HttpBrainTests.cs</code>
+(formats, retries, time-outs, strict stops, the cache, both wait modes) and <code>HttpMutatorTests.cs</code>.</p>
+<h2 id="read-next">Read next</h2>
+<p><a class="xref" href="../api/EvoSim.OllamaPointsBrain.html">OllamaPointsBrain</a>, then <a class="xref" href="../api/EvoSim.JevBrain.html">JevBrain</a> (batched requests, log-probabilities);
+<a class="xref" href="../api/EvoSim.OllamaMutatorClient.html">OllamaMutatorClient</a>, <a class="xref" href="../api/EvoSim.OpenAIMutatorClient.html">OpenAIMutatorClient</a>; <a href="brain.html">A brain</a>, <a href="mutation.html">Mutation</a>,
+<a href="../guides/brains-and-decisions.html">Decisions and brains</a>; the specification's
+<a href="../spec/08-decisions-brains-and-prompts.html">08 — Decisions, brains and prompts</a> and <a href="../spec/10-mutation.html">10 — Mutation</a>.</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
