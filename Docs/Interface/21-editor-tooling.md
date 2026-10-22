@@ -40,7 +40,7 @@ Severity: **E** error (blocks Play), **W** warning, **I** information.
 | V-12 | W | the species' signature changed since it was last accepted (SPEC-03): results and caches change | accept |
 | V-13 | E | a species without exactly one locomotion component (MOVE-01) | add `KinematicLocomotion` |
 | V-19 | E | every action of a species is an overlay: nothing can carry the animal (ACT-07) | add Rest |
-| V-27 | E | an overlay that mates or hunts (ACT-07) | — |
+| V-27 | E | an overlay that mates or hunts (ACT-07); a structure check with a number from the references' block, every structure number up to V-19 being in use | — |
 | **References** |
 | V-20 | E | a module names a layer, entity kind or species that doesn't exist | pick from a list |
 | V-21 | W | an animal set resolves to nothing (flee with no threat, hunt with no prey) | — |

@@ -57,7 +57,7 @@ One row per `statsEvery` ticks, columns `t` then, per species with the prefix
 | `births`, `immigrants` | cumulative |
 | `deaths_starve`, `deaths_pred` (killed), `deaths_age`, `deaths_migrated` | cumulative deaths by cause |
 | `decisions`, `backend_queries`, `invalid` | cumulative decisions, brain queries after the memo, searching choices |
-| `act_<action>` | cumulative decisions per action |
+| `act_<action>` | cumulative decisions per action; a drawn overlay counts for itself and for its carrier (ACT-07), so with overlays these columns add up to more than `decisions` |
 | `portions` | cumulative carcass portions eaten (hunters) |
 
 and `alleles`, the number of alleles registered (all species).

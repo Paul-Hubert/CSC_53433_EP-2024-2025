@@ -1,11 +1,26 @@
 # 50 — Implementation status
-Updated: 2026-10-11, M14 documentation for students ⏸ (before it: M13 real-time visual test, `Docs/prompts/07-real-time-visual-test.md`)
+Updated: 2026-10-22, M15 overlay actions and the alarm-calls student example ⏸ (before it: M14 documentation for students)
 
 The single source of truth between implementation sessions of
 [`Docs/prompts/06-implement-unity-system.md`](../prompts/06-implement-unity-system.md).
 
 ## Next step
-M14 (2026-10-11, owner: document the whole code base for students, inline and as a website) waits for the owner ⏸:
+M15 (2026-10-21, owner's choice of overlays for short actions, 40 §2 #18) waits for the owner ⏸. Overlay actions
+(ACT-07): an action done in passing (a call, a mark) runs beside a carrier drawn from the rest of the row, so it no longer
+holds the animal still for a whole decision period; no extra brain call, R-01 unchanged. `Assets/Student` holds a worked
+example written as a student would (alarm calls: a world service, a phase, an overlay action with its gene, a sense,
+tests, a scene built by a menu script) and the site explains it (`extending/worked-example-alarm-calls.md`). EditMode
+466/466 (batch). Details in 51 §M15; the commit, d5e5870, is titled "M14.2".
+
+Since M14.1, docs only: the five blocking student-readiness fixes B1–B5 (0a322b7, merged in 9f0838f: model servers for
+L1/L2, player arguments per level, replaying a player run in the editor, `Builds/` not in git); the site published on
+gh-pages under `/evosim`, built from 9f0838f (334771d); the owner's brief `design.md` and `design.pdf` committed (2ac2368).
+2026-10-22: these commits checked against the docs, and the stale text fixed: overlays in 01, 13, 20 §5, 21 §2, 22 and the
+site's guides, the editor assembly and the worked example's code on the site, the replay notes, a note on top of
+`design.md`, this file and 40 §2 #18. The gh-pages site predates
+these fixes: rebuild and publish it again.
+
+Before M15, M14 (2026-10-11, owner: document the whole code base for students, inline and as a website) waited for the owner ⏸:
 every type and member of `Assets/EvoSim` has a doc comment (DocAudit 0 issues; comments only, proven by Roslyn syntax
 equivalence with d5769e0), and `Docs/Site` builds the students' website with DocFX 2.81: 19 guide pages, 21 extending pages
 (the extension map, one per mechanism, a generated page of every extension point), the API reference grouped by folder, and
@@ -38,7 +53,8 @@ EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh
 | M10 Editor tooling | done | c61f043 | a world from the menus validates and runs; T-EDIT-01 for every catalogue code; windows not checked by eye |
 | M11 Samples, scenarios, verification, CI | done | e5f402d…cde9e9c, M11.5 | samples, conformance, CI, scenarios S00–S27, R-01…R-08, coverage test; EditMode 319 + T3, PlayMode 17/17; gates B-01…B-11 (Machine) |
 | M12 Teaching path and final audit | review | bb6b46a, 1eaa571, 66a81e5, 83019ce, M12.5 | 14 stubs, Exercises menu, README (no grading, hooks); P1 phases 1–2; EditMode 433/433 (with soak and pinned hashes), PlayMode 19/19 ⏸ |
-| M14 Documentation for students | review | M14.1 | `///` on every type and member (347 files, +10 149 lines, code token-identical); Docs/Site: 41 pages, 50 compiled examples, strict build 0 warnings; EditMode 438/438, PlayMode 23/23 (batch, -nographics) ⏸ |
+| M15 Overlay actions, alarm-calls example | review | d5e5870 (titled M14.2) | ACT-07 overlays: a carrier drawn from the rest of the row, V-19, V-27, T-ACT-11 (OverlayTests); `Assets/Student` worked example with tests, scene and site page; EditMode 466/466 (batch), R-01 unchanged ⏸ |
+| M14 Documentation for students | review | 598a755, 0a322b7 | `///` on every type and member (347 files, +10 149 lines, code token-identical); Docs/Site: 41 pages, 50 compiled examples, strict build 0 warnings; EditMode 438/438, PlayMode 23/23 (batch, -nographics); B1–B5 student-readiness fixes (0a322b7); published on gh-pages `/evosim` (334771d) ⏸ |
 | M13 Real-time visual test | review | ed16db5, d155e72, 29838b3, 9140625, c9d9e0a, e735804, 5efefe4, 6f3b302, 2328091, M13.10 | scenes watchable (ground, food, cover, markers, overlay, camera, capture); L0 and L2 hashes equal headless = Play = build; then memo of cache hits, player build of the project, staggered reference; EditMode 438/438, PlayMode 23/23; report RT-2026-10-10 ⏸ |
 
 ## Machine
@@ -171,7 +187,8 @@ M0–M11: in [51](51-implementation-log.md). Since then:
   `StartMutation` (templates, samples, tests). The contract's text should follow.
 Brief vs Interface: none found so far. Chapter B of the brief (the Claude Doc, tabs A–G) matches 20; it adds the run loop's
 seven states (Idle, Running, Waiting, Blocked, Paused, Stepping, Stopped), now `RunState`.
-`Docs/Interface/design.md` (chapter A) and `design.pdf` stay untracked (the owner's).
+`Docs/Interface/design.md` (chapter A) and `design.pdf` are the owner's, committed in 2ac2368 (2026-10-21) as the v1 brief
+of 2026-10-10; a note at the top of `design.md` says what changed since.
 
 ## Known problems
 - 2026-10-10 13:54–16:05 — the editor froze after the pipeline's 5-minute timer cancelled a synchronous EditMode run;
@@ -180,8 +197,8 @@ seven states (Idle, Running, Waiting, Blocked, Paused, Stepping, Stopped), now `
   loaded). Rerun with the editor closed and one model loaded at a time (gemma4:26b is about 19 GB).
 - GPU shared: the JEV container (restarted by Docker Desktop's restart policy) and another Python process of the
   owner's; the mutator runs on the CPU in Ollama (started for the checks).
-- Untracked files that aren't EvoSim's and were left alone: `Assets/MobileDependencyResolver/`, two `.cs.meta`
-  in `Assets/02 - Scripts/`, `Docs/Interface/design.md`, `design.pdf`.
+- Files that aren't EvoSim's, left alone, then committed as they were in 2ac2368 (2026-10-21):
+  `Assets/MobileDependencyResolver/`, two `.cs.meta` in `Assets/02 - Scripts/`, `Docs/Interface/design.md`, `design.pdf`.
 - M13: in the editor a capture needs a drawn Game view (hidden, captures are given up after 5 s); Unity warns on Play that
   the Input Manager is deprecated (`activeInputHandler: 0`, the owner's setting).
 - M14: `ViewPlayTests.ViewsNeverChangeTheRun` fails in batch mode with a graphics device (start and end captures 1 < 2: the

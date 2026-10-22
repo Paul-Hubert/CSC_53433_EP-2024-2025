@@ -96,7 +96,7 @@ After `t`, each species has a block of columns prefixed with its id (`prey_pop`,
 | `deaths_<cause>` | one more column per other cause: a death rule's, or any recorded by a module |
 | `decisions`, `backend_queries`, `invalid` | cumulative decisions, decisions the memo could not answer, searching choices |
 | `portions` | carcass portions eaten |
-| `act_<action>` | cumulative decisions per action |
+| `act_<action>` | cumulative decisions per action; a drawn overlay counts for itself and for its carrier ([Actions done in passing](../extending/action.md#actions-done-in-passing)), so with overlays these columns add up to more than `decisions` |
 
 Modules add their own columns after the species' block ([Recording and statistics](../extending/recording.md)). A
 column `alleles` (all alleles registered) follows the first species, and world modules' columns end the row. Counters

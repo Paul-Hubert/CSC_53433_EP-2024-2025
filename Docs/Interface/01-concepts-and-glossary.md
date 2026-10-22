@@ -102,6 +102,7 @@
 | **Band** | A distance range with a name: adjacent, close, medium, far, none. |
 | **Situation text** | The observation written as text for the brain. |
 | **Action** | A behaviour the brain can choose (eat, flee, hide, hunt, …). It chooses a target, produces an **intent** (a direction, walk or run, how far at most) and may trigger an **interaction**. |
+| **Overlay, carrier** | An overlay is an action done in passing (a call, a scent mark): when the draw picks it, a second action, the carrier, is drawn from the rest of the probabilities and moves the animal; the overlay only adds its interaction ([07](07-actions-and-locomotion.md) ACT-07). |
 | **Search** | What an action does when it has nothing to act on in sight: a random walk. Counted as an invalid choice. |
 | **Locomotion** | The species' module that turns an intent into movement over the ground: kinematic straight lines in the reference; terrain, NavMesh or physics subclasses later. |
 | **Interaction** | A contact effect: graze, strike, eat a carcass portion, enter cover. |

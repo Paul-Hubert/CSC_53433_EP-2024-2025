@@ -91,10 +91,13 @@ and `FromCommandLine` has no `-cache` option and no replay-only mode. It reads t
 4. **Read the result line**, the last line of `Logs/EvoSim/realtime-batch.txt`. Its `hash` must equal the live run's
    `events_hash`, and it must say **`brain calls 0`** and **`mutator calls 0`**: any other number means answers were
    missing from the cache and the models were asked again, so the replay is not a replay. Don't trust the exit code:
-   `FromCommandLine` exits with 0 whatever happened, a failure included (the line then starts with `FAILED`).
+   `FromCommandLine` exits with 0 whatever happened, a failure included (after the line's date and `headless:`, the
+   result then reads `FAILED: …`).
 
-A model server that was down when the live run started records the model as `@unknown`; the replay then misses the cache.
-Start the servers and check them in *Brain Health* before a live run you want to replay.
+An Ollama server that was down when the live run started gives its model the identity `<model>@unknown` instead of
+`<model>@<digest>` (the mutator's, and an Ollama brain's); the replay, with the server up, then misses those answers in the
+cache. JEV's identity comes from its settings, not from the server. Start the servers and check them in *Brain Health*
+before a live run you want to replay.
 
 ## The same run everywhere
 

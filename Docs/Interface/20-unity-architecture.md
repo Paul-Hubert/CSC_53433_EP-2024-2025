@@ -725,7 +725,11 @@ public class ChooseActionsPhase : TickPhase
         foreach (var d in t.Decisions.Due)
         {
             var p = Sampling.Temper(d.Probabilities, t.World.SamplingTemperature);   // DEC-20
-            d.Animal.Action = t.Stream(d.Animal.Species, "sampling").Choose(p);       // RAND-03
+            var sampling = t.Stream(d.Animal.Species, "sampling");                    // RAND-03
+            d.Animal.Action = sampling.Choose(p);
+            d.Animal.EndOverlay();
+            if (d.Animal.CurrentAction.Overlay)                                        // ACT-07: keep it as the overlay,
+                DrawCarrier(d.Animal, p, sampling);                                    // the carrier from p with overlays at 0
             d.Animal.Searching = d.Animal.BredThisPeriod = false;                     // DEC-03
         }
     }

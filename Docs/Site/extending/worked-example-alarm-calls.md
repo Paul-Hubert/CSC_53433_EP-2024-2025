@@ -20,7 +20,9 @@ The change touches the four kinds of extension:
 
 The files are `Assets/Student/AlarmCalls.cs`, `FadeAlarmCalls.cs`, `AlarmCallAction.cs`, `AlarmSense.cs`, the tests in
 `Assets/Student/Tests/AlarmCallsTests.cs`, and the scene builder in `Assets/Student/Editor/AlarmCallsScene.cs`. The code
-below is that code, with its `///` comments left out.
+below is that code, shortened: the `///` comments are left out, and so are the members only the tests and the scene
+builder use (`Configure`, `Memory`, `Calls`, `Range`, `Cost`), `FadeAlarmCalls.Validate`, and `AlarmSense`'s call to
+`base.Initialize()`. The action's prompt rule and `IsRelevant` are described after its code.
 
 ## 1. The world: a list of calls
 

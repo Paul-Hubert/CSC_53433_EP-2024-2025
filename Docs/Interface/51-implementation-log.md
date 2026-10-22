@@ -1396,7 +1396,10 @@ staggering, MutatorClient.ModelIdentity, Batch.WithScene, the exercise stubs' ru
 reports.
 
 ## M15 (2026-10-21): overlay actions, done in passing
-Owner's choice of option A in `Logs/EvoSim/Reports/SHORT-ACTIONS-DESIGN.md`: a short action (a call, a mark) didn't fit
+Commit d5e5870, titled "EvoSim M14.2": the same milestone, M15 here and in 50.
+
+Owner's choice of option A in `Logs/EvoSim/Reports/SHORT-ACTIONS-DESIGN.md` (a local report: `Logs/` is not in git; the
+decision is recorded in 40 §2 #18): a short action (a call, a mark) didn't fit
 ACT-02, since an action runs every tick until the next decision; the first alarm call stood still next to the predator
 for up to 4 ticks and was caught. New rule ACT-07; ACT-02, ACT-03, DEC-20, PROMPT-03 extended; 20 §3.6, 21 (inspector,
 V-19, V-27) and 30 (T-ACT-11) updated.

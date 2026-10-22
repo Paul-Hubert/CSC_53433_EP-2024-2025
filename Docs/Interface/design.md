@@ -2,6 +2,13 @@
 
 Oct 10, 2026 · @Paul
 
+> **A snapshot, kept as written on 2026-10-10.** This is chapter A of the owner's brief, exported from the Claude Doc;
+> `design.pdf` holds the whole brief with its diagrams. The system has been built since (milestones M0–M15:
+> [50](50-implementation-status.md), [51](51-implementation-log.md)), so "Nothing is built yet" below no longer holds.
+> Later owner decisions are not in its table: no grading of the teaching path, gemma4:26b as the reference mutator,
+> staggered decisions in the reference scenes (DEC-04), cached answers joining the memo (DEC-30), and overlay actions
+> (ACT-07); see [40](40-open-questions.md) §2. As the brief says, the contract wins.
+
 **Proposed architecture, v1 (2026-10-10).** A tree of replaceable components.
 
 The system is a tree of small, replaceable components: a student who understands one base class can read, reimplement or invent one behaviour without touching the rest. Course staff build the Unity 6000.3 version from this brief; Master 2 students read it when they extend the system. Nothing is built yet, and wherever this brief and the contract in `Docs/Interface/` disagree, the contract wins.
@@ -14,15 +21,15 @@ The system is a tree of small, replaceable components: a student who understands
 - F. Verification — test tiers, conformance suites, scenarios, integrity checks, CI
 - G. Appendix — rule ids, glossary, decisions log, open questions, what changed from Python
 
-## The system on one sheet
+## 1. The system on one sheet
 
-&#91;embedded content: the poster · the whole system on one sheet\]
+*(Embedded in `design.pdf`: the poster, the whole system on one sheet.)*
 
 Left to right: the GameObject tree is the configuration, the eleven phases run it every tick, and what they record is judged by the tests, scenarios and gates. Each column has its own chapter: B for the first two, F for the third.
 
 ## 2. The loop
 
-&#91;embedded content: the loop · 15 steps, from genes back to genes\]
+*(Embedded in `design.pdf`: the loop, 15 steps from genes back to genes.)*
 
 Read it clockwise from Genes. Ordinary code does everything physical; the brain only chooses among actions (`CORE-06`), and mutation never sees what helps (`CORE-07`). This is the conceptual order; the exact phase order of a tick is section 11 of chapter B.
 

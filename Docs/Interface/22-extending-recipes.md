@@ -122,6 +122,12 @@ the gene passes the guards; the signature changes (accept it); copy *T-ACT
 template* (search when nothing is in sight, reach, intent never moves the animal
 itself).
 
+Something done in a moment (a call, a scent mark) is an **overlay** (07 ACT-07):
+override `Overlay` to return true and plan only an interaction, with no search;
+the engine draws a carrier from the rest of the row to move the animal. The
+worked example in `Assets/Student` (alarm calls: a service, a phase, an overlay
+action with its gene, a sense, tests and a scene) builds one completely.
+
 ## 4. A number gene
 
 No code: add a `NumberGene` under the species, set its trait (`stamina.max`),

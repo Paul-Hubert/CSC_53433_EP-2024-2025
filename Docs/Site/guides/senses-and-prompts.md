@@ -127,7 +127,7 @@ When the run starts, <xref:EvoSim.PromptWriter.Build(EvoSim.Species)> writes eac
 |---|---|
 | Header | the species' **Prompt Header** ("You decide what a wild animal does next in a simple world.") |
 | `Actions:` and one line per action, in action order | each action's **Description**: `- eat: go to the nearest visible food and eat it` |
-| Rule lines | every species module's `WritePromptRules` (search rule, locomotion, stamina, mating), then every world service's (the carcass line) |
+| Rule lines | the engine's line for actions done in passing, first, when the species has any (ACT-07, PROMPT-03): *Some actions are done in passing (alarm): the animal also does its next most likely choice.*; then every species module's `WritePromptRules` (search rule, locomotion, stamina, mating), then every world service's (the carcass line) |
 | Genes intro | the species' **Genes Intro** ("This animal's instincts (its genes)…") |
 | `{genes}` | one line per gene the brain reads, in locus order: `- eat: "Eat whenever food is close."` (PROMPT-02) |
 | `Situation: {situation}` | the situation text |

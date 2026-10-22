@@ -22,17 +22,21 @@ in tests. Choose a **window or inspector** to look at a running world; it exists
 ## Where editor code lives
 
 Editor code uses `UnityEditor`, which players lack, so it lives in an editor-only assembly (EDIT-03); in the runtime
-`Student` assembly it would break the player build. Create `Assets/Student/Editor/Student.Editor.asmdef`:
+`Student` assembly it would break the player build. The repository already has one,
+`Assets/Student/Editor/Student.Editor.asmdef`, made for the scene builder of the
+[worked example](worked-example-alarm-calls.md):
 
 ```json
 {
     "name": "Student.Editor",
-    "references": ["Student", "EvoSim.Runtime", "EvoSim.Samples", "EvoSim.Editor"],
-    "includePlatforms": ["Editor"]
+    "references": ["Student", "EvoSim.Runtime", "EvoSim.Editor"],
+    "includePlatforms": ["Editor"],
+    "autoReferenced": false
 }
 ```
 
-Put your windows, inspectors and menus in that folder: they see your modules, EvoSim and its editor helpers.
+Put your windows, inspectors and menus in that folder: they see your modules, EvoSim and its editor helpers. If your
+editor code uses the samples, add `"EvoSim.Samples"` to `references`.
 
 ## A window
 

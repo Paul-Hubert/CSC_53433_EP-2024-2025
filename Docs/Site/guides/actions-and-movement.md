@@ -33,6 +33,12 @@ flowchart TD
 4. **Settle.** <xref:EvoSim.Metabolism> charges energy for what the animal did, and <xref:EvoSim.Stamina> pays the
    meters or recovers. A busy animal's countdown drops by one.
 
+An action done in passing, an **overlay** such as a call (ACT-07), runs beside the animal's action, its **carrier**. In
+step 1 the carrier plans the intent and its interaction as above, then the overlay plans in the same context: its intent
+is ignored and only its interaction is kept. In step 3 both apply, the carrier's first. In step 4 the overlay's own
+countdown drops (once by default); it also ends at the next decision, when the animal becomes busy, or when it dies.
+The inspector shows both: "flee + alarm". See [Actions done in passing](../extending/action.md#actions-done-in-passing).
+
 ## Planning with the act context
 
 An action never moves an animal and never changes another one (ACT-06). It only asks questions and states a plan:

@@ -139,6 +139,12 @@ The draw uses the species' `sampling` random stream, so the seed decides it (RAN
 brain's own rows, untempered. The animal keeps its last observation, situation text and row for the inspector
 (DEC-21).
 
+When the draw picks an action done in passing, an **overlay** such as a call (ACT-07), a second draw from the same
+stream picks the **carrier**, the action that moves the animal meanwhile: from the same tempered row with every overlay
+set to 0, renormalised (DEC-20). A row with nothing but overlays leaves no carrier, and the animal stays. The brain is
+not asked again, and a species without overlays draws exactly once. See
+[Actions done in passing](../extending/action.md#actions-done-in-passing).
+
 ## The reference brains
 
 | Brain | Class | Needs | How it answers | Limits |
