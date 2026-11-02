@@ -38,6 +38,9 @@ small additions to core (§4), and none of them changes an existing run.
 | 10 | Neural founders in the comparisons | **Random networks** (the naive start); no pre-evolved pool | §6.2 |
 | 11 | Decision rate in the comparisons | **Both**: the neural default (every tick) as the main arm, and the matched-rate arm (period 4, staggered, like JEV) as a variant | §6.2 |
 | 12 | Measured runs | **2 seeds, run long enough, only for the prey-vs-prey and 2×2 scenarios**; the other pairings are functional checks | §6.3 |
+| 13 | Prey vs prey | **Only prey**: JEV prey and neural prey, no predators (S33) | §6.1 |
+| 14 | Mating in the measured runs | **Asexual for both species, for now**; sexual runs later | §6.3 |
+| 15 | A "same interface" arm (the neural brain on JEV's senses and actions) | **Never** | §6.2, §11 |
 
 ## 2. Where it comes from: the previous lab
 
@@ -94,7 +97,7 @@ correct because no two animals share weights.
   on the candidate nearest to where the step ends. ACT-10 applies it only within reach.
 - The neural prey eats the grass it walks onto. The neural predator strikes the prey it runs
   into, gets busy digesting, and leaves a carcass, exactly as the JEV predator does.
-- Every neural action has `Mates => true`:
+- Every neural action has `Mates => true` by default (a per-action setting):
   - **asexual** (REPRO-04): a ready animal breeds alone;
   - **sexual** (REPRO-02): it breeds on contact with a ready animal of its species, and the
     baby's network comes from `NeuronCrossover` (§5.3).
@@ -183,8 +186,9 @@ Hatch ── no mutator to wait for
 - **Layout** (`NeuralLayout.For(species)`, rebuilt at `Initialize`, hashed):
   - inputs, in sense order: a sense implementing `INeuralSense` contributes its attachment
     width (`RayFanSense`: rays × kinds; `InteroceptionSense`: 5). Any other sense contributes
-    a one-hot of its tokens (the energy `LevelSense` costs 3), so the same brain can also
-    drive a species with the reference senses (§6.2, optional arm);
+    a one-hot of its tokens (the energy `LevelSense` costs 3). This exists only because the
+    brain conformance suite runs every brain on the reference species (C6); no scenario
+    uses it (owner: never a same-interface arm);
   - outputs: one logit per action of the species, in action order;
   - hidden: the gene's `hidden` setting (default one layer of 12);
   - **vector length** = Σ over layers of (fan-in + 1) × fan-out.
@@ -277,7 +281,7 @@ energy level (low/medium/high).
 ### 5.5 The five actions: `NeuralAction` and its subclasses
 
 `NeuralAction : AnimalAction` (abstract) holds what they share:
-- `SelfDirected => true` (C4) for the moving ones; `Mates => true`; `Hunts =>` contacts include
+- `SelfDirected => true` (C4) for the moving ones; `Mates => mates` (a setting, default true on every action); `Hunts =>` contacts include
   Strike; `IsRelevant => true`.
 - `contacts` (Graze | Strike | Scavenge; the templates set Graze for prey and Strike | Scavenge
   for predators; checked against the diet, V-75). After the intent, one interaction on the
@@ -347,12 +351,13 @@ JEV predator's diet and to the cover's hiding species (§6.2).
 | **S32 Brains2x2** (§6.2) | JEV **and** neural | JEV **and** neural | JEV | T4, **measured** |
 | **S33 PreyVsPrey** (§6.2) | JEV **and** neural | none | JEV | T4, **measured** |
 
-- S33 is the 2×2 without its predators: the two prey species share the grass and nothing
-  hunts them, so it isolates foraging and breeding from escaping. That is how this plan reads
-  "prey vs prey"; adding the JEV predator back would make it S32 minus `predator-nn`.
+- S33 is the 2×2 without its predators (owner: only prey). The two prey species share the
+  grass and nothing hunts them, so it isolates foraging and breeding from escaping.
 - S29–S31 are functional checks (the L0 versions in CI, a 10-minute T4 smoke run with JEV).
   Only S32 and S33 get the measured runs of §6.3 (owner).
-- Each runs asexual and sexual (a scenario override of the mating rule) on Lab1_Small's map.
+- Every scenario has an asexual and a sexual version (the World's control "C7 ASEXUAL" of 15,
+  switches every species at once) on Lab1_Small's map. The measured runs use asexual for now
+  (§6.3).
 - Each has an L0 variant where JEV is replaced by `RandomBrain` or `ScriptedBrain`, so CI
   covers every pairing without a server.
 - **Rates:** decision periods are the species' `DecisionSchedule` values (JEV reference: 4,
@@ -381,7 +386,8 @@ JEV predator's diet and to the cover's hiding species (§6.2).
   because two species graze (a scenario setting). Same map for every run (World seed, RAND-04);
   only the run seed varies.
 - S33 is the same world without both predators: `prey` and `prey-nn`, the same Grass at ×2,
-  the same caps.
+  the same caps. The neural prey keeps the same ray kinds as in S32 (its `Threat` channel
+  stays at 0), so the two scenarios' neural prey have the same layout.
 - **Neural founders are random networks** (owner): every run starts the neural species from
   the gene's seeded random pool, and newcomers below the floor come from it too. JEV founders
   are curated sentences, so the comparison includes how fast evolution gets a random network
@@ -391,9 +397,9 @@ JEV predator's diet and to the cover's hiding species (§6.2).
   - *Default rate* (main): neural species decide every tick (their `DecisionSchedule` period 1).
   - *Matched rate* (variant): neural species on period 4, staggered, like JEV. This separates
     "better controller" from "decides 4× more often".
-  - *Same interface* (optional, not measured unless the owner asks, §12): `NeuralBrain` driving
-    species with JEV's own senses and actions (one-hot tokens, the reference actions). This
-    separates the brain from the ray/steering interface.
+  - There is no same-interface arm (owner: never). The comparison is between whole
+    controllers: JEV with its senses, sentences and six actions, against the network with its
+    rays and five steering actions.
 - **Floor:** with the reference floor, newcomers hide extinctions, so the count of newcomers
   needed per species is itself a result (POP-05). A floor-0 variant gives times to extinction.
 
@@ -432,8 +438,22 @@ censoring, not death):
 |---|---|---|
 | Arms | default rate, matched rate | default rate, matched rate |
 | Seeds | 2 (run seeds 1 and 2; same World seed, so the same map) | 2 |
-| Mating | the reference rule (sexual); asexual only if the owner asks | same |
+| Mating | **asexual for every species** (the World's control "C7 ASEXUAL" of 15) | same |
 | Runs | 2 arms × 2 seeds = 4 | 4 |
+
+**Asexual for both, now; sexual later** (owner). Two things change for the JEV species, and
+the scenario sets both:
+- **Their prompt.** The mating rule's line ("Breeding needs only one of the two to choose
+  mate… as soon as it reaches a ready partner") would be false. The scenario overrides it with
+  "An adult that chooses mate breeds alone as soon as it is ready." A prompt that matches the
+  world is required (PROMPT-03 in spirit). It gives the JEV species new prompt ids, so these
+  runs start with an empty answer cache; the first run's cost measure includes that.
+- **Their choice.** A JEV animal still breeds only when its brain picks `mate` and it is ready
+  (REPRO-04). A neural animal has no `mate` action: every one of its actions has
+  `Mates => true`, so it breeds whenever it is ready, as the old lab's animals did. This
+  difference is part of the controllers being compared, and the report states it. The per-action
+  `mates` setting (§5.5) can restrict neural breeding to `stop` if the owner wants breeding to
+  cost a choice.
 
 **"Long enough" is a stop rule, not a guess** (`PlateauStop`, a world module that requests a
 clean stop at a tick boundary, RAND-20). A run stops at the first window boundary where both
@@ -525,21 +545,22 @@ the door open.
 | Physics raycasts | Animals, food and carcasses aren't colliders; rays hit EvoSim objects only (owner) |
 | Mutating weights with `GaussianMutation` | It is the number-gene operator (one value, a range); the owner wants a separate class for networks |
 | Comparing brains in separate worlds only (S30, S31) | Kept, but separate worlds don't share food or predators. The 2×2 puts all four under the same conditions, and its kill matrix shows who eats whom |
+| A same-interface arm (the neural brain on JEV's senses and actions) | Rejected by the owner: never |
 
 ## 12. Still open
 
-1. **"Prey vs prey"** is read here as S33: JEV prey and neural prey alone, no predators (§6.1).
-   Should it keep the JEV predator instead?
-2. **Mating in the measured runs:** the reference rule (sexual, like the JEV prey and
-   predator) for all 8 runs, or asexual too (doubling them)?
-3. **Optional "same interface" arm** (`NeuralBrain` on JEV's senses and actions): measure it
-   too, or leave it for later?
+Nothing blocks M16.1–M16.8. Before the measured runs (M16.9):
+
+1. **Breeding as a choice for the neural species:** in the asexual runs it breeds whenever it
+   is ready, while JEV breeds only when it picks `mate` (§6.3). Keep that (recommended: the
+   owner's five actions, the old lab's regime, stated in the report), or let only `stop` breed?
 
 ## 13. Risks
 
 - **Fairness of the 2×2:**
-  - The JEV and neural species differ in their interface (senses, actions) as well as in their
-    brain. That is why the same-interface arm and the matched-rate arm exist.
+  - The JEV and neural species differ in their interface (senses, actions, breeding without a
+    mate choice) as well as in their brain. Whole controllers are compared (owner). The
+    matched-rate arm takes out the decision rate; the report lists the remaining differences.
   - JEV's founders are curated sentences and the neural founders random networks (owner),
     so early windows measure the bootstrap more than the brain. The plateau rule (§6.3) and
     the per-window report keep the two apart: compare the late windows.
