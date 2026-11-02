@@ -1,7 +1,7 @@
 # Plan — neural prey and predators beside JEV, and a 2×2 brain comparison (M16)
 
 Status: **plan, not started.** Written 2026-11-02 against `llm-evolution` at 2fdd431;
-revised three times the same day with the owner's answers (§1). Still open: §12.
+revised the same day with the owner's answers (§1, 29 decisions). Nothing open (§12).
 
 ## 0. In one paragraph
 
@@ -41,13 +41,27 @@ small additions to core (§4), and none of them changes an existing run.
 | 13 | Prey vs prey | **Only prey**: JEV prey and neural prey, no predators (S33) | §6.1 |
 | 14 | Mating in the measured runs | **Asexual for both species, for now**; sexual runs later | §6.3 |
 | 15 | A "same interface" arm (the neural brain on JEV's senses and actions) | **Never** | §6.2, §11 |
+| 16 | Breeding as a choice for the neural species | **No**: it breeds whenever it is ready (every action mates), as in the old lab | D5, §6.3 |
+| 17 | World of the measured runs | **Lab1_Full**: per species prey 136 initial / cap 270, predators 28 / cap 68 | §6.2 |
+| 18 | Floor in the measured runs | **On**, and the newcomers each species needed are counted as a result | §6.2 |
+| 19 | Grass with two prey species | **×2 regrowth** | §6.2 |
+| 20 | Headline survival measure | **The death hazard ratio** (Kaplan–Meier survival by age), JEV vs neural within each role, in the late windows | §6.2 |
+| 21 | Policy of the neural brain | **Greedy**: the action with the highest output, like the old net | D1, §5.6 |
+| 22 | Occlusion | **Everything occludes**: cover, animals, food and obstacles all stop a ray | §5.4 |
+| 23 | Extra inputs | **In-cover flag, previous action, ticks since last meal** | §5.4 |
+| 24 | Network size | **One hidden layer of 12** | §5.1 |
+| 25 | Mutation defaults | **Gentle**: rate 0.5; 5 % of weights get a random float in ±0.5 added; 0.5 % are replaced | §5.2 |
+| 26 | Founder pool | **256 random networks** | §5.1 |
+| 27 | Ray fan | **12 rays over 360°**, 20 m | §5.4 |
+| 28 | Stop rule | **The plateau rule**: ≥ 50 generations, ±10 % over three 2 000-tick windows, cap 60 000 ticks | §6.3 |
+| 29 | Survival analysis | **C# in the editor**: a Survival Report window, no Python | §6.2 |
 
 ## 2. Where it comes from: the previous lab
 
 | Previous lab (`Assets/02 - Scripts/04 - Crowds and Evolution`, on `master`) | Here |
 |---|---|
-| 5 eyes, ray-marched over the grass grid, distance only (food) | N rays, symmetric fan, each stopped by the **first EvoSim object**, reporting distance and kind |
-| Net 5 → 5 → 1, sigmoid everywhere, weights U(−10, 10) (saturated: bang-bang steering) | Net in → hidden (tanh) → softmax over the 5 actions; Xavier init (the old ±10 init kept as a setting) |
+| 5 eyes, ray-marched over the grass grid, distance only (food) | 12 rays all round, each stopped by the **first EvoSim object**, reporting distance and kind |
+| Net 5 → 5 → 1, sigmoid everywhere, weights U(−10, 10) (saturated: bang-bang steering) | Net in → 12 hidden (tanh) → 5 outputs, the highest one wins (greedy, like the old net); Xavier init (the old ±10 init kept as a setting) |
 | One output: turn in [−10°, +10°] per frame; constant speed from `CapsuleAutoController` | `left`/`right` turn at one speed, `walk`/`run` straight, `stop`; turn angle and speed tunable |
 | Genome = weight matrices, copied with per-weight swap (1 %) / nudge (1 %) | One `Vector` allele per animal, given a lineage; random float mutations; per-neuron crossover in sexual mode |
 | Grazers only; eat a grass cell → +energy and an offspring at once | Neural prey and neural predators; graze or strike on contact (ACT-10); breed when ready, alone or with a partner |
@@ -60,9 +74,11 @@ probabilities over the species' actions (CORE-06, DEC-11); a sense returns a tok
 finite list (SENSE-01); alleles are text or numbers (GENE-02). Each decision below keeps the
 rule and gets the old behaviour back.
 
-**D1 — Five discrete actions, one softmax.** The actions are `left`, `right`, `walk`, `run`
-and `stop`, in that order. The network has one output per action, and the row it returns is
-their softmax, a valid DEC-11 row. `left`/`right` turn by a set angle per tick (20° by
+**D1 — Five discrete actions, the highest output wins.** The actions are `left`, `right`,
+`walk`, `run` and `stop`, in that order. The network has one output per action. With the
+default Greedy policy (owner) the row it returns is a one-hot on the highest output (ties to
+the lower index), a valid DEC-11 row, so the draw always picks that action. A `Sample` policy
+(softmax) stays available as a setting. `left`/`right` turn by a set angle per tick (20° by
 default) while moving at one set speed (walk by default). `walk`/`run` keep the heading.
 `stop` stays still and rests. With a decision every tick the animal steers continuously, as
 the old net did each frame.
@@ -127,7 +143,7 @@ green, and that is the exit criterion of M16.1.
 
 | # | Change | Files | Rule text to add |
 |---|---|---|---|
-| C1 | `AlleleKind.Vector`; `AlleleValue.OfVector(float[])` (copied), `.Vector` (read-only), `Canonical(d)` = the length plus SHA-256 (16 hex) of the values rounded to *d* decimals, `ToString()` = `vec[725]#ab12cd34`; `Equals` through `Canonical` | `Genes/AlleleKind.cs`, `Genes/AlleleValue.cs` | GENE-07 becomes MUST-if-used: vector alleles compare at the gene's decimals |
+| C1 | `AlleleKind.Vector`; `AlleleValue.OfVector(float[])` (copied), `.Vector` (read-only), `Canonical(d)` = the length plus SHA-256 (16 hex) of the values rounded to *d* decimals, `ToString()` = `vec[1229]#ab12cd34`; `Equals` through `Canonical` | `Genes/AlleleKind.cs`, `Genes/AlleleValue.cs` | GENE-07 becomes MUST-if-used: vector alleles compare at the gene's decimals |
 | C2 | Recording a vector: birth-event mutation entries and `alleles.jsonl` write `vector_sha` and `length`, never the values; values go to a sidecar `vectors.jsonl` (`{id, values}`, written at the same flushes). `RunOverlay` and the Gene Pool window show `ToString()` | `Phases/HatchPhase.cs`, `Recording/RunRecorder.cs`, `Views/RunOverlay.cs`, `Editor/GenePoolWindow.cs` | 13: the new sidecar file |
 | C3 | `DecisionQuery.Genome`: the genome the brain reads (`QueryGenome`, so the shuffled-genes control still works); null for tool-built queries. A brain reads only genes with `ReadByBrain` from it, so the brain-visible genome key (DEC-31) stays exact | `Brains/DecisionQuery.cs`, `Phases/AskBrainsPhase.cs`, `Editor/AskTheBrainWindow.cs`, `Editor/PromptPreview.cs` | DEC-10 gains "the brain-visible genome" |
 | C4 | `AnimalAction.SelfDirected` (virtual, false). The action conformance suite accepts a self-directed action that moves alone in an empty world and is not searching | `Actions/AnimalAction.cs`, `Tests/EditMode/Conformance/ConformanceTests.cs` | ACT-04: "…except self-directed actions (steering), which have no target" |
@@ -150,15 +166,17 @@ Assets/EvoSim/Neuro/
   Mutation/     NeuralMutation.cs                     Reproduction/ NeuronCrossover.cs
   Net/          NeuralLayout.cs       NeuralNet.cs    Brains/       NeuralBrain.cs
   Senses/       RayFanSense.cs  RayHitKind.cs  WorldRayCaster.cs  InteroceptionSense.cs  NeuralInput.cs  INeuralSense.cs
+                HungerClock.cs (stats for "ticks since last meal", updated each tick)
   Actions/      NeuralAction.cs (base: contacts, Mates, SelfDirected)
                 TurnAction.cs (left | right)   ForwardAction.cs (walk | run)   StopAction.cs
   Comparison/   MatchedPairs.cs (WorldModule: pairs + V-78)   SurvivalStats.cs (WorldModule, IStatsColumns)
                 PlateauStop.cs (WorldModule: the "long enough" stop rule of §6.3)
+                SurvivalAnalysis.cs (pure C#: Kaplan–Meier, hazard ratios, kill matrix, windows)
   Recording/    NeuroStats.cs (IStatsColumns: action shares, speed, food per meter)
   Views/        RayFanView.cs (AnimalView: draws the fan, each ray coloured by what it hit)
   Editor/       EvoSim.Neuro.Editor.asmdef: NeuralSpeciesMenu.cs (prey / predator, matched to a
                 JEV species), NeuralGenomeGeneEditor.cs (layout table, vector length),
-                AnimalInspector panel (inputs, action probabilities)
+                AnimalInspector panel (inputs, outputs), SurvivalReportWindow.cs (§6.2)
   Tests/        EvoSim.Neuro.Tests.asmdef (EditMode)
   Modules/      NeuroPrey.prefab, NeuroPredator.prefab, NeuroPreyBody.prefab, NeuroPredatorBody.prefab
 Assets/EvoSim/Scenes/     Neuro_Lab.unity, Prey_vs_Prey.unity, Brains_2x2.unity
@@ -169,9 +187,9 @@ One tick, for one neural animal (reference phases, unchanged):
 
 ```
 Sense ── RayFanSense.ReadAll (token)   InteroceptionSense (token)
-Ask brains ── attachments: RayFan float[rays × kinds], Interoception float[5]
+Ask brains ── attachments: RayFan float[12 rays × kinds], Interoception float[12]
           ── DecisionQuery{Species, Genome, Observation, Attachments}
-          ── NeuralBrain.Ask → BrainAnswer.Later → worker: encode → forward → softmax(5)
+          ── NeuralBrain.Ask → BrainAnswer.Later → worker: encode → forward → one-hot argmax(5)
           (JEV's batch for the JEV species is already in flight)
 Choose actions ── waits for both ── draws from <species>/sampling (DEC-20)
 Act ── left/right: heading ± turn, turn speed │ walk/run: straight │ stop: stay, rests
@@ -185,7 +203,7 @@ Hatch ── no mutator to wait for
 
 - **Layout** (`NeuralLayout.For(species)`, rebuilt at `Initialize`, hashed):
   - inputs, in sense order: a sense implementing `INeuralSense` contributes its attachment
-    width (`RayFanSense`: rays × kinds; `InteroceptionSense`: 5). Any other sense contributes
+    width (`RayFanSense`: rays × kinds; `InteroceptionSense`: 12). Any other sense contributes
     a one-hot of its tokens (the energy `LevelSense` costs 3). This exists only because the
     brain conformance suite runs every brain on the reference species (C6); no scenario
     uses it (owner: never a same-interface arm);
@@ -194,8 +212,8 @@ Hatch ── no mutator to wait for
   - **vector length** = Σ over layers of (fan-in + 1) × fan-out.
 - `Kind => AlleleKind.Vector`, `ReadByBrain => true` (so the weights are part of the
   brain-visible genome key), `Decimals => 4`.
-- Settings: `hidden` (default `[12]`), `activation` (tanh | sigmoid | relu), `init`
-  (Xavier | OldLab ±10), `founders` (default 64), `founderSeed`, `clamp` (|w| ≤ 10).
+- Settings: `hidden` (default `[12]`, owner), `activation` (tanh | sigmoid | relu), `init`
+  (Xavier | OldLab ±10), `founders` (default 256, owner), `founderSeed`, `clamp` (|w| ≤ 10).
 - **Founder pool** (GENE-20/21): `founders` random vectors from a private SplitMix64 seeded
   by `founderSeed` and the layout hash, never by the run seed. Every run therefore starts
   from the same random nets (the owner's naive start), and newcomers below the floor are
@@ -203,22 +221,25 @@ Hatch ── no mutator to wait for
   (a `NeuralFounderPool` asset) is left for later (§9).
 - `Check`: length equals the layout's, every value finite and within ±clamp.
 - `Express`: sets no traits; for the genes block it writes one summary line
-  (`- brain: "vec[725]#ab12cd34"`). The brain reads the values from `q.Genome` (C3).
+  (`- brain: "vec[1229]#ab12cd34"`). The brain reads the values from `q.Genome` (C3).
 
-**Sizes with the default templates** (7 rays, 12 hidden, 5 actions):
+**Sizes with the default templates** (12 rays, interoception 12, 12 hidden, 5 actions):
 
 | Template | Ray kinds | Inputs | Vector length |
 |---|---|---|---|
-| prey, asexual | Food, Threat, Kin, OtherAnimal, Cover, Carcass, Obstacle (7) | 7×7 + 5 = 54 | (54+1)·12 + (12+1)·5 = **725** |
-| prey, sexual | + ReadyKin (8) | 7×8 + 5 = 61 | **809** |
-| predator, asexual | Prey, Carcass, Kin, OtherAnimal, Cover, Threat, Obstacle (7) | 54 | **725** |
-| predator, sexual | + ReadyKin (8) | 61 | **809** |
+| prey, asexual (the measured runs) | Food, Threat, Kin, OtherAnimal, Cover, Carcass, Obstacle (7) | 12×7 + 12 = 96 | (96+1)·12 + (12+1)·5 = **1 229** (4.9 KB) |
+| prey, sexual | + ReadyKin (8) | 12×8 + 12 = 108 | **1 373** |
+| predator, asexual (the measured runs) | Prey, Carcass, Kin, OtherAnimal, Cover, Threat, Obstacle (7) | 96 | **1 229** |
+| predator, sexual | + ReadyKin (8) | 108 | **1 373** |
+
+The founder pool of 256 networks is about 1.3 MB per neural species, registered once per run.
 
 ### 5.2 `NeuralMutation : MutationOperator`, its own class of random float mutations
 
 - Separate from `LlmMutation` (text) and `GaussianMutation` (number):
   `Accepts(g) => g.Kind == AlleleKind.Vector`, so MUT-02 gives every vector gene this
   operator and no other.
+- Defaults are the owner's "Gentle" set.
 - `Rate` (MUT-01) = probability that a baby's network mutates (default 0.5). When it does,
   each weight independently:
   - with `pAdd` (default 0.05) gets a **random float added**, U(−`addStrength`, +`addStrength`)
@@ -248,11 +269,16 @@ Hatch ── no mutator to wait for
 
 ### 5.4 `RayFanSense : Sense, INeuralSense` and `WorldRayCaster`
 
-- **Fan.** `rays` (7), `fov` (120°), `range` (the `vision` trait, else 20 m), symmetric:
-  ray *i* at `−fov/2 + i·fov/(rays−1)` from the heading (one ray: straight ahead). This fixes
-  the old −25…+15° bug. An optional rear ray. Rays start at the body radius (0.5 m), so they
-  never hit the animal itself or the item it stands on ("on food" is an interoception input).
-- **What stops a ray: the first EvoSim object.** Along the ray, the nearest of:
+- **Fan.** `rays` (default 12), `fov` (default 360°), `range` (the `vision` trait, else 20 m).
+  - At 360° the rays are evenly spaced: ray *i* at `i·360°/rays` from the heading. Ray 0 looks
+    straight ahead, and with an even count one looks straight back. That gives all-round
+    vision like JEV's senses (owner).
+  - Below 360° the fan is symmetric: ray *i* at `−fov/2 + i·fov/(rays−1)` (one ray: straight
+    ahead). This fixes the old −25…+15° bug.
+  - Rays start at the body radius (0.5 m), so they never hit the animal itself or the item it
+    stands on ("on food" is an interoception input).
+- **What stops a ray: the first EvoSim object** (owner: everything occludes). Along the ray,
+  the nearest of:
 
   | Object | Found through | Kind channel |
   |---|---|---|
@@ -274,9 +300,25 @@ Hatch ── no mutator to wait for
 - Pure function of the start-of-tick state, no random draws (SENSE-03). `ReadAll` and `Read`
   give the same tokens (SENSE-31).
 
-`InteroceptionSense : Sense, INeuralSense`: attachment = energy/max, stamina/max,
-min(age/maturity, 1), ready to mate (0/1), standing on food or carcass (0/1). Token = the
-energy level (low/medium/high).
+`InteroceptionSense : Sense, INeuralSense`: the animal's own state, 12 inputs with 5 actions.
+Token = the energy level (low/medium/high).
+
+| Input | Width | Value |
+|---|---|---|
+| energy | 1 | energy / max |
+| stamina | 1 | stamina / max |
+| age | 1 | min(age / maturity, 1) |
+| ready to mate | 1 | 0 / 1 |
+| on food | 1 | 1 when a grazeable item (prey) or an edible carcass (predator) is within reach |
+| **in cover** (owner) | 1 | 1 when a cover service hides it from at least one threat species (`World.Queries.IsHiddenFrom`); for a species with no threat, 1 when it stands in cover |
+| **previous action** (owner) | 5 (the action count) | one-hot of `a.Action`, the action it did last tick; all zeros before its first decision. Read from the animal's record, so no hidden state (CORE-05) |
+| **ticks since last meal** (owner) | 1 | min(ticks / `hungerHorizon`, 1), `hungerHorizon` = 200 by default |
+
+"Ticks since last meal" needs per-animal state, so `HungerClock` (a species module) declares
+two stats (CORE-05): `neuro.mealsSeen` and `neuro.sinceMeal`. Each tick, in the death phase
+(the hook the thirst recipe uses, 22 §1, returning no cause of death), it resets `sinceMeal`
+to 0 when `a.Meals` grew and adds 1 otherwise. `InteroceptionSense` has
+`[RequiresModule(typeof(HungerClock))]`.
 
 ### 5.5 The five actions: `NeuralAction` and its subclasses
 
@@ -304,18 +346,23 @@ walk-speed prey (1 m/tick) turns on a radius of about 2.9 m (1 / 0.349 rad).
 
 ### 5.6 `NeuralBrain : Brain` (a world service)
 
-- `Id => $"neural-{policy}-{tau:0.##}"`, `Memoizable => false`, `useCache` off,
+- `Id => "neural-greedy"` (or `$"neural-sample-{tau:0.##}"`), `Memoizable => false`, `useCache` off,
   `AcceptsAttachments => true`, `CanMixSpecies => true`, `ReadsGeneText => false` (C5),
   `MaxActions` unlimited, `MaxPromptTokens => 0`, not strict.
 - `[RequiresModule(typeof(NeuralGenomeGene))]`: validation offers to add it, and the brain
   conformance suite adds it (C6).
 - **Ask:** on the main thread, encode each query into a pooled `float[]` (one-hot tokens and
   attachments, in layout order) and take the weights from `q.Genome[gene.Locus].Value.Vector`.
-  Then `BrainAnswer.Later(n)` and `Task.Run`: forward pass, softmax, `SetRow`/`Fail`,
+  Then `BrainAnswer.Later(n)` and `Task.Run`: forward pass, policy, `SetRow`/`Fail`,
   `Complete`. Below `syncBelow` queries (default 32) it computes inline (`BrainAnswer.Now`).
-- **Policy:** `Sample` gives softmax with the brain's own τ. `Greedy` gives a one-hot of the
-  argmax (ties go to the lower index). The World's τ (DEC-20) applies on top and is world-wide,
-  so keep it at 1 in mixed worlds.
+- **Policy:** **`Greedy` (default, owner)** gives a one-hot of the argmax, ties to the lower
+  index. The draw from the sampling stream then always returns that action, and the World's τ
+  can't change a one-hot row. `Sample` (a setting) gives softmax with the brain's own τ, and
+  the World's τ (DEC-20) applies on top of it.
+- **Steering loops:** a greedy, deterministic policy can lock into a loop (circling, or
+  walking into a wall). The previous-action input (§5.4) and mutation are what break such
+  loops. `NeuroStats` counts the share of animals that did the same action for 50 ticks in a
+  row, so loops show up in the stats.
 - **Failures:** no genome, wrong length or a NaN gives `Fail(i, reason)`, never a made-up row
   (DEC-40).
 - `NeuralNet` is allocation-free (`Span<float>`). It is the test oracle for the Burst path.
@@ -356,15 +403,17 @@ JEV predator's diet and to the cover's hiding species (§6.2).
 - S29–S31 are functional checks (the L0 versions in CI, a 10-minute T4 smoke run with JEV).
   Only S32 and S33 get the measured runs of §6.3 (owner).
 - Every scenario has an asexual and a sexual version (the World's control "C7 ASEXUAL" of 15,
-  switches every species at once) on Lab1_Small's map. The measured runs use asexual for now
-  (§6.3).
+  switches every species at once). The measured runs use asexual for now (§6.3).
+- Maps: the functional scenarios (S29–S31 and the L0 versions) use Lab1_Small's map, which is
+  cheap. The measured S32 and S33 use **Lab1_Full** (owner), whose populations are large
+  enough for a neural predator species to evolve.
 - Each has an L0 variant where JEV is replaced by `RandomBrain` or `ScriptedBrain`, so CI
   covers every pairing without a server.
 - **Rates:** decision periods are the species' `DecisionSchedule` values (JEV reference: 4,
   staggered; neural default: 1) and can be overridden per scenario. The World's run speed is
   the World's setting: Fast without JEV, and in lockstep with JEV each tick lasts as long as
-  JEV's batch (SPACE-13). The neural work, about 150 animals × (rays + a 725-weight forward
-  pass) ≈ 1 ms, runs on a worker inside that wait.
+  JEV's batch (SPACE-13). The neural work runs on a worker inside that wait: in S32 at the
+  caps, about 340 neural animals × (12 rays + a 1 229-weight forward pass), a few ms.
 - **What adding neural species does to JEV species:** their signatures, senses and prompts
   don't change, so their answer caches stay valid. Their streams are per species (RAND-03).
   Run hashes differ, and comparisons are made within a scenario.
@@ -382,9 +431,9 @@ JEV predator's diet and to the cover's hiding species (§6.2).
   preys graze the same Grass. `Cover` hides both preys from both predators (its hiding-species
   list names both, V-79).
 - Fairness: matched body and life settings (V-78), equal initial populations and caps per role
-  (Lab1_Small's: prey 24 / cap 40, predators 4 / cap 6, floor as reference), grass regrowth ×2
-  because two species graze (a scenario setting). Same map for every run (World seed, RAND-04);
-  only the run seed varies.
+  (Lab1_Full's, owner: prey 136 / cap 270 / floor 10, predators 28 / cap 68 / floor 3, per
+  species), and grass regrowth ×2 because two species graze (owner, a scenario setting). Same
+  map for every run (World seed, RAND-04); only the run seed varies.
 - S33 is the same world without both predators: `prey` and `prey-nn`, the same Grass at ×2,
   the same caps. The neural prey keeps the same ray kinds as in S32 (its `Threat` channel
   stays at 0), so the two scenarios' neural prey have the same layout.
@@ -400,32 +449,47 @@ JEV predator's diet and to the cover's hiding species (§6.2).
   - There is no same-interface arm (owner: never). The comparison is between whole
     controllers: JEV with its senses, sentences and six actions, against the network with its
     rays and five steering actions.
-- **Floor:** with the reference floor, newcomers hide extinctions, so the count of newcomers
-  needed per species is itself a result (POP-05). A floor-0 variant gives times to extinction.
+- **Floor: on** (owner). Newcomers (random networks for the neural species) keep every species
+  alive, and the number each species needed is a result (POP-05). No extinction variant.
 
 **Survival measures, per species** (from `events.jsonl`; migration and the run's end are
 censoring, not death):
 
 | Measure | Definition |
 |---|---|
-| Survival curve | Kaplan–Meier over age, deaths = killed, starvation, old age |
-| Cause-specific hazards | deaths by cause per 1 000 animal-ticks alive |
+| **Death hazard ratio (headline, owner)** | per role, neural vs JEV: the ratio of death rates (deaths per animal-tick, all causes but migration) in the late windows, with its 95 % interval; below 1 means the neural species survives better |
+| Survival curve | Kaplan–Meier over age (deaths = killed, starvation, old age), with Greenwood bands; median lifespan |
+| Cause-specific hazards | deaths by cause per 1 000 animal-ticks alive, and their neural/JEV ratios |
 | Juvenile survival | share of animals born that reach maturity |
 | Reproductive success | offspring per animal over its life; share that ever breed |
-| Persistence | newcomers needed (floor on); tick of extinction (floor 0) |
+| Persistence | newcomers needed per 1 000 ticks |
 | Population | mean and range over time; share of ticks at the cap |
-| **Kill matrix** | kills by killer species × victim species (2×2), per 1 000 predator-ticks and per 1 000 prey-ticks |
-| Predator success | kills and scavenged portions per predator-tick; starvation hazard |
+| **Kill matrix** (S32) | kills by killer species × victim species (2×2), per 1 000 predator-ticks and per 1 000 prey-ticks |
+| Predator success (S32) | kills and scavenged portions per predator-tick; starvation hazard |
 
-- `SurvivalStats` (world module, `IStatsColumns`) writes live columns to `stats.csv`:
-  alive, births, deaths by cause, and kills by the killer's species for each species. At the
-  end it writes `survival.json` with the measures above.
-- An offline script (Python, next to the existing long-run analysis) reads the runs. It
-  produces Kaplan–Meier curves with confidence bands and hazard ratios JEV vs neural within each
-  role, with the intervals computed from individual animals: a run has thousands of deaths. It
-  also produces the kill matrix per window. The brain effect within each role is read from the
-  rows and columns of the 2×2. The interaction (for example, the neural prey doing better
-  against the neural predator than against JEV) is read from the kill matrix.
+"Late windows" are the last three 2 000-tick windows, the ones the plateau rule (§6.3)
+checked. Every measure is also given per window, so the bootstrap from random networks shows.
+
+**The analysis is C# in the editor** (owner):
+- `SurvivalStats` (world module, `IStatsColumns`) writes live columns to `stats.csv`: alive,
+  births, deaths by cause, and kills by the killer's species, for each species. At the end it
+  writes `survival.json`.
+- `SurvivalAnalysis` (pure C#, in `EvoSim.Neuro`, unit-tested) reads a run's `events.jsonl`. It
+  rebuilds each animal's life: birth or arrival, death with cause, age and killer; migration
+  and the run's end count as censoring. From these it computes:
+  - Kaplan–Meier curves with Greenwood intervals;
+  - death-rate ratios as the hazard ratios, with a 95 % interval from the log rate ratio
+    (SE = √(1/d₁ + 1/d₂), d = deaths in each species;
+    a constant-hazard model per window, no regression library);
+  - the kill matrix and every per-window measure.
+- `SurvivalReportWindow` (`Window ▸ EvoSim ▸ Survival Report`, `EvoSim.Neuro.Editor`) opens
+  one or more run folders. It shows:
+  - the curves and the per-window plots, drawn with the editor's own drawing (no package);
+  - the kill matrix, and the headline table per seed and pooled.
+
+  It also writes the markdown report and CSV tables. The brain effect within each role is read
+  from the rows and columns of the 2×2. The interaction (for example, the neural prey doing
+  better against the neural predator than against JEV) is read from the kill matrix.
 - With 2 seeds there is no between-seed error bar. Each measure is reported per seed and
   pooled. An effect counts only when it points the same way in both seeds and its pooled
   interval excludes zero.
@@ -436,6 +500,7 @@ censoring, not death):
 
 | | S33 PreyVsPrey | S32 Brains2x2 |
 |---|---|---|
+| Map and populations | Lab1_Full, 2 prey species | Lab1_Full, 2 prey + 2 predator species |
 | Arms | default rate, matched rate | default rate, matched rate |
 | Seeds | 2 (run seeds 1 and 2; same World seed, so the same map) | 2 |
 | Mating | **asexual for every species** (the World's control "C7 ASEXUAL" of 15) | same |
@@ -450,12 +515,12 @@ the scenario sets both:
   runs start with an empty answer cache; the first run's cost measure includes that.
 - **Their choice.** A JEV animal still breeds only when its brain picks `mate` and it is ready
   (REPRO-04). A neural animal has no `mate` action: every one of its actions has
-  `Mates => true`, so it breeds whenever it is ready, as the old lab's animals did. This
-  difference is part of the controllers being compared, and the report states it. The per-action
-  `mates` setting (§5.5) can restrict neural breeding to `stop` if the owner wants breeding to
-  cost a choice.
+  `Mates => true`, so it breeds whenever it is ready, as the old lab's animals did (owner:
+  kept). This difference is part of the controllers being compared, and the report states it.
+  The per-action `mates` setting (§5.5) stays available for later experiments.
 
-**"Long enough" is a stop rule, not a guess** (`PlateauStop`, a world module that requests a
+**"Long enough" is a stop rule, not a guess** (owner: kept as proposed; `PlateauStop`, a world
+module that requests a
 clean stop at a tick boundary, RAND-20). A run stops at the first window boundary where both
 of these hold:
 1. **at least 50 generations** of every neural species (its mean generation over the window);
@@ -464,13 +529,15 @@ of these hold:
    stay within ±10 % of their mean.
 
 There is a hard cap (default 60 000 ticks) for a species that never settles; the report then
-says so. A species that dies out with the floor at 0 also ends its run. Both seeds of an arm
+says so. Both seeds of an arm
 then run to the **larger** of their stop ticks, rounded up to 5 000, so the two seeds cover
 the same length. That costs one resumed run (RAND-21: the shorter seed replays from its
 caches and continues).
 
 **Cost, to measure on the first run.** JEV sets the tick rate. In S33 one JEV species decides
-(about the Lab1_Small prey load); in S32 two do. Runs are resumable (stop file, answer caches),
+(the Lab1_Full prey load, up to 270 animals on a staggered period of 4); in S32 two do (prey
+and predators, up to 338). The asexual prompt override also starts the answer cache empty.
+Runs are resumable (stop file, answer caches),
 so a long run can be split over several sessions. The first S33 run measures seconds per tick
 and the stop tick, and the owner confirms the remaining runs before they start.
 
@@ -485,7 +552,7 @@ and the stop tick, and the owner confirms the remaining runs before they start.
 | V-74 | info | a neural species decides less often than every tick (it steers late); expected in the matched-rate arm |
 | V-75 | warning | a contact the diet can't use (Strike without a striking diet entry…) |
 | V-76 | error | ray fan: rays < 1, fov ∉ (0, 360], range ≤ 0, no kind enabled |
-| V-77 | info | the World's sampling τ ≠ 1 also tempers the neural species' rows |
+| V-77 | info | a neural species on the `Sample` policy in a World whose sampling τ ≠ 1: τ tempers its rows too (the default Greedy policy is immune) |
 | V-78 | warning | a matched pair differs in a body or life setting (lists each one: speed, stamina, metabolism, maturity, mating, litter, diet energy, cap…) |
 | V-79 | warning | a matched pair is treated differently by the world: a predator's diet or a cover's hiding species names one of the pair but not the other |
 
@@ -497,15 +564,15 @@ and the stop tick, and the owner confirms the remaining runs before they start.
 | T-NEURO-02 | gene conformance (T-GENE-01) for `NeuralGenomeGene`; vector length = the layout formula for 1–3 senses, 1–8 actions, 0–2 hidden layers; the random founder pool is identical in two worlds with different run seeds (GENE-21); adding an action → V-71 |
 | T-NEURO-03 | the T-MUT suite passes for `NeuralMutation`: same stream → same mutant; the mutant differs from its parent; `Check` passes; clamped; over 10 000 mutations the share of added and replaced weights matches pAdd and pReplace within 4 s.e. |
 | T-NEURO-04 | `NeuronCrossover`: each neuron slice comes whole from one parent; same stream → same baby; a recombinant is registered once with both parents (C7); a child equal to a parent reuses its allele |
-| T-NEURO-05 | fan angles symmetric for 1, 2, 5, 7 rays; food 3 m ahead → centre ray Food proximity 0.85; a kin 2 m ahead hides food 3 m behind it (first object); a prey in cover → the ray stops at the cover cell; killed → passes through; the world edge → Obstacle; equal distance → kind order; in a 4-species world both predators read as Threat to both preys |
-| T-NEURO-06 | `ReadAll` = `Read` over 500 animals (SENSE-31, T-SENSE-09) |
-| T-NEURO-07 | brain conformance (T-DEC-03) with the companions (C6), on the reference prey and on both neural templates; rows sum to 1; Greedy is one-hot; a query without a genome → `Fail` |
+| T-NEURO-05 | 360° fan: 12 rays at 0°, 30° … 330° from the heading, none doubled at ±180°; partial fans symmetric for 1, 2, 5, 7 rays; food 3 m ahead → ray 0 Food proximity 0.85; a kin 2 m ahead hides food 3 m behind it (first object); a prey in cover → the ray stops at the cover cell; killed → passes through; the world edge → Obstacle; equal distance → kind order; in a 4-species world both predators read as Threat to both preys |
+| T-NEURO-06 | `ReadAll` = `Read` over 500 animals (SENSE-31, T-SENSE-09); interoception: in-cover flag set only where a cover hides the animal from a threat, previous action one-hot (zeros before the first decision), ticks since last meal resets on a graze, strike or scavenge and grows by 1 per tick, clamped at `hungerHorizon` |
+| T-NEURO-07 | brain conformance (T-DEC-03) with the companions (C6), on the reference prey and on both neural templates; rows sum to 1; Greedy is a one-hot on the largest output (ties → lower index) and the drawn action is always it, whatever the World's τ; a query without a genome → `Fail` |
 | T-NEURO-08 | async: `Later` with a slow `FakeHttpTransport` JEV in the same world → the tick completes and neural rows equal the synchronous ones; Freeze vs Responsive and Fast vs RealTime → the same hash (SPACE-11, SPACE-14) |
 | T-NEURO-09 | actions: action conformance with `SelfDirected` (C4); `left` for 9 ticks → heading −20°/tick at walk speed; angle 35° and speed Run → −35°/tick at run speed; `walk`/`run` keep the heading; `stop` doesn't move, charges the rest cost, recovers stamina |
 | T-NEURO-10 | contacts: grass 0.8 m ahead → the neural prey walks and grazes the same tick; a prey 0.8 m ahead → the neural predator strikes, gets busy, leaves a carcass; `stop` on food → grazes; at most one interaction per tick (ACT-03) |
 | T-NEURO-11 | breeding: asexual → a ready animal breeds alone and pays the litter; sexual → only on contact with a ready kin, the baby's network is a neuron mix; in both, mutation with probability `Rate` |
 | T-NEURO-12 | templates: `NeuroPrey`/`NeuroPredator` built against the reference species → V-78 silent; change the neural prey's run speed → V-78 names it; the JEV predator's diet without `prey-nn` → V-79 |
-| T-NEURO-13 | `SurvivalStats` on a scripted 4-species run: deaths by cause and kills by killer species equal the events; migrated animals are censored, not dead; the kill matrix sums to the kills |
+| T-NEURO-13 | `SurvivalStats` on a scripted 4-species run: deaths by cause and kills by killer species equal the events; migrated animals are censored, not dead; the kill matrix sums to the kills. `SurvivalAnalysis` on hand-made event logs: Kaplan–Meier and Greenwood values equal a worked textbook example; the rate ratio and its interval equal hand-computed values; censoring at the run's end and at migration |
 | T-NEURO-14 | `PlateauStop` on scripted measures: no stop before 50 generations; stops at the first window boundary of a ±10 % plateau over three windows; stops at the cap otherwise; the run's outputs are complete (RAND-20) |
 | T-NEURO-15 (T2) | S29 asexual and sexual for 5 000 ticks, and the L0 versions of S30–S33: the same seed twice → the same hash; evolved neural prey eat more grass per animal-tick than the random founder pool under the no-mutation control (measured first, then pinned as a gate) |
 | T-NEURO-16 (T4) | S32 and S33 with JEV: 10 minutes each, never stall on the neural brain, JEV cache hit rate within ±5 points of Lab1 alone; `survival.json` written; a stopped run resumes and gives the hash of an unbroken one |
@@ -516,13 +583,13 @@ and the stop tick, and the owner confirms the remaining runs before they start.
 |---|---|---|
 | **M16.1** Core | C1–C7 with their tests; spec text in 07, 08, 09, 13, 30 | 466 + new EditMode tests green; R-01 unchanged |
 | **M16.2** Genes | `NeuralLayout`, `NeuralNet`, `NeuralGenomeGene`, `NeuralMutation`, `NeuronCrossover` | T-NEURO-01…04 |
-| **M16.3** Senses | `WorldRayCaster`, `RayFanSense`, `InteroceptionSense`, `RayFanView` | T-NEURO-05, 06; the fan visible in a sandbox |
+| **M16.3** Senses | `WorldRayCaster`, `RayFanSense`, `InteroceptionSense`, `HungerClock`, `RayFanView` | T-NEURO-05, 06; the fan visible in a sandbox |
 | **M16.4** Brain | `NeuralBrain` (sync), Sample/Greedy | T-NEURO-07 |
 | **M16.5** Actions | `NeuralAction`, `TurnAction`, `ForwardAction`, `StopAction`, contacts, mating both ways | T-NEURO-09…11 |
 | **M16.6** Templates and pairings | `NeuroPrey`, `NeuroPredator`, the menu, `MatchedPairs` (V-78, V-79), `Neuro_Lab` scene, S29–S31 and their L0 versions, `NeuroStats`, inspector panel | T-NEURO-12, T-NEURO-15 (S29–S31); the owner watches S29 |
-| **M16.7** Comparison scenarios | `Prey_vs_Prey` and `Brains_2x2` scenes, S33 and S32 with both arms, `SurvivalStats`, `PlateauStop`, `survival.json`, the analysis script, the report template, docs chapter `Docs/Interface/16-neural-species.md` and site page `extending/neural-species.md` | T-NEURO-13, 14, 15 (S32/S33 L0), 16 |
+| **M16.7** Comparison scenarios | `Prey_vs_Prey` and `Brains_2x2` scenes on Lab1_Full's map, S33 and S32 with both arms, `SurvivalStats`, `PlateauStop`, `survival.json`, `SurvivalAnalysis`, `SurvivalReportWindow` and its markdown report, docs chapter `Docs/Interface/16-neural-species.md` and site page `extending/neural-species.md` | T-NEURO-13, 14, 15 (S32/S33 L0), 16 |
 | **M16.8** Concurrency and scale | async `Later` path, pooled attachments, one fan per animal per tick (a per-tick buffer in a world service), optional Burst `IJobParallelFor` forward pass and ray march behind `ReadAll` (same results as the managed oracle), C8 if needed. Before the measured runs, so they don't pay for slow code | T-NEURO-08; the 20 §9 budget at 300 neural animals |
-| **M16.9** Measured runs | §6.3: the first S33 run (default rate, seed 1) measures the cost and the stop tick; with the owner's go, the other 7 runs; one report per scenario and arm | 8 runs done; reports written |
+| **M16.9** Measured runs | §6.3: the first S33 run (default rate, seed 1) measures the cost and the stop tick; with the owner's go, the other 7 runs; one Survival Report per scenario and arm | 8 runs done; reports written |
 | *Later* | a `NeuralFounderPool` asset (networks exported from a run, used as founders); §10 | — |
 
 ## 10. Later: a DRL brain on the same species
@@ -549,18 +616,19 @@ the door open.
 
 ## 12. Still open
 
-Nothing blocks M16.1–M16.8. Before the measured runs (M16.9):
-
-1. **Breeding as a choice for the neural species:** in the asexual runs it breeds whenever it
-   is ready, while JEV breeds only when it picks `mate` (§6.3). Keep that (recommended: the
-   owner's five actions, the old lab's regime, stated in the report), or let only `stop` breed?
+Nothing. The only gate left is in M16.9: the first measured run reports its cost and stop
+tick, and the owner gives the go for the other seven.
 
 ## 13. Risks
 
 - **Fairness of the 2×2:**
-  - The JEV and neural species differ in their interface (senses, actions, breeding without a
-    mate choice) as well as in their brain. Whole controllers are compared (owner). The
-    matched-rate arm takes out the decision rate; the report lists the remaining differences.
+  - The JEV and neural species differ in their interface as well as in their brain. Whole
+    controllers are compared (owner). The matched-rate arm takes out the decision rate; the
+    report lists the remaining differences:
+    - senses: JEV's see through cover and animals, the neural rays don't (owner: everything
+      occludes);
+    - action choice: JEV samples, the network is greedy (owner);
+    - breeding: JEV picks `mate`, the network breeds whenever it is ready (owner).
   - JEV's founders are curated sentences and the neural founders random networks (owner),
     so early windows measure the bootstrap more than the brain. The plateau rule (§6.3) and
     the per-window report keep the two apart: compare the late windows.
@@ -568,16 +636,20 @@ Nothing blocks M16.1–M16.8. Before the measured runs (M16.9):
     evolution. Their count is reported as a result (POP-05), not hidden.
 - **Two seeds** show whether an effect repeats, not how large its spread is. Intervals come
   from individual animals within runs, and an effect must agree in both seeds (§6.2).
-- **Run time:** JEV sets the tick rate. S32 has two JEV species and about doubles the JEV load
-  of Lab1_Small. The plateau rule may ask for tens of thousands of ticks. The first S33 run
-  measures the cost before the other seven start.
-- **Memory:** every allele keeps its vector for the run's lineage, about 3 KB × 10 000 mutants
-  and recombinants ≈ 30 MB per neural species. Mitigation: float16 storage, or drop the values
-  of extinct alleles after they reach `vectors.jsonl`.
+- **Run time:** JEV sets the tick rate. On Lab1_Full, S32 has two JEV species at reference
+  sizes, the heaviest JEV load of any scene so far. The plateau rule may ask for tens of
+  thousands of ticks. The first S33 run measures the cost before the other seven start.
+- **Memory:** every allele keeps its vector for the run's lineage, about 4.9 KB × 10 000
+  mutants ≈ 49 MB per neural species, plus 1.3 MB of founders. Lab1_Full's larger populations
+  make more mutants. Mitigation: float16 storage, or drop the values of extinct alleles after
+  they reach `vectors.jsonl`.
+- **Greedy loops:** a deterministic policy can circle or push into a wall for many ticks. The
+  previous-action input and mutation should break it; `NeuroStats` measures it (§5.6).
 - **Determinism across code paths:** the managed and Burst forward passes may differ in the last
   bit. Pick one path per run; the Burst job uses `FloatMode.Strict` and is checked against the
   managed oracle (RAND-12 limits hash comparisons to one machine).
-- **The world-wide τ** also tempers neural rows (V-77). Keep τ = 1 in mixed worlds.
+- **The world-wide τ** would temper neural rows under the `Sample` policy (V-77). The default
+  Greedy policy is immune; keep τ = 1 in mixed worlds anyway, as JEV's reference.
 - **Hidden assumptions:** windows or tools that treat "not text" as "number" (Gene Pool,
   Ask-the-Brain, integrity gates) need a vector branch. They are listed in C2/C3; the M16.1
   tests read every window's text for vector genes.
