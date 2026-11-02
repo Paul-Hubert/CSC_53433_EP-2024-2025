@@ -1,7 +1,7 @@
 # Plan — neural prey and predators beside JEV, and a 2×2 brain comparison (M16)
 
 Status: **plan, not started.** Written 2026-11-02 against `llm-evolution` at 2fdd431;
-revised twice the same day with the owner's answers (§1). Still open: §12.
+revised three times the same day with the owner's answers (§1). Still open: §12.
 
 ## 0. In one paragraph
 
@@ -17,6 +17,8 @@ length follows the observation and action sizes. **Mutation is its own class of 
 changes**. Breeding is **sexual or asexual**, a setting. Scenarios cover every pairing of
 prey and predator brains. The big one puts **two prey species and two predator species
 (JEV and neural for each role) in one world, a 2×2 design that compares survival rates**.
+A prey-vs-prey world does the same without predators. Those two are measured with 2 seeds
+each, from random neural founders, until a plateau rule says the run is long enough.
 Everything is C#, deterministic, and kept within the EvoSim contract. The contract needs eight
 small additions to core (§4), and none of them changes an existing run.
 
@@ -33,6 +35,9 @@ small additions to core (§4), and none of them changes an existing run.
 | 7 | Mutation | **A separate class, random float mutations** (`NeuralMutation`), apart from the LLM and Gaussian operators | §5.2 |
 | 8 | Turning | **The defaults are fine, and they must be tunable**: turn angle and turn speed are Inspector settings of the turn actions | §5.5 |
 | 9 | The big scenario | **Two prey species and two predator species, JEV and neural for each role (2×2), in one world, to compare survival rates** | D8, §6.2 |
+| 10 | Neural founders in the comparisons | **Random networks** (the naive start); no pre-evolved pool | §6.2 |
+| 11 | Decision rate in the comparisons | **Both**: the neural default (every tick) as the main arm, and the matched-rate arm (period 4, staggered, like JEV) as a variant | §6.2 |
+| 12 | Measured runs | **2 seeds, run long enough, only for the prey-vs-prey and 2×2 scenarios**; the other pairings are functional checks | §6.3 |
 
 ## 2. Where it comes from: the previous lab
 
@@ -145,16 +150,16 @@ Assets/EvoSim/Neuro/
   Actions/      NeuralAction.cs (base: contacts, Mates, SelfDirected)
                 TurnAction.cs (left | right)   ForwardAction.cs (walk | run)   StopAction.cs
   Comparison/   MatchedPairs.cs (WorldModule: pairs + V-78)   SurvivalStats.cs (WorldModule, IStatsColumns)
-  Founders/     NeuralFounderPool.cs (asset: networks exported from a run, used as founders)
+                PlateauStop.cs (WorldModule: the "long enough" stop rule of §6.3)
   Recording/    NeuroStats.cs (IStatsColumns: action shares, speed, food per meter)
   Views/        RayFanView.cs (AnimalView: draws the fan, each ray coloured by what it hit)
   Editor/       EvoSim.Neuro.Editor.asmdef: NeuralSpeciesMenu.cs (prey / predator, matched to a
                 JEV species), NeuralGenomeGeneEditor.cs (layout table, vector length),
-                ExportFounders.cs, AnimalInspector panel (inputs, action probabilities)
+                AnimalInspector panel (inputs, action probabilities)
   Tests/        EvoSim.Neuro.Tests.asmdef (EditMode)
   Modules/      NeuroPrey.prefab, NeuroPredator.prefab, NeuroPreyBody.prefab, NeuroPredatorBody.prefab
-Assets/EvoSim/Scenes/     Neuro_Lab.unity, Brains_2x2.unity
-Assets/EvoSim/Scenarios/  S29–S32 (§6)
+Assets/EvoSim/Scenes/     Neuro_Lab.unity, Prey_vs_Prey.unity, Brains_2x2.unity
+Assets/EvoSim/Scenarios/  S29–S33 (§6)
 ```
 
 One tick, for one neural animal (reference phases, unchanged):
@@ -186,11 +191,12 @@ Hatch ── no mutator to wait for
 - `Kind => AlleleKind.Vector`, `ReadByBrain => true` (so the weights are part of the
   brain-visible genome key), `Decimals => 4`.
 - Settings: `hidden` (default `[12]`), `activation` (tanh | sigmoid | relu), `init`
-  (Xavier | OldLab ±10), `founders` (default 64), `founderSeed`, `founderPool` (an optional
-  `NeuralFounderPool` asset, used instead of random founders), `clamp` (|w| ≤ 10).
-- **Founder pool** (GENE-20/21): either the asset's networks or `founders` random vectors
-  from a private SplitMix64 seeded by `founderSeed` and the layout hash, never by the run
-  seed. Every run therefore starts from the same nets. There is no neutral allele.
+  (Xavier | OldLab ±10), `founders` (default 64), `founderSeed`, `clamp` (|w| ≤ 10).
+- **Founder pool** (GENE-20/21): `founders` random vectors from a private SplitMix64 seeded
+  by `founderSeed` and the layout hash, never by the run seed. Every run therefore starts
+  from the same random nets (the owner's naive start), and newcomers below the floor are
+  drawn from the same pool. There is no neutral allele. Loading evolved networks as founders
+  (a `NeuralFounderPool` asset) is left for later (§9).
 - `Check`: length equals the layout's, every value finite and within ±clamp.
 - `Express`: sets no traits; for the genes block it writes one summary line
   (`- brain: "vec[725]#ab12cd34"`). The brain reads the values from `q.Genome` (C3).
@@ -338,8 +344,14 @@ JEV predator's diet and to the cover's hiding species (§6.2).
 | **S29 NeuroLab** | neural | neural | none | **T2 (CI)** |
 | **S30 JevPreyNeuroPredator** | JEV | neural | JEV | T4 |
 | **S31 NeuroPreyJevPredator** | neural | JEV | JEV | T4 |
-| **S32 Brains2x2** (§6.2) | JEV **and** neural | JEV **and** neural | JEV | T4 |
+| **S32 Brains2x2** (§6.2) | JEV **and** neural | JEV **and** neural | JEV | T4, **measured** |
+| **S33 PreyVsPrey** (§6.2) | JEV **and** neural | none | JEV | T4, **measured** |
 
+- S33 is the 2×2 without its predators: the two prey species share the grass and nothing
+  hunts them, so it isolates foraging and breeding from escaping. That is how this plan reads
+  "prey vs prey"; adding the JEV predator back would make it S32 minus `predator-nn`.
+- S29–S31 are functional checks (the L0 versions in CI, a 10-minute T4 smoke run with JEV).
+  Only S32 and S33 get the measured runs of §6.3 (owner).
 - Each runs asexual and sexual (a scenario override of the mating rule) on Lab1_Small's map.
 - Each has an L0 variant where JEV is replaced by `RandomBrain` or `ScriptedBrain`, so CI
   covers every pairing without a server.
@@ -352,7 +364,7 @@ JEV predator's diet and to the cover's hiding species (§6.2).
   don't change, so their answer caches stay valid. Their streams are per species (RAND-03).
   Run hashes differ, and comparisons are made within a scenario.
 
-### 6.2 S32 Brains2x2: survival rates of four species in one world
+### 6.2 S32 Brains2x2 and S33 PreyVsPrey: survival rates in one world
 
 **Design.**
 
@@ -368,16 +380,20 @@ JEV predator's diet and to the cover's hiding species (§6.2).
   (Lab1_Small's: prey 24 / cap 40, predators 4 / cap 6, floor as reference), grass regrowth ×2
   because two species graze (a scenario setting). Same map for every run (World seed, RAND-04);
   only the run seed varies.
-- **Arms** (scenario overrides):
-  - *Naive*: neural founders are random networks. JEV founders are curated sentences, so this
-    arm measures how fast evolution catches up from nothing.
-  - *Pre-evolved* (recommended main arm): neural founders come from a `NeuralFounderPool` exported
-    from the last generation of an S29 run of the same length.
-  - *Matched rate*: neural species on period 4, staggered, like JEV. This separates "better
-    controller" from "decides 4× more often".
-  - *Same interface* (optional): `NeuralBrain` driving species with JEV's own senses and actions
-    (one-hot tokens, the reference actions). This separates the brain from the ray/steering
-    interface.
+- S33 is the same world without both predators: `prey` and `prey-nn`, the same Grass at ×2,
+  the same caps.
+- **Neural founders are random networks** (owner): every run starts the neural species from
+  the gene's seeded random pool, and newcomers below the floor come from it too. JEV founders
+  are curated sentences, so the comparison includes how fast evolution gets a random network
+  to survive. The survival measures are therefore reported per time window (§6.3), not only
+  over the whole run.
+- **Arms** (scenario overrides; both measured, owner):
+  - *Default rate* (main): neural species decide every tick (their `DecisionSchedule` period 1).
+  - *Matched rate* (variant): neural species on period 4, staggered, like JEV. This separates
+    "better controller" from "decides 4× more often".
+  - *Same interface* (optional, not measured unless the owner asks, §12): `NeuralBrain` driving
+    species with JEV's own senses and actions (one-hot tokens, the reference actions). This
+    separates the brain from the ray/steering interface.
 - **Floor:** with the reference floor, newcomers hide extinctions, so the count of newcomers
   needed per species is itself a result (POP-05). A floor-0 variant gives times to extinction.
 
@@ -398,13 +414,45 @@ censoring, not death):
 - `SurvivalStats` (world module, `IStatsColumns`) writes live columns to `stats.csv`:
   alive, births, deaths by cause, and kills by the killer's species for each species. At the
   end it writes `survival.json` with the measures above.
-- An offline script (Python, next to the existing long-run analysis) pools runs: Kaplan–Meier
-  curves with confidence bands, hazard ratios JEV vs neural within each role, and the kill
-  matrix with mean ± s.e. over seeds. The brain effect within each role is read from the rows
-  and columns of the 2×2. The interaction (for example, the neural prey doing better against the
-  neural predator than against JEV) is read from the kill matrix.
-- Report: one page per scenario arm, `Logs/EvoSim/Reports/2x2-<date>.md`, with the settings
-  that differed between arms.
+- An offline script (Python, next to the existing long-run analysis) reads the runs. It
+  produces Kaplan–Meier curves with confidence bands and hazard ratios JEV vs neural within each
+  role, with the intervals computed from individual animals: a run has thousands of deaths. It
+  also produces the kill matrix per window. The brain effect within each role is read from the
+  rows and columns of the 2×2. The interaction (for example, the neural prey doing better
+  against the neural predator than against JEV) is read from the kill matrix.
+- With 2 seeds there is no between-seed error bar. Each measure is reported per seed and
+  pooled. An effect counts only when it points the same way in both seeds and its pooled
+  interval excludes zero.
+- Report: one page per scenario and arm, `Logs/EvoSim/Reports/<S32|S33>-<arm>-<date>.md`,
+  with the settings that differed between arms.
+
+### 6.3 Measured runs: 2 seeds, long enough
+
+| | S33 PreyVsPrey | S32 Brains2x2 |
+|---|---|---|
+| Arms | default rate, matched rate | default rate, matched rate |
+| Seeds | 2 (run seeds 1 and 2; same World seed, so the same map) | 2 |
+| Mating | the reference rule (sexual); asexual only if the owner asks | same |
+| Runs | 2 arms × 2 seeds = 4 | 4 |
+
+**"Long enough" is a stop rule, not a guess** (`PlateauStop`, a world module that requests a
+clean stop at a tick boundary, RAND-20). A run stops at the first window boundary where both
+of these hold:
+1. **at least 50 generations** of every neural species (its mean generation over the window);
+2. **a plateau**: over the last three 2 000-tick windows, every neural species' per-window
+   measures (population mean, starvation hazard, predation hazard in S32, births per animal)
+   stay within ±10 % of their mean.
+
+There is a hard cap (default 60 000 ticks) for a species that never settles; the report then
+says so. A species that dies out with the floor at 0 also ends its run. Both seeds of an arm
+then run to the **larger** of their stop ticks, rounded up to 5 000, so the two seeds cover
+the same length. That costs one resumed run (RAND-21: the shorter seed replays from its
+caches and continues).
+
+**Cost, to measure on the first run.** JEV sets the tick rate. In S33 one JEV species decides
+(about the Lab1_Small prey load); in S32 two do. Runs are resumable (stop file, answer caches),
+so a long run can be split over several sessions. The first S33 run measures seconds per tick
+and the stop tick, and the owner confirms the remaining runs before they start.
 
 ## 7. Validation (new codes V-70…V-79)
 
@@ -426,7 +474,7 @@ censoring, not death):
 | Id | Test |
 |---|---|
 | T-NEURO-01 | vectors equal at 4 decimals → one allele; differ in the 3rd → two; canonical stable across runs; R-01 and every existing golden unchanged (C1, C2) |
-| T-NEURO-02 | gene conformance (T-GENE-01) for `NeuralGenomeGene`; vector length = the layout formula for 1–3 senses, 1–8 actions, 0–2 hidden layers; the founder pool is identical in two worlds with different run seeds (GENE-21); adding an action → V-71; a `NeuralFounderPool` asset is used as founders |
+| T-NEURO-02 | gene conformance (T-GENE-01) for `NeuralGenomeGene`; vector length = the layout formula for 1–3 senses, 1–8 actions, 0–2 hidden layers; the random founder pool is identical in two worlds with different run seeds (GENE-21); adding an action → V-71 |
 | T-NEURO-03 | the T-MUT suite passes for `NeuralMutation`: same stream → same mutant; the mutant differs from its parent; `Check` passes; clamped; over 10 000 mutations the share of added and replaced weights matches pAdd and pReplace within 4 s.e. |
 | T-NEURO-04 | `NeuronCrossover`: each neuron slice comes whole from one parent; same stream → same baby; a recombinant is registered once with both parents (C7); a child equal to a parent reuses its allele |
 | T-NEURO-05 | fan angles symmetric for 1, 2, 5, 7 rays; food 3 m ahead → centre ray Food proximity 0.85; a kin 2 m ahead hides food 3 m behind it (first object); a prey in cover → the ray stops at the cover cell; killed → passes through; the world edge → Obstacle; equal distance → kind order; in a 4-species world both predators read as Threat to both preys |
@@ -438,21 +486,24 @@ censoring, not death):
 | T-NEURO-11 | breeding: asexual → a ready animal breeds alone and pays the litter; sexual → only on contact with a ready kin, the baby's network is a neuron mix; in both, mutation with probability `Rate` |
 | T-NEURO-12 | templates: `NeuroPrey`/`NeuroPredator` built against the reference species → V-78 silent; change the neural prey's run speed → V-78 names it; the JEV predator's diet without `prey-nn` → V-79 |
 | T-NEURO-13 | `SurvivalStats` on a scripted 4-species run: deaths by cause and kills by killer species equal the events; migrated animals are censored, not dead; the kill matrix sums to the kills |
-| T-NEURO-14 (T2) | S29 asexual and sexual for 5 000 ticks, and the L0 versions of S30–S32: the same seed twice → the same hash; evolved neural prey eat more grass per animal-tick than the founder pool under the no-mutation control (measured first, then pinned as a gate) |
-| T-NEURO-15 (T4) | S32 with JEV: 10 minutes, never stalls on the neural brain, JEV cache hit rate within ±5 points of Lab1 alone; `survival.json` written |
+| T-NEURO-14 | `PlateauStop` on scripted measures: no stop before 50 generations; stops at the first window boundary of a ±10 % plateau over three windows; stops at the cap otherwise; the run's outputs are complete (RAND-20) |
+| T-NEURO-15 (T2) | S29 asexual and sexual for 5 000 ticks, and the L0 versions of S30–S33: the same seed twice → the same hash; evolved neural prey eat more grass per animal-tick than the random founder pool under the no-mutation control (measured first, then pinned as a gate) |
+| T-NEURO-16 (T4) | S32 and S33 with JEV: 10 minutes each, never stall on the neural brain, JEV cache hit rate within ±5 points of Lab1 alone; `survival.json` written; a stopped run resumes and gives the hash of an unbroken one |
 
 ## 9. Milestones (M16, after M15)
 
 | Step | Delivers | Done when |
 |---|---|---|
 | **M16.1** Core | C1–C7 with their tests; spec text in 07, 08, 09, 13, 30 | 466 + new EditMode tests green; R-01 unchanged |
-| **M16.2** Genes | `NeuralLayout`, `NeuralNet`, `NeuralGenomeGene`, `NeuralMutation`, `NeuronCrossover`, `NeuralFounderPool` | T-NEURO-01…04 |
+| **M16.2** Genes | `NeuralLayout`, `NeuralNet`, `NeuralGenomeGene`, `NeuralMutation`, `NeuronCrossover` | T-NEURO-01…04 |
 | **M16.3** Senses | `WorldRayCaster`, `RayFanSense`, `InteroceptionSense`, `RayFanView` | T-NEURO-05, 06; the fan visible in a sandbox |
 | **M16.4** Brain | `NeuralBrain` (sync), Sample/Greedy | T-NEURO-07 |
 | **M16.5** Actions | `NeuralAction`, `TurnAction`, `ForwardAction`, `StopAction`, contacts, mating both ways | T-NEURO-09…11 |
-| **M16.6** Templates and pairings | `NeuroPrey`, `NeuroPredator`, the menu, `MatchedPairs` (V-78, V-79), `Neuro_Lab` scene, S29–S31 and their L0 versions, `NeuroStats`, inspector panel, export of founders | T-NEURO-12, T-NEURO-14 (S29–S31); the owner watches S29 |
-| **M16.7** The 2×2 | `Brains_2x2` scene, S32 with its arms, `SurvivalStats`, `survival.json`, the analysis script, the report template, docs chapter `Docs/Interface/16-neural-species.md` and site page `extending/neural-species.md` | T-NEURO-13, T-NEURO-14 (S32 L0), T-NEURO-15; first report for the owner |
-| **M16.8** Concurrency and scale | async `Later` path, pooled attachments, one fan per animal per tick (a per-tick buffer in a world service), optional Burst `IJobParallelFor` forward pass and ray march behind `ReadAll` (same results as the managed oracle), C8 if needed | T-NEURO-08; the 20 §9 budget at 300 neural animals |
+| **M16.6** Templates and pairings | `NeuroPrey`, `NeuroPredator`, the menu, `MatchedPairs` (V-78, V-79), `Neuro_Lab` scene, S29–S31 and their L0 versions, `NeuroStats`, inspector panel | T-NEURO-12, T-NEURO-15 (S29–S31); the owner watches S29 |
+| **M16.7** Comparison scenarios | `Prey_vs_Prey` and `Brains_2x2` scenes, S33 and S32 with both arms, `SurvivalStats`, `PlateauStop`, `survival.json`, the analysis script, the report template, docs chapter `Docs/Interface/16-neural-species.md` and site page `extending/neural-species.md` | T-NEURO-13, 14, 15 (S32/S33 L0), 16 |
+| **M16.8** Concurrency and scale | async `Later` path, pooled attachments, one fan per animal per tick (a per-tick buffer in a world service), optional Burst `IJobParallelFor` forward pass and ray march behind `ReadAll` (same results as the managed oracle), C8 if needed. Before the measured runs, so they don't pay for slow code | T-NEURO-08; the 20 §9 budget at 300 neural animals |
+| **M16.9** Measured runs | §6.3: the first S33 run (default rate, seed 1) measures the cost and the stop tick; with the owner's go, the other 7 runs; one report per scenario and arm | 8 runs done; reports written |
+| *Later* | a `NeuralFounderPool` asset (networks exported from a run, used as founders); §10 | — |
 
 ## 10. Later: a DRL brain on the same species
 
@@ -477,24 +528,28 @@ the door open.
 
 ## 12. Still open
 
-1. **The 2×2's main arm:** pre-evolved neural founders (recommended) or naive? The other arms
-   stay available as overrides.
-2. **Decision rate in the 2×2:** neural at its default period 1 with the matched-rate arm
-   (period 4) alongside (recommended), or matched only?
-3. **Run length and seeds** for S32: recommended 5 seeds × 10 000 ticks per arm. With JEV in
-   lockstep that is hours per seed, to be measured on the first run before committing to more.
-4. **Optional "same interface" arm** (`NeuralBrain` on JEV's senses and actions): include it in
-   M16.7, or leave it for later?
+1. **"Prey vs prey"** is read here as S33: JEV prey and neural prey alone, no predators (§6.1).
+   Should it keep the JEV predator instead?
+2. **Mating in the measured runs:** the reference rule (sexual, like the JEV prey and
+   predator) for all 8 runs, or asexual too (doubling them)?
+3. **Optional "same interface" arm** (`NeuralBrain` on JEV's senses and actions): measure it
+   too, or leave it for later?
 
 ## 13. Risks
 
 - **Fairness of the 2×2:**
   - The JEV and neural species differ in their interface (senses, actions) as well as in their
     brain. That is why the same-interface arm and the matched-rate arm exist.
-  - JEV's curated founder sentences against random networks would measure the bootstrap, not
-    the brain. That is why the pre-evolved arm is the main one.
-- **Run time:** JEV sets the tick rate. Four species, two of them on JEV, about doubles the
-  JEV load of Lab1_Small. Measure on the first run, then size seeds and ticks.
+  - JEV's founders are curated sentences and the neural founders random networks (owner),
+    so early windows measure the bootstrap more than the brain. The plateau rule (§6.3) and
+    the per-window report keep the two apart: compare the late windows.
+  - Newcomers below the floor bring random networks back into the neural species and slow its
+    evolution. Their count is reported as a result (POP-05), not hidden.
+- **Two seeds** show whether an effect repeats, not how large its spread is. Intervals come
+  from individual animals within runs, and an effect must agree in both seeds (§6.2).
+- **Run time:** JEV sets the tick rate. S32 has two JEV species and about doubles the JEV load
+  of Lab1_Small. The plateau rule may ask for tens of thousands of ticks. The first S33 run
+  measures the cost before the other seven start.
 - **Memory:** every allele keeps its vector for the run's lineage, about 3 KB × 10 000 mutants
   and recombinants ≈ 30 MB per neural species. Mitigation: float16 storage, or drop the values
   of extinct alleles after they reach `vectors.jsonl`.
