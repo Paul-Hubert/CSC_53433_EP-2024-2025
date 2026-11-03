@@ -37,6 +37,15 @@ MonoBehaviour:
     - path: World/noMutation
       value: true
     remove: []
+  - name: more-predators
+    brain: 
+    tier: T2
+    set:
+    - path: World/asexual
+      value: true
+    - path: Neuro Predator/CapRule/cap
+      value: 20
+    remove: []
   seeds: d2040000070000002a000000
   ticks: 5000
   brain: Random

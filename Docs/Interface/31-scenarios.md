@@ -262,7 +262,8 @@ and removes their LLM mutation (T2). Asexual variants set the JEV species' matin
 breeds alone as soon as it is ready."
 
 - **S29 NeuroLab** — `Neuro_Lab` (Lab1_Small's map), neural prey and neural predators, 5 000 ticks, seeds 1234, 7,
-  42; variants `asexual`, `sexual`, `no-mutation` (asexual, no mutation). **Expect** (T2): the same seed twice gives
+  42; variants `asexual`, `sexual`, `no-mutation` (asexual, no mutation), `more-predators` (asexual, predator cap 20
+  instead of 6). **Expect** (T2): the same seed twice gives
   the same hash; evolving prey eat more per animal-tick over the last 1 000 ticks than under `no-mutation` in seeds
   1234 and 7 (T-NEURO-15).
 - **S30 JevPreyNeuroPredator** — `Neuro_JevPrey`: JEV prey, neural predators; **S31 NeuroPreyJevPredator** —

@@ -291,7 +291,8 @@ namespace EvoSim.Neuro.Editor
                 new[] { "invariants", "deterministic", "evolving neural prey eat more per animal-tick than in no-mutation (nn_meals_per_tick)" },
                 Variant("asexual", "", "T2", null, ("World/asexual", "true")),
                 Variant("sexual", "", "T2", null),
-                Variant("no-mutation", "", "T2", null, ("World/asexual", "true"), ("World/noMutation", "true")));
+                Variant("no-mutation", "", "T2", null, ("World/asexual", "true"), ("World/noMutation", "true")),
+                Variant("more-predators", "", "T2", null, ("World/asexual", "true"), ("Neuro Predator/CapRule/cap", "20")));
             Scenario("S30_JevPreyNeuroPredator", "S30 JEV prey and neural predators", JevPrey, 2000, "T4", seeds,
                 new[] { "invariants", "deterministic" },
                 Variant("L0-asexual", "Random", "T2", "Prey/Mutation", ("World/asexual", "true")),
