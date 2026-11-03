@@ -9,8 +9,8 @@ mutation operators, brains, tick phases, food layers, cover, ground. The referen
 yours: they derive from the same public base classes and use no hidden shortcut. Any of them is a working example of its
 kind, and any of them can be replaced by your own.
 
-Given a feature to build? Read [Before you start a feature](before-you-start.md) first: which mechanism, which module
-to read, what the review will check.
+Have an idea to try? Read [Before you start a feature](before-you-start.md) first: which mechanism, which module to
+read, the rules to keep and the mistakes to avoid.
 
 ## The workflow
 

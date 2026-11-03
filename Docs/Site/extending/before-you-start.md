@@ -4,9 +4,10 @@ uid: extend-before-you-start
 
 # Before you start a feature
 
-You have been given a feature to add to EvoSim: a sense, an action, a gene, a brain, a food layer, a species… This page
-is a briefing for the first lab session. It says what to read, which mechanism to use, how to start, what the system
-will check, and the mistakes to avoid. It teaches nothing in depth: every section links to the page that does.
+You have an idea for EvoSim: animals that get thirsty, prey that call out when they see a predator, a brain of your own,
+winters that slow the grass down. This page helps you turn the idea into modules: which mechanism to use, what to read
+first, how to start, which rules keep the simulation working, and the mistakes that are easy to make. It teaches
+nothing in depth: every section links to the page that does.
 
 ## What a feature is in EvoSim
 
@@ -66,9 +67,10 @@ Not on the list? [Extending EvoSim](index.md) has a longer *I want to…* table,
    row every 100 ticks ([Recording and outputs](../guides/recording-and-outputs.md)). Check that your feature shows: a
    population that changes, a `deaths_<cause>` column, a column of your own ([Recording and statistics](recording.md)).
 
-## The rules the system will check
+## The rules every module keeps
 
-The review of your feature (32 §3 P2) checks these first. Each id links to the rule in the specification.
+Break one of these and the simulation still runs, but it no longer means what you think. Each id links to the rule in
+the specification.
 
 | Rule | Why | How to keep it |
 |---|---|---|
@@ -105,28 +107,28 @@ in your own code the rules are yours to keep.
 8. **Setting up in `Awake` or `Start`**, or keeping a field from the last run. Reset your fields in `Initialize`: the
    same object starts every run ([Species modules](species-modules.md#rules-your-module-keeps)).
 
-## Practise first
+## Ways in
 
-If you are new to EvoSim, spend part of the first session on one exercise of [the teaching path](exercises.md): replace
-a small reference module (`RestAction`, `LevelSense`, `Starvation`) with a stub and write it yourself. Then read
-[Worked example: alarm calls](worked-example-alarm-calls.md): one student feature, a sense, an action, a gene and a
-world service, from the idea to a tested scene. The [samples](samples.md) show complete small features.
+To get a feel for the code first, rewrite one small reference module (`RestAction`, `LevelSense`, `Starvation`) from
+its stub: [the teaching path](exercises.md). To see a whole idea built, read
+[Worked example: alarm calls](worked-example-alarm-calls.md): a sense, an action, a gene and a world service, from the
+idea to a working scene. The [samples](samples.md) are small complete features (thirst, water, seasons, slopes) to
+copy, change and combine.
 
-## Getting help and handing in
+## Watching your idea at work
 
-When you ask for help, include:
+Once it runs, the editor shows what your modules do. All are under *Window ▸ EvoSim ▸*
+([Editor tooling](../guides/editor-tooling.md#windows)):
 
-- the scene, or the steps that rebuild it from a reference scene;
-- the exact validation message or test failure (its id, such as V-05 or SENSE-01, and the object it names);
-- the seed and the tick where things go wrong, so that someone else can replay the run.
+| To see | Open |
+|---|---|
+| what one animal senses, chooses and carries, and its stats | **Animal Inspector**, then click the animal in the Scene view |
+| what a gene sentence does to the brain's answer, in a situation you pick | **Ask the Brain** |
+| populations, births and deaths by cause, action shares over time | **Ecology Monitor** |
+| which sentences spread and where they came from | **Gene Pool** |
+| who eats whom, once your species or food is in | **Food Web** |
+| every event as it happens, filtered to one animal | **Event Log** |
 
-When you hand in, the review checks, in plain words:
-
-1. your class derives from the right base class and overrides what the recipe says;
-2. the conformance suite of its kind passes, and you wrote your own tests (a brain: a copy of the brain test);
-3. no per-animal state, no global randomness, actions only plan, senses return declared tokens, a small observation
-   space;
-4. validation is green; if the species' signature changed (V-12), you meant it and accepted it;
-5. the prompt preview reads well and stays under the brain's limit.
-
-The review then says what works, what breaks a rule (with the rule id and the line), and what to improve.
+Change one thing at a time and keep the seed: the same seed and the same brain answers replay a run exactly, so any
+difference comes from your change. The **Scenario Runner** runs several seeds headless, when one run is not enough to
+tell.

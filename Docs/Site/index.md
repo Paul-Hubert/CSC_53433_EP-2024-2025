@@ -23,7 +23,7 @@ counts living animals, births, deaths and model calls.*
 | open a scene and watch it run | [Getting started](guides/getting-started.md) |
 | understand the whole loop in one page | [How EvoSim works](guides/overview.md) |
 | learn one part in depth | the [guides](guides/index.md): the world, a tick, senses, brains, actions, genes, mutation… |
-| prepare to implement a feature you were given | [Before you start a feature](extending/before-you-start.md) |
+| turn an idea of your own into a feature | [Before you start a feature](extending/before-you-start.md) |
 | add a sense, an action, a gene, a brain, a phase… | [Extending EvoSim](extending/index.md), then the page for your kind of module |
 | rewrite a reference module as an exercise | [The teaching path](extending/exercises.md) |
 | look up a class or a method | the [API reference](api/index.md), grouped by folder |
