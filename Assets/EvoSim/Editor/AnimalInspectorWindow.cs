@@ -5,7 +5,8 @@ namespace EvoSim.Editor
 {
     /// <summary>
     /// The selected animal (21 §4, lab C): stats, traits, genome sentences, last situation, last probabilities as bars,
-    /// current action and target, busy reason, parents and offspring. Click an animal's view to select it.
+    /// current action and target, busy reason, parents and offspring, then the <see cref="AnimalInspectorPanel"/>s that show
+    /// it. Click an animal's view to select it.
     /// </summary>
     /// <remarks>
     /// Open it with <c>Window ▸ EvoSim ▸ Animal Inspector</c>. It works in Play mode: pause the world, click an animal in
@@ -15,6 +16,7 @@ namespace EvoSim.Editor
     public class AnimalInspectorWindow : EditorWindow
     {
         Vector2 scroll;   // the window's scroll position
+        System.Collections.Generic.List<AnimalInspectorPanel> panels;   // the extra panels, found on first use
 
         /// <summary>Opens the window (<c>Window ▸ EvoSim ▸ Animal Inspector</c>).</summary>
         [MenuItem("Window/EvoSim/Animal Inspector")]
@@ -66,7 +68,26 @@ namespace EvoSim.Editor
                     EditorGUI.DrawRect(bar, EditorWorlds.ActionColor(i));
                     GUI.Label(new Rect(r.xMax - 50, r.y, 50, r.height), a.LastProbabilities[i].ToString("0.000"));
                 }
+            foreach (var panel in Panels())
+                if (panel.Shows(a))
+                {
+                    EditorGUILayout.Space();
+                    EditorGUILayout.LabelField(panel.Title, EditorStyles.boldLabel);
+                    panel.Draw(a, w);
+                }
             EditorGUILayout.EndScrollView();
+        }
+
+        /// <summary>One instance of every <see cref="AnimalInspectorPanel"/> in the project, made on first use.</summary>
+        System.Collections.Generic.List<AnimalInspectorPanel> Panels()
+        {
+            if (panels != null) return panels;
+            panels = new System.Collections.Generic.List<AnimalInspectorPanel>();
+            foreach (var t in TypeCache.GetTypesDerivedFrom<AnimalInspectorPanel>())
+                if (!t.IsAbstract && t.GetConstructor(System.Type.EmptyTypes) != null)
+                    panels.Add((AnimalInspectorPanel)System.Activator.CreateInstance(t));
+            panels.Sort((x, y) => string.CompareOrdinal(x.Title, y.Title));
+            return panels;
         }
     }
 }

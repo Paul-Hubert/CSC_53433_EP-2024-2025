@@ -1,15 +1,16 @@
 # 50 — Implementation status
-Updated: 2026-11-03, M16.5 actions for the neural species (before it: M15 overlay actions ⏸)
+Updated: 2026-11-03, M16.6 templates and pairings for the neural species ⏸ (before it: M15 overlay actions ⏸)
 
 The single source of truth between implementation sessions of
 [`Docs/prompts/06-implement-unity-system.md`](../prompts/06-implement-unity-system.md).
 
 ## Next step
-M16 (plan `Docs/Neuro/PLAN.md`, prompt `Docs/prompts/08-implement-neural-species.md`): **M16.6 Templates and pairings** — the
-prey/predator templates and menu, `MatchedPairs` (V-78, V-79), `Neuro_Lab`, S29–S31, `NeuroStats`, with T-NEURO-12, 15 ⏸.
-M16.5 (the five actions, contacts, breeding), M16.4 (`NeuralBrain`, sync),
-M16.3 (ray fan, interoception, hunger clock, fan view) and M16.2 (genes, mutation,
-crossover in `Assets/EvoSim/Neuro`) are done; the fan is seen in a sandbox once M16.6 gives the `Neuro_Lab` scene. M16.1 (core C1–C7) is done: vector alleles, `vectors.jsonl`, `DecisionQuery.Genome`,
+M16 (plan `Docs/Neuro/PLAN.md`, prompt `Docs/prompts/08-implement-neural-species.md`): **M16.6 waits for the owner ⏸**: open
+`Neuro_Lab` and watch S29 (the fan shows on each neural body; Animal Inspector ▸ Network). Then **M16.7 Comparison
+scenarios** (`Prey_vs_Prey`, `Brains_2x2`, S32/S33, survival analysis; tell the owner before the T-NEURO-16 model runs).
+M16.6 (templates and menu, `MatchedPairs`, the three neural scenes, S29–S31, `NeuroStats`, the inspector panel), M16.5
+(the five actions, contacts, breeding), M16.4 (`NeuralBrain`, sync), M16.3 (ray fan, interoception, hunger clock, fan
+view) and M16.2 (genes, mutation, crossover in `Assets/EvoSim/Neuro`) are done. M16.1 (core C1–C7) is done: vector alleles, `vectors.jsonl`, `DecisionQuery.Genome`,
 `AnimalAction.SelfDirected`, `Brain.ReadsGeneText`, the conformance fixtures, recombinant alleles; EditMode see M16.1 row,
 R-01 unchanged. The owner's review of the core diff (⏸ M16.1) is still to come.
 
@@ -42,8 +43,8 @@ Before M15, M14 and M13 waited at their checkpoints ⏸; their next-step notes m
 | M16.3 Senses | done | M16.3 | `WorldRayCaster`, `RayFanSense`, `InteroceptionSense`, `HungerClock`, `RayFanView`; T-NEURO-05, 06 (NeuralSenseTests); EditMode 496/496 with Neuro |
 | M16.4 Brain | done | M16.4 | `NeuralBrain` (sync, Greedy/Sample, V-70, V-77); T-NEURO-07 (NeuralBrainTests, BrainConformance); EditMode 502/502 with Neuro |
 | M16.5 Actions | done | M16.5 | `NeuralAction`, `TurnAction`, `ForwardAction`, `StopAction`, contacts, breeding, V-75; T-NEURO-09…11 (NeuralActionTests); EditMode 517/517 |
-| M16.6 Templates and pairings | next | | `NeuroPrey`/`NeuroPredator`, menu, `MatchedPairs` V-70…V-79, `Neuro_Lab`, S29–S31 (+L0), `NeuroStats`; T-NEURO-12, 15 ⏸ |
-| M16.7 Comparison scenarios | | | `Prey_vs_Prey`, `Brains_2x2`, S32/S33 both arms, survival analysis and report, chapter 16, site page; T-NEURO-13…16 ⏸ |
+| M16.6 Templates and pairings | done ⏸ | M16.6 | `NeuralTemplates` + menu, `MatchedPairs` (V-78, V-79), V-73, V-74, `Neuro_Lab`/`Neuro_JevPrey`/`Neuro_JevPredator`, S29–S31 (+L0), `NeuroStats`, Animal Inspector panel; T-NEURO-12, 15 (NeuralTemplateTests, NeuroScenarioTests); EditMode 539/539 |
+| M16.7 Comparison scenarios | next | | `Prey_vs_Prey`, `Brains_2x2`, S32/S33 both arms, survival analysis and report, chapter 16, site page; T-NEURO-13…16 ⏸ |
 | M16.8 Concurrency and scale | | | async `Later`, pooled attachments, one fan per tick, profile S32; T-NEURO-08 |
 | M16.9 Measured runs | | | first S33 run (cost, stop tick) ⏸, then 7 runs with the owner's go ⏸ |
 
@@ -121,28 +122,7 @@ pass (gemma4:12b on CPU, every sum 100); B-08 pass (P(flee) wolf 0.42, shadow 0.
 to 0.04 (reported); B-10 FAIL, gemma4:26b: 72.5 % usable after one mutation < 80 %, 62.5 % after ten, the founders themselves 92.5 % (qwen3.5:0.8b: 67.5 % / 17.5 %) (40 §2 #13); B-11 pass. About 5 500 calls.
 
 ## Decisions taken while implementing
-M0–M15: in [51](51-implementation-log.md) (M12–M15 at its end). Since then:
-- M16 (2026-11-03) — prompt 08 was only on `origin/ccr-6660386e-d1ubni` (147e31c); cherry-picked onto llm-evolution (be097e3).
-- C1 — a vector's canonical form is `vec[<n>]#` + 16 hex of SHA-256 over each value as the int64 round(v·10^d), little-endian
-  (no text formatting in the hash); `ToString` keeps 8 hex. `Vector` is a `ReadOnlySpan<float>` over a private copy.
-- C2 — `vectors.jsonl` is appended at each `alleles.jsonl` write (rewriting it would copy megabytes every 5 000 ticks), and
-  exists only once a vector allele does, so runs without vector genes write exactly the files they did.
-- C3 — `DecisionQuery.Genome` is a new optional constructor argument; the ask-brains phase and the prompt preview pass it.
-  Ask-the-Brain builds its queries from sentences without a genome, so it passes none (a network brain will fail there,
-  DEC-40, rather than invent a row).
-- C5/C6 — `ScriptedBrain.ReadsText` (test fixture) switches `ReadsGeneText`; the brain suite adds a brain's
-  `[RequiresModule]` species modules to both species and passes each animal's genome.
-- M16.2 — the test assembly is `EvoSim.Tests.Neuro` (plan: `EvoSim.Neuro.Tests`): the conformance suites scan every
-  `EvoSim.*` assembly except `EvoSim.Testing*`/`EvoSim.Tests*`, so a test probe in `EvoSim.Neuro.Tests` would become a
-  conformance case.
-- M16.2 — founders come from `RandomStream(founderSeed, "neuro/founders/<layout hash>")` (PCG32, the project's stream)
-  instead of a private SplitMix64: same property (independent of the run seed, GENE-21). Xavier draws weights only;
-  biases start at 0. Weights are stored neuron by neuron (bias, then incoming weights), so a neuron's slice is contiguous.
-- M16.2 — V-71: the founder pool survives `Initialize` (only the layout is rebuilt), so a pool drawn for an older layout
-  is reported with the fix "Rebuild founders" instead of being replaced silently; Inspector edits rebuild it.
-- M16.2 — `NeuralMutation`: 3 draws per weight (choice, added float, replacement) plus the fallback's index and float, so
-  the count never depends on the outcome (MUT-30); add and replace are exclusive per weight; the Gentle rate 0.5 is set in
-  the constructor (the base class keeps 0.03 for other operators).
+M0–M15 and M16.1–M16.2: in [51](51-implementation-log.md) (at its end). Since then:
 - M16.3 — a ray's distance to an animal, entity or item is where its centre projects on the ray (food 3 m ahead reads 3 m,
   0.85 at 20 m), hit when the ray passes within 0.5 m (items: through their cell). Cover counts only where a ray enters it
   from outside, so an animal in a thicket is not blinded by its own cell. Tie order = the `RayHitKind` values: Threat,
@@ -154,6 +134,15 @@ M0–M15: in [51](51-implementation-log.md) (M12–M15 at its end). Since then:
 - M16.5 — a step is exactly one tick's move (walk, run, or slow = a fraction of walk) toward the heading ± the turn, so
   the act phase's heading update gives exact turns. `stop` is not self-directed (it stays, like rest). Contacts look
   around the step's predicted end; breeding needs no new code (`Mates` on every action, the core's REPRO-02/04).
+- M16.6 — the templates are runtime code (`NeuralTemplates`, used by the menu, the scene builder and the tests): a copy of
+  the JEV species, its controller stripped. S30 and S31 get their own scenes (`Neuro_JevPrey`, `Neuro_JevPredator`)
+  instead of removals in `Neuro_Lab`: a diet naming a removed species is an error (V-20). Neural display names are
+  `neural prey`/`neural predator`; placeholders naming a replaced species are renamed to them. These scenes have no
+  `MatchedPairs` (one side of each pair is gone); pairs are checked in T-NEURO-12 and the 2×2.
+- M16.6 — V-73 and V-74 (left out of M16.4) are in `NeuralBrain.Validate`. The Animal Inspector gains an extension point
+  (`AnimalInspectorPanel`, editor only); the network panel is one. `NeuroStats` is a never-killing `DeathRule` like
+  `HungerClock`; its rates are over a 100-tick window. S29 measured (seeds 1234, 7): evolving prey 0.0652 and 0.0654 meals
+  per animal-tick over ticks 4 000–5 000, no-mutation 0.0620 and 0.0558; pinned as "greater" in both seeds.
 
 ## Disagreements between the brief and Docs/Interface
 - 20 §3.9 names the operator method `MutationOperator.Start(gene, parent, rng)`; on a MonoBehaviour Unity takes

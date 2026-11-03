@@ -76,7 +76,15 @@ namespace EvoSim.Neuro
         {
             foreach (var s in World.AllSpecies)
             {
-                if (s.Brain != this || s.Module<NeuralGenomeGene>() != null) continue;
+                if (s.Brain != this) continue;
+                var mating = s.Module<MatingRule>();
+                if (mating != null && mating.Sexual && s.Module<NeuronCrossover>() == null)
+                    report.Warning("V-73", s, $"'{s.DisplayName}' mates in pairs without a NeuronCrossover: each baby takes one parent's whole network.");
+                var schedule = s.Module<DecisionSchedule>();
+                int period = schedule != null ? schedule.Period(World) : World.DecisionPeriod;
+                if (period > 1)
+                    report.Info("V-74", s, $"'{s.DisplayName}' decides every {period} ticks: it steers late between decisions (expected in the matched-rate arm).");
+                if (s.Module<NeuralGenomeGene>() != null) continue;
                 var species = s;
                 report.Error("V-70", s, $"'{s.DisplayName}' uses {Id} but has no NeuralGenomeGene: its animals have no weights.",
                              new ValidationFix("Add a NeuralGenomeGene", () => species.gameObject.AddComponent<NeuralGenomeGene>()));
@@ -118,6 +126,43 @@ namespace EvoSim.Neuro
             for (int k = 0; k < net.Output.Length; k++)
                 if (float.IsNaN(net.Output[k]) || float.IsInfinity(net.Output[k])) return $"output {k} is not a number";
             row = ToRow(net.Output, policy, temperature);
+            return null;
+        }
+
+        /// <summary>
+        /// The query the ask-brains phase would build for this animal now: its observation, the senses' attachments and its
+        /// genome. For tools (the Animal Inspector's neural panel); it only reads the world (SPACE-12).
+        /// </summary>
+        /// <param name="a">A living animal of a neural species.</param>
+        /// <returns>The query, with the animal's id.</returns>
+        public static DecisionQuery QueryOf(Animal a)
+        {
+            var s = a.Species;
+            var ctx = new SenseContext(s.World);
+            var o = s.Observe(a, ctx);
+            var attachments = new List<object>();
+            foreach (var sense in s.Senses)
+                if (sense.HasAttachments && sense.Attachment(a, ctx) is object att) attachments.Add(att);
+            return new DecisionQuery(s, new List<KeyValuePair<string, string>>(), o, s.Describe(o, TextStyle.V1), TextStyle.V1,
+                                     a.Genome.BrainKey, attachments, a.Genome) { AnimalId = a.Id };
+        }
+
+        /// <summary>
+        /// Runs one query's network and copies out its inputs and outputs (the Animal Inspector's panel): what
+        /// <see cref="Answer"/> computes, without the policy.
+        /// </summary>
+        /// <param name="q">The query.</param>
+        /// <param name="inputs">The network's inputs in layout order, or null on failure.</param>
+        /// <param name="outputs">One output per action, or null on failure.</param>
+        /// <returns>Null, or why the network can't run (as <see cref="Answer"/> says it).</returns>
+        public string Explain(DecisionQuery q, out float[] inputs, out float[] outputs)
+        {
+            inputs = outputs = null;
+            string error = Answer(q, out _);
+            if (error != null) return error;
+            var net = NetOf(q.Species);
+            inputs = (float[])net.Input.Clone();
+            outputs = (float[])net.Output.Clone();
             return null;
         }
 

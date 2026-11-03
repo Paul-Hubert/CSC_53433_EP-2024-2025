@@ -1565,3 +1565,26 @@ EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh
   the six scenes and the R-01 hashes are again exactly those of M13.6 (verified: PinnedHashes passes on M13.6's file), and
   01, 08, 14 read as at M13.6. Kept from M13.8–M13.9: `-minutes`, `RealTimeRuns.FromCommandLine`, Update Reference Scenes,
   the soak's memo cap.
+
+### M16 (neural species): decisions of M16.1–M16.2, moved from 50
+- M16 (2026-11-03) — prompt 08 was only on `origin/ccr-6660386e-d1ubni` (147e31c); cherry-picked onto llm-evolution (be097e3).
+- C1 — a vector's canonical form is `vec[<n>]#` + 16 hex of SHA-256 over each value as the int64 round(v·10^d), little-endian
+  (no text formatting in the hash); `ToString` keeps 8 hex. `Vector` is a `ReadOnlySpan<float>` over a private copy.
+- C2 — `vectors.jsonl` is appended at each `alleles.jsonl` write (rewriting it would copy megabytes every 5 000 ticks), and
+  exists only once a vector allele does, so runs without vector genes write exactly the files they did.
+- C3 — `DecisionQuery.Genome` is a new optional constructor argument; the ask-brains phase and the prompt preview pass it.
+  Ask-the-Brain builds its queries from sentences without a genome, so it passes none (a network brain will fail there,
+  DEC-40, rather than invent a row).
+- C5/C6 — `ScriptedBrain.ReadsText` (test fixture) switches `ReadsGeneText`; the brain suite adds a brain's
+  `[RequiresModule]` species modules to both species and passes each animal's genome.
+- M16.2 — the test assembly is `EvoSim.Tests.Neuro` (plan: `EvoSim.Neuro.Tests`): the conformance suites scan every
+  `EvoSim.*` assembly except `EvoSim.Testing*`/`EvoSim.Tests*`, so a test probe in `EvoSim.Neuro.Tests` would become a
+  conformance case.
+- M16.2 — founders come from `RandomStream(founderSeed, "neuro/founders/<layout hash>")` (PCG32, the project's stream)
+  instead of a private SplitMix64: same property (independent of the run seed, GENE-21). Xavier draws weights only;
+  biases start at 0. Weights are stored neuron by neuron (bias, then incoming weights), so a neuron's slice is contiguous.
+- M16.2 — V-71: the founder pool survives `Initialize` (only the layout is rebuilt), so a pool drawn for an older layout
+  is reported with the fix "Rebuild founders" instead of being replaced silently; Inspector edits rebuild it.
+- M16.2 — `NeuralMutation`: 3 draws per weight (choice, added float, replacement) plus the fallback's index and float, so
+  the count never depends on the outcome (MUT-30); add and replace are exclusive per weight; the Gentle rate 0.5 is set in
+  the constructor (the base class keeps 0.03 for other operators).

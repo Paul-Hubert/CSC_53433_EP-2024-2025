@@ -625,6 +625,9 @@ tick, and the owner gives the go for the other seven.
 - M16.1 C3: Ask-the-Brain builds queries from sentences without a genome; a network fails there (DEC-40).
 - M16.3: an object's ray distance is its centre's projection on the ray; cover is seen only where a ray enters it from
   outside; ties follow the `RayHitKind` order (threat first, the ground last).
+- M16.6: S30 and S31 have their own scenes (`Neuro_JevPrey`, `Neuro_JevPredator`, also copies of Lab1_Small) rather than
+  removals in `Neuro_Lab`, because a diet that names a removed species is an error (V-20). The neural species are named
+  `neural prey` and `neural predator` (ids `prey-nn`, `predator-nn`), so prompt placeholders can name them.
 
 ## 13. Risks
 

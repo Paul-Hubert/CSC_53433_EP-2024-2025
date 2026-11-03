@@ -5,6 +5,8 @@
         "EvoSim.Runtime",
         "EvoSim.Neuro",
         "EvoSim.Testing",
+        "EvoSim.Neuro.Editor",
+        "EvoSim.Editor",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
