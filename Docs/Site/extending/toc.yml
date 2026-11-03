@@ -36,6 +36,8 @@
     href: recording.md
   - name: Views
     href: views.md
+- name: "Worked example: a neural species"
+  href: neural-species.md
 - name: Tools and practice
   items:
   - name: The editor

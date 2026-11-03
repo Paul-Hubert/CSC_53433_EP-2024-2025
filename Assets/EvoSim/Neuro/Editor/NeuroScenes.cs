@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using EvoSim.Editor;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -32,6 +33,14 @@ namespace EvoSim.Neuro.Editor
         public const string JevPrey = ReferenceScenes.ScenesFolder + "/Neuro_JevPrey.unity";
         /// <summary>S31: neural prey and JEV predators.</summary>
         public const string JevPredator = ReferenceScenes.ScenesFolder + "/Neuro_JevPredator.unity";
+        /// <summary>The scene the comparison scenes copy: Lab1_Full's map, populations and services (plan §6.2, owner).</summary>
+        public const string FullSource = ReferenceScenes.ScenesFolder + "/Lab1_Full.unity";
+        /// <summary>S32: JEV and neural prey, JEV and neural predators, in one world.</summary>
+        public const string Brains2x2 = ReferenceScenes.ScenesFolder + "/Brains_2x2.unity";
+        /// <summary>S33: JEV and neural prey, no predators.</summary>
+        public const string PreyVsPrey = ReferenceScenes.ScenesFolder + "/Prey_vs_Prey.unity";
+        /// <summary>The grass regrowth of the comparison scenarios: twice the reference 0.0015, as two species graze (owner).</summary>
+        public const string DoubleRegrowth = "0.003";
         /// <summary>The prompt line of a JEV species' mating rule when every species breeds alone (plan §6.3).</summary>
         public const string AsexualMatingRule = "An adult that chooses mate breeds alone as soon as it is ready.";
 
@@ -51,11 +60,105 @@ namespace EvoSim.Neuro.Editor
                 Scene(JevPrey, false, true, preyBody, predatorBody, false),
                 Scene(JevPredator, true, false, preyBody, predatorBody, false),
             };
+            lines.Add(ComparisonScene(Brains2x2, true, preyBody, predatorBody));
+            lines.Add(ComparisonScene(PreyVsPrey, false, preyBody, predatorBody));
             BuildScenarios();
             AssetDatabase.SaveAssets();
             string result = string.Join("\n", lines);
             Debug.Log("EvoSim: neural content built\n" + result);
             return result;
+        }
+
+        /// <summary>
+        /// <c>EvoSim ▸ Neuro ▸ Build Comparison Scenes</c>: only <c>Brains_2x2</c>, <c>Prey_vs_Prey</c> and the scenarios,
+        /// leaving the bodies and the M16.6 scenes as they are.
+        /// </summary>
+        /// <returns>One line per scene.</returns>
+        [MenuItem("EvoSim/Neuro/Build Comparison Scenes")]
+        public static string BuildComparison()
+        {
+            var preyBody = NeuralSpeciesMenu.Body("NeuroPreyBody");
+            var predatorBody = NeuralSpeciesMenu.Body("NeuroPredatorBody");
+            var lines = new List<string>
+            {
+                ComparisonScene(Brains2x2, true, preyBody, predatorBody),
+                ComparisonScene(PreyVsPrey, false, preyBody, predatorBody),
+            };
+            BuildScenarios();
+            AssetDatabase.SaveAssets();
+            string result = string.Join("\n", lines);
+            Debug.Log("EvoSim: comparison content built\n" + result);
+            return result;
+        }
+
+        /// <summary>
+        /// A comparison scene (plan §6.2): a copy of Lab1_Full with the neural prey (and, with predators, the neural
+        /// predator) beside the JEV species, both predators striking and scavenging both preys, the matched pairs,
+        /// <see cref="SurvivalStats"/>, and <see cref="PlateauStop"/> after the Record phase. Without predators (S33) both
+        /// predators are removed, and the placeholders that named the JEV predator are replaced by their values, so the
+        /// JEV prey's prompt reads exactly as in Lab1_Full (its answer cache stays valid).
+        /// </summary>
+        static string ComparisonScene(string path, bool predators, GameObject preyBody, GameObject predatorBody)
+        {
+            if (SceneManager.GetSceneByPath(path).isLoaded) return path + ": open in the editor, skipped";
+            File.Copy(FullSource, path, true);
+            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+            var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
+            try
+            {
+                World world = null;
+                foreach (var root in scene.GetRootGameObjects())
+                    if ((world = root.GetComponentInChildren<World>(true)) != null) break;
+                world.gameObject.name = predators ? "Brains 2x2 World" : "Prey vs Prey World";
+                var prey = Find(world, "prey");
+                var predator = Find(world, "predator");
+                var nnPrey = NeuralTemplates.Prey(prey, body: preyBody);
+                if (predators)
+                {
+                    var nnPredator = NeuralTemplates.Predator(predator, body: predatorBody);
+                    NeuralTemplates.Retarget(predator.GetComponentInChildren<Diet>(true), prey.RequestedId, nnPrey.RequestedId, keep: true);
+                    NeuralTemplates.Retarget(nnPredator.GetComponentInChildren<Diet>(true), prey.RequestedId, nnPrey.RequestedId, keep: true);
+                }
+                else
+                {
+                    Freeze(world, predator.DisplayName);
+                    Object.DestroyImmediate(predator.gameObject);
+                }
+                NeuralTemplates.PairsOf(world).gameObject.AddComponent<SurvivalStats>();
+                var plateau = new GameObject("Plateau stop");
+                plateau.transform.SetParent(world.transform.Find("Phases"), false);
+                plateau.AddComponent<PlateauStop>();
+                EditorSceneManager.SaveScene(scene, path);
+                return path + ": built";
+            }
+            finally
+            {
+                EditorSceneManager.CloseScene(scene, true);
+            }
+        }
+
+        /// <summary>
+        /// Replaces every placeholder under the World that names a species (<c>{predator.Stamina.max}</c>) by the value it
+        /// reads now (<c>30</c>), before that species is removed.
+        /// </summary>
+        static void Freeze(World world, string speciesName)
+        {
+            var placeholder = new Regex(@"\{" + Regex.Escape(speciesName) + @"\.([A-Za-z_][\w ]*)\.([A-Za-z_][\w ]*)\}");
+            foreach (var c in world.GetComponentsInChildren<Component>(true))
+            {
+                if (c == null || c is Transform) continue;
+                var so = new SerializedObject(c);
+                var p = so.GetIterator();
+                bool changed = false;
+                while (p.Next(true))
+                    if (p.propertyType == SerializedPropertyType.String && placeholder.IsMatch(p.stringValue))
+                    {
+                        p.stringValue = placeholder.Replace(p.stringValue, m =>
+                            FieldPath.Get(world, $"{speciesName}/{m.Groups[1].Value}/{m.Groups[2].Value}") ?? m.Value);
+                        changed = true;
+                    }
+                if (changed) so.ApplyModifiedPropertiesWithoutUndo();
+            }
         }
 
         /// <summary>
@@ -201,20 +304,59 @@ namespace EvoSim.Neuro.Editor
                 Variant("L0-sexual", "Random", "T2", "Predator/Mutation"),
                 Variant("jev-asexual", "JEV", "T4", null, ("World/asexual", "true"), ("Predator/MatingRule/promptRule", AsexualMatingRule)),
                 Variant("jev-sexual", "JEV", "T4", null));
+            BuildComparisonScenarios();
+        }
+
+        /// <summary>
+        /// S32 Brains2x2 and S33 PreyVsPrey (plan §6.2, §6.3): seeds 1 and 2, asexual with the JEV mating prompt override,
+        /// grass regrowth x2, a 60 000-tick cap (the plateau rule stops earlier); arms <c>default</c> (neural species decide
+        /// every tick) and <c>matched</c> (every 4 ticks, staggered, like JEV), each in T4 with JEV and in T2 as L0 (the
+        /// random brain, the JEV species' LLM mutation off).
+        /// </summary>
+        public static void BuildComparisonScenarios()
+        {
+            var seeds = new List<int> { 1, 2 };
+            var expect = new[] { "invariants", "deterministic", "survival.json written", "stops at the plateau or the cap" };
+            var matched = new[] { ("Neuro Prey/DecisionSchedule/period", "4"), ("Neuro Prey/DecisionSchedule/staggered", "true"),
+                                  ("Neuro Predator/DecisionSchedule/period", "4"), ("Neuro Predator/DecisionSchedule/staggered", "true") };
+            var matchedPrey = new[] { matched[0], matched[1] };
+            Scenario("S32_Brains2x2", "S32 Brains 2x2: JEV and neural prey, JEV and neural predators", Brains2x2, 60000, "T4", seeds, expect,
+                new[] { ("World/asexual", "true"), ("Environment/Grass/FoodGrid/regrowP", DoubleRegrowth),
+                        ("Prey/MatingRule/promptRule", AsexualMatingRule), ("Predator/MatingRule/promptRule", AsexualMatingRule) },
+                Variant("default", "JEV", "T4", null),
+                Variant("matched", "JEV", "T4", null, matched),
+                Removing("L0-default", "Random", "T2", new[] { "Prey/Mutation", "Predator/Mutation" }),
+                Removing("L0-matched", "Random", "T2", new[] { "Prey/Mutation", "Predator/Mutation" }, matched));
+            Scenario("S33_PreyVsPrey", "S33 Prey vs prey: JEV and neural prey, no predators", PreyVsPrey, 60000, "T4", seeds, expect,
+                new[] { ("World/asexual", "true"), ("Environment/Grass/FoodGrid/regrowP", DoubleRegrowth),
+                        ("Prey/MatingRule/promptRule", AsexualMatingRule) },
+                Variant("default", "JEV", "T4", null),
+                Variant("matched", "JEV", "T4", null, matchedPrey),
+                Removing("L0-default", "Random", "T2", new[] { "Prey/Mutation" }),
+                Removing("L0-matched", "Random", "T2", new[] { "Prey/Mutation" }, matchedPrey));
         }
 
         /// <summary>A variant: its brain, tier, one GameObject to remove (or null) and its overrides.</summary>
-        static ScenarioAsset.Variant Variant(string name, string brain, string tier, string remove, params (string path, string value)[] set)
+        static ScenarioAsset.Variant Variant(string name, string brain, string tier, string remove, params (string path, string value)[] set) =>
+            Removing(name, brain, tier, remove != null ? new[] { remove } : null, set);
+
+        /// <summary>A variant: its brain, tier, the GameObjects to remove (or null) and its overrides.</summary>
+        static ScenarioAsset.Variant Removing(string name, string brain, string tier, string[] remove, params (string path, string value)[] set)
         {
             var v = new ScenarioAsset.Variant { name = name, brain = brain, tier = tier };
             foreach (var (path, value) in set) v.set.Add(new ScenarioAsset.Override(path, value));
-            if (remove != null) v.remove.Add(remove);
+            if (remove != null) v.remove.AddRange(remove);
             return v;
         }
 
         /// <summary>Writes one scenario asset to the scenarios folder, replacing any of that name.</summary>
         static void Scenario(string file, string title, string scene, int ticks, string tier, List<int> seeds, string[] expect,
-                             params ScenarioAsset.Variant[] variants)
+                             params ScenarioAsset.Variant[] variants) =>
+            Scenario(file, title, scene, ticks, tier, seeds, expect, new (string, string)[0], variants);
+
+        /// <summary>Writes one scenario asset with overrides for every variant; an existing asset is overwritten in place (same GUID).</summary>
+        static void Scenario(string file, string title, string scene, int ticks, string tier, List<int> seeds, string[] expect,
+                             (string path, string value)[] set, params ScenarioAsset.Variant[] variants)
         {
             var s = ScriptableObject.CreateInstance<ScenarioAsset>();
             s.title = title;
@@ -225,9 +367,17 @@ namespace EvoSim.Neuro.Editor
             s.seeds = new List<int>(seeds);
             s.expect = new List<string>(expect);
             s.variants = new List<ScenarioAsset.Variant>(variants);
-            string path = ReferenceScenes.ScenariosFolder + "/" + file + ".asset";
-            AssetDatabase.DeleteAsset(path);
-            AssetDatabase.CreateAsset(s, path);
+            foreach (var (path, value) in set) s.set.Add(new ScenarioAsset.Override(path, value));
+            string asset = ReferenceScenes.ScenariosFolder + "/" + file + ".asset";
+            var existing = AssetDatabase.LoadAssetAtPath<ScenarioAsset>(asset);
+            if (existing != null)
+            {
+                s.name = existing.name;
+                EditorUtility.CopySerialized(s, existing);
+                EditorUtility.SetDirty(existing);
+                Object.DestroyImmediate(s);
+            }
+            else AssetDatabase.CreateAsset(s, asset);
         }
     }
 }

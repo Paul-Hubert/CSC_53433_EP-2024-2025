@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a848ffdcb441a8448c1b33aeb415ce1, type: 3}
+  m_Name: S33_PreyVsPrey
+  m_EditorClassIdentifier: EvoSim.Runtime::EvoSim.ScenarioAsset
+  title: 'S33 Prey vs prey: JEV and neural prey, no predators'
+  scene: Assets/EvoSim/Scenes/Prey_vs_Prey.unity
+  set:
+  - path: World/asexual
+    value: true
+  - path: Environment/Grass/FoodGrid/regrowP
+    value: 0.003
+  - path: Prey/MatingRule/promptRule
+    value: An adult that chooses mate breeds alone as soon as it is ready.
+  variants:
+  - name: default
+    brain: JEV
+    tier: T4
+    set: []
+    remove: []
+  - name: matched
+    brain: JEV
+    tier: T4
+    set:
+    - path: Neuro Prey/DecisionSchedule/period
+      value: 4
+    - path: Neuro Prey/DecisionSchedule/staggered
+      value: true
+    remove: []
+  - name: L0-default
+    brain: Random
+    tier: T2
+    set: []
+    remove:
+    - Prey/Mutation
+  - name: L0-matched
+    brain: Random
+    tier: T2
+    set:
+    - path: Neuro Prey/DecisionSchedule/period
+      value: 4
+    - path: Neuro Prey/DecisionSchedule/staggered
+      value: true
+    remove:
+    - Prey/Mutation
+  seeds: 0100000002000000
+  ticks: 60000
+  brain: Random
+  expect:
+  - invariants
+  - deterministic
+  - survival.json written
+  - stops at the plateau or the cap
+  tier: T4

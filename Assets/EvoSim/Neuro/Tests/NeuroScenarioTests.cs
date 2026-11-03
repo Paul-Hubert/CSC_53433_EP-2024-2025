@@ -59,6 +59,62 @@ namespace EvoSim.Neuro.Tests
             Twice("S31_NeuroPreyJevPredator", "L0-sexual", 2000);
         }
 
+        [Test, Description("T-NEURO-15 (T2): S32 L0 (the 2x2 on Lab1_Full, random JEV), both arms → the same hash twice, no model call")]
+        public void S32L0Repeats()
+        {
+            Twice("S32_Brains2x2", "L0-default", 600);
+            Twice("S32_Brains2x2", "L0-matched", 300);
+        }
+
+        [Test, Description("T-NEURO-15 (T2): S33 L0 (two preys on Lab1_Full, random JEV), both arms → the same hash twice, no model call")]
+        public void S33L0Repeats()
+        {
+            Twice("S33_PreyVsPrey", "L0-default", 600);
+            Twice("S33_PreyVsPrey", "L0-matched", 300);
+        }
+
+        /// <summary>The JEV prey's prompt id and text in a scene, after validation.</summary>
+        static string JevPreyPrompt(string scene) => EvoSim.Batch.WithScene(scene, w =>
+        {
+            var report = new ValidationReport();
+            w.Prepare(report);
+            var s = w.FindSpecies("prey");
+            return s.Prompt.Id + "\n" + s.Prompt.Text;
+        });
+
+        [Test, Description("Plan D8, §6.2: the JEV prey's prompt in Brains_2x2 and Prey_vs_Prey is Lab1_Full's (its answer cache stays valid)")]
+        public void JevPromptUnchanged()
+        {
+            string reference = JevPreyPrompt("Assets/EvoSim/Scenes/Lab1_Full.unity");
+            Assert.AreEqual(reference, JevPreyPrompt("Assets/EvoSim/Scenes/Brains_2x2.unity"), "the 2x2");
+            Assert.AreEqual(reference, JevPreyPrompt("Assets/EvoSim/Scenes/Prey_vs_Prey.unity"), "without predators: placeholders frozen to their values");
+        }
+
+        // ---- T-NEURO-16 (T4: JEV is called; the owner is told before it runs) ----
+
+        /// <summary>A T4 smoke run of S32 or S33 with JEV for about ten minutes (Responsive, as in Play mode).</summary>
+        static string Smoke(string scenario, int ticks) =>
+            EvoSim.Batch.Run(Load(scenario), "default", 1, ticks, null, WaitMode.Responsive);
+
+        [Test, Explicit("T4: calls JEV for about 10 minutes per scenario"), Category("T4")]
+        [Description("T-NEURO-16 (T4): S32 and S33 with JEV never stall on the neural brain and write survival.json; a run stopped halfway and run again from its caches gives the hash of an unbroken one")]
+        public void SmokeWithJev([Values("S32_Brains2x2", "S33_PreyVsPrey")] string scenario)
+        {
+            if (System.Environment.GetEnvironmentVariable("EVOSIM_T4") != "1")
+                Assert.Ignore("T4: set EVOSIM_T4=1 to call JEV (the batch runner also runs Explicit tests when an assembly is named)");
+            string whole = Smoke(scenario, 600);
+            Debug.Log("T-NEURO-16 " + whole);
+            StringAssert.DoesNotStartWith("FAILED", whole);
+            StringAssert.Contains("600 ticks", whole, "never stalled: it reached its end");
+            string folder = whole.Substring(whole.IndexOf("folder ") + 7).Trim();
+            Assert.IsTrue(System.IO.File.Exists(System.IO.Path.Combine(folder, "survival.json")));
+            string half = Smoke(scenario, 300);
+            string resumed = Smoke(scenario, 600);
+            Debug.Log("T-NEURO-16 resumed " + resumed);
+            Assert.AreEqual(Hash(whole), Hash(resumed), "replayed from the caches (RAND-21)");
+            StringAssert.DoesNotStartWith("FAILED", half);
+        }
+
         /// <summary>
         /// The neural prey's meals per animal-tick over the last <paramref name="window"/> ticks of a 5 000-tick S29 run
         /// (<see cref="NeuroStats"/>' <c>nn_meals_per_tick</c>, its window widened before the run).

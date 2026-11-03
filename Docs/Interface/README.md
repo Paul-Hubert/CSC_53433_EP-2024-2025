@@ -38,6 +38,7 @@ cover is its own behaviour.
 | 13 | [Outputs and recording](13-outputs-and-recording.md) | events, stats, alleles, summary, run info |
 | 14 | [Configuration reference](14-configuration-reference.md) | every parameter with its reference value and unit |
 | 15 | [Controls, metrics and gates](15-controls-metrics-and-gates.md) | experimental controls, sensitivity metrics, gates G1–G5 |
+| 16 | [Neural species and the brain comparison](16-neural-species.md) | the neural prey and predator, matched pairs, S29–S33, survival analysis |
 
 ### Part B — the proposed Unity implementation
 

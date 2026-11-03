@@ -628,6 +628,8 @@ tick, and the owner gives the go for the other seven.
 - M16.6: S30 and S31 have their own scenes (`Neuro_JevPrey`, `Neuro_JevPredator`, also copies of Lab1_Small) rather than
   removals in `Neuro_Lab`, because a diet that names a removed species is an error (V-20). The neural species are named
   `neural prey` and `neural predator` (ids `prey-nn`, `predator-nn`), so prompt placeholders can name them.
+- M16.7: `SurvivalStats` is a world service and `PlateauStop` a phase after Record (each needs that kind of hook). In
+  `Prey_vs_Prey` the removed predator's placeholders are written as their values, so the JEV prey's prompt is Lab1_Full's.
 
 ## 13. Risks
 
