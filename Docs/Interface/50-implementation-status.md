@@ -1,5 +1,5 @@
 # 50 — Implementation status
-Updated: 2026-11-03, M16.8 concurrency and scale ⏸ (before it: M15 overlay actions ⏸)
+Updated: 2026-11-03, docs pass 09 step 3 (before it: M16.9 measured runs started, M16.8 ⏸)
 
 The single source of truth between implementation sessions of
 [`Docs/prompts/06-implement-unity-system.md`](../prompts/06-implement-unity-system.md).
@@ -8,12 +8,11 @@ The single source of truth between implementation sessions of
 M16 (plan `Docs/Neuro/PLAN.md`, prompt `Docs/prompts/08-implement-neural-species.md`): **M16.9 running**: the owner accepted the
 budget miss and gave the go; Ollama started; the first S33 run (default, seed 1, log `Logs/m169-s33-s1.log`) began
 2026-11-03 20:40 (a 200-tick check: 0.5 s per tick, mutations ok). When it stops: report cost and stop tick ⏸, then the
-other 7 runs with the owner's go. M16.7 ⏸ (Survival Report) and M16.6 ⏸ (S29 in `Neuro_Lab`) still wait. M16.8 (the worker task, pools, one fan per tick, faster casts), M16.7 (`Brains_2x2`, `Prey_vs_Prey`, S32/S33 with both arms, `SurvivalStats`, `PlateauStop`,
-`SurvivalAnalysis`, the Survival Report, chapter 16 and the site page), M16.6 (templates and menu, `MatchedPairs`, the three neural scenes, S29–S31, `NeuroStats`, the inspector panel), M16.5
-(the five actions, contacts, breeding), M16.4 (`NeuralBrain`, sync), M16.3 (ray fan, interoception, hunger clock, fan
-view) and M16.2 (genes, mutation, crossover in `Assets/EvoSim/Neuro`) are done. M16.1 (core C1–C7) is done: vector alleles, `vectors.jsonl`, `DecisionQuery.Genome`,
-`AnimalAction.SelfDirected`, `Brain.ReadsGeneText`, the conformance fixtures, recombinant alleles; EditMode see M16.1 row,
-R-01 unchanged. The owner's review of the core diff (⏸ M16.1) is still to come.
+other 7 runs with the owner's go. M16.1–M16.8 are done (milestone rows; details in 51, end); still waiting for the
+owner: the core diff (⏸ M16.1), S29 in `Neuro_Lab` (⏸ M16.6), the Survival Report (⏸ M16.7).
+
+Docs pass (09, `Docs/prompts/09-update-documentation.md`): step 3 done (2026-11-03: inventory in `Logs/docs-pass-09.md`,
+the contract, this file and 51). Next: step 4, the site.
 
 Before M16: M15 waits for the owner ⏸ (overlay actions, the alarm-calls example; 51 §M15). Since M14.1, docs only (0a322b7,
 9f0838f, 334771d, 2ac2368, 2fdd431); the gh-pages site predates the 2026-10-22 doc fixes: rebuild and publish it again.
@@ -123,44 +122,12 @@ pass (gemma4:12b on CPU, every sum 100); B-08 pass (P(flee) wolf 0.42, shadow 0.
 to 0.04 (reported); B-10 FAIL, gemma4:26b: 72.5 % usable after one mutation < 80 %, 62.5 % after ten, the founders themselves 92.5 % (qwen3.5:0.8b: 67.5 % / 17.5 %) (40 §2 #13); B-11 pass. About 5 500 calls.
 
 ## Decisions taken while implementing
-M0–M15 and M16.1–M16.2: in [51](51-implementation-log.md) (at its end). Since then:
-- M16.3 — a ray's distance to an animal, entity or item is where its centre projects on the ray (food 3 m ahead reads 3 m,
-  0.85 at 20 m), hit when the ray passes within 0.5 m (items: through their cell). Cover counts only where a ray enters it
-  from outside, so an animal in a thicket is not blinded by its own cell. Tie order = the `RayHitKind` values: Threat,
-  Prey, ReadyKin, Kin, OtherAnimal, Carcass, Entity, Food, Item, Cover, Water, Obstacle. V-76 checks the fan's settings.
-- M16.3 — `HungerClock` is a `DeathRule` that never kills (the thirst-recipe hook). The sense conformance suite gives a sense
-  with attachments a scripted brain that accepts them (V-51), an additive fixture change like C6.
-- M16.4 — `NeuralBrain` answers at once (the worker task of D4 is M16.8); it keeps one network and input buffer per
-  species, rebuilt when the gene's layout changes. Failures name the rule: no genome (DEC-10), length (V-71), width (V-72).
-- M16.5 — a step is exactly one tick's move (walk, run, or slow = a fraction of walk) toward the heading ± the turn, so
-  the act phase's heading update gives exact turns. `stop` is not self-directed (it stays, like rest). Contacts look
-  around the step's predicted end; breeding needs no new code (`Mates` on every action, the core's REPRO-02/04).
-- M16.6 — the templates are runtime code (`NeuralTemplates`, used by the menu, the scene builder and the tests): a copy of
-  the JEV species, its controller stripped. S30 and S31 get their own scenes (`Neuro_JevPrey`, `Neuro_JevPredator`)
-  instead of removals in `Neuro_Lab`: a diet naming a removed species is an error (V-20). Neural display names are
-  `neural prey`/`neural predator`; placeholders naming a replaced species are renamed to them. These scenes have no
-  `MatchedPairs` (one side of each pair is gone); pairs are checked in T-NEURO-12 and the 2×2.
-- M16.6 — V-73 and V-74 (left out of M16.4) are in `NeuralBrain.Validate`. The Animal Inspector gains an extension point
-  (`AnimalInspectorPanel`, editor only); the network panel is one. `NeuroStats` is a never-killing `DeathRule` like
-  `HungerClock`; its rates are over a 100-tick window. S29 measured (seeds 1234, 7): evolving prey 0.0652 and 0.0654 meals
-  per animal-tick over ticks 4 000–5 000, no-mutation 0.0620 and 0.0558; pinned as "greater" in both seeds.
-- M16.7 — `SurvivalStats` is a world service (only phases and services give `stats.csv` columns); `PlateauStop` is a phase
-  after Record (it needs every tick). A death ends the time at risk at its tick; founders start at age 0; killers' species
-  come from the arrival events. `Prey_vs_Prey` writes the removed predator's placeholders as their values, so the JEV
-  prey's prompt id equals Lab1_Full's (tested). Scenario assets are now overwritten in place (same GUID).
-- M16.7 — T-NEURO-16 with JEV (seed 1, 600 ticks): S32 2 719 s, 18 203 calls, hash dbf4abfb4aa14b1a; S33 2 425 s, 13 468
-  calls, 42eccc12957cd021; stopped at 300 and rerun from the caches → the same hashes, 0 calls; `survival.json` written.
-  NUnit's 180 s default failed both: 4-hour Timeout now. Not done: the cache hit rate against a Lab1 run with JEV.
-- M16.8 — the worker answer waits on a task (`Pending.Of`), not `ManualPending`'s spin: its `Sleep(1)` fallback is 15.6 ms
-  on Windows and made S29 9× slower. The fan's per-tick buffer is in the sense (`TickPool`), not a world service: no scene
-  change. Casts bin the animals once per sense context and tick, cache SENSE-06 per animal and viewer, give each ray the
-  candidates within asin(r/d) + 0.5° of it, and skip the ground march's tests well inside a plain `FlatGround`; all keep
-  the scan's order and floats (T-NEURO-08 compares them; every T-NEURO-15 hash is unchanged). No C8, no Burst.
+M0–M15 and M16.1–M16.8: in [51](51-implementation-log.md) (at its end).
 
 ## Disagreements between the brief and Docs/Interface
 - 20 §3.9 names the operator method `MutationOperator.Start(gene, parent, rng)`; on a MonoBehaviour Unity takes
   `Start` for its message and logs "Script error: Start() can not take parameters" for every operator. Renamed
-  `StartMutation` (templates, samples, tests). The contract's text should follow.
+  `StartMutation` (templates, samples, tests); 20 §3.9 and 22 follow since the docs pass 09.
 Brief vs Interface: none found so far. Chapter B of the brief (the Claude Doc, tabs A–G) matches 20; it adds the run loop's
 seven states (Idle, Running, Waiting, Blocked, Paused, Stepping, Stopped), now `RunState`.
 `Docs/Interface/design.md` (chapter A) and `design.pdf` are the owner's, committed in 2ac2368 (2026-10-21) as the v1 brief
@@ -183,12 +150,6 @@ of 2026-10-10; a note at the top of `design.md` says what changed since.
   (format upgrade, `m_Enabled: 1`); restored from git. Build players from the copy only.
 - 2026-11-03 — `ExerciseTests.StubsCompile` failed once in batch `-nographics` before any M16 change (`AssemblyBuilder.Build()`
   returned false: "the build started"), then passed on the next runs: flaky in batch, not an M16 regression.
-- 2026-11-03 (M16.7) — the batch runner ran the `[Explicit]` T-NEURO-16 when the Neuro assembly was named: 300 requests to
-  JEV, all refused (no server on localhost:8000), so no model ran. It is now also gated by `EVOSIM_T4=1`.
-
-- M16.8 — the 20 §9 budget (2 ms without the brain) is not met: S32 L0 (136 neural of 337 animals) 6.7 ms, senses 4.8
-  ms; a neural fan costs about 12 µs, so 300 neural animals need about 4 ms of senses. `TickTimeOnLab1Full` guards
-  10 ms. Next to JEV (seconds per tick) it is negligible; meeting it needs the optional Burst path.
 - M16.8 — T-NEURO-16's runs spent about 24 of their 32 minutes on the JEV species' Ollama mutator, not running: all 161
   mutation calls failed, each 3 tries × about 2 s (a refused connection on Windows) plus 3 s of backoff. M16.9 needs
   Ollama up, or its JEV arms run without LLM mutation.

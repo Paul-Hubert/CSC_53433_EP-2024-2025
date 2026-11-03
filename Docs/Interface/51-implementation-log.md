@@ -1588,3 +1588,45 @@ EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh
 - M16.2 — `NeuralMutation`: 3 draws per weight (choice, added float, replacement) plus the fallback's index and float, so
   the count never depends on the outcome (MUT-30); add and replace are exclusive per weight; the Gentle rate 0.5 is set in
   the constructor (the base class keeps 0.03 for other operators).
+
+### M16 (neural species): decisions of M16.3–M16.8, moved from 50 (docs pass 09, 2026-11-03)
+- M16.3 — a ray's distance to an animal, entity or item is where its centre projects on the ray (food 3 m ahead reads 3 m,
+  0.85 at 20 m), hit when the ray passes within 0.5 m (items: through their cell). Cover counts only where a ray enters it
+  from outside, so an animal in a thicket is not blinded by its own cell. Tie order = the `RayHitKind` values: Threat,
+  Prey, ReadyKin, Kin, OtherAnimal, Carcass, Entity, Food, Item, Cover, Water, Obstacle. V-76 checks the fan's settings.
+- M16.3 — `HungerClock` is a `DeathRule` that never kills (the thirst-recipe hook). The sense conformance suite gives a sense
+  with attachments a scripted brain that accepts them (V-51), an additive fixture change like C6.
+- M16.4 — `NeuralBrain` answers at once (the worker task of D4 is M16.8); it keeps one network and input buffer per
+  species, rebuilt when the gene's layout changes. Failures name the rule: no genome (DEC-10), length (V-71), width (V-72).
+- M16.5 — a step is exactly one tick's move (walk, run, or slow = a fraction of walk) toward the heading ± the turn, so
+  the act phase's heading update gives exact turns. `stop` is not self-directed (it stays, like rest). Contacts look
+  around the step's predicted end; breeding needs no new code (`Mates` on every action, the core's REPRO-02/04).
+- M16.6 — the templates are runtime code (`NeuralTemplates`, used by the menu, the scene builder and the tests): a copy of
+  the JEV species, its controller stripped. S30 and S31 get their own scenes (`Neuro_JevPrey`, `Neuro_JevPredator`)
+  instead of removals in `Neuro_Lab`: a diet naming a removed species is an error (V-20). Neural display names are
+  `neural prey`/`neural predator`; placeholders naming a replaced species are renamed to them. These scenes have no
+  `MatchedPairs` (one side of each pair is gone); pairs are checked in T-NEURO-12 and the 2×2.
+- M16.6 — V-73 and V-74 (left out of M16.4) are in `NeuralBrain.Validate`. The Animal Inspector gains an extension point
+  (`AnimalInspectorPanel`, editor only); the network panel is one. `NeuroStats` is a never-killing `DeathRule` like
+  `HungerClock`; its rates are over a 100-tick window. S29 measured (seeds 1234, 7): evolving prey 0.0652 and 0.0654 meals
+  per animal-tick over ticks 4 000–5 000, no-mutation 0.0620 and 0.0558; pinned as "greater" in both seeds.
+- M16.7 — `SurvivalStats` is a world service (only phases and services give `stats.csv` columns); `PlateauStop` is a phase
+  after Record (it needs every tick). A death ends the time at risk at its tick; founders start at age 0; killers' species
+  come from the arrival events. `Prey_vs_Prey` writes the removed predator's placeholders as their values, so the JEV
+  prey's prompt id equals Lab1_Full's (tested). Scenario assets are now overwritten in place (same GUID).
+- M16.7 — T-NEURO-16 with JEV (seed 1, 600 ticks): S32 2 719 s, 18 203 calls, hash dbf4abfb4aa14b1a; S33 2 425 s, 13 468
+  calls, 42eccc12957cd021; stopped at 300 and rerun from the caches → the same hashes, 0 calls; `survival.json` written.
+  NUnit's 180 s default failed both: 4-hour Timeout now. Not done: the cache hit rate against a Lab1 run with JEV.
+- M16.8 — the worker answer waits on a task (`Pending.Of`), not `ManualPending`'s spin: its `Sleep(1)` fallback is 15.6 ms
+  on Windows and made S29 9× slower. The fan's per-tick buffer is in the sense (`TickPool`), not a world service: no scene
+  change. Casts bin the animals once per sense context and tick, cache SENSE-06 per animal and viewer, give each ray the
+  candidates within asin(r/d) + 0.5° of it, and skip the ground march's tests well inside a plain `FlatGround`; all keep
+  the scan's order and floats (T-NEURO-08 compares them; every T-NEURO-15 hash is unchanged). No C8, no Burst.
+
+### M16: known problems closed or moved to the contract (docs pass 09)
+- 2026-11-03 (M16.7) — the batch runner ran the `[Explicit]` T-NEURO-16 when the Neuro assembly was named: 300 requests to
+  JEV, all refused (no server on localhost:8000), so no model ran. It is now also gated by `EVOSIM_T4=1`.
+- M16.8 — the 20 §9 budget (2 ms without the brain) is not met: S32 L0 (136 neural of 337 animals) 6.7 ms, senses 4.8
+  ms; a neural fan costs about 12 µs, so 300 neural animals need about 4 ms of senses. `TickTimeOnLab1Full` guards
+  10 ms. Next to JEV (seconds per tick) it is negligible; meeting it needs the optional Burst path.
+  Owner, 2026-11-03: the miss is accepted (20 §9, 40 §2 #19).
