@@ -623,6 +623,8 @@ tick, and the owner gives the go for the other seven.
 - M16.1 C1: the vector hash is SHA-256 over each value as the int64 round(v·10^d), little-endian.
 - M16.1 C2: `vectors.jsonl` is appended at each `alleles.jsonl` write, and exists only in runs with a vector gene.
 - M16.1 C3: Ask-the-Brain builds queries from sentences without a genome; a network fails there (DEC-40).
+- M16.3: an object's ray distance is its centre's projection on the ray; cover is seen only where a ray enters it from
+  outside; ties follow the `RayHitKind` order (threat first, the ground last).
 
 ## 13. Risks
 

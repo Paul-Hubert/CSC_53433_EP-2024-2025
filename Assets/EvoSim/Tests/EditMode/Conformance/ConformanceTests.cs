@@ -102,12 +102,26 @@ namespace EvoSim.Tests
         /// <param name="predators">Founders of the predator.</param>
         /// <param name="food">The fraction of food cells with an item at the start, 0 to 1.</param>
         /// <param name="seed">The world seed.</param>
+        /// <param name="attachments">True: the brain is a scripted one that accepts attachments, for a sense that gives
+        /// them (V-51; plan M16 C6).</param>
         /// <returns>The builder, not yet built.</returns>
-        WorldBuilder Ecology(string name, Action<GameObject> addToPrey, int prey = 16, int predators = 3, float food = 0.1f, int seed = 7) =>
-            New(seed, name: name).Ecology(40f, 0.2f, food,
+        WorldBuilder Ecology(string name, Action<GameObject> addToPrey, int prey = 16, int predators = 3, float food = 0.1f, int seed = 7,
+                             bool attachments = false)
+        {
+            var b = New(seed, name: name).Ecology(40f, 0.2f, food,
                     prey: s => { s.Population(prey); addToPrey?.Invoke(s.GameObject); },
                     predator: s => s.Population(predators))
-                .Carcasses().Service<EggSystem>("Eggs").ReferencePhases().DefaultBrain<RandomBrain>();
+                .Carcasses().Service<EggSystem>("Eggs").ReferencePhases();
+            return attachments ? b.DefaultBrain<ScriptedBrain>(x => x.TakesAttachments = true) : b.DefaultBrain<RandomBrain>();
+        }
+
+        /// <summary>True when a sense class gives attachments: its world then needs a brain that reads them (V-51).</summary>
+        static bool GivesAttachments(Type type)
+        {
+            var go = new GameObject("probe");
+            try { return ((Sense)go.AddComponent(type)).HasAttachments; }
+            finally { Object.DestroyImmediate(go); }
+        }
 
         // ---- T-SENSE template ----
 
@@ -120,7 +134,7 @@ namespace EvoSim.Tests
                 Companions(type, go);
                 sense = (Sense)Child(go, type.Name).AddComponent(type);
                 sense.SetLabel("Probe " + type.Name);                               // never the label of a reference sense (V-17)
-            }).Build();
+            }, attachments: GivesAttachments(type)).Build();
             Assert.Greater(sense.Tokens.Count, 0, "tokens declared");
             foreach (var t in sense.Tokens) Assert.IsFalse(string.IsNullOrWhiteSpace(t), "a token is empty");
             for (int k = 0; k < sense.Tokens.Count; k++)
