@@ -741,7 +741,7 @@ namespace EvoSim.DocAudit
                 "05-animals-stats-and-life-cycle.md", "06-senses-and-observations.md", "07-actions-and-locomotion.md",
                 "08-decisions-brains-and-prompts.md", "09-genes-alleles-and-genomes.md", "10-mutation.md",
                 "11-reproduction-and-population.md", "12-tick-order-and-determinism.md", "13-outputs-and-recording.md",
-                "14-configuration-reference.md", "15-controls-metrics-and-gates.md",
+                "14-configuration-reference.md", "15-controls-metrics-and-gates.md", "16-neural-species.md",
             }),
             ("Part B — the Unity implementation", new[] { "20-unity-architecture.md", "21-editor-tooling.md", "22-extending-recipes.md" }),
             ("Part C — verification", new[] { "30-tests.md", "31-scenarios.md", "32-integrity-prompts-and-ci.md", "40-open-questions.md" }),
