@@ -31,11 +31,11 @@ cover is its own behaviour.
 | 06 | [Senses and observations](06-senses-and-observations.md) | discrete observations, distance bands, situation text, batched raycasts, camera senses |
 | 07 | [Actions and locomotion](07-actions-and-locomotion.md) | actions, search fallback, movement, stamina budget, interactions, act order |
 | 08 | [Decisions, brains and prompts](08-decisions-brains-and-prompts.md) | when animals decide, the brain interface, the prompt, sampling, memo, cache, failures, reference brains |
-| 09 | [Genes, alleles and genomes](09-genes-alleles-and-genomes.md) | text and number genes, expression, alleles, registry, founder pools, crossover |
+| 09 | [Genes, alleles and genomes](09-genes-alleles-and-genomes.md) | text, number and vector genes, expression, alleles, registry, founder pools, crossover |
 | 10 | [Mutation](10-mutation.md) | rates, operators (LLM instruction deck, numeric rules), guards, redraws, asynchronous mutation |
 | 11 | [Reproduction and population](11-reproduction-and-population.md) | mating, litters, eggs and incubation, caps, migration, floors, newcomers |
 | 12 | [Tick order and determinism](12-tick-order-and-determinism.md) | the phase list, act order policies, random streams, event hash, replay |
-| 13 | [Outputs and recording](13-outputs-and-recording.md) | events, stats, alleles, summary, run info |
+| 13 | [Outputs and recording](13-outputs-and-recording.md) | events, stats, alleles, vectors, survival, summary, run info |
 | 14 | [Configuration reference](14-configuration-reference.md) | every parameter with its reference value and unit |
 | 15 | [Controls, metrics and gates](15-controls-metrics-and-gates.md) | experimental controls, sensitivity metrics, gates G1–G5 |
 | 16 | [Neural species and the brain comparison](16-neural-species.md) | the neural prey and predator, matched pairs, S29–S33, survival analysis |
@@ -56,6 +56,13 @@ cover is its own behaviour.
 | 31 | [Scenarios](31-scenarios.md) | test worlds with different options, genes, mutations, senses and actions |
 | 32 | [Integrity prompts and CI](32-integrity-prompts-and-ci.md) | brain integrity checks, prompts for coding agents, the CI tiers (with real LLMs) |
 | 40 | [Open questions](40-open-questions.md) | blind spots and decisions still to take |
+
+### Part D — implementation record
+
+| # | Document | Covers |
+|---|---|---|
+| 50 | [Implementation status](50-implementation-status.md) | milestones, the next step, the machine, decisions and known problems still live |
+| 51 | [Implementation log](51-implementation-log.md) | finished milestones' details and decisions, in order |
 
 A prompt for Claude Design turns this folder into an illustrated architecture
 brief (UML, design patterns, worked custom setups):

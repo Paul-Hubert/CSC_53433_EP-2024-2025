@@ -533,6 +533,10 @@ public class NumberGene : Gene
 }
 ```
 
+A third kind, `AlleleKind.Vector` (M16, GENE-07), holds a whole `float[]` in one allele
+(`AlleleValue.OfVector`, `.Vector`, `.Canonical(decimals)`); `NeuralGenomeGene` in
+`EvoSim.Neuro` uses it for a network's weights ([16](16-neural-species.md)).
+
 Founder sentences live in an `AllelePool` ScriptableObject when several species
 or prefabs share them; the inspector checks every sentence with the mutation
 guards (GENE-22).
@@ -584,8 +588,12 @@ public abstract class Brain : WorldService
 {
     public virtual int MaxActions => int.MaxValue;
     public virtual bool AcceptsAttachments => false;
+    public virtual bool CanMixSpecies => true;                   // false: one batch per species (DEC-13)
+    public virtual bool ReadsGeneText => true;                   // false: no sentence read, V-05 skipped (M16 C5)
+    public virtual bool Memoizable => true;                      // false: never memoised or cached
     public abstract string Id { get; }                           // part of memo and cache keys
-    /// Answer a batch (DEC-11). Fast brains fill the answer at once; HTTP brains later.
+    /// Answer a batch (DEC-11). Fast brains fill the answer at once; HTTP brains later;
+    /// a local brain may answer later from a worker task (DEC-16).
     public abstract BrainAnswer Ask(IReadOnlyList<DecisionQuery> batch);
 }
 ```
@@ -596,6 +604,7 @@ public abstract class Brain : WorldService
 | Ollama points | `OllamaPointsBrain : HttpBrain` | JSON schema per species, temperature 0, seed, `num_ctx`, `think: false`, parallel requests |
 | JEV choice | `JevBrain : HttpBrain` | one `/v1/completions` request with the list of prompts of the batch, `max_tokens` 1, allowed option tokens, log-probabilities, head bias, calibrated temperature |
 | Fake | `ScriptedBrain` (tests) | returns given vectors, counts calls |
+| Neural (M16) | `NeuralBrain` (`EvoSim.Neuro`) | a forward pass over the animal's weights from `DecisionQuery.Genome`; Greedy or Sample; reads no gene text, never memoised; from `SyncBelow` queries on, on a worker task ([16](16-neural-species.md)) |
 
 `HttpBrain` holds the shared plumbing: a `System.Net.Http.HttpClient`, retries
 with back-off, time-outs, a cap on parallel requests, strict mode, and the answer
@@ -761,9 +770,14 @@ Assets/EvoSim/
   Testing/          EvoSim.Testing.asmdef        WorldBuilder, ScriptedBrain, FakeMutator, Golden
   Tests/EditMode/   EvoSim.Tests.EditMode.asmdef
   Tests/PlayMode/   EvoSim.Tests.PlayMode.asmdef
+  Neuro/            EvoSim.Neuro.asmdef          the neural species (M16): Net/ Genes/ Mutation/ Reproduction/
+                                                 Senses/ Brains/ Actions/ Templates/ Comparison/ Recording/
+                                                 Views/ Modules/; Editor/ (EvoSim.Neuro.Editor),
+                                                 Tests/ (EvoSim.Tests.Neuro)
   Modules/          prefabs: Eat, Flee, Hide, Follow, Rest, Mate, Hunt, Scavenge, StaminaGene, ...
   Data/             AllelePools, mutation decks (TextAssets), frozen prompts, control sentences
-  Scenes/           Lab1_Full, Lab1_Small, HideVsFlee, ThreeSpecies, Terrain_Locomotion, Sandbox
+  Scenes/           Lab1_Full, Lab1_Small, HideVsFlee, ThreeSpecies, Terrain_Locomotion, Sandbox;
+                    Neuro_Lab, Neuro_JevPrey, Neuro_JevPredator, Brains_2x2, Prey_vs_Prey (M16)
   Scenarios/        ScenarioAssets (overrides, CFG-02)
 ```
 
@@ -802,6 +816,13 @@ need jobs.
 
 LLM brains dominate everything else: JEV answers about 12 queries per second, so
 the memo, the answer cache and batching matter far more than C# speed.
+
+**Measured with the neural species (M16.8): the budget is not met.** S32 L0 (Lab1_Full, 136
+neural of 337 animals) takes 6.7 ms a tick without the brain, 4.8 ms of it in the senses: a
+neural ray fan costs about 12 µs, so 300 neural animals need about 4 ms of senses alone. The
+owner accepted the miss (2026-11-03): next to JEV's seconds per tick it is negligible.
+`TickTimeOnLab1Full` guards 10 ms. Meeting 2 ms needs the optional Burst path behind `ReadAll`
+(open question, [40](40-open-questions.md)).
 
 ## 10. Designed to scale (later)
 

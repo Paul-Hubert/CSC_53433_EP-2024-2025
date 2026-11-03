@@ -220,6 +220,28 @@ Format: **id** — given → expect *(rules)*.
 - **T-EDIT-02** — the runtime assembly has no reference to `UnityEditor` *(EDIT-03)*.
 - **T-EDIT-03** *(T0)* — validate every scene in `Scenes/` and every prefab in `Modules/` → no errors *(EDIT-01)*.
 
+### Neural species (M16)
+
+In `Assets/EvoSim/Neuro/Tests` (assembly `EvoSim.Tests.Neuro`), except T-NEURO-01 (`Tests/EditMode/Genes`). The
+species, the codes V-70…V-79 and the scenarios are in [16](16-neural-species.md).
+
+- **T-NEURO-01** — vector alleles equal at the gene's decimals → one allele, different → two; `Canonical` stable across runs; `alleles.jsonl` names a vector by `vector_sha` and `length`, `vectors.jsonl` holds its values (and is absent without a vector gene), `parent2_id` only on a recombinant; a query carries the brain-visible genome; V-05 skipped for a brain that reads no sentence *(GENE-07, GENE-10, GENE-12, DEC-10, C1–C3, C5, C7)*.
+- **T-NEURO-02** — `NeuralGenomeGene` passes the gene template; vector length = Σ (fan-in + 1) × fan-out for 1–3 senses, 1–8 actions, 0–2 hidden layers; the random founder pool is the same under two run seeds; an action added after the founders were drawn → V-71 with a fix that rebuilds them *(T-GENE-01, GENE-21)*.
+- **T-NEURO-03** — `NeuralMutation` passes the T-MUT template (same stream → same mutant, differs from its parent, clamped); over 10 000 mutations the shares of added and replaced weights match pAdd and pReplace within 4 s.e. *(MUT-20, MUT-30)*.
+- **T-NEURO-04** — `NeuronCrossover`: each neuron slice whole from one parent; same stream → same baby; a recombinant registered once with both parents; a child equal to a parent reuses its allele *(GENE-30, GENE-32, GENE-12)*.
+- **T-NEURO-05** — the ray fan: 12 rays at 0°, 30° … 330°, partial fans symmetric; food 3 m ahead → proximity 0.85; the first object occludes; cover stops a predator's ray at a hidden prey; the world's edge is an Obstacle; ties follow the kind order; in a 4-species world both predators are Threats to both preys *(SENSE-06, SENSE-40, SPACE-08)*.
+- **T-NEURO-06** — `ReadAll` = `Read` over 500 animals; interoception: the in-cover flag, the previous action one-hot (zeros before the first decision), ticks since the last meal (reset by a meal, clamped at `hungerHorizon`); widths 84 + 12 = 96 with the default kinds *(SENSE-31, T-SENSE-09, CORE-05)*.
+- **T-NEURO-07** — `NeuralBrain` passes the brain template on both neural species; Greedy is a one-hot on the largest output (ties → lower index), drawn whatever the World's τ; Sample is a softmax; no genome or a wrong length fails the query; V-70 *(T-DEC-03, DEC-11, DEC-12, DEC-20, DEC-40)*.
+- **T-NEURO-08** — the worker task gives the synchronous rows bit for bit; S32 with a slow fake JEV completes its ticks, and inline or worker, Freeze or Responsive, Fast or RealTime give one hash; binned casts equal the full scan ray for ray; the tick pool; S32 L0's tick time is reported against 20 §9 *(DEC-16, SPACE-11, SPACE-14)*.
+- **T-NEURO-09** — the actions pass the T-ACT template as self-directed; `left`/`right` turn ∓20° a tick at walk speed, a 35° turn at run speed turns 35°; `walk`/`run` keep the heading; `stop` stays, pays the rest cost and recovers stamina *(ACT-04)*.
+- **T-NEURO-10** — contacts: grass 0.8 m ahead is grazed in the same tick; a prey 0.8 m ahead is struck and leaves a carcass; at most one interaction a tick, strike > scavenge > graze *(ACT-03, ACT-10)*.
+- **T-NEURO-11** — breeding: asexual, a ready animal breeds alone; sexual, only on contact with a ready kin, the baby a neuron mix; mutation at rate 1 always, at 0 never *(REPRO-02, REPRO-04, MUT-01)*.
+- **T-NEURO-12** — templates against the reference species → no V-78, V-79; a changed run speed → V-78 names it; a diet without `prey-nn` → V-79; V-73, V-74.
+- **T-NEURO-13** — `SurvivalAnalysis`: Kaplan–Meier and Greenwood on a worked example, the rate ratio and its interval, lives and censoring from events; `SurvivalStats` on S32 L0 equals the events and writes `survival.json`.
+- **T-NEURO-14** — `PlateauStop`: no stop before 50 generations; a ±10 % plateau over three windows stops at the window boundary with complete outputs; otherwise the cap *(RAND-20)*.
+- **T-NEURO-15** *(T2)* — S29 asexual and sexual for 5 000 ticks, and the L0 versions of S30–S33: the same seed twice → the same hash, no model call; evolving neural prey (S29) eat more per animal-tick than under the no-mutation control in seeds 1234 and 7.
+- **T-NEURO-16** *(T4)* — S32 and S33 with JEV (seed 1, 600 ticks): no stall on the neural brain, `survival.json` written, a run stopped halfway and rerun from its caches gives the unbroken hash. `[Explicit]`, runs only with `EVOSIM_T4=1`; timeout 4 hours.
+
 ## 4. Conformance suites for students' modules
 
 Parameterised tests that run against **every** class of a kind found in the
@@ -228,7 +250,7 @@ the recipes of [22](22-extending-recipes.md) refer to.
 
 | Suite | Runs on | Checks |
 |---|---|---|
-| T-SENSE template | every `Sense` | tokens declared and non-empty; `Read` returns a declared index in 200 random worlds; `Write` is deterministic and non-empty for every token; nothing hidden is reported; batched equals sequential |
+| T-SENSE template | every `Sense` | tokens declared and non-empty; `Read` returns a declared index in 200 random worlds; `Write` is deterministic and non-empty for every token; nothing hidden is reported; batched equals sequential. A sense with attachments gets a scripted brain that accepts them (V-51) |
 | T-ACT template | every `AnimalAction` | searches when alone (a self-directed action instead moves alone and doesn't search, ACT-04); intent only (no position or stat of another animal changed); description present; bound gene or V-05 |
 | T-ANIM stat template | every module declaring a stat | stays in range for 5 000 ticks; initial values for founders and babies |
 | T-ENV layer template | every `ResourceLayer` | consume once; nearest equals brute force; changes only in its phase with its own stream |

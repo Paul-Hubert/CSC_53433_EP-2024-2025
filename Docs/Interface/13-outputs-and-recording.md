@@ -29,6 +29,7 @@ files follow the prototype's formats so that the prototype's analysis tools
 | `stats.csv` | one row every `statsEvery` ticks (reference 100), §4 |
 | `alleles.jsonl` | every allele seen, all species: `id`, `locus`, `text` (or `value` for number genes, or `vector_sha` and `length` for vector genes), `origin`, `parent_id` (and `parent2_id` for a recombinant), `operator`, `model`, `seed` |
 | `vectors.jsonl` | only in a run with a vector gene: the values of every vector allele, one line `{id, values}` each, in registration order, appended when `alleles.jsonl` is written |
+| `survival.json` | only in a world with `SurvivalStats` (M16): at the run's end, `end_tick`, `stop_reason`, `plateau_tick` (−1 if none), the matched `pairs`, and per species its maturity, cap, floor, initial population, whether it is neural, the living, births, newcomers, deaths by cause and kills by victim; read with `events.jsonl` by the Survival Report ([16 §4](16-neural-species.md#4-survival)) |
 | `final_population.json` | the living animals at the end: `id`, `gen`, `genome` (allele ids), `species` |
 | `summary.json` | totals per species and for the run (§5) |
 | `run_info.json` | what ran: scene or configuration snapshot, git commit, Unity version, brains (model names, digests or pinned revisions, hosts), mutator (API, host, model), seeds, wait mode, act order |
@@ -62,6 +63,17 @@ One row per `statsEvery` ticks, columns `t` then, per species with the prefix
 | `portions` | cumulative carcass portions eaten (hunters) |
 
 and `alleles`, the number of alleles registered (all species).
+
+Modules add columns through `IStatsColumns`: a species module's columns follow that species'
+`act_…` columns, with its prefix; a world module's (phase or service) end the row, unprefixed.
+The neural species (M16, [16](16-neural-species.md)) add two sets:
+
+| Column | Module | Meaning |
+|---|---|---|
+| `<species>_nn_speed`, `_nn_meals_per_tick`, `_nn_meals_per_m` | `NeuroStats` (species) | meters per animal-tick, meals (graze, strike or scavenge) per animal-tick and per meter, over the last `Window` ticks (100) |
+| `<species>_nn_loops`, `_nn_share_<action>` | `NeuroStats` | shares of the living animals now: repeating one action for `LoopTicks` (50) ticks or more; deciding each action |
+| `sv_<species>_alive`, `_births`, `_immigrants`, `_deaths_<cause>` | `SurvivalStats` (world service) | living animals, then cumulative counts; causes `starvation`, `killed`, `old_age`, `migrated` |
+| `sv_<killer>_kills_<victim>` | `SurvivalStats` | cumulative kills, for each species whose diet strikes another |
 
 ## 5. Summary
 

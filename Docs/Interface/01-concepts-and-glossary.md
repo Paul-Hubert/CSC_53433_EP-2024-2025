@@ -82,13 +82,15 @@
 | **Gene, locus** | A slot of the genome with a fixed meaning, e.g. "the eat gene". Identified by a locus id. |
 | **Text gene** | A gene whose value is a sentence, read by the brain through the prompt. |
 | **Number gene** | A gene whose value is a number, expressed into a trait. |
-| **Allele** | One value a gene can take (a sentence or a number), with an id and a lineage. |
+| **Vector gene, vector allele** | A gene whose one allele holds a whole list of floats, such as a neural network's weights; two vectors are the same allele when they agree at the gene's decimals (`Canonical`). Their values are recorded in `vectors.jsonl` ([09](09-genes-alleles-and-genomes.md) GENE-07, [16](16-neural-species.md)). |
+| **Allele** | One value a gene can take (a sentence, a number or a vector), with an id and a lineage. |
 | **Genome** | One allele per locus of the animal's species, in the species' locus order. |
 | **Expression** | Turning a genome into what acts at run time: sentences into the prompt, numbers into traits. |
 | **Founder pool** | The alleles from which the first animals and newcomers are drawn, per locus, including a **neutral** allele ("No preference."). |
 | **Contrast alleles** | A "pro" and an "anti" sentence per locus, used only in tests of the brain. |
 | **Control alleles** | Meaningless or irrelevant sentences, used in controls and tests. |
 | **Crossover** | Building a child's genome from its parents', locus by locus. |
+| **Recombinant** | An allele a crossover built from two parent alleles (a neuron mix of two networks); it records both parents (GENE-12). |
 | **Mutation operator** | A rule that changes one allele: an LLM instruction deck for sentences, a numeric rule for numbers. |
 | **Mutator** | The service that runs LLM mutations (a small model, batched). |
 | **Guard, redraw** | A check on a mutated sentence; a rejected answer is drawn again with a new instruction and seed. |
@@ -109,6 +111,13 @@
 | **Act order** | The order in which animals act within a tick (species in turn, all mixed, or simultaneous). |
 | **Decision period** | Ticks between two decisions (4 in the reference). |
 | **Brain** | A module that maps a batch of queries to probability rows over actions. |
+| **Neural species** | A species whose brain is a small network carried in its genome (`NeuralBrain`, M16): it reads numbers from its senses, not sentences, and steers with five actions ([16](16-neural-species.md)). |
+| **Attachment** | Extra data a sense hands the brain beside its token, such as a ray fan's floats or a camera image (SENSE-40). |
+| **Ray fan** | The neural species' eyes: rays spread around the heading, each stopped by the first object it meets and reporting its kind and closeness (`RayFanSense`). |
+| **Self-directed action** | An action with no target, such as turning or walking straight; it never searches (ACT-04, `AnimalAction.SelfDirected`). |
+| **Matched pair** | A JEV species and its neural copy with the same body and life settings, so only the controller differs (`MatchedPairs`, V-78, V-79). |
+| **Plateau stop** | The rule that ends a comparison run once every neural species has 50 generations and its measures stay within ±10 % over three 2 000-tick windows (`PlateauStop`; cap 60 000 ticks). |
+| **Survival analysis** | Kaplan–Meier survival by age and death-rate ratios between the two species of a matched pair, read from the events (`SurvivalAnalysis`, the Survival Report). |
 | **Query** | What the brain receives for one animal: species, brain-visible genes, observation, situation text. |
 | **Sampling temperature** | τ applied to the brain's probabilities before drawing: p^(1/τ), renormalised. |
 | **Memo** | Within a run, the answer for each (species, brain, brain-visible genome, observation) is computed once. |

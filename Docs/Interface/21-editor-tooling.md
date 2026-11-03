@@ -74,6 +74,7 @@ Severity: **E** error (blocks Play), **W** warning, **I** information.
 | V-60 | W | an HTTP brain or the mutator is unreachable (checked on demand: *Test connection*) | — |
 | V-61 | E | a key or token in a serialized field of a scene, prefab or asset (OUT-04) | move to an environment variable |
 | V-62 | E | the answer cache folder can't be written | pick another |
+| V-70…V-79 | E / W / I | the neural species (M16): network gene, layout, ray fan, contacts, matched pairs | [16 §2](16-neural-species.md#2-matched-to-jev) |
 
 ## 3. Inspectors
 
@@ -121,6 +122,12 @@ or *random*), switch V1/V2, see the full prompt with its token estimate, copy it
 | **Event log** | events filtered by kind, species and animal; follow a lineage | D |
 | **Scenario runner** | scenario assets, run N seeds headless, results against expected ranges, pass or fail ([31](31-scenarios.md)) | G |
 | **Brain health** | hosts, *Test connection*, model digests or revisions, latency, failures, cache size and hit rate | — |
+| **Survival Report** (M16, `Window ▸ EvoSim ▸ Survival Report`) | the runs of one scenario and arm: headline death-rate ratios, Kaplan–Meier curves with Greenwood bands, per-window hazards, the kill matrix; writes a markdown report and its CSV to `Logs/EvoSim/Reports/` ([16 §4](16-neural-species.md#4-survival)) | — |
+
+The Animal inspector draws extra sections under the decision: a class derived from
+`AnimalInspectorPanel` in any editor assembly is found and drawn for the animals it
+`Shows`. The neural species' **Network** panel is one: the layout, each sense's inputs
+and each action's output, the chosen one marked.
 
 ## 5. Scene view
 
@@ -144,6 +151,11 @@ or *random*), switch V1/V2, see the full prompt with its token estimate, copy it
   undoes it.
 - `GameObject ▸ EvoSim ▸ Add Action / Sense / Gene` instantiates module prefabs
   from `Modules/`.
+- `GameObject ▸ EvoSim ▸ New Neural Species ▸ Prey | Predator` (M16) adds a neural
+  copy of the selected species (or the scene's `prey` or `predator`) and names the pair
+  in `MatchedPairs`; other diets are left alone (V-79 lists them);
+  `EvoSim ▸ Neuro ▸ Build Neuro Scenes` and `Build Comparison Scenes` rebuild the five
+  neural scenes ([16](16-neural-species.md)).
 - `Assets ▸ Create ▸ EvoSim ▸` *Allele Pool*, *Scenario*, *Mutation Deck*, and
   *Script* templates for a new sense, action, gene kind, stat, phase, brain or
   mutation operator, each with the methods to override and a matching test file.

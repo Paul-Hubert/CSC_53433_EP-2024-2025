@@ -43,6 +43,12 @@
 - **DEC-15 (SHOULD)** All queries of a tick that go to one brain are sent as one
   batch (one request where the server accepts a list), after the memo removed
   the ones already answered.
+- **DEC-16 (MAY; MUST if used)** A brain that computes locally may answer a batch on a worker
+  task (`BrainAnswer.Later(n, Pending.Of(task))`), so its work runs while other brains' requests
+  are in flight; the tick waits for it as for any brain (TICK-03). If it does, it **must** copy
+  every input it reads on the main thread before it returns, touch no World or Unity object on
+  the worker, and give exactly the rows its synchronous path gives (DEC-12), so the wait mode never
+  changes a run (SPACE-14). `NeuralBrain` does this from `SyncBelow` queries on (default 32; M16.8).
 
 ## 3. Drawing the action
 

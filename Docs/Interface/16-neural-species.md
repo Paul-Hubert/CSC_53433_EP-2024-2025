@@ -31,7 +31,7 @@ controller changes. `MatchedPairs` names the pairs and validation reports:
 |---|---|---|
 | V-70 | error | a species with `NeuralBrain` has no `NeuralGenomeGene` |
 | V-71 | error | founder vectors don't match the layout's length |
-| V-72 | error | a neural sense's width changed since the layout was built |
+| V-72 | error | a neural sense's width changed since the layout was built (reported as a failed query at decision time, not before the run; [40](40-open-questions.md) #21) |
 | V-73 | warning | sexual mating without `NeuronCrossover` |
 | V-74 | info | a neural species decides less often than every tick |
 | V-75 | warning | a contact the diet can't use |
@@ -41,6 +41,8 @@ controller changes. `MatchedPairs` names the pairs and validation reports:
 | V-79 | warning | a diet or a cover treats the two of a pair differently |
 
 ## 3. Scenes and scenarios
+
+Variants, seeds and lengths: [31 §3](31-scenarios.md#s29s33-neural-species-m16).
 
 | Scenario | Scene | Prey | Predators | Tier |
 |---|---|---|---|---|
@@ -59,11 +61,10 @@ builders are `EvoSim ▸ Neuro ▸ Build Neuro Scenes` and `Build Comparison Sce
 
 ## 4. Survival
 
-- **`SurvivalStats`** (world service) adds `sv_<species>_alive`, `_births`, `_immigrants`, `_deaths_<cause>` and
-  `sv_<killer>_kills_<victim>` to `stats.csv`, and writes `survival.json` at the run's end: each species' maturity, cap,
-  floor, initial population, counts, and the matched pairs and plateau tick.
+- **`SurvivalStats`** (world service) adds the `sv_` columns to `stats.csv` and writes `survival.json` at the run's end
+  ([13](13-outputs-and-recording.md): files and columns); `NeuroStats` adds each neural species' `nn_` columns.
 - **`PlateauStop`** (a phase after Record) closes a window every 2 000 ticks and stops the run cleanly (RAND-20) at the
-  first boundary where every neural species has a mean generation of at least 50 and its mean population, starvation
+  first boundary where every tracked species (the ids listed, else every neural species) has a mean generation of at least 50 and its mean population, starvation
   hazard, predation hazard and births per animal stay within ±10 % over the last three windows. Cap: 60 000 ticks
   (reason `plateau cap`). With **Stops Run** off it only records the tick.
 - **`SurvivalAnalysis`** rebuilds each life from `events.jsonl` (founder, birth or newcomer to death; migration and the
@@ -76,6 +77,6 @@ builders are `EvoSim ▸ Neuro ▸ Build Neuro Scenes` and `Build Comparison Sce
 
 ## 5. Tests
 
-T-NEURO-01…16 (plan §8) in `Assets/EvoSim/Neuro/Tests` (assembly `EvoSim.Tests.Neuro`), plus the conformance suites,
+T-NEURO-01…16 ([30 §3](30-tests.md#neural-species-m16)) in `Assets/EvoSim/Neuro/Tests` (assembly `EvoSim.Tests.Neuro`), plus the conformance suites,
 which pick up every neural sense, action, brain, gene and operator. T-NEURO-16 calls JEV: it runs only with
 `EVOSIM_T4=1` in the environment.

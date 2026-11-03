@@ -3,8 +3,10 @@
 In the prototype every gene is an English sentence, one per action. Here a gene
 is an interface: the reference kinds are **text genes** (sentences the brain
 reads) and **number genes** (values expressed into traits, such as maximum
-stamina). Both evolve the same way: inherited by crossover, changed by blind
-mutation, kept or lost by selection.
+stamina). Since M16 the core has a third kind, **vector genes** (one allele holds a
+whole `float[]`, such as a neural network's weights; GENE-07, [16](16-neural-species.md)).
+All evolve the same way: inherited by crossover, changed by blind mutation, kept or
+lost by selection.
 
 ## 1. Genes (loci)
 

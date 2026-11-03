@@ -58,6 +58,11 @@ deferred.
 | 17 | The open system's seams (owner 2026-10-10: students should be able to make anything): `OnBorn`/`OnDied` on species and world modules, `IStatsColumns`, `[RequiresModule]`, `Diet.KillChanceAgainst`/`EnergyFrom`, `InteractionContext.Feed`, `Brain.Memoizable` with `DecisionQuery.AnimalId`, several Cover services, `NearestEntity<T>`, `AnimalView.OnShow`, property placeholders and `{{ }}` escapes, `AnimalAction.Hunts`, `MutationOperator.UsesMutatorService` (51, M12.5). 20 §3 and 22 could list them | as implemented | 20 §3, 22 |
 | 18 | Short actions (a call, a scent mark): under ACT-02 an action runs every tick until the next decision, so the first alarm call stood next to the predator for up to 4 ticks and was caught. **Owner, 2026-10-21: overlays** (option A of the M15 design report, `Logs/EvoSim/Reports/SHORT-ACTIONS-DESIGN.md`, which stays local: `Logs/` is not in git). An action may be an overlay: when drawn, a carrier is drawn from the rest of the row and moves the animal, the overlay adds only its interaction, for `OverlayTicks` ticks; no extra brain call; decision timing, REPRO-03 and the memo unchanged | as implemented (M15) | 01, 07 ACT-07, 08 DEC-20 and PROMPT-03, 13 §4, 20 §3.6 and §5, 21 §2 (V-19, V-27), 22 §3, 30 T-ACT-11 |
 
+| 19 | The Burst path for the neural species (M16.8): a Burst ray march and forward pass behind `ReadAll`, checked against the managed oracle, to meet the 20 §9 budget (S32 L0 takes 6.7 ms a tick, 2 ms asked) | managed code only; the owner accepted the miss (2026-11-03) | 20 §9, 16 |
+| 20 | The JEV species' Ollama mutator in the measured runs (M16.9): with Ollama down, T-NEURO-16 spent about 24 of 32 minutes on mutation calls that all failed | Ollama up for every run with LLM mutation (started for M16.9); otherwise run the JEV arms without LLM mutation | 16 §3, 31 S32/S33 |
+| 21 | V-72 is not a validation message: a sense whose width changed after the layout was built fails each query at decision time ("… (V-72)"), not before the run | as implemented | 16 §2, 21 §2 |
+| 22 | T-NEURO-16 doesn't check the plan's "JEV cache hit rate within ±5 points of Lab1 alone" (no Lab1 run with JEV to compare with yet) | not checked | 30 T-NEURO-16 |
+
 ## 3. Deferred by the owner ("later")
 
 | Topic | What is ready for it now |
@@ -70,6 +75,8 @@ deferred.
 | Directions and angles in observations | senses are free to add tokens; the observation-space warning (V-50) |
 | Scale beyond a few hundred animals | the seams of 20 §10 |
 | A shared answer cache for a class | the cache key (DEC-33) doesn't depend on where the file lives |
+| Pre-evolved neural founders (a `NeuralFounderPool` asset), sexual measured runs (M16) | `vectors.jsonl` holds every network of a run; S32/S33 have no sexual variant yet ([Neuro plan §9](../Neuro/PLAN.md)) |
+| A trained (DRL) brain on the neural species | the species' ray observation and 5 discrete actions fit an ML-Agents policy; a `Brain` with `Memoizable => false` ([Neuro plan §10](../Neuro/PLAN.md)) |
 
 ## 4. Rules to revisit after the first Unity runs
 

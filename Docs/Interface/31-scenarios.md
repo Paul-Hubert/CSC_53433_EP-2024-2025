@@ -71,6 +71,11 @@ point `EvoSim.Batch.RunScenario` both read these assets.
 | S26 | Names in genes | a species renamed | LLM | T4 |
 | S27 | Lab 1 with an LLM | JEV and Ollama, short run | JEV, gemma | T4 |
 | S28 | Egg eaters | eggs made edible by components | scripted, then JEV | T2 / T4 |
+| S29 | Neuro lab | neural prey and predators only (M16) | neural | T2 |
+| S30 | JEV prey, neural predators | the predator's brain | JEV + neural; random (L0) | T2 / T4 |
+| S31 | Neural prey, JEV predators | the prey's brain | neural + JEV; random (L0) | T2 / T4 |
+| S32 | Brains 2×2 | JEV and neural prey and predators in one world | JEV + neural; random (L0) | T2 / T4 measured |
+| S33 | Prey vs prey | JEV and neural prey, no predators | JEV + neural; random (L0) | T2 / T4 measured |
 
 ## 3. Scenarios in detail
 
@@ -249,4 +254,23 @@ diet is `egg:prey` ([22 §15](22-extending-recipes.md#15-food-make-eggs-edible))
 **Expect** (T2, scripted egg eaters): eaten eggs never hatch and are recorded as
 lost; without the `Edible`, V-24 fires and no egg is eaten. With JEV (T4): the
 prey's births drop compared with S03 at incubation 20 without egg eaters.
+
+### S29–S33 Neural species (M16)
+The neural species, their scenes and the survival analysis are in [16](16-neural-species.md). In every one of
+these scenarios a `jev-…` or plain variant runs the JEV species on JEV; an `L0-…` variant gives them the random brain
+and removes their LLM mutation (T2). Asexual variants set the JEV species' mating line to "An adult that chooses mate
+breeds alone as soon as it is ready."
+
+- **S29 NeuroLab** — `Neuro_Lab` (Lab1_Small's map), neural prey and neural predators, 5 000 ticks, seeds 1234, 7,
+  42; variants `asexual`, `sexual`, `no-mutation` (asexual, no mutation). **Expect** (T2): the same seed twice gives
+  the same hash; evolving prey eat more per animal-tick over the last 1 000 ticks than under `no-mutation` in seeds
+  1234 and 7 (T-NEURO-15).
+- **S30 JevPreyNeuroPredator** — `Neuro_JevPrey`: JEV prey, neural predators; **S31 NeuroPreyJevPredator** —
+  `Neuro_JevPredator`: neural prey, JEV predators. 2 000 ticks, seeds 1234, 7, 42; variants `L0-asexual`,
+  `L0-sexual`, `jev-asexual`, `jev-sexual`. **Expect**: L0 replays (T2); with JEV, functional checks only (T4).
+- **S32 Brains2x2** — `Brains_2x2` (Lab1_Full's map): `prey`, `prey-nn`, `predator`, `predator-nn`, both
+  predators eating both preys. **S33 PreyVsPrey** — `Prey_vs_Prey`: `prey` and `prey-nn`, no predators. Both
+  asexual, grass `regrowP` 0.003 (×2), seeds 1 and 2, up to 60 000 ticks (`PlateauStop`), variants `default` (the
+  neural species decide every tick), `matched` (period 4, staggered), `L0-default`, `L0-matched`. **Expect**: L0
+  replays (T2, T-NEURO-15); with JEV, the measured runs of M16.9 and one Survival Report per scenario and arm (T4).
 
