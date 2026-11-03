@@ -92,11 +92,11 @@ namespace EvoSim.Neuro.Tests
 
         // ---- T-NEURO-16 (T4: JEV is called; the owner is told before it runs) ----
 
-        /// <summary>A T4 smoke run of S32 or S33 with JEV for about ten minutes (Responsive, as in Play mode).</summary>
+        /// <summary>A T4 smoke run of S32 or S33 with JEV (Responsive, as in Play mode); 600 ticks take about 45 minutes.</summary>
         static string Smoke(string scenario, int ticks) =>
             EvoSim.Batch.Run(Load(scenario), "default", 1, ticks, null, WaitMode.Responsive);
 
-        [Test, Explicit("T4: calls JEV for about 10 minutes per scenario"), Category("T4")]
+        [Test, Explicit("T4: calls JEV for about 1.5 hours per scenario"), Category("T4"), Timeout(4 * 60 * 60 * 1000)]
         [Description("T-NEURO-16 (T4): S32 and S33 with JEV never stall on the neural brain and write survival.json; a run stopped halfway and run again from its caches gives the hash of an unbroken one")]
         public void SmokeWithJev([Values("S32_Brains2x2", "S33_PreyVsPrey")] string scenario)
         {

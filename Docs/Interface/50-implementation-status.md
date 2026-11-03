@@ -5,9 +5,8 @@ The single source of truth between implementation sessions of
 [`Docs/prompts/06-implement-unity-system.md`](../prompts/06-implement-unity-system.md).
 
 ## Next step
-M16 (plan `Docs/Neuro/PLAN.md`, prompt `Docs/prompts/08-implement-neural-species.md`): **M16.7 waits for the owner ⏸**: T-NEURO-16
-(about 10 minutes of JEV each for S32 and S33) needs the owner's go and a running JEV server (`EVOSIM_T4=1`); then open
-the Survival Report on the L0 and smoke runs. M16.6 also waits ⏸ (watch S29 in `Neuro_Lab`). Next: **M16.8 Concurrency
+M16 (plan `Docs/Neuro/PLAN.md`, prompt `Docs/prompts/08-implement-neural-species.md`): **M16.7 waits for the owner ⏸**: open
+the Survival Report on the L0 and smoke runs (T-NEURO-16 ran, see the M16.7 notes). M16.6 also waits ⏸ (watch S29 in `Neuro_Lab`). Next: **M16.8 Concurrency
 and scale**. M16.7 (`Brains_2x2`, `Prey_vs_Prey`, S32/S33 with both arms, `SurvivalStats`, `PlateauStop`,
 `SurvivalAnalysis`, the Survival Report, chapter 16 and the site page), M16.6 (templates and menu, `MatchedPairs`, the three neural scenes, S29–S31, `NeuroStats`, the inspector panel), M16.5
 (the five actions, contacts, breeding), M16.4 (`NeuralBrain`, sync), M16.3 (ray fan, interoception, hunger clock, fan
@@ -45,7 +44,7 @@ Before M15, M14 and M13 waited at their checkpoints ⏸; their next-step notes m
 | M16.4 Brain | done | M16.4 | `NeuralBrain` (sync, Greedy/Sample, V-70, V-77); T-NEURO-07 (NeuralBrainTests, BrainConformance); EditMode 502/502 with Neuro |
 | M16.5 Actions | done | M16.5 | `NeuralAction`, `TurnAction`, `ForwardAction`, `StopAction`, contacts, breeding, V-75; T-NEURO-09…11 (NeuralActionTests); EditMode 517/517 |
 | M16.6 Templates and pairings | done ⏸ | M16.6 | `NeuralTemplates` + menu, `MatchedPairs` (V-78, V-79), V-73, V-74, `Neuro_Lab`/`Neuro_JevPrey`/`Neuro_JevPredator`, S29–S31 (+L0), `NeuroStats`, Animal Inspector panel; T-NEURO-12, 15 (NeuralTemplateTests, NeuroScenarioTests); EditMode 539/539 |
-| M16.7 Comparison scenarios | done ⏸ | M16.7 | `Prey_vs_Prey`, `Brains_2x2`, S32/S33 both arms (+L0), `SurvivalStats`, `PlateauStop`, `SurvivalAnalysis`, `SurvivalReport(Window)`, chapter 16, site page; T-NEURO-13, 14, 15 (SurvivalTests, NeuroScenarioTests); T-NEURO-16 written, not run; EditMode 559/559 + 2 T4 skipped |
+| M16.7 Comparison scenarios | done ⏸ | M16.7 | `Prey_vs_Prey`, `Brains_2x2`, S32/S33 both arms (+L0), `SurvivalStats`, `PlateauStop`, `SurvivalAnalysis`, `SurvivalReport(Window)`, chapter 16, site page; T-NEURO-13, 14, 15 (SurvivalTests, NeuroScenarioTests); T-NEURO-16 run with JEV (see notes); EditMode 559/559 + 2 T4 skipped |
 | M16.8 Concurrency and scale | next | | async `Later`, pooled attachments, one fan per tick, profile S32; T-NEURO-08 |
 | M16.9 Measured runs | | | first S33 run (cost, stop tick) ⏸, then 7 runs with the owner's go ⏸ |
 
@@ -148,8 +147,12 @@ M0–M15 and M16.1–M16.2: in [51](51-implementation-log.md) (at its end). Sinc
   after Record (it needs every tick). A death ends the time at risk at its tick; founders start at age 0; killers' species
   come from the arrival events. `Prey_vs_Prey` writes the removed predator's placeholders as their values, so the JEV
   prey's prompt id equals Lab1_Full's (tested). Scenario assets are now overwritten in place (same GUID).
+- M16.7 — T-NEURO-16 with JEV (seed 1, Responsive, 600 ticks): S32 2 719 s, 18 203 decision calls, hash dbf4abfb4aa14b1a;
+  S33 2 425 s, 13 468 calls, hash 42eccc12957cd021. Stopped at 300 and run again from the caches, both give the same hash
+  (0 decision calls); `survival.json` written; longest Advance call 685–826 ms, no stall. The plan's "10 minutes" is about
+  45 per run, so NUnit's 180 s default failed both; the test now has a 4-hour Timeout (not run again).
 - M16.7 — not done: T-NEURO-16's "JEV cache hit rate within ±5 points of Lab1 alone" (needs a Lab1 run with JEV beside
-  it); it belongs with the smoke runs.
+  it).
 
 ## Disagreements between the brief and Docs/Interface
 - 20 §3.9 names the operator method `MutationOperator.Start(gene, parent, rng)`; on a MonoBehaviour Unity takes
