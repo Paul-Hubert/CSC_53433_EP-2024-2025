@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace EvoSim.Neuro
@@ -16,7 +17,10 @@ namespace EvoSim.Neuro
     /// <para>It is pure arithmetic and draws no random number, so the same query gives the same row (DEC-12). Its queries
     /// are never memoised or cached: no two animals share weights (SENSE-41). No genome, a vector of the wrong length, a
     /// missing attachment or a NaN output fails the query; it never makes a row up (DEC-40).</para>
-    /// <para>This is the synchronous form (M16.4): it answers at once. The worker-task form of D4 comes with M16.8.</para>
+    /// <para>From <see cref="SyncBelow"/> queries on, <see cref="Ask"/> encodes the inputs on the main thread and runs the
+    /// networks on a worker task (D4): the tick waits for it like any other brain (TICK-03), so the work hides inside JEV's
+    /// round-trip. The worker has its own buffers and reads only copied inputs and the alleles' read-only vectors, so it gives
+    /// the rows of the synchronous path bit for bit (DEC-12, SPACE-14).</para>
     /// </remarks>
     [RequiresModule(typeof(NeuralGenomeGene))]
     public class NeuralBrain : Brain
@@ -25,17 +29,33 @@ namespace EvoSim.Neuro
         NeuralPolicy policy = NeuralPolicy.Greedy;
         [SerializeField, Min(0.01f), Tooltip("The softmax temperature of the Sample policy (reference 1).")]
         float temperature = 1f;
+        [SerializeField, Min(0), Tooltip("Below this many queries in a batch it answers at once; from it on, on a worker task (plan D4, default 32).")]
+        int syncBelow = 32;
 
-        /// <summary>One species' network, inputs and outputs, rebuilt when its layout changes.</summary>
+        /// <summary>One species' network, inputs and outputs, rebuilt when its layout changes; the worker has its own.</summary>
         sealed class Net
         {
             public NeuralGenomeGene Gene;
             public NeuralLayout Layout;
-            public NeuralNet Network;
-            public float[] Input, Output;
+            public NeuralNet Network, WorkerNetwork;
+            public float[] Input, Output, WorkerOutput;
+        }
+
+        /// <summary>One query of a batch, ready for the worker: its network, weights and inputs, or why it can't run.</summary>
+        struct Job
+        {
+            public Net Net;
+            public AlleleValue Weights;
+            public int Offset;                                          // where its inputs start in the batch's buffer
+            public string Error;
         }
 
         readonly Dictionary<Species, Net> nets = new Dictionary<Species, Net>();
+        Job[] jobs = new Job[0];                                        // the batch's jobs, reused (one batch in flight, TICK-03)
+        float[] inputs = new float[0];                                  // the batch's inputs end to end, reused
+
+        /// <summary>The batch size from which the networks run on a worker task.</summary>
+        public int SyncBelow { get => syncBelow; set => syncBelow = Math.Max(0, value); }
 
         /// <summary>The policy.</summary>
         public NeuralPolicy Policy => policy;
@@ -96,15 +116,63 @@ namespace EvoSim.Neuro
         /// <inheritdoc/>
         public override BrainAnswer Ask(IReadOnlyList<DecisionQuery> batch)
         {
-            var answer = BrainAnswer.Later(batch.Count);
-            for (int i = 0; i < batch.Count; i++)
+            int n = batch.Count;
+            if (jobs.Length < n) jobs = new Job[Math.Max(n, jobs.Length * 2)];
+            int size = 0;
+            for (int i = 0; i < n; i++)
             {
-                string error = Answer(batch[i], out var row);
-                if (error == null) answer.SetRow(i, row);
-                else answer.Fail(i, error);
+                jobs[i] = default;
+                jobs[i].Error = Prepare(batch[i], out jobs[i].Net, out jobs[i].Weights);
+                jobs[i].Offset = size;
+                if (jobs[i].Error == null) size += jobs[i].Net.Layout.Inputs;
             }
-            answer.Complete();
+            if (inputs.Length < size) inputs = new float[Math.Max(size, inputs.Length * 2)];
+            for (int i = 0; i < n; i++)                                     // the inputs are copied now, on the main thread (D4)
+                if (jobs[i].Error == null)
+                    jobs[i].Error = Encode(batch[i], jobs[i].Net.Layout, new Span<float>(inputs, jobs[i].Offset, jobs[i].Net.Layout.Inputs));
+            if (n < syncBelow)
+            {
+                var now = BrainAnswer.Later(n);
+                Run(n, now);
+                return now;
+            }
+            // The answer waits on a task, not a spin: a blocked wait wakes when the worker ends (a spin falls back to
+            // 15 ms sleeps on Windows, which cost more than the networks).
+            var finished = new TaskCompletionSource<bool>();
+            var answer = BrainAnswer.Later(n, Pending.Of(finished.Task));
+            Task.Run(() =>
+            {
+                Run(n, answer);
+                finished.SetResult(true);
+            });
             return answer;
+        }
+
+        /// <summary>Runs a prepared batch's networks into the answer and completes it, whatever happens (the worker's body).</summary>
+        void Run(int n, BrainAnswer answer)
+        {
+            try
+            {
+                for (int i = 0; i < n; i++)
+                {
+                    var job = jobs[i];
+                    if (job.Error != null) { answer.Fail(i, job.Error); continue; }
+                    var net = job.Net;
+                    string error = Forward(net.WorkerNetwork, job.Weights, new ReadOnlySpan<float>(inputs, job.Offset, net.Layout.Inputs),
+                                           net.WorkerOutput, out var row);
+                    if (error == null) answer.SetRow(i, row);
+                    else answer.Fail(i, error);
+                }
+            }
+            catch (Exception e)
+            {
+                for (int i = 0; i < n; i++)
+                    if (answer.Row(i) == null) answer.Fail(i, "the network failed: " + e.Message);
+            }
+            finally
+            {
+                answer.Complete();
+            }
         }
 
         /// <summary>Runs one query's network: the row, or the reason it can't (DEC-40).</summary>
@@ -114,18 +182,34 @@ namespace EvoSim.Neuro
         public string Answer(DecisionQuery q, out float[] row)
         {
             row = null;
-            var net = NetOf(q.Species);
+            string error = Prepare(q, out var net, out var weights);
+            if (error != null) return error;
+            error = Encode(q, net.Layout, net.Input);
+            if (error != null) return error;
+            return Forward(net.Network, weights, net.Input, net.Output, out row);
+        }
+
+        /// <summary>The query's network and weights, or why it has none (main thread: it reads the species).</summary>
+        string Prepare(DecisionQuery q, out Net net, out AlleleValue weights)
+        {
+            weights = default;
+            net = NetOf(q.Species);
             if (net == null) return $"'{q.Species.DisplayName}' has no NeuralGenomeGene (V-70)";
             if (q.Genome == null) return "the query carries no genome: a network needs its weights (DEC-10)";
-            var weights = q.Genome[net.Gene.Locus].Value;
+            weights = q.Genome[net.Gene.Locus].Value;
             if (weights.Kind != AlleleKind.Vector || weights.VectorLength != net.Layout.VectorLength)
                 return $"the weights hold {weights.VectorLength} values; the layout needs {net.Layout.VectorLength} (V-71)";
-            string error = Encode(q, net);
-            if (error != null) return error;
-            net.Network.Forward(weights.Vector, net.Input, net.Output);
-            for (int k = 0; k < net.Output.Length; k++)
-                if (float.IsNaN(net.Output[k]) || float.IsInfinity(net.Output[k])) return $"output {k} is not a number";
-            row = ToRow(net.Output, policy, temperature);
+            return null;
+        }
+
+        /// <summary>The forward pass and the policy: pure arithmetic on its arguments, so any thread may run it.</summary>
+        string Forward(NeuralNet network, AlleleValue weights, ReadOnlySpan<float> input, float[] output, out float[] row)
+        {
+            row = null;
+            network.Forward(weights.Vector, input, output);
+            for (int k = 0; k < output.Length; k++)
+                if (float.IsNaN(output[k]) || float.IsInfinity(output[k])) return $"output {k} is not a number";
+            row = ToRow(output, policy, temperature);
             return null;
         }
 
@@ -187,11 +271,10 @@ namespace EvoSim.Neuro
         }
 
         /// <summary>Writes the query's inputs in layout order: attachments copied, other senses one-hot.</summary>
-        static string Encode(DecisionQuery q, Net net)
+        static string Encode(DecisionQuery q, NeuralLayout layout, Span<float> input)
         {
-            var input = net.Input;
-            Array.Clear(input, 0, input.Length);
-            foreach (var slot in net.Layout.Slots)
+            input.Clear();
+            foreach (var slot in layout.Slots)
             {
                 if (slot.SenseIndex < 0) { input[slot.Offset] = 1f; continue; }          // no sense: one constant input
                 if (!slot.Attached)
@@ -207,7 +290,7 @@ namespace EvoSim.Neuro
                         if (att is NeuralInput n && n.SenseIndex == slot.SenseIndex) { found = n; break; }
                 if (found == null) return $"sense {slot.SenseIndex} gave no attachment";
                 if (found.Values.Length != slot.Width) return $"sense {slot.SenseIndex} gave {found.Values.Length} values; the layout has {slot.Width} (V-72)";
-                Array.Copy(found.Values, 0, input, slot.Offset, slot.Width);
+                found.Values.AsSpan().CopyTo(input.Slice(slot.Offset, slot.Width));
             }
             return null;
         }
@@ -224,8 +307,10 @@ namespace EvoSim.Neuro
                 Gene = gene,
                 Layout = layout,
                 Network = new NeuralNet(layout, gene.Activation),
+                WorkerNetwork = new NeuralNet(layout, gene.Activation),
                 Input = new float[layout.Inputs],
                 Output = new float[layout.Outputs],
+                WorkerOutput = new float[layout.Outputs],
             };
             nets[s] = net;
             return net;

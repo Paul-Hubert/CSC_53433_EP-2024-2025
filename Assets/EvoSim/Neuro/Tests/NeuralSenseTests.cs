@@ -180,6 +180,35 @@ namespace EvoSim.Neuro.Tests
 
         // ---- T-NEURO-06 ----
 
+        [Test, Description("T-NEURO-08 (M16.8): over 500 animals, casts with bins and per-ray lists equal the full scan ray for ray, for a full fan and partial fans of 90° and 270°")]
+        public void BinnedCastEqualsFullScan()
+        {
+            var w = FanWorld("bins", prey: 400, predators: 100, size: 60f, food: 0.1f, cover: 0.2f);
+            w.Advance(3);
+            var ctx = new SenseContext(w);
+            var reference = new WorldRayCaster(w) { UseBuckets = false };
+            var fast = new WorldRayCaster(w);
+            int rays = 0;
+            foreach (var (count, fov) in new[] { (12, 360f), (7, 90f), (9, 270f) })
+            {
+                var angles = WorldRayCaster.FanAngles(count, fov);
+                var full = new RayHit[count];
+                var binned = new RayHit[count];
+                foreach (var a in w.AllSpecies.SelectMany(s => s.Animals).Where(x => x.IsAlive))
+                {
+                    reference.Cast(a, 20f, angles, full);
+                    fast.Cast(a, 20f, angles, binned, ctx);
+                    for (int r = 0; r < count; r++, rays++)
+                    {
+                        Assert.AreEqual(full[r].Kind, binned[r].Kind, $"{a} fan {fov} ray {r}");
+                        Assert.AreEqual(full[r].Distance, binned[r].Distance, $"{a} fan {fov} ray {r}");
+                        Assert.AreEqual(full[r].Id, binned[r].Id, $"{a} fan {fov} ray {r}");
+                    }
+                }
+            }
+            Assert.Greater(rays, 10000);
+        }
+
         [Test, Description("T-NEURO-06 (SENSE-31, T-SENSE-09, SENSE-03): over 500 animals, ReadAll gives Read's tokens, and a fan's attachment is the same when read twice")]
         public void ReadAllEqualsRead()
         {

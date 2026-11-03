@@ -124,12 +124,21 @@ namespace EvoSim.Neuro
         }
 
         /// <inheritdoc/>
+        /// <remarks>The returned input is pooled (M16.8): it holds these values until this sense is read in a later tick.</remarks>
         public override object Attachment(Animal a, SenseContext s)
         {
-            var values = new float[NeuralWidth];
-            Fill(a, values);
-            return new NeuralInput(Index, values);
+            int width = NeuralWidth;
+            pool.Get(World != null ? World.Tick : 0, a.Id, out var box);
+            if (box.Input == null || box.Input.SenseIndex != Index || box.Input.Values.Length != width)
+                box.Input = new NeuralInput(Index, new float[width]);
+            Fill(a, box.Input.Values);
+            return box.Input;
         }
+
+        /// <summary>A pooled slot for one animal's attachment.</summary>
+        sealed class Slot { public NeuralInput Input; }
+
+        readonly TickPool<Slot> pool = new TickPool<Slot>(() => new Slot());
 
         /// <inheritdoc/>
         public override string Write(int token, TextStyle style) =>

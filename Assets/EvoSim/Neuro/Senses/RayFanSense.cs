@@ -39,8 +39,19 @@ namespace EvoSim.Neuro
         float[] angles;                 // the rays' angles from the heading, built at Initialize
         int[] channelOf;                // per RayHitKind value: its channel, or -1 when not enabled
         List<string> tokens;            // "none", then one per enabled kind
-        RayHit[] scratch;               // one fan's hits, reused
         WorldRayCaster caster;
+        TickPool<Fan> fans;             // each animal's fan this tick, rebuilt with the angles
+
+        /// <summary>One animal's fan in one tick: where it was cast from, its hits, and its pooled attachment.</summary>
+        sealed class Fan
+        {
+            public Vector3 Position;
+            public float Heading;
+            public bool Fresh;          // cast by Read and not yet used by Attachment
+            public readonly RayHit[] Hits;
+            public NeuralInput Input;
+            public Fan(int rays, int senseIndex, int width) { Hits = new RayHit[rays]; Input = new NeuralInput(senseIndex, new float[width]); }
+        }
 
         /// <summary>The number of rays.</summary>
         public int Rays => rays;
@@ -93,6 +104,8 @@ namespace EvoSim.Neuro
         {
             if (angles != null) return;
             angles = WorldRayCaster.FanAngles(rays, fov);
+            int count = angles.Length, width = NeuralWidth;
+            fans = new TickPool<Fan>(() => new Fan(count, Index, width));
             channelOf = new int[Enum.GetValues(typeof(RayHitKind)).Length];
             for (int i = 0; i < channelOf.Length; i++) channelOf[i] = -1;
             tokens = new List<string> { "none" };
@@ -101,7 +114,6 @@ namespace EvoSim.Neuro
                 tokens.Add(Word(kinds[c]));                            // token 1 + c: the kind of channel c
                 if (channelOf[(int)kinds[c]] < 0) channelOf[(int)kinds[c]] = c;   // a kind listed twice keeps its first channel (V-76 warns)
             }
-            scratch = new RayHit[angles.Length];
         }
 
         /// <summary>The range of this animal's rays: the setting, or its vision (SENSE-22).</summary>
@@ -112,13 +124,14 @@ namespace EvoSim.Neuro
         /// <summary>Casts this animal's fan: one hit per ray, in ray order.</summary>
         /// <param name="a">The animal that looks.</param>
         /// <param name="hits">Where to write the hits; at least <see cref="Rays"/> long.</param>
-        public void Cast(Animal a, Span<RayHit> hits)
+        /// <param name="context">The tick's sense context, or null (see <see cref="WorldRayCaster.Cast"/>).</param>
+        public void Cast(Animal a, Span<RayHit> hits, SenseContext context = null)
         {
             Build();
             if (caster == null) caster = new WorldRayCaster(World);
             caster.ReadyKin = channelOf[(int)RayHitKind.ReadyKin] >= 0;
             caster.SplitWater = channelOf[(int)RayHitKind.Water] >= 0;
-            caster.Cast(a, RangeOf(a), angles, hits);
+            caster.Cast(a, RangeOf(a), angles, hits, context);
         }
 
         /// <summary>The channel of a kind, or -1 when this fan does not report it.</summary>
@@ -146,15 +159,21 @@ namespace EvoSim.Neuro
         }
 
         /// <inheritdoc/>
+        /// <remarks>The fan is kept for this tick, so the attachment asked next for the same animal casts no ray again
+        /// (M16.8: one fan per animal per tick).</remarks>
         public override int Read(Animal a, SenseContext s)
         {
             Build();
-            Cast(a, scratch);
+            var fan = FanOf(a);
+            Cast(a, fan.Hits, s);
+            fan.Position = a.Position;
+            fan.Heading = a.Heading;
+            fan.Fresh = true;
             int token = 0;
             RayHit nearest = RayHit.Miss(float.MaxValue);
             for (int r = 0; r < angles.Length; r++)
             {
-                var h = scratch[r];
+                var h = fan.Hits[r];
                 if (!h.Any || channelOf[(int)h.Kind] < 0 || !h.Before(nearest)) continue;
                 nearest = h;
                 token = 1 + channelOf[(int)h.Kind];
@@ -163,13 +182,24 @@ namespace EvoSim.Neuro
         }
 
         /// <inheritdoc/>
+        /// <remarks>It reuses the fan <see cref="Read"/> cast for this animal in this tick, from where it still stands;
+        /// otherwise it casts. The returned input is pooled: it holds these values until this sense is read in a later tick.</remarks>
         public override object Attachment(Animal a, SenseContext s)
         {
             Build();
-            Cast(a, scratch);
-            var values = new float[NeuralWidth];
-            Encode(scratch, RangeOf(a), values);
-            return new NeuralInput(Index, values);
+            var fan = FanOf(a);
+            if (!(fan.Fresh && fan.Position == a.Position && fan.Heading == a.Heading)) Cast(a, fan.Hits, s);
+            fan.Fresh = false;
+            Encode(fan.Hits, RangeOf(a), fan.Input.Values);
+            return fan.Input;
+        }
+
+        /// <summary>The animal's pooled fan for this tick (not fresh when new to it).</summary>
+        Fan FanOf(Animal a)
+        {
+            if (fans.Get(World.Tick, a.Id, out var fan)) fan.Fresh = false;
+            if (fan.Input.SenseIndex != Index) fan.Input = new NeuralInput(Index, fan.Input.Values);
+            return fan;
         }
 
         /// <inheritdoc/>

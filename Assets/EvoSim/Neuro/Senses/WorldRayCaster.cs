@@ -28,6 +28,10 @@ namespace EvoSim.Neuro
         public float BodyRadius = 0.5f;
         /// <summary>The step of a march (other layers, other covers, the ground), in meters (plan: 0.25).</summary>
         public float MarchStep = 0.25f;
+
+        /// <summary>True (default): animals are binned per sense context and sorted into per-ray lists; false: every ray tests
+        /// every animal. Both give the same hits (tests compare them).</summary>
+        public bool UseBuckets = true;
         /// <summary>True: a kin ready to mate reads <see cref="RayHitKind.ReadyKin"/>.</summary>
         public bool ReadyKin;
         /// <summary>True: water reads <see cref="RayHitKind.Water"/> instead of <see cref="RayHitKind.Obstacle"/>.</summary>
@@ -42,6 +46,26 @@ namespace EvoSim.Neuro
         readonly List<Cover> covers = new List<Cover>();
         readonly List<EntityKind> entityKinds = new List<EntityKind>();
         bool bound;                                                     // the services were listed
+
+        /// <summary>On a plain flat ground, how far inside the edges the march may skip its tests (meters, M16.8).</summary>
+        const float SureMargin = 0.01f;
+        /// <summary>The side of a cell of the animal bins (meters).</summary>
+        const float BinSize = 4f;
+
+        // The animal bins of one sense context in one tick (M16.8; the sense phase reuses its context): per species, per cell, the indices into its animal list. Made at
+        // the first cast with a new context, so a tick's fans share one binning and a tool's fresh context gets a fresh one.
+        SenseContext binned;
+        int binnedTick;
+        readonly List<List<int>[]> bins = new List<List<int>[]>();     // per species, in AllSpecies order
+        readonly List<int> found = new List<int>();                     // one species' indices near this cast, sorted
+        readonly List<sbyte[]> hidden = new List<sbyte[]>();            // per species: per animal and viewer species, -1 unknown, 0, 1
+        Rect binBounds;
+        readonly List<List<int>> buckets = new List<List<int>>();       // per ray: the candidates it may meet, in gathered order
+        /// <summary>The bearing margin of a ray's candidate list, in degrees (far above float error).</summary>
+        const double BucketMargin = 0.5;
+        readonly List<float> marchTs = new List<float>();               // the ground march's distances, shared by every ray
+        float marchFrom = float.NaN, marchStep = float.NaN;
+        int binWidth, binHeight;
 
         /// <summary>Makes a caster for a world; it lists the world's layers, covers and entity kinds at its first cast.</summary>
         /// <param name="world">The world to cast through.</param>
@@ -69,14 +93,18 @@ namespace EvoSim.Neuro
         /// <param name="range">How far the rays go, in meters.</param>
         /// <param name="angles">The rays' angles, in degrees from the animal's heading, clockwise.</param>
         /// <param name="hits">Where to write the hits, one per angle.</param>
-        public void Cast(Animal a, float range, IReadOnlyList<float> angles, Span<RayHit> hits)
+        /// <param name="context">The tick's sense context, or null. With one, the animals are binned once for every cast
+        /// with that context (the world must not change in between: one tick's sense and ask phases); without, every animal
+        /// is checked. Both give the same hits.</param>
+        public void Cast(Animal a, float range, IReadOnlyList<float> angles, Span<RayHit> hits, SenseContext context = null)
         {
             Bind();
-            Gather(a, range);
+            Gather(a, range, context);
+            bool bucketed = UseBuckets && Bucket(a, angles);
             for (int k = 0; k < angles.Count; k++)
             {
                 float r = (a.Heading + angles[k]) * Mathf.Deg2Rad;
-                hits[k] = CastOne(a, a.Position.x, a.Position.z, Mathf.Sin(r), Mathf.Cos(r), range);
+                hits[k] = CastOne(a, a.Position.x, a.Position.z, Mathf.Sin(r), Mathf.Cos(r), range, bucketed ? buckets[k] : null);
             }
         }
 
@@ -91,26 +119,31 @@ namespace EvoSim.Neuro
         }
 
         /// <summary>Collects the animals and entities a ray of this cast may meet: within range plus a body radius.</summary>
-        void Gather(Animal a, float range)
+        void Gather(Animal a, float range, SenseContext context)
         {
             near.Clear();
             float reach = range + BodyRadius, reach2 = reach * reach;
             var me = a.Species;
             var diet = me.Module<Diet>();
-            foreach (var s in world.AllSpecies)
+            bool useBins = UseBuckets && context != null && Bin(context);
+            var all = world.AllSpecies;
+            for (int si = 0; si < all.Count; si++)
             {
+                var s = all[si];
                 RayHitKind kind = s == me ? RayHitKind.Kin
                                 : diet != null && diet.Striking(s) != null ? RayHitKind.Prey
                                 : world.IsThreat(s, me) ? RayHitKind.Threat
                                 : RayHitKind.OtherAnimal;
                 var animals = s.Animals;
-                for (int i = 0; i < animals.Count; i++)
+                if (useBins) Near(si, a.Position, reach);
+                int count = useBins ? found.Count : animals.Count;
+                for (int j = 0; j < count; j++)
                 {
-                    var o = animals[i];
+                    var o = animals[useBins ? found[j] : j];
                     if (o == a || !o.IsAlive) continue;                                    // killed: the rays pass through
                     float dx = o.Position.x - a.Position.x, dz = o.Position.z - a.Position.z;
                     if (dx * dx + dz * dz > reach2) continue;
-                    if (world.Queries.IsHiddenFrom(o, me)) continue;                        // SENSE-06
+                    if (useBins ? Hidden(si, found[j], o, me, all) : world.Queries.IsHiddenFrom(o, me)) continue;   // SENSE-06
                     var k = kind == RayHitKind.Kin && ReadyKin && world.Queries.IsReady(o) ? RayHitKind.ReadyKin : kind;
                     near.Add(new Candidate { X = o.Position.x, Z = o.Position.z, Kind = k, Id = o.Id });
                 }
@@ -129,17 +162,136 @@ namespace EvoSim.Neuro
             }
         }
 
+        /// <summary>
+        /// Sorts the gathered candidates into per-ray lists, in their gathered order (M16.8): a candidate goes to every ray
+        /// whose angle lies within asin(r / d) of its bearing, plus a margin, which is every ray its exact test can pass. Only
+        /// for evenly spaced fans of two rays or more; false (every ray tests every candidate) otherwise.
+        /// </summary>
+        bool Bucket(Animal a, IReadOnlyList<float> angles)
+        {
+            int n = angles.Count;
+            if (n < 2) return false;
+            float step = angles[1] - angles[0];
+            if (step <= 0f) return false;
+            for (int k = 2; k < n; k++)
+                if (Mathf.Abs(angles[k] - angles[k - 1] - step) > 1e-3f) return false;
+            bool full = Mathf.Abs(step * n - 360f) < 1e-3f;
+            while (buckets.Count < n) buckets.Add(new List<int>());
+            for (int k = 0; k < n; k++) buckets[k].Clear();
+            double first = a.Heading + angles[0];
+            double gapMiddle = step * (n - 1) + (360.0 - step * (n - 1)) / 2.0;   // a partial fan: the middle of the angles it skips
+            for (int i = 0; i < near.Count; i++)
+            {
+                var c = near[i];
+                double rx = c.X - a.Position.x, rz = c.Z - a.Position.z;
+                double d = Math.Sqrt(rx * rx + rz * rz);
+                int lo, hi;
+                if (d <= BodyRadius * 1.01) { lo = 0; hi = n - 1; }
+                else
+                {
+                    double half = Math.Asin(Math.Min(1.0, BodyRadius / d)) * (180.0 / Math.PI) + BucketMargin;
+                    double rel = Math.Atan2(rx, rz) * (180.0 / Math.PI) - first;     // the ray direction is (sin, cos) of its angle
+                    rel -= 360.0 * Math.Floor(rel / 360.0);                             // into [0, 360)
+                    if (full)
+                    {
+                        lo = (int)Math.Ceiling((rel - half) / step);
+                        hi = (int)Math.Floor((rel + half) / step);
+                    }
+                    else
+                    {
+                        if (rel > gapMiddle) rel -= 360.0;                              // behind the fan's gap: before its first ray
+                        lo = Math.Max(0, (int)Math.Ceiling((rel - half) / step));
+                        hi = Math.Min(n - 1, (int)Math.Floor((rel + half) / step));
+                    }
+                }
+                if (hi - lo + 1 >= n) { lo = 0; hi = n - 1; }
+                for (int k = lo; k <= hi; k++) buckets[((k % n) + n) % n].Add(i);
+            }
+            return true;
+        }
+
+        /// <summary>Bins every animal by cell for this context, once; false when the world has no ground to bin over.</summary>
+        bool Bin(SenseContext context)
+        {
+            if (context == binned && world.Tick == binnedTick) return true;
+            var ground = world.Ground;
+            if (ground == null) return false;
+            var all = world.AllSpecies;
+            var b = ground.Bounds;
+            int w = Math.Max(1, Mathf.CeilToInt(b.width / BinSize)), h = Math.Max(1, Mathf.CeilToInt(b.height / BinSize));
+            if (b != binBounds || w != binWidth || h != binHeight) bins.Clear();
+            binBounds = b;
+            binWidth = w;
+            binHeight = h;
+            while (bins.Count < all.Count)
+            {
+                var cells = new List<int>[w * h];
+                for (int c = 0; c < cells.Length; c++) cells[c] = new List<int>(8);
+                bins.Add(cells);
+            }
+            while (hidden.Count < all.Count) hidden.Add(new sbyte[0]);
+            for (int si = 0; si < all.Count; si++)
+            {
+                var cells = bins[si];
+                for (int c = 0; c < cells.Length; c++) cells[c].Clear();
+                var animals = all[si].Animals;
+                for (int i = 0; i < animals.Count; i++) cells[BinOf(animals[i].Position.x, animals[i].Position.z)].Add(i);
+                int size = animals.Count * all.Count;
+                if (hidden[si].Length < size) hidden[si] = new sbyte[Math.Max(size, hidden[si].Length * 2)];
+                for (int k = 0; k < size; k++) hidden[si][k] = -1;
+            }
+            binned = context;
+            binnedTick = world.Tick;
+            return true;
+        }
+
+        /// <summary>Whether an animal is hidden from a viewer species (SENSE-06), asked once per pair in this context.</summary>
+        bool Hidden(int speciesIndex, int animalIndex, Animal o, Species viewer, IReadOnlyList<Species> all)
+        {
+            int v = 0;
+            while (all[v] != viewer) v++;
+            int k = animalIndex * all.Count + v;
+            var flags = hidden[speciesIndex];
+            if (flags[k] < 0) flags[k] = world.Queries.IsHiddenFrom(o, viewer) ? (sbyte)1 : (sbyte)0;
+            return flags[k] == 1;
+        }
+
+        /// <summary>The bin of a point, clamped to the grid (an animal outside the ground lands in an edge bin).</summary>
+        int BinOf(float x, float z)
+        {
+            int ix = Mathf.Clamp(Mathf.FloorToInt((x - binBounds.xMin) / BinSize), 0, binWidth - 1);
+            int iz = Mathf.Clamp(Mathf.FloorToInt((z - binBounds.yMin) / BinSize), 0, binHeight - 1);
+            return iz * binWidth + ix;
+        }
+
+        /// <summary>
+        /// Lists the indices of one species' animals in the bins a circle of radius <paramref name="reach"/> around p
+        /// touches, ascending: the order of the full scan, so ties resolve as they do without bins.
+        /// </summary>
+        void Near(int speciesIndex, Vector3 p, float reach)
+        {
+            found.Clear();
+            var cells = bins[speciesIndex];
+            int x0 = BinOf(p.x - reach, p.z - reach), x1 = BinOf(p.x + reach, p.z + reach);
+            int ix0 = x0 % binWidth, iz0 = x0 / binWidth, ix1 = x1 % binWidth, iz1 = x1 / binWidth;
+            for (int iz = iz0; iz <= iz1; iz++)
+                for (int ix = ix0; ix <= ix1; ix++)
+                    found.AddRange(cells[iz * binWidth + ix]);
+            found.Sort();
+        }
+
         /// <summary>The first object along one ray from (ox, oz), direction (dx, dz) of length 1.</summary>
-        RayHit CastOne(Animal a, float ox, float oz, float dx, float dz, float range)
+        RayHit CastOne(Animal a, float ox, float oz, float dx, float dz, float range, List<int> only)
         {
             float start = BodyRadius;
             var best = RayHit.Miss(range);
 
             // Animals and entities: circles, at the projection of their centre.
             float r2 = BodyRadius * BodyRadius;
-            for (int i = 0; i < near.Count; i++)
+            int count = only != null ? only.Count : near.Count;
+            for (int j = 0; j < count; j++)
             {
-                var c = near[i];
+                var c = near[only != null ? only[j] : j];
                 float rx = c.X - ox, rz = c.Z - oz;
                 float t = rx * dx + rz * dz;
                 if (t < start || t > range) continue;
@@ -245,13 +397,66 @@ namespace EvoSim.Neuro
             var b = ground.Bounds;
             float edge = ExitDistance(b, ox, oz, dx, dz);
             float end = Mathf.Min(edge, limit);
-            for (float t = start; t < end; t += MarchStep)
+            // A plain flat ground has no water, and every point inside is walkable: the steps that stay well inside on both
+            // axes can't stop the ray. They are still stepped (the same float sums), so the hits stay exactly those of the
+            // march (M16.8). The margin is across each axis, not along the ray: a ray almost along an edge runs a hair
+            // from it, where rounding decides.
+            float sure = ground.GetType() == typeof(FlatGround)
+                ? Mathf.Min(SureAlong(ox, dx, b.xMin, b.xMax), SureAlong(oz, dz, b.yMin, b.yMax))
+                : float.NegativeInfinity;
+            var steps = MarchSteps(start, end);
+            int k = sure > start ? FirstStepFrom(steps, sure) : 0;
+            for (; k < steps.Count && steps[k] < end; k++)
             {
+                float t = steps[k];
                 var p = new Vector3(ox + dx * t, 0f, oz + dz * t);
                 if (ground.IsWater(p)) return new RayHit(SplitWater ? RayHitKind.Water : RayHitKind.Obstacle, t, -1);
                 if (!ground.IsWalkable(p)) return new RayHit(RayHitKind.Obstacle, t, -1);
             }
             return edge <= limit ? new RayHit(RayHitKind.Obstacle, Mathf.Max(edge, start), -1) : RayHit.Miss(limit);
+        }
+
+        /// <summary>
+        /// The march's distances from <paramref name="start"/>, each the float sum of the one before and the step (as the
+        /// loop <c>t += MarchStep</c> makes them), at least up to <paramref name="end"/>; computed once and extended.
+        /// </summary>
+        List<float> MarchSteps(float start, float end)
+        {
+            if (marchFrom != start || marchStep != MarchStep)
+            {
+                marchTs.Clear();
+                marchFrom = start;
+                marchStep = MarchStep;
+            }
+            if (marchTs.Count == 0) marchTs.Add(start);
+            while (marchTs[marchTs.Count - 1] < end) marchTs.Add(marchTs[marchTs.Count - 1] + marchStep);
+            return marchTs;
+        }
+
+        /// <summary>The index of the first step at or beyond a distance (the steps grow).</summary>
+        static int FirstStepFrom(List<float> steps, float from)
+        {
+            int lo = 0, hi = steps.Count;
+            while (lo < hi)
+            {
+                int mid = (lo + hi) >> 1;
+                if (steps[mid] < from) lo = mid + 1;
+                else hi = mid;
+            }
+            return lo;
+        }
+
+        /// <summary>
+        /// On one axis, the distance along the ray before which the point stays at least <see cref="SureMargin"/> inside
+        /// [min, max); negative infinity when the origin itself is not that far inside.
+        /// </summary>
+        static float SureAlong(float o, float d, float min, float max)
+        {
+            float lo = min + SureMargin, hi = max - SureMargin;
+            if (o < lo || o >= hi) return float.NegativeInfinity;
+            if (d > 0f) return (hi - o) / d;
+            if (d < 0f) return (lo - o) / d;
+            return float.PositiveInfinity;
         }
 
         /// <summary>Where a ray from inside a rectangle leaves it (0 when it starts outside).</summary>

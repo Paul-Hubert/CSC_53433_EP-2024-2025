@@ -104,6 +104,31 @@ namespace EvoSim.Neuro.Tests
             Assert.AreEqual("neural-sample-0.5", w.GetComponentInChildren<NeuralBrain>().Id);
         }
 
+        [Test, Description("T-NEURO-08 (D4, DEC-12): from SyncBelow queries on, the networks run on a worker task; its rows equal the synchronous ones bit for bit")]
+        public void WorkerRowsEqualSyncRows()
+        {
+            var w = NeuralWorld("worker", prey: 40, predators: 8);
+            w.Advance(2);
+            var brain = w.GetComponentInChildren<NeuralBrain>();
+            var queries = w.AllSpecies.SelectMany(s => s.Animals.Where(a => a.IsAlive)).Select(a => QueryOf(a)).ToList();
+            queries.Add(QueryOf(queries[0].Species.Animals.First(a => a.IsAlive), withGenome: false));   // one failure among them
+            Assert.GreaterOrEqual(queries.Count, 32);
+            brain.SyncBelow = int.MaxValue;
+            var now = brain.Ask(queries);
+            Assert.IsTrue(now.IsDone, "below SyncBelow: answered at once");
+            brain.SyncBelow = 0;
+            var later = brain.Ask(queries);
+            later.Pending.Wait();
+            Assert.IsTrue(later.IsDone);
+            for (int i = 0; i < queries.Count; i++)
+            {
+                Assert.AreEqual(now.Failed(i), later.Failed(i), $"query {i}");
+                if (now.Failed(i)) Assert.AreEqual(now.Error(i), later.Error(i));
+                else CollectionAssert.AreEqual(now.Row(i), later.Row(i), $"query {i}");
+            }
+            Assert.IsTrue(later.Failed(queries.Count - 1), "no genome: a failure on the worker too");
+        }
+
         [Test, Description("T-NEURO-07 (DEC-20): with Greedy the drawn action is always the one-hot's, whatever the World's τ")]
         public void GreedyIgnoresTemperature()
         {

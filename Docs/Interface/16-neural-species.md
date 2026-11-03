@@ -14,7 +14,7 @@ survive better or worse than an evolved sentence genome read by an LLM? The desi
 | Network | `NeuralLayout`, `NeuralNet` | inputs from the senses in order, hidden layers (default one of 12, tanh), one linear output per action |
 | Senses | `RayFanSense`, `InteroceptionSense` | 12 rays over 360° (one channel per kind of thing, 1 − distance/range), and energy, stamina, age, readiness, food, cover, the last action, ticks since a meal |
 | Actions | `TurnAction`, `ForwardAction`, `StopAction` | `left`, `right` (20°), `walk`, `run`, `stop`; each eats, strikes or scavenges what is in reach, and breeds when ready |
-| Brain | `NeuralBrain` | one forward pass per decision; Greedy (the largest output) by default, or Sample (softmax) |
+| Brain | `NeuralBrain` | one forward pass per decision; Greedy (the largest output) by default, or Sample (softmax); from `SyncBelow` (32) queries on, on a worker task beside the other brains, with the same rows |
 | Evolution | `NeuralMutation`, `NeuronCrossover` | adds or replaces weights at random; a baby takes each neuron whole from one parent |
 | Stats | `HungerClock`, `NeuroStats` | the meal clock the interoception reads; speed, meals per tick and per meter, action shares, loops in `stats.csv` |
 
