@@ -1,12 +1,13 @@
 # 50 — Implementation status
-Updated: 2026-11-03, M16.3 senses for the neural species (before it: M15 overlay actions ⏸)
+Updated: 2026-11-03, M16.4 brain for the neural species (before it: M15 overlay actions ⏸)
 
 The single source of truth between implementation sessions of
 [`Docs/prompts/06-implement-unity-system.md`](../prompts/06-implement-unity-system.md).
 
 ## Next step
-M16 (plan `Docs/Neuro/PLAN.md`, prompt `Docs/prompts/08-implement-neural-species.md`): **M16.4 Brain** — `NeuralBrain` (sync,
-Greedy/Sample), with T-NEURO-07. M16.3 (ray fan, interoception, hunger clock, fan view) and M16.2 (genes, mutation,
+M16 (plan `Docs/Neuro/PLAN.md`, prompt `Docs/prompts/08-implement-neural-species.md`): **M16.5 Actions** — `NeuralAction`,
+`TurnAction`, `ForwardAction`, `StopAction`, contacts, mating both ways, with T-NEURO-09…11. M16.4 (`NeuralBrain`, sync),
+M16.3 (ray fan, interoception, hunger clock, fan view) and M16.2 (genes, mutation,
 crossover in `Assets/EvoSim/Neuro`) are done; the fan is seen in a sandbox once M16.6 gives the `Neuro_Lab` scene. M16.1 (core C1–C7) is done: vector alleles, `vectors.jsonl`, `DecisionQuery.Genome`,
 `AnimalAction.SelfDirected`, `Brain.ReadsGeneText`, the conformance fixtures, recombinant alleles; EditMode see M16.1 row,
 R-01 unchanged. The owner's review of the core diff (⏸ M16.1) is still to come.
@@ -38,8 +39,8 @@ Before M15, M14 and M13 waited at their checkpoints ⏸; their next-step notes m
 | M16.1 Neural species: core C1–C7 | done | M16.1 | `AlleleKind.Vector`, `vectors.jsonl`, `DecisionQuery.Genome`, `SelfDirected`, `ReadsGeneText`, `VectorProbeGene`, recombinants; T-NEURO-01 (VectorAlleleTests); EditMode 472/472 (batch), 6 new; R-01 unchanged ⏸ |
 | M16.2 Genes | done | M16.2 | `NeuralLayout`, `NeuralNet`, `NeuralGenomeGene`, `NeuralMutation`, `NeuronCrossover`; T-NEURO-02…04 (NeuralGeneTests), T-EDIT-02 for EvoSim.Neuro; EditMode 480/480 + 1 |
 | M16.3 Senses | done | M16.3 | `WorldRayCaster`, `RayFanSense`, `InteroceptionSense`, `HungerClock`, `RayFanView`; T-NEURO-05, 06 (NeuralSenseTests); EditMode 496/496 with Neuro |
-| M16.4 Brain | next | | `NeuralBrain` (sync, Greedy/Sample); T-NEURO-07 |
-| M16.5 Actions | | | `NeuralAction`, `TurnAction`, `ForwardAction`, `StopAction`, contacts, breeding; T-NEURO-09…11 |
+| M16.4 Brain | done | M16.4 | `NeuralBrain` (sync, Greedy/Sample, V-70, V-77); T-NEURO-07 (NeuralBrainTests, BrainConformance); EditMode 502/502 with Neuro |
+| M16.5 Actions | next | | `NeuralAction`, `TurnAction`, `ForwardAction`, `StopAction`, contacts, breeding; T-NEURO-09…11 |
 | M16.6 Templates and pairings | | | `NeuroPrey`/`NeuroPredator`, menu, `MatchedPairs` V-70…V-79, `Neuro_Lab`, S29–S31 (+L0), `NeuroStats`; T-NEURO-12, 15 ⏸ |
 | M16.7 Comparison scenarios | | | `Prey_vs_Prey`, `Brains_2x2`, S32/S33 both arms, survival analysis and report, chapter 16, site page; T-NEURO-13…16 ⏸ |
 | M16.8 Concurrency and scale | | | async `Later`, pooled attachments, one fan per tick, profile S32; T-NEURO-08 |
@@ -147,6 +148,8 @@ M0–M15: in [51](51-implementation-log.md) (M12–M15 at its end). Since then:
   Prey, ReadyKin, Kin, OtherAnimal, Carcass, Entity, Food, Item, Cover, Water, Obstacle. V-76 checks the fan's settings.
 - M16.3 — `HungerClock` is a `DeathRule` that never kills (the thirst-recipe hook). The sense conformance suite gives a sense
   with attachments a scripted brain that accepts them (V-51), an additive fixture change like C6.
+- M16.4 — `NeuralBrain` answers at once (the worker task of D4 is M16.8); it keeps one network and input buffer per
+  species, rebuilt when the gene's layout changes. Failures name the rule: no genome (DEC-10), length (V-71), width (V-72).
 
 ## Disagreements between the brief and Docs/Interface
 - 20 §3.9 names the operator method `MutationOperator.Start(gene, parent, rng)`; on a MonoBehaviour Unity takes
