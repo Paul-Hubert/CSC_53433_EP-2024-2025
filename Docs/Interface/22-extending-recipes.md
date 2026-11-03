@@ -190,7 +190,7 @@ public class IntensityLadder : MutationOperator
 {
     static readonly string[] Ladder = { "never", "rarely", "sometimes", "often", "always" };
     public override bool Accepts(Gene g) => g.Kind == AlleleKind.Text;
-    public override MutationJob Start(Gene g, Allele parent, RandomStream rng)
+    public override MutationJob StartMutation(Gene g, Allele parent, RandomStream rng)
     {
         var words = parent.Text.Split(' ');
         int i = Array.FindIndex(words, w => Ladder.Contains(w.ToLowerInvariant()));

@@ -550,14 +550,14 @@ public abstract class MutationOperator : SpeciesModule
     [SerializeField] List<Gene> onlyThese;                      // empty = every gene it accepts
     public abstract bool Accepts(Gene g);
     /// Draw every random choice now (MUT-30), then start the work; the job may finish later.
-    public abstract MutationJob Start(Gene gene, Allele parent, RandomStream rng);
+    public abstract MutationJob StartMutation(Gene gene, Allele parent, RandomStream rng);
 }
 
 public class GaussianMutation : MutationOperator
 {
     [SerializeField] float sigma = 5f;
     public override bool Accepts(Gene g) => g.Kind == AlleleKind.Number;
-    public override MutationJob Start(Gene g, Allele parent, RandomStream rng)
+    public override MutationJob StartMutation(Gene g, Allele parent, RandomStream rng)
     {
         var gene = (NumberGene)g;
         float v = Mathf.Clamp(parent.Number + sigma * rng.NextGaussian(), gene.Min, gene.Max);
@@ -572,7 +572,7 @@ public class LlmMutation : MutationOperator
     [SerializeField] int tries = 5, maxWords = 12;
     List<string> instructions;                                  // read from the deck in Initialize
     public override bool Accepts(Gene g) => g.Kind == AlleleKind.Text;
-    public override MutationJob Start(Gene g, Allele parent, RandomStream rng)
+    public override MutationJob StartMutation(Gene g, Allele parent, RandomStream rng)
     {
         var plan = TryPlan.Draw(rng, tries, instructions.Count);  // (instruction, seed) per try
         return World.Service<MutatorService>().Submit(parent.Text, plan, contextLine, instructions,
