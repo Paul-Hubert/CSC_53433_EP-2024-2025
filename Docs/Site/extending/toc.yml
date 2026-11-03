@@ -1,3 +1,5 @@
+- name: Before you start a feature
+  href: before-you-start.md
 - name: Extending EvoSim
   href: index.md
 - name: Species modules, the common base
