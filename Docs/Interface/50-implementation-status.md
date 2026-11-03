@@ -5,10 +5,10 @@ The single source of truth between implementation sessions of
 [`Docs/prompts/06-implement-unity-system.md`](../prompts/06-implement-unity-system.md).
 
 ## Next step
-M16 (plan `Docs/Neuro/PLAN.md`, prompt `Docs/prompts/08-implement-neural-species.md`): **M16.9 running**: the owner accepted the
-budget miss and gave the go; Ollama started; the first S33 run (default, seed 1, log `Logs/m169-s33-s1.log`) began
-2026-11-03 20:40 (a 200-tick check: 0.5 s per tick, mutations ok). When it stops: report cost and stop tick ⏸, then the
-other 7 runs with the owner's go. M16.1–M16.8 are done (milestone rows; details in 51, end); still waiting for the
+M16 (plan `Docs/Neuro/PLAN.md`, prompt `Docs/prompts/08-implement-neural-species.md`): **M16.9 waits for the owner ⏸**: the owner
+wants no long runs: every measured run is 2 000 ticks (`-ticks 2000`), not the plateau rule (the 60 000-tick run was
+stopped at tick 1 000). First run, S33 default seed 1: 984 s (0.49 s per tick), 14 362 JEV calls, 298 mutations (0 failed),
+hash 4390b352edf46069. Next, with the owner's go: the other 7 (about 2 h), then the Survival Reports. M16.1–M16.8 are done (milestone rows; details in 51, end); still waiting for the
 owner: the core diff (⏸ M16.1), S29 in `Neuro_Lab` (⏸ M16.6), the Survival Report (⏸ M16.7).
 
 Docs pass (09, `Docs/prompts/09-update-documentation.md`): step 3 done (2026-11-03: inventory in `Logs/docs-pass-09.md`,
@@ -46,7 +46,7 @@ Before M15, M14 and M13 waited at their checkpoints ⏸; their next-step notes m
 | M16.6 Templates and pairings | done ⏸ | M16.6 | `NeuralTemplates` + menu, `MatchedPairs` (V-78, V-79), V-73, V-74, `Neuro_Lab`/`Neuro_JevPrey`/`Neuro_JevPredator`, S29–S31 (+L0), `NeuroStats`, Animal Inspector panel; T-NEURO-12, 15 (NeuralTemplateTests, NeuroScenarioTests); EditMode 539/539 |
 | M16.7 Comparison scenarios | done ⏸ | M16.7 | `Prey_vs_Prey`, `Brains_2x2`, S32/S33 both arms (+L0), `SurvivalStats`, `PlateauStop`, `SurvivalAnalysis`, `SurvivalReport(Window)`, chapter 16, site page; T-NEURO-13, 14, 15 (SurvivalTests, NeuroScenarioTests); T-NEURO-16 run with JEV (see notes); EditMode 559/559 + 2 T4 skipped |
 | M16.8 Concurrency and scale | done ⏸ | M16.8 | `NeuralBrain` worker task (`SyncBelow` 32), `TickPool`, one fan per animal per tick, binned and bucketed casts; T-NEURO-08 (NeuralConcurrencyTests, NeuralBrainTests, NeuralSenseTests); budget not met; EditMode 564/564 + 2 T4 skipped |
-| M16.9 Measured runs | running | | first S33 run (cost, stop tick) ⏸, then 7 runs with the owner's go ⏸ |
+| M16.9 Measured runs | 1 of 8 ⏸ | | first S33 run (cost, stop tick) ⏸, then 7 runs with the owner's go ⏸ |
 
 ## Machine
 - Unity **6000.3.9f1**: `C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Unity.exe`
