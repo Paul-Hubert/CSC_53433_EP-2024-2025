@@ -24,7 +24,9 @@ intent into movement over the ground, and contacts trigger **interactions**
   in sight (no food, threat, kin, prey, carcass, ready partner, cover within the
   animal's vision), the animal wanders instead and the choice is counted as
   *searching* (the prototype's "invalid"), once per decision. Eating with no food
-  in sight means searching for food.
+  in sight means searching for food. Self-directed actions (steering: turn, walk
+  straight on; `AnimalAction.SelfDirected`) are the exception: they have no target,
+  move the animal by themselves and never search.
 - **ACT-05 (MUST)** Actions only target what the animal's senses could report:
   within its vision, not hidden from it, not killed, not itself.
 - **ACT-06 (MUST)** An action never changes another animal's stats or position

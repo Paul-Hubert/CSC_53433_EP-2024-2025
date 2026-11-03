@@ -229,11 +229,11 @@ the recipes of [22](22-extending-recipes.md) refer to.
 | Suite | Runs on | Checks |
 |---|---|---|
 | T-SENSE template | every `Sense` | tokens declared and non-empty; `Read` returns a declared index in 200 random worlds; `Write` is deterministic and non-empty for every token; nothing hidden is reported; batched equals sequential |
-| T-ACT template | every `AnimalAction` | searches when alone; intent only (no position or stat of another animal changed); description present; bound gene or V-05 |
+| T-ACT template | every `AnimalAction` | searches when alone (a self-directed action instead moves alone and doesn't search, ACT-04); intent only (no position or stat of another animal changed); description present; bound gene or V-05 |
 | T-ANIM stat template | every module declaring a stat | stays in range for 5 000 ticks; initial values for founders and babies |
 | T-ENV layer template | every `ResourceLayer` | consume once; nearest equals brute force; changes only in its phase with its own stream |
-| T-DEC brain template | every `Brain` | row shape, sum, order; same query same answer; failure behaviour |
-| T-MUT template | every `MutationOperator` | receives only gene and allele; same seed same result; result passes the gene kind's checks or is rejected |
+| T-DEC brain template | every `Brain` | row shape, sum, order; same query same answer; failure behaviour. The modules the brain names with `[RequiresModule]` are added to the species, and each query carries its animal's genome |
+| T-MUT template | every `MutationOperator` | receives only gene and allele; same seed same result; result passes the gene kind's checks or is rejected. The species holds a text, a number and a vector gene (`VectorProbeGene`): an operator accepts at least one |
 | T-TICK phase template | every `TickPhase` | runs on an empty world; declares what it waits for; doesn't break the hash of an unchanged world when disabled and re-enabled |
 | T-MOVE locomotion template | every `Locomotion` | never ends a tick on non-walkable ground or outside; reports the meters actually moved; a stuck animal moves again within 3 ticks; extra cost ≥ 0; batch and single-animal versions agree |
 

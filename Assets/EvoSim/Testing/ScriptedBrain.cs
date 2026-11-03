@@ -58,6 +58,8 @@ namespace EvoSim.Testing
         public int TokenLimit;
         /// <summary>True: queries may carry attachments, such as a camera sense's image (SENSE-41).</summary>
         public bool TakesAttachments;
+        /// <summary>False: it reads no sentence, like a network, so actions need no text gene (V-05; plan M16 C5).</summary>
+        public bool ReadsText = true;
         /// <summary>The answer instruction that ends the prompt (PROMPT-07).</summary>
         public string Instruction = "Answer with the probabilities.";
 
@@ -76,6 +78,8 @@ namespace EvoSim.Testing
         public override int MaxPromptTokens => TokenLimit;
         /// <inheritdoc/>
         public override bool AcceptsAttachments => TakesAttachments;
+        /// <inheritdoc/>
+        public override bool ReadsGeneText => ReadsText;
         /// <inheritdoc/>
         public override bool CanMixSpecies => MixesSpecies;
         /// <inheritdoc/>

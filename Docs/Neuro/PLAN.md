@@ -619,6 +619,11 @@ the door open.
 Nothing. The only gate left is in M16.9: the first measured run reports its cost and stop
 tick, and the owner gives the go for the other seven.
 
+**Readings taken while implementing** (also in the status file; for the owner at the next checkpoint):
+- M16.1 C1: the vector hash is SHA-256 over each value as the int64 round(v·10^d), little-endian.
+- M16.1 C2: `vectors.jsonl` is appended at each `alleles.jsonl` write, and exists only in runs with a vector gene.
+- M16.1 C3: Ask-the-Brain builds queries from sentences without a genome; a network fails there (DEC-40).
+
 ## 13. Risks
 
 - **Fairness of the 2×2:**

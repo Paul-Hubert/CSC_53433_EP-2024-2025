@@ -27,8 +27,12 @@ mutation, kept or lost by selection.
 - **GENE-06 (MUST)** A genome holds exactly one allele per locus of its species,
   in the species' locus order. A genome of the wrong length or of another
   species is an error.
-- **GENE-07 (MAY)** Other kinds may exist: a choice among a few options, a small
-  vector, the weights of a small neural network (the previous lab's genome).
+- **GENE-07 (MAY; MUST if used)** Other kinds may exist: a choice among a few options, a small
+  vector, the weights of a small neural network (the previous lab's genome). The core has a
+  third kind, **vector** (`AlleleKind.Vector`): one allele holds a whole `float[]`. If a
+  gene uses it, vector alleles **must** be compared at the gene's decimals: two vectors are
+  the same value when they have the same length and the same values rounded to those
+  decimals (`Canonical` = `vec[<length>]#<16 hex of SHA-256>`, M16).
 
 ## 2. Alleles and the registry
 
@@ -41,9 +45,11 @@ mutation, kept or lost by selection.
   (`prey.eat`, `predator.hunt`); the prototype writes the prey's without the
   species prefix (`eat:3`, `predator.hunt:0`).
 - **GENE-12 (MUST)** An allele records: id, locus, value, origin (`founder`,
-  `neutral`, `contrast`, `control`, `mutant`, `custom`), parent allele id,
+  `neutral`, `contrast`, `control`, `mutant`, `recombinant`, `custom`), parent allele id,
   mutation operator (e.g. `llm#3` = instruction 3 of the deck, `gauss`), model,
-  seed. Following parent ids gives the lineage of every gene.
+  seed. A `recombinant` (a crossover that built a new value from two alleles, such as a
+  network mixed neuron by neuron) also records its second parent's allele id. Following
+  parent ids gives the lineage of every gene.
 - **GENE-13 (MUST)** A **genome key** is a hash of the species id and the allele
   *values* in locus order, so the same genes give the same key in any run.
   The brain-visible key (DEC-31) uses only the alleles the brain reads.
@@ -105,7 +111,9 @@ platform."), length-matched to the founders.
 - **GENE-32 (MUST)** Every baby of a litter gets its own crossover, so siblings
   usually differ.
 - **GENE-33 (MAY)** A number gene may declare a blending crossover (e.g. the mean
-  of the parents' values) instead of picking one.
+  of the parents' values) instead of picking one; a vector gene may mix its parents'
+  values in parts (e.g. per neuron). A value that equals neither parent's is
+  registered as a `recombinant` with both parents (GENE-12).
 
 ## 5. Number genes: an example and a warning
 

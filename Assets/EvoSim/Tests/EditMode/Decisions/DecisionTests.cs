@@ -119,6 +119,13 @@ namespace EvoSim.Tests
                 http.ConfigureClient("http://fake.test", 5f, 1, 0f, 4);
             }
             b.World.DefaultBrain = brain;
+            // The modules the brain names with [RequiresModule] (a network needs its weights gene) go on both species, as the
+            // action suite adds an action's companions (plan M16 C6).
+            foreach (var sp in b.World.GetComponentsInChildren<Species>(true))
+                foreach (RequiresModuleAttribute need in type.GetCustomAttributes(typeof(RequiresModuleAttribute), true))
+                    if (need.Module != null && !need.Module.IsAbstract && typeof(SpeciesModule).IsAssignableFrom(need.Module)
+                        && sp.GetComponentInChildren(need.Module, true) == null)
+                        sp.gameObject.AddComponent(need.Module);
             var w = b.Build();
             var prey = w.FindSpecies("prey");
             var predator = w.FindSpecies("predator");
@@ -131,7 +138,8 @@ namespace EvoSim.Tests
                 var a = Place.Animal(s, Place.At(rng.Range(0f, 48f), rng.Range(0f, 48f)));
                 w.Space.Rebuild();
                 var o = s.Observe(a, new SenseContext(w));
-                queries.Add(new DecisionQuery(s, new List<KeyValuePair<string, string>>(), o, s.Describe(o, TextStyle.V1), TextStyle.V1, a.Genome.BrainKey));
+                queries.Add(new DecisionQuery(s, new List<KeyValuePair<string, string>>(), o, s.Describe(o, TextStyle.V1), TextStyle.V1, a.Genome.BrainKey,
+                                              genome: a.Genome));
             }
             var answer = brain.Ask(queries);
             answer.Pending.Wait();

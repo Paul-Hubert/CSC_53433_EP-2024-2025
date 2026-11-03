@@ -37,6 +37,14 @@ namespace EvoSim
         /// </summary>
         public string GenomeKey { get; }
 
+        /// <summary>
+        /// The genome the brain reads (DEC-10): the animal's own, or the one the shuffled-genes control lent it
+        /// (CTRL-01); null for a query built by a tool without one. A brain reads only the genes whose
+        /// <see cref="Gene.ReadByBrain"/> is true, so <see cref="GenomeKey"/> stays exact (DEC-31). A numeric brain reads a
+        /// vector gene's values here (plan M16 §4 C3).
+        /// </summary>
+        public Genome Genome { get; }
+
         /// <summary>The deciding animal's id (-1 when the query is built by a tool): for brains that aren't memoizable.</summary>
         public int AnimalId { get; set; } = -1;
 
@@ -48,9 +56,12 @@ namespace EvoSim
         /// <param name="style">The style of that text.</param>
         /// <param name="genomeKey">The brain-visible genome key (DEC-31).</param>
         /// <param name="attachments">Attachments from senses, or null for none.</param>
+        /// <param name="genome">The genome the brain reads, or null (tools).</param>
         public DecisionQuery(Species species, IReadOnlyList<KeyValuePair<string, string>> genes, Observation observation,
-                             string situation, TextStyle style, string genomeKey, IReadOnlyList<object> attachments = null)
+                             string situation, TextStyle style, string genomeKey, IReadOnlyList<object> attachments = null,
+                             Genome genome = null)
         {
+            Genome = genome;
             Species = species;
             Genes = genes;
             Observation = observation;

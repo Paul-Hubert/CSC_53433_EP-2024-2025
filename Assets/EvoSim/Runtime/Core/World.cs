@@ -613,7 +613,7 @@ namespace EvoSim
                 if (!seen.Add(a.Name))
                     report.Error("V-03", a, $"Two actions of '{s.DisplayName}' are named '{a.Name}' (ACT-01).",
                                  new ValidationFix("Rename", () => action.gameObject.name = action.Name + " 2"));
-                if (a.Gene == null)
+                if (a.Gene == null && (s.Brain == null || s.Brain.ReadsGeneText))                  // a brain that reads no sentence needs none (C5)
                     report.Warning("V-05", a, $"Action '{a.Name}' has no text gene: the brain can't be steered for it.",
                                    new ValidationFix("Add a text gene", () => action.gameObject.AddComponent<TextGene>()));   // its pool: the neutral allele
             }

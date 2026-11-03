@@ -9,7 +9,8 @@ namespace EvoSim
 {
     /// <summary>
     /// Writes a run into its own folder (13): events.jsonl, stats.csv, alleles.jsonl, final_population.json,
-    /// summary.json, run_info.json. Events and stats are flushed every 500 ticks, alleles every 5 000 (RAND-22), and
+    /// summary.json, run_info.json, and vectors.jsonl in a run with a vector gene (the values of each vector allele,
+    /// which the other files name by hash). Events and stats are flushed every 500 ticks, alleles every 5 000 (RAND-22), and
     /// every file is written when the run stops, whatever the reason (RAND-20). The compatibility mode writes a
     /// two-species world exactly as the prototype does (OUT-05).
     /// </summary>
@@ -46,6 +47,7 @@ namespace EvoSim
         bool writeFiles = true;
 
         StreamWriter events, stats;                                     // events.jsonl and stats.csv, open during the run; null otherwise
+        int vectorsWritten;                                             // alleles already looked at for vectors.jsonl
         readonly List<string> statColumns = new List<string>();         // the stats.csv header as written now
         readonly List<Dictionary<string, string>> statRows = new List<Dictionary<string, string>>();   // to rewrite the file when a species is added
         readonly System.Diagnostics.Stopwatch clock = new System.Diagnostics.Stopwatch();              // wall-clock time of the run, for the summary
@@ -368,15 +370,56 @@ namespace EvoSim
                 var d = new SortedDictionary<string, object>(StringComparer.Ordinal);
                 d["id"] = CompatId(a.Id);
                 d["locus"] = CompatId(a.Locus);
-                if (a.Kind == AlleleKind.Text) d["text"] = a.Text; else d["value"] = a.Number;
+                AddValue(d, a);
                 d["origin"] = a.Origin;
                 d["parent_id"] = CompatId(a.ParentId);
+                if (a.SecondParentId != null) d["parent2_id"] = CompatId(a.SecondParentId);       // a recombinant only (GENE-12)
                 d["operator"] = a.Operator;
                 d["model"] = a.Model;
                 d["seed"] = a.Seed;
                 sb.Append(CanonicalJson.Write(d)).Append('\n');
             }
             File.WriteAllText(Path.Combine(RunFolder, "alleles.jsonl"), sb.ToString(), new UTF8Encoding(false));
+            AppendVectors();
+        }
+
+        /// <summary>
+        /// Writes an allele's value into a record: <c>text</c> for a sentence, <c>value</c> for a number, and for a vector
+        /// <c>vector_sha</c> and <c>length</c>, never the values (13, plan M16 §4 C2: they go to <c>vectors.jsonl</c>).
+        /// </summary>
+        /// <param name="record">A birth event's mutation entry or a line of <c>alleles.jsonl</c>.</param>
+        /// <param name="a">The allele.</param>
+        public static void AddValue(IDictionary<string, object> record, Allele a)
+        {
+            switch (a.Kind)
+            {
+                case AlleleKind.Text: record["text"] = a.Text; break;
+                case AlleleKind.Vector:
+                    record["vector_sha"] = AlleleValue.VectorSha(a.Value.Vector, 4);
+                    record["length"] = a.Value.VectorLength;
+                    break;
+                default: record["value"] = a.Number; break;
+            }
+        }
+
+        /// <summary>
+        /// Appends to <c>vectors.jsonl</c> the values of every vector allele registered since the last call, one line
+        /// <c>{"id", "values"}</c> each, in registration order (13, plan M16 §4 C2). The file exists only in runs with a
+        /// vector gene.
+        /// </summary>
+        void AppendVectors()
+        {
+            var all = World.Alleles.All;
+            if (vectorsWritten >= all.Count) return;
+            var sb = new StringBuilder();
+            for (; vectorsWritten < all.Count; vectorsWritten++)
+            {
+                var a = all[vectorsWritten];
+                if (a.Kind != AlleleKind.Vector) continue;
+                var d = new SortedDictionary<string, object>(StringComparer.Ordinal) { ["id"] = CompatId(a.Id), ["values"] = a.Value.Vector.ToArray() };
+                sb.Append(CanonicalJson.Write(d)).Append('\n');
+            }
+            if (sb.Length > 0) File.AppendAllText(Path.Combine(RunFolder, "vectors.jsonl"), sb.ToString(), new UTF8Encoding(false));
         }
 
         /// <summary>The living animals for final_population.json: id, generation, genome (allele ids) and species.</summary>

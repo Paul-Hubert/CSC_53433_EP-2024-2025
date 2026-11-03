@@ -80,6 +80,13 @@ namespace EvoSim
         public virtual bool CanMixSpecies => true;
 
         /// <summary>
+        /// True (reference) when the brain is steered by text genes, one per action; a brain that reads no sentence (a
+        /// network reading a vector gene) says false, and validation then doesn't ask its species' actions for a text gene
+        /// (V-05; plan M16 §4 C5).
+        /// </summary>
+        public virtual bool ReadsGeneText => true;
+
+        /// <summary>
         /// The answer instruction that ends the prompt, hard-coded per brain because its parsing depends on it (PROMPT-07);
         /// empty for brains that read no prompt.
         /// </summary>

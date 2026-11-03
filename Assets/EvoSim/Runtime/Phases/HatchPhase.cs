@@ -93,7 +93,7 @@ namespace EvoSim
                 if (m.Job.Operator != null && m.Job.Operator.StartsWith("llm#") && int.TryParse(m.Job.Operator.Substring(4), out int deckIndex))
                     entry["prompt"] = deckIndex;
                 else entry["operator"] = m.Job.Operator;
-                if (allele.Kind == AlleleKind.Text) entry["text"] = allele.Text; else entry["value"] = allele.Number;
+                RunRecorder.AddValue(entry, allele);                                       // text, value, or vector_sha and length (13, plan M16 C2)
                 mutations.Add(entry);
             }
 

@@ -21,12 +21,20 @@ namespace EvoSim
         /// <summary>The value: a sentence or a number.</summary>
         public AlleleValue Value { get; }
         /// <summary>
-        /// Where it came from: <c>founder</c>, <c>neutral</c>, <c>contrast</c>, <c>control</c>, <c>mutant</c> or
-        /// <c>custom</c> (placed by a test or a tool) (GENE-12).
+        /// Where it came from: <c>founder</c>, <c>neutral</c>, <c>contrast</c>, <c>control</c>, <c>mutant</c>,
+        /// <c>recombinant</c> (built by a crossover from two parents) or <c>custom</c> (placed by a test or a tool) (GENE-12).
         /// </summary>
         public string Origin { get; }
-        /// <summary>The id of the allele it mutated from, or null when it is not a mutant.</summary>
+        /// <summary>
+        /// The id of the allele it mutated from, or null when it is not a mutant; for a recombinant, the first parent's
+        /// allele.
+        /// </summary>
         public string ParentId { get; }
+        /// <summary>
+        /// For a <c>recombinant</c> (a crossover that built a new value from two alleles), the second parent's allele id;
+        /// null otherwise (GENE-12, plan M16 §4 C7).
+        /// </summary>
+        public string SecondParentId { get; }
         /// <summary>
         /// The operator detail of a mutant, e.g. <c>llm#3</c> (instruction 3 of the deck) or <c>gauss</c>; null otherwise.
         /// </summary>
@@ -40,7 +48,7 @@ namespace EvoSim
         public string Text => Value.Text;
         /// <summary>The number of a number allele; 0 for a text allele.</summary>
         public float Number => Value.Number;
-        /// <summary>Whether it holds a sentence or a number.</summary>
+        /// <summary>Whether it holds a sentence, a number or a vector.</summary>
         public AlleleKind Kind => Value.Kind;
 
         /// <summary>
@@ -55,9 +63,11 @@ namespace EvoSim
         /// <param name="op">The operator detail of a mutant (<c>llm#3</c>, <c>gauss</c>), or null.</param>
         /// <param name="model">The mutator model's name, or null.</param>
         /// <param name="seed">The mutator call's seed, or null.</param>
+        /// <param name="secondParentId">For a recombinant, the second parent's allele id; else null.</param>
         public Allele(string locus, int index, AlleleValue value, string origin, string parentId = null,
-                      string op = null, string model = null, long? seed = null)
+                      string op = null, string model = null, long? seed = null, string secondParentId = null)
         {
+            SecondParentId = secondParentId;
             Locus = locus;
             Index = index;
             Id = locus + ":" + index;

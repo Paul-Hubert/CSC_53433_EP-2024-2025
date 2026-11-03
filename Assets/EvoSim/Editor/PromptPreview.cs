@@ -32,7 +32,8 @@ namespace EvoSim.Editor
         /// <param name="style">The situation text style (V1 or V2).</param>
         /// <returns>A query as a brain receives it, with no animal id (-1).</returns>
         public static DecisionQuery Query(Species s, Genome genome, Observation o, TextStyle style) =>
-            new DecisionQuery(s, DecisionQuery.BrainGenes(s, genome), o, s.Describe(o, style), style, genome != null ? genome.BrainKey : s.Id);
+            new DecisionQuery(s, DecisionQuery.BrainGenes(s, genome), o, s.Describe(o, style), style, genome != null ? genome.BrainKey : s.Id,
+                              genome: genome);
 
         /// <summary>A founder genome for the preview: the first founder of each gene (or the one at the given index).</summary>
         /// <param name="w">The world whose allele registry records the founder alleles.</param>

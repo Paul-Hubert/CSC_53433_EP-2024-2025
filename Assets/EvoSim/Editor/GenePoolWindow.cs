@@ -131,7 +131,7 @@ namespace EvoSim.Editor
                 var allele = watched.Alleles.ById(ids[i]);
                 EditorGUILayout.BeginHorizontal();
                 EditorGUI.DrawRect(GUILayoutUtility.GetRect(12, 12, GUILayout.Width(12)), ColorOf(ids[i]));
-                if (GUILayout.Button($"{100f * counts[ids[i]] / living:0}%  {allele?.Text}  ({allele?.Origin}, {ids[i]})", EditorStyles.label)) selected = ids[i];
+                if (GUILayout.Button($"{100f * counts[ids[i]] / living:0}%  {allele?.Value.ToString()}  ({allele?.Origin}, {ids[i]})", EditorStyles.label)) selected = ids[i];
                 EditorGUILayout.EndHorizontal();
             }
         }
@@ -144,7 +144,7 @@ namespace EvoSim.Editor
             var a = watched.Alleles.ById(selected);
             for (int guard = 0; a != null && guard < 50; guard++)
             {
-                EditorGUILayout.LabelField(a.Id, $"{a.Text}   — {a.Origin}{(a.Operator != null ? ", " + a.Operator : "")}", EditorStyles.wordWrappedLabel);
+                EditorGUILayout.LabelField(a.Id, $"{a.Value}   — {a.Origin}{(a.Operator != null ? ", " + a.Operator : "")}", EditorStyles.wordWrappedLabel);
                 a = watched.Alleles.ById(a.ParentId);
             }
         }

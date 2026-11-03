@@ -27,7 +27,8 @@ files follow the prototype's formats so that the prototype's analysis tools
 |---|---|
 | `events.jsonl` | one line per event (§3) |
 | `stats.csv` | one row every `statsEvery` ticks (reference 100), §4 |
-| `alleles.jsonl` | every allele seen, all species: `id`, `locus`, `text` (or `value` for number genes), `origin`, `parent_id`, `operator`, `model`, `seed` |
+| `alleles.jsonl` | every allele seen, all species: `id`, `locus`, `text` (or `value` for number genes, or `vector_sha` and `length` for vector genes), `origin`, `parent_id` (and `parent2_id` for a recombinant), `operator`, `model`, `seed` |
+| `vectors.jsonl` | only in a run with a vector gene: the values of every vector allele, one line `{id, values}` each, in registration order, appended when `alleles.jsonl` is written |
 | `final_population.json` | the living animals at the end: `id`, `gen`, `genome` (allele ids), `species` |
 | `summary.json` | totals per species and for the run (§5) |
 | `run_info.json` | what ran: scene or configuration snapshot, git commit, Unity version, brains (model names, digests or pinned revisions, hosts), mutator (API, host, model), seeds, wait mode, act order |
@@ -38,7 +39,7 @@ files follow the prototype's formats so that the prototype's analysis tools
 |---|---|
 | `founder` | `id`, `genome` |
 | `immigrant` | `id`, `genome` (a newcomer below the floor) |
-| `birth` | `id`, `parents`, `gen`, `genome`, `litter` (its litter's size), `mutations`: a list of {`locus`, `parent` (allele id), `child` (new allele id), `prompt` (instruction number, LLM operator) or `operator`, `text` or `value`}; a hatched egg also has `laid` (the conception tick) |
+| `birth` | `id`, `parents`, `gen`, `genome`, `litter` (its litter's size), `mutations`: a list of {`locus`, `parent` (allele id), `child` (new allele id), `prompt` (instruction number, LLM operator) or `operator`, `text` or `value` (or `vector_sha` and `length`)}; a hatched egg also has `laid` (the conception tick) |
 | `death` | `id`, `cause` (`starvation`, `old_age`, `predator`/`killed`, `migrated`, or a module's cause), `age`, `gen`, `food` (meals), `offspring`, and `killer` for a kill |
 | `egg_lost` (Unity) | `id` of the egg, `parents`, `reason` |
 | `species_created` (Unity) | `species`, `name`, `parent_species` |

@@ -201,6 +201,13 @@ namespace EvoSim.Tests
                 Assert.IsFalse(alone.Mates || alone.Hunts, "an overlay neither mates nor hunts (V-27)");
                 return;
             }
+            if (alone.SelfDirected)
+            {
+                // A steering action has no target: it moves alone, and never searches (ACT-04 exemption, plan M16 C4).
+                Assert.IsFalse(solo.Searching, "a self-directed action doesn't search (ACT-04)");
+                Assert.IsFalse(ctx.Intent.IsStay, "a self-directed action moves alone in an empty world");
+                return;
+            }
             Assert.IsTrue(solo.Searching || ctx.Intent.IsStay, "alone with nothing in sight it searches (ACT-04), or stays");
         }
 
@@ -280,6 +287,7 @@ namespace EvoSim.Tests
                 {
                     s.PreyBody().LifeRules(10, 0).Action<RestAction>("rest", founders: new[] { "Rest often when tired." });
                     s.Module<NumberGene>(n => n.Configure("stamina.max", 20f, 120f, new[] { 60f }, false, "stamina"));
+                    s.Module<VectorProbeGene>(v => v.SetLabel("weights"));                 // a vector gene too (plan M16 C6)
                     op = (MutationOperator)Child(s.GameObject, "operator").AddComponent(type);
                     if (op is LlmMutation llm) llm.Configure(EvoSim.Testing.Lab.Deck, "The sentence below is a rule that a wild animal follows.");
                 }).Build();
@@ -299,7 +307,7 @@ namespace EvoSim.Tests
                 Assert.AreEqual(a.Result, b.Result, "same seed, same result");
                 Assert.IsNull(gene.Check(a.Result), "the result passes the gene's checks");
             }
-            Assert.Greater(accepted, 0, "it accepts at least one of a text and a number gene");
+            Assert.Greater(accepted, 0, "it accepts at least one of a text, a number and a vector gene");
         }
 
         // ---- T-TICK phase template ----

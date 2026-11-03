@@ -21,8 +21,12 @@
 
 - **DEC-10 (MUST)** Each deciding animal produces one **query**: its species, the
   genes its brain reads (text genes as sentences, in locus order, with their
-  labels), its observation, its situation text in the brain's style, and any
-  attachments (SENSE-40).
+  labels), its observation, its situation text in the brain's style, any
+  attachments (SENSE-40), and the brain-visible genome (`DecisionQuery.Genome`: the
+  animal's own, or the one the shuffled-genes control lends it; a numeric brain reads a
+  vector gene's values there, and only genes it reads, so the key of DEC-31 stays exact).
+  A brain that reads no sentence says so (`Brain.ReadsGeneText`), and its species'
+  actions then need no text gene (V-05 is not reported).
 - **DEC-11 (MUST)** A brain answers a batch of queries with one probability vector
   per query: one entry per action of the query's species, in the species' action
   order, every entry ≥ 0, summing to 1 (± 1e-6). Answers come back in the order

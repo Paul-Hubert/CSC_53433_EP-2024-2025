@@ -48,7 +48,7 @@ namespace EvoSim
                 var genome = QueryGenome(a, t);
                 var attachments = SensePhase.Attachments(a, sense, out string attachmentKey, out bool memoable);
                 d.Query = new DecisionQuery(species, DecisionQuery.BrainGenes(species, genome), d.Observation, d.Situation, World.TextStyle,
-                                            genome != null ? genome.BrainKey : species.Id, attachments);
+                                            genome != null ? genome.BrainKey : species.Id, attachments, genome);   // the shuffled genome under CTRL-01 (C3)
                 d.Query.AnimalId = a.Id;
                 if (d.Brain != null && !d.Brain.Memoizable) memoable = false;              // a brain with memory: no memo, no sharing, no cache
                 d.MemoKey = memoable ? DecisionMemo.Key(species, d.Brain, d.Query.GenomeKey, d.Observation) + (attachmentKey.Length > 0 ? "|" + attachmentKey : "") : null;

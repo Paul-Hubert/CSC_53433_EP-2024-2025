@@ -187,7 +187,7 @@ namespace EvoSim
             {
                 var allele = a.Genome[i];
                 sb.AppendLine().Append("  ").Append(s.Genes[i].Label).Append(": ")
-                  .Append(allele.Kind == AlleleKind.Text ? allele.Text : allele.Number.ToString("0.##"));
+                  .Append(allele.Kind == AlleleKind.Number ? allele.Number.ToString("0.##") : allele.Value.ToString());   // a vector: vec[n]#hash
             }
             return sb.ToString();
         }

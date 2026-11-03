@@ -41,15 +41,17 @@ namespace EvoSim
         /// <param name="op">For a mutant, the operator detail (<c>llm#3</c>, <c>gauss</c>); else null.</param>
         /// <param name="model">For a mutant sentence, the mutator model's name; else null.</param>
         /// <param name="seed">For a mutant sentence, the mutator call's seed; else null.</param>
+        /// <param name="secondParent">For a <c>recombinant</c>, the id of the second parent's allele (GENE-12, plan M16 §4
+        /// C7); else null.</param>
         /// <returns>The new allele, or the one already registered with this value at this locus.</returns>
         public Allele Register(Gene gene, AlleleValue value, string origin, string parentId = null,
-                               string op = null, string model = null, long? seed = null)
+                               string op = null, string model = null, long? seed = null, string secondParent = null)
         {
             string locus = gene.LocusId;
             string key = locus + "\u0001" + value.Canonical(gene.Decimals);           // one key per (locus, canonical value)
             if (byKey.TryGetValue(key, out var known)) return known;
             countPerLocus.TryGetValue(locus, out int n);
-            var allele = new Allele(locus, n, value, origin, parentId, op, model, seed);
+            var allele = new Allele(locus, n, value, origin, parentId, op, model, seed, secondParent);
             countPerLocus[locus] = n + 1;
             byKey.Add(key, allele);
             byId.Add(allele.Id, allele);

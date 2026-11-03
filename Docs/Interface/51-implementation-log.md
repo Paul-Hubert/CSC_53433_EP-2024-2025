@@ -1428,3 +1428,140 @@ V-19, V-27) and 30 (T-ACT-11) updated.
   headless L0 seed 1234, 400 ticks, twice: 3 204 prey decisions, 438 alarm draws, 438 calls, 2 333 decisions heard a
   call (800 fled or hid), same hash `ed746ccc…`. Site: "Actions done in passing" in `extending/action.md`; the worked
   example's section 2 explains the overlay. Strict site build: 0 issues, 56 examples compile, 0 warnings.
+
+## Moved from the status file (2026-11-03): M13 real-time test and P1 audit tables
+
+### M13 real-time visual test (2026-10-10): HideVsFlee, seed 1234, 600 ticks
+Report `Logs/EvoSim/Reports/RT-2026-10-10.md` (captures in `RT-2026-10-10/`); details in 51.
+
+| Level | Headless | Play mode | Build | Note |
+|---|---|---|---|---|
+| L0 | `27c52857…` | same (5 and 20 ticks/s) | same (20 ticks/s) | left at tick 279: files complete, hash = headless 279 |
+| L2 | `1183278b…` | same (5 live, 20 replay) | same (20, 1920 × 1080; 1 tick/s for 10 min) | 4 105 JEV + 5 gemma calls, all in Play mode |
+
+Pace: replays 5.0/5, 19.9/20, 20.0/20 ticks/s at 70–120 FPS; live L2 0.55/5 (JEV serves about two prompts at a time; 248
+waits, longest 9.6 s; a mutator wait of 11.2 s at 54 FPS). Memory flat (build: private 540–567 MB over 10 min). Lab1_Full:
+119 FPS lowest with 275 animals (340 never reached at L0). Behaviour (probe on the L2 replay): 53 kills, 74 carcass
+portions, food regrown 2 424, hunters' nearest prey hidden 1 280 times and never targeted, babies within 2 m of a parent.
+
+| # | Rule | Problem | Sev. | State |
+|---|---|---|---|---|
+| 1 | DEC-30, 13 §4 | cache hits aren't memoised: a replay's `backend_queries`, `memo_hit_rate` differ from the live run's | risk | fixed M13.4 |
+| 2 | SPACE-12 | RealTime views didn't interpolate (jumps 5×/s) | bug (look) | fixed M13.1 |
+| 3 | SPACE-14 | RealTime catch-up bursts after a wait | risk | fixed M13.1 |
+| 4 | DEC-01 | L2 pace = JEV throughput: all animals decide on the same tick | risk | M13.6: staggered reference (~13 % faster, no stall; JEV still bounds the pace) |
+| 5 | — | editor captures need a drawn Game view | risk | fixed M13.1 (give up after 5 s) |
+| 6 | ARCH-01 | `Batch.WithScene` ran on an open scene, changed and closed it (then saved by the test runner) | bug (tooling) | fixed M13.1 |
+| 7 | — | Input Manager deprecation warning on Play | look | owner's setting |
+| 8 | — | the course's scripts block any player build | risk | fixed M13.5 (`#if UNITY_EDITOR`) |
+| 9–11 | — | long copy path; `-screen-*` stays fullscreen; "waiting" shown while paused | look | 9, 10 worked around; 11 proposed |
+
+### P1 audit (2026-10-10): phase 1 findings, phase 2 fixes
+Four read-only audits, then every row fixed (owner 2026-10-10). Severity: bug (proved), risk (could go wrong / weak
+test), doc. The auditors' details and what each fix changed are in 51.
+
+| # | Rule | Finding | Evidence | Sev. | Phase 2 |
+|---|---|---|---|---|---|
+| 1 | ARCH-06, DEC-13, V-61 | A disabled, inactive or other World's brain is still used when pointed to: never initialized, validated (V-20/V-61) or in run_info | Species.cs:40, AskBrainsPhase.cs:95 | bug | V-10 with a fix (Use <brain>) |
+| 2 | V-35 | Override `World/decisionPeriod=0` bypasses the setter's clamp: divide by zero at tick 0 | FieldPath.cs:27, World.cs:88, SensePhase.cs:29 | bug | V-35 for the World's settings, clamp fixes |
+| 3 | SPEC-30, CORE-08 | AddSpecies ignores its discovery report, validates nothing, keeps a duplicate display name | World.Species.cs:17-27 | bug | new id and name; validated; nothing kept on errors |
+| 4 | RAND-20, TICK-04 | Strict mutator failure stops inside Hatch after Act/Breed: no Deaths/Record that tick | MutatorService.cs:128 | bug (strict) | RequestStop: ends the tick, then stops |
+| 5 | MUT-03/05 | Gaussian at its range edge clamps to the parent value, counted as a success `{parent:X, child:X}` | GaussianMutation.cs:18, HatchPhase.cs:46 | bug | "unchanged" is a failure |
+| 6 | 13 §5 | `backend_s` always 0: BrainMilliseconds never added to | SpeciesCounters.cs:16, RunRecorder.cs:306 | bug | BrainAnswer.Milliseconds per species |
+| 7 | SPEC-03 | Signature computed before the food web: an empty threat label hashes "Predator", later "Wolf" → false V-12 | Species.cs:183, World.cs:361 | bug (low) | signed after the food web |
+| 8 | ARCH-12 | `Locomotion.MoveAll` never called; `ReadAll`/`ActAll` absent: the batch seam of 20 §10 is dead | Locomotion.cs:41, ActPhase.cs:147 | bug (low) | ReadAll, ActAll, MoveAll called |
+| 9 | GENE-13 | Genome keys hash numbers at 4 decimals, the registry at the gene's precision (decimals 1) | Genome.cs:44, AlleleRegistry.cs:27 | bug (non-default) | Canonical(gene.Decimals) |
+| 10 | 13 §2, OUT-05, V-36 | No stats.csv before statsEvery; compat `failures` overwritten by a species; V-36 checks only gene-bound traits | RunRecorder.cs:123,338; SpeciesBuilder.cs:51 | bug (minor) | header in Begin; run's keys kept; V-36, V-38 |
+| 11 | coverage gate | Citation regex credits test ids ("T-DEC-02" → DEC-02, 56 rules); the MUST regex misses TICK-04's form | CoverageTests.cs:28,45 | bug (test) | both regexes + CitationsAreReadCorrectly |
+| 12 | MUT-20 (S13) | S13 filters origin "mutation", mutants are "mutant": its checks assert nothing | ScenarioTests.cs:156,167 | bug (test) | "mutant", non-empty, births |
+| 13 | OUT-04 (T-OUT-03) | Sets OLLAMA_API_KEY that nothing reads; logs not scanned: can't fail | OutputPlayTests.cs:99-114 | bug (test) | fake Ollama on the key; logs scanned |
+| 14 | EDIT-01 | Module prefabs never validated (StaminaGene, Senses/Carcass in no scene) | EditorToolTests.cs:36-44 | bug (test) | EveryModulePrefabValidates |
+| 15 | DEC-02 | No real test that a busy animal never decides (removing `\|\| a.IsBusy` passes) | SensePhase.cs:28, DecisionTests.cs:26 | risk | BusyAnimalsNeverDecide |
+| 16 | RAND-20, OUT-03 | Leaving Play doesn't Stop: runs < 5 000 ticks get no alleles.jsonl / final_population / summary | RunRecorder.cs:219-241 | risk (high) | OnDisable stops; the recorder finishes |
+| 17 | ARCH-06, GENE-05 | Disabling only an action leaves its gene in the genome and prompt (V-06 warning) | Ownership.cs:30 | risk | absent (OnDisabledAction) |
+| 18 | EDIT-01 | MutatorService without a client: silent, every mutation fails | MutatorService.cs:47,91 | risk | V-63 |
+| 19 | ACT-04, ACT-31, ACT-13 | Conformance accepts Stay for Search; sequential visibility untested; eggs in act phase unseen | ConformanceTests.cs:137, ActPhase.cs:158 | risk | ActOrderTests, EggTests, Searchers |
+| 20 | SPEC-10/13 | An added species' strikes use the parent's Edible | Diet.cs:95, InteractionResolver.cs:57 | risk | the struck species' own Edible |
+| 21 | ARCH-05, ACT-01, RAND-02 | Nested World undetected; duplicate sense labels / layer names / id = other name not validated | World.cs:303,349 | risk | V-15, V-16, V-17, V-18; V-07 wider |
+| 22 | OUT-04, V-61 | Key check misses gsk_/ghp_/AIza/hex and `?key=`; run_info leaves `-serial`, `-auth`, Bearer unmasked | HttpChecks.cs:9, RunInfo.cs:61 | risk | wider patterns, every string; Secrets.Mask |
+| 23 | RAND-11, SPACE-12 | Views keep colliders on layer 2: a ray mask with it ties senses to rendering | ViewPool.cs:45, RayBatch.cs:53 | risk | no colliders; layer 2 masked |
+| 24 | ACT-20, CORE-06 | Genome/LastSituation public; T-ACT-09 scans Runtime/Actions only; contextLine not checked single-line | Animal.cs:13, ActionTests.cs:233 | risk | scan widened; V-49 |
+| 25 | EDIT-01/02, 21 §2 | Severities differ (V-20 warnings, V-02), codes reused; no severity asserts; 8 fix buttons of 25 | World.cs:324, ValidationCatalogueTests.cs:123 | risk | own codes, (code, severity) asserted, 24 fixes |
+| 26 | weak tests | ANIM-17, ANIM-35, SENSE-04, CORE-05, REPRO-03/24, GENE-03/06, RAND-05, V-60 TestConnection | 51 | risk | strengthened (51) |
+| 27 | SPEC-30, ACT-05, ARCH-07 | stats.csv columns fixed at row 1; mate ignores partnerRange < vision; mutable static lists in samples | RunRecorder.cs:123, WorldQueries.cs:74 | risk (low) | columns rewritten; min(vision, range); read-only |
+| 28 | OUT-02, RAND-03, SPEC-05, GENE-12 | species_created has no id; one act-order stream; asymmetric nesting rule; llm#n is 0-based | SimEvent.cs:24, ActPhase.cs:57 | doc | 40 §2 #15 |
+| 29 | citations | ANIM-31, SPACE-04/06, SENSE-10…13, ENV-12, ACT-02, SPACE-13 cited by the wrong tests | 51 | doc | descriptions fixed; ANIM-31 in 40 §2 #15 |
+
+Clean: no global or unseeded randomness, no deciding iteration over hash sets, ties by id, async answers applied by
+index, Freeze = Responsive path, animals as data, MUT-11 prompt, TICK-04 and ACT-30/31/32 orders, no secret in the
+repository, every genome of 8 real runs rebuilt from the events (no run with a mutation yet).
+
+### The status file's next-step notes for M14 and M13 (moved 2026-11-03)
+
+Before M15, M14 (2026-10-11, owner: document the whole code base for students, inline and as a website) waited for the owner ⏸:
+every type and member of `Assets/EvoSim` has a doc comment (DocAudit 0 issues; comments only, proven by Roslyn syntax
+equivalence with d5769e0), and `Docs/Site` builds the students' website with DocFX 2.81: 19 guide pages, 21 extending pages
+(the extension map, one per mechanism, a generated page of every extension point), the API reference grouped by folder, and
+this specification with rule ids linked (`powershell -File Docs\Site\build.ps1 -Serve`; setup in `Docs/Site/README.md`).
+The pass found about 90 bugs and stale statements, none fixed (code untouched): 51 §M14 lists them for the owner.
+
+Before M14, M13 waited at its checkpoint ⏸: the owner watches HideVsFlee (Play mode, or `Builds/EvoSim/2026-10-10/EvoSim.exe`) and
+reads `Logs/EvoSim/Reports/RT-2026-10-10.md`. The owner's three M13 decisions are done (M13.4–M13.6): cache hits join the
+memo, the course's scripts build for a player, the reference scenes stagger decisions (R-01 re-pinned). The reference
+decision period was tried at 20 (M13.8) and 10 (M13.9, a 10-minute live L2 build run:
+`Logs/EvoSim/Reports/RT-2026-10-11-P10.md`), then set back to 4 (M13.10, owner). Long runs on five scenes are prepared,
+not started (owner): `Logs/EvoSim/long-runs/README.md` (runner, analysis, replay; build `Builds/EvoSim/2026-10-11-p4`;
+about 2 300–3 600 JEV calls per scene per 10 minutes, so the owner picks scenes and minutes). Still open from M12:
+40 §2 #1, #2 (golden texts), #13 (the B-10 bar), #15–#17 (wording, new codes and seams for the contract).
+EditMode runs go through the editor with `--async_tests true` (scratchpad evo.sh); long runs on the batch copy.
+
+### Decisions M12–M15 (moved from the status file 2026-11-03)
+
+- 32 §2 B-02 — the 48 reference situations have no cover, so a hide gene could never matter — the hide pair's
+  relevant situations get cover "close" (the Unity prey's own sense).
+- 32 §2 B-08 — run on the reference scene with the predator renamed (wolf / shadow) through a field override.
+- 32 §2 B-10 — the judge's {topic} per slot: the prototype's table (gene_timeline.TOPIC), "hide" = "when to hide in cover".
+- 22 §0 — stubs are templates (`Exercises/My*.cs.txt`), not compiled in the package (the conformance suites would
+  run them and fail); the menu writes them to Assets/Student. Stamina/Litter stubs derive from the reference (40 §2 #10);
+  no grading: there is no criterion to reach (owner 2026-10-10, 40 §2 #14); TeachingPathGradingTests removed.
+- 10 §2 — the reference mutator is gemma4:26b in Ollama on the CPU (num_gpu 0, num_ctx 1 024, thinking off, T 1.2), the
+  owner's "better mutator on the CPU"; qwen3.5:0.8b stays the small, faster choice.
+- RAND-03 — one `act-order` stream for all species is kept (per-species streams would change every pinned hash); the
+  contract should state the exception (40 §2 #15, with the other wording the audit asks for).
+- 21 §2 — new codes V-15, V-16, V-17, V-18, V-26, V-37, V-38, V-49, V-63, and widened V-07, V-09, V-35, V-36, V-60,
+  V-61 (40 §2 #16). No fix button for V-20, V-36, V-62: the target, value or folder is a person's choice.
+- Open system — every module hears births and deaths, adds stats columns, names its companions, and most reference
+  methods are virtual; the seams are listed in 51 (M12.5), the students' README §3 and 40 §2 #17.
+- M12.5 — the audit fixes and the seams share one commit: they change the same files.
+- M13 — the run views are components of their own ("Run views": GroundView, EntityMarkers, RunOverlay, RunCapture; a
+  WorldCamera on the camera), outside the World's tree, added to the six reference scenes and by the scene builder; the
+  bodies were rebuilt (standing on the ground, a nose, an ActionView marker). Overlay in IMGUI: it works in a build.
+- M13 — Play settings from the CLI go in through `World.Configuring` (the player's `PlayerArgs`), never into the scene file.
+- M13 — L2 live calls happened in Play mode at 5 ticks/s (owner's choice); headless, 20 ticks/s, the build and the 10-minute
+  run replayed the answer cache. 4 105 JEV calls for an estimate of 3 300 (owner agreed at tick 536).
+- DEC-30 (M13.4, owner) — a cached answer joins the memo where a live one would (ChooseActionsPhase, Due order), so a replay
+  counts exactly like the live run: HideVsFlee L2 replay stats.csv byte-identical to the live run's.
+- M13.5 (owner) — the course's two scripts guard their editor-only lines with `#if UNITY_EDITOR`; the project builds its
+  own player (the copy is no longer needed).
+- DEC-04 (M13.6, owner) — staggered decisions are the reference: a staggered DecisionSchedule in every species' Life group
+  (scene builder, the menu's New Species, the six scenes migrated by EvoSim ▸ Reference ▸ Stagger Decisions in Reference
+  Scenes). Worlds built in code still decide all together (the prototype's way). R-01 re-pinned (all 12 hashes; the
+  re-pinned file reproduced on a second run). The M13 report's HideVsFlee hashes predate staggering.
+- DEC-01 (M13.8, owner 2026-10-11) — the reference decision period is 20 (5 × 4): `ReferenceScenes.ReferenceDecisionPeriod`,
+  set by the scene builder (and so the menu's new World); the six scenes updated by EvoSim ▸ Reference ▸ Update Reference
+  Scenes (one line each). A World component added by hand still starts at 4, and worlds built in code (tests) keep 4.
+  R-01 re-pinned again (reproduced). HideVsFlee seed 1234: L0 600 ticks 541 brain queries instead of 3 033, prey births 3
+  instead of 69, the prey at their floor (10) from tick 200; L2 (JEV) 600 ticks: 680 JEV calls instead of 4 105, 119 s
+  headless, prey 30 → 10 (their floor) by tick 500 with 29 births instead of 87, predators 6 → 11.
+- DEC-01 (M13.9, owner 2026-10-11) — the reference decision period is 10 (20 cost too many prey births). Same mechanism
+  (`ReferenceDecisionPeriod`, Update Reference Scenes); R-01 re-pinned. 10-minute live L2 build run of HideVsFlee seed 1234:
+  1 368 ticks, 2.28 ticks/s, 3 631 JEV + 10 gemma calls, 37 mutations ok of 37; at tick 600 prey 32 and 99 births (period 4:
+  23 and 87), then a decline to the prey floor by tick ~1 300 with the predators near their cap; the headless replay gives
+  the build's hash. Report `Logs/EvoSim/Reports/RT-2026-10-11-P10.md`.
+- R-06 (M13.9) — the soak caps the memo at 8 192 keys: at period 10 the reference memo (262 144 keys) is still filling
+  between ticks 10 000 and 100 000 (13 829 → 102 249 keys, 14.8 → 19.8 MB), which the "5 % after tick 10 000" bound
+  read as a leak; at period 4 it was full before tick 10 000. Capped: 20.8 → 21.0 MB.
+- DEC-01 (M13.10, owner 2026-10-11) — back to a reference period of 4 (staggered, as M13.6): `ReferenceDecisionPeriod = 4`,
+  the six scenes and the R-01 hashes are again exactly those of M13.6 (verified: PinnedHashes passes on M13.6's file), and
+  01, 08, 14 read as at M13.6. Kept from M13.8–M13.9: `-minutes`, `RealTimeRuns.FromCommandLine`, Update Reference Scenes,
+  the soak's memo cap.

@@ -140,6 +140,12 @@ namespace EvoSim
         public virtual bool Mates => false;
 
         /// <summary>
+        /// True for a steering action that has no target, such as turn left or walk straight on: it moves the animal by
+        /// itself, so the search rule (ACT-04) doesn't apply to it. False by default (plan M16 §4 C4).
+        /// </summary>
+        public virtual bool SelfDirected => false;
+
+        /// <summary>
         /// True for an action done in passing (a call, a scent mark): when the brain's draw picks it, the animal also does a
         /// second action, the carrier, drawn from the rest of the row; this one adds its interaction only (ACT-07).
         /// </summary>
