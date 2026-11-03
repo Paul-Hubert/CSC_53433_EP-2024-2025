@@ -5,9 +5,9 @@ The single source of truth between implementation sessions of
 [`Docs/prompts/06-implement-unity-system.md`](../prompts/06-implement-unity-system.md).
 
 ## Next step
-M16 (plan `Docs/Neuro/PLAN.md`, prompt `Docs/prompts/08-implement-neural-species.md`): **M16.2 Genes** — `NeuralLayout`,
-`NeuralNet`, `NeuralGenomeGene`, `NeuralMutation`, `NeuronCrossover` in the new `Assets/EvoSim/Neuro` assemblies, with
-T-NEURO-02…04. M16.1 (core C1–C7) is done: vector alleles, `vectors.jsonl`, `DecisionQuery.Genome`,
+M16 (plan `Docs/Neuro/PLAN.md`, prompt `Docs/prompts/08-implement-neural-species.md`): **M16.3 Senses** — `WorldRayCaster`,
+`RayFanSense`, `InteroceptionSense`, `HungerClock`, `RayFanView`, with T-NEURO-05, 06. M16.2 (genes, mutation, crossover in
+`Assets/EvoSim/Neuro`) is done. M16.1 (core C1–C7) is done: vector alleles, `vectors.jsonl`, `DecisionQuery.Genome`,
 `AnimalAction.SelfDirected`, `Brain.ReadsGeneText`, the conformance fixtures, recombinant alleles; EditMode see M16.1 row,
 R-01 unchanged. The owner's review of the core diff (⏸ M16.1) is still to come.
 
@@ -36,8 +36,8 @@ Before M15, M14 and M13 waited at their checkpoints ⏸; their next-step notes m
 | M14 Documentation for students | review | 598a755, 0a322b7 | `///` on every type and member (347 files, +10 149 lines, code token-identical); Docs/Site: 41 pages, 50 compiled examples, strict build 0 warnings; EditMode 438/438, PlayMode 23/23 (batch, -nographics); B1–B5 student-readiness fixes (0a322b7); published on gh-pages `/evosim` (334771d) ⏸ |
 | M13 Real-time visual test | review | ed16db5, d155e72, 29838b3, 9140625, c9d9e0a, e735804, 5efefe4, 6f3b302, 2328091, M13.10 | scenes watchable (ground, food, cover, markers, overlay, camera, capture); L0 and L2 hashes equal headless = Play = build; then memo of cache hits, player build of the project, staggered reference; EditMode 438/438, PlayMode 23/23; report RT-2026-10-10 ⏸ |
 | M16.1 Neural species: core C1–C7 | done | M16.1 | `AlleleKind.Vector`, `vectors.jsonl`, `DecisionQuery.Genome`, `SelfDirected`, `ReadsGeneText`, `VectorProbeGene`, recombinants; T-NEURO-01 (VectorAlleleTests); EditMode 472/472 (batch), 6 new; R-01 unchanged ⏸ |
-| M16.2 Genes | next | | `NeuralLayout`, `NeuralNet`, `NeuralGenomeGene`, `NeuralMutation`, `NeuronCrossover`; T-NEURO-02…04 |
-| M16.3 Senses | | | `WorldRayCaster`, `RayFanSense`, `InteroceptionSense`, `HungerClock`, `RayFanView`; T-NEURO-05, 06 |
+| M16.2 Genes | done | M16.2 | `NeuralLayout`, `NeuralNet`, `NeuralGenomeGene`, `NeuralMutation`, `NeuronCrossover`; T-NEURO-02…04 (NeuralGeneTests), T-EDIT-02 for EvoSim.Neuro; EditMode 480/480 + 1 |
+| M16.3 Senses | next | | `WorldRayCaster`, `RayFanSense`, `InteroceptionSense`, `HungerClock`, `RayFanView`; T-NEURO-05, 06 |
 | M16.4 Brain | | | `NeuralBrain` (sync, Greedy/Sample); T-NEURO-07 |
 | M16.5 Actions | | | `NeuralAction`, `TurnAction`, `ForwardAction`, `StopAction`, contacts, breeding; T-NEURO-09…11 |
 | M16.6 Templates and pairings | | | `NeuroPrey`/`NeuroPredator`, menu, `MatchedPairs` V-70…V-79, `Neuro_Lab`, S29–S31 (+L0), `NeuroStats`; T-NEURO-12, 15 ⏸ |
@@ -130,6 +130,17 @@ M0–M15: in [51](51-implementation-log.md) (M12–M15 at its end). Since then:
   DEC-40, rather than invent a row).
 - C5/C6 — `ScriptedBrain.ReadsText` (test fixture) switches `ReadsGeneText`; the brain suite adds a brain's
   `[RequiresModule]` species modules to both species and passes each animal's genome.
+- M16.2 — the test assembly is `EvoSim.Tests.Neuro` (plan: `EvoSim.Neuro.Tests`): the conformance suites scan every
+  `EvoSim.*` assembly except `EvoSim.Testing*`/`EvoSim.Tests*`, so a test probe in `EvoSim.Neuro.Tests` would become a
+  conformance case.
+- M16.2 — founders come from `RandomStream(founderSeed, "neuro/founders/<layout hash>")` (PCG32, the project's stream)
+  instead of a private SplitMix64: same property (independent of the run seed, GENE-21). Xavier draws weights only;
+  biases start at 0. Weights are stored neuron by neuron (bias, then incoming weights), so a neuron's slice is contiguous.
+- M16.2 — V-71: the founder pool survives `Initialize` (only the layout is rebuilt), so a pool drawn for an older layout
+  is reported with the fix "Rebuild founders" instead of being replaced silently; Inspector edits rebuild it.
+- M16.2 — `NeuralMutation`: 3 draws per weight (choice, added float, replacement) plus the fallback's index and float, so
+  the count never depends on the outcome (MUT-30); add and replace are exclusive per weight; the Gentle rate 0.5 is set in
+  the constructor (the base class keeps 0.03 for other operators).
 
 ## Disagreements between the brief and Docs/Interface
 - 20 §3.9 names the operator method `MutationOperator.Start(gene, parent, rng)`; on a MonoBehaviour Unity takes
