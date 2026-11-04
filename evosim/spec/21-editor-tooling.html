@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/21-editor-tooling.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Site/spec/21-editor-tooling.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -210,7 +210,7 @@ Play mode on the running world.</li>
 <tr>
 <td>V-27</td>
 <td>E</td>
-<td>an overlay that mates or hunts (ACT-07)</td>
+<td>an overlay that mates or hunts (ACT-07); a structure check with a number from the references' block, every structure number up to V-19 being in use</td>
 <td>—</td>
 </tr>
 <tr>
@@ -411,6 +411,12 @@ Play mode on the running world.</li>
 <td>the answer cache folder can't be written</td>
 <td>pick another</td>
 </tr>
+<tr>
+<td>V-70…V-79</td>
+<td>E / W / I</td>
+<td>the neural species (M16): network gene, layout, ray fan, contacts, matched pairs</td>
+<td><a href="16-neural-species.html#2-matched-to-jev">16 §2</a></td>
+</tr>
 </tbody>
 </table>
 <h2 id="3-inspectors">3. Inspectors</h2>
@@ -518,8 +524,17 @@ guards' verdict.</li>
 <td>hosts, <em>Test connection</em>, model digests or revisions, latency, failures, cache size and hit rate</td>
 <td>—</td>
 </tr>
+<tr>
+<td><strong>Survival Report</strong> (M16, <code>Window ▸ EvoSim ▸ Survival Report</code>)</td>
+<td>the runs of one scenario and arm: headline death-rate ratios, Kaplan–Meier curves with Greenwood bands, per-window hazards, the kill matrix; writes a markdown report and its CSV to <code>Logs/EvoSim/Reports/</code> (<a href="16-neural-species.html#4-survival">16 §4</a>)</td>
+<td>—</td>
+</tr>
 </tbody>
 </table>
+<p>The Animal inspector draws extra sections under the decision: a class derived from
+<code>AnimalInspectorPanel</code> in any editor assembly is found and drawn for the animals it
+<code>Shows</code>. The neural species' <strong>Network</strong> panel is one: the layout, each sense's inputs
+and each action's output, the chosen one marked.</p>
 <h2 id="5-scene-view">5. Scene view</h2>
 <ul>
 <li><strong>Gizmos</strong> for the selected animal: vision circle and band rings, a line to its
@@ -542,6 +557,11 @@ the reference module's tests grade the student's version (the teaching path,
 undoes it.</li>
 <li><code>GameObject ▸ EvoSim ▸ Add Action / Sense / Gene</code> instantiates module prefabs
 from <code>Modules/</code>.</li>
+<li><code>GameObject ▸ EvoSim ▸ New Neural Species ▸ Prey | Predator</code> (M16) adds a neural
+copy of the selected species (or the scene's <code>prey</code> or <code>predator</code>) and names the pair
+in <code>MatchedPairs</code>; other diets are left alone (V-79 lists them);
+<code>EvoSim ▸ Neuro ▸ Build Neuro Scenes</code> and <code>Build Comparison Scenes</code> rebuild the five
+neural scenes (<a href="16-neural-species.html">16</a>).</li>
 <li><code>Assets ▸ Create ▸ EvoSim ▸</code> <em>Allele Pool</em>, <em>Scenario</em>, <em>Mutation Deck</em>, and
 <em>Script</em> templates for a new sense, action, gene kind, stat, phase, brain or
 mutation operator, each with the methods to override and a matching test file.</li>

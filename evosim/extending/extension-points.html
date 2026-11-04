@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/extension-points.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Site/extending/extension-points.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -168,6 +168,11 @@ The <a href="index.html">extension guide</a> explains when to use which.</p>
 <td>virtual property</td>
 <td>True for actions that rest: the metabolism charges its rest cost, not its base cost, when the animal stays still (05 §4).</td>
 </tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.AnimalAction.html#EvoSim_AnimalAction_SelfDirected">SelfDirected</a></td>
+<td>virtual property</td>
+<td>True for a steering action that has no target, such as turn left or walk straight on: it moves the animal by itself, so the search rule (ACT-04) doesn't apply to it. False by default (plan M16 §4 C4).</td>
+</tr>
 </tbody>
 </table>
 <p>In EvoSim: <a class="xref" href="../api/EvoSim.Testing.BatchProbeAction.html">BatchProbeAction</a>, <a class="xref" href="../api/EvoSim.Samples.DragAction.html">DragAction</a>, <a class="xref" href="../api/EvoSim.Samples.DrinkAction.html">DrinkAction</a>, <a class="xref" href="../api/EvoSim.EatAction.html">EatAction</a>, <a class="xref" href="../api/EvoSim.Testing.FeedAction.html">FeedAction</a>, <a class="xref" href="../api/EvoSim.FleeAction.html">FleeAction</a>, <a class="xref" href="../api/EvoSim.FollowAction.html">FollowAction</a>, <a class="xref" href="../api/EvoSim.Testing.GoToAction.html">GoToAction</a>, <a class="xref" href="../api/EvoSim.HideAction.html">HideAction</a>, <a class="xref" href="../api/EvoSim.HuntAction.html">HuntAction</a>, <a class="xref" href="../api/EvoSim.MateAction.html">MateAction</a>, <a class="xref" href="../api/EvoSim.Testing.OverlayProbeAction.html">OverlayProbeAction</a>, <a class="xref" href="../api/EvoSim.Testing.ProbeAction.html">ProbeAction</a>, <a class="xref" href="../api/EvoSim.RestAction.html">RestAction</a>.</p>
@@ -303,6 +308,11 @@ The <a href="index.html">extension guide</a> explains when to use which.</p>
 <td><a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_ModelIdentity">ModelIdentity</a></td>
 <td>virtual property</td>
 <td>The model and its pinned revision or digest, part of cache keys (DEC-33); the by default.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Brain.html#EvoSim_Brain_ReadsGeneText">ReadsGeneText</a></td>
+<td>virtual property</td>
+<td>True (reference) when the brain is steered by text genes, one per action; a brain that reads no sentence (a network reading a vector gene) says false, and validation then doesn't ask its species' actions for a text gene (V-05; plan M16 §4 C5).</td>
 </tr>
 </tbody>
 </table>
@@ -660,7 +670,7 @@ The <a href="index.html">extension guide</a> explains when to use which.</p>
 </tr>
 </tbody>
 </table>
-<p>In EvoSim: <a class="xref" href="../api/EvoSim.NumberGene.html">NumberGene</a>, <a class="xref" href="../api/EvoSim.TextGene.html">TextGene</a>.</p>
+<p>In EvoSim: <a class="xref" href="../api/EvoSim.NumberGene.html">NumberGene</a>, <a class="xref" href="../api/EvoSim.TextGene.html">TextGene</a>, <a class="xref" href="../api/EvoSim.Testing.VectorProbeGene.html">VectorProbeGene</a>.</p>
 <h3 id="ground">Ground</h3>
 <p><a class="xref" href="../api/EvoSim.Ground.html">Ground</a> — abstract class. Answers, for any point, its height and whether it is walkable (SPACE-04), inside a bounded rectangle with hard borders (SPACE-03).</p>
 <table>
@@ -1175,7 +1185,7 @@ The <a href="index.html">extension guide</a> explains when to use which.</p>
 </tr>
 </tbody>
 </table>
-<p>In EvoSim: <a class="xref" href="../api/EvoSim.AgeSense.html">AgeSense</a>, <a class="xref" href="../api/EvoSim.Testing.AllLayersObstacleSense.html">AllLayersObstacleSense</a>, <a class="xref" href="../api/EvoSim.AnimalAction.html">AnimalAction</a>, <a class="xref" href="../api/EvoSim.BandedSense.html">BandedSense</a>, <a class="xref" href="../api/EvoSim.BatchedSense.html">BatchedSense</a>, <a class="xref" href="../api/EvoSim.Testing.BatchProbeAction.html">BatchProbeAction</a>, <a class="xref" href="../api/EvoSim.Testing.BatchProbeLocomotion.html">BatchProbeLocomotion</a>, <a class="xref" href="../api/EvoSim.Testing.BatchProbeSense.html">BatchProbeSense</a>, <a class="xref" href="../api/EvoSim.Body.html">Body</a>, <a class="xref" href="../api/EvoSim.Testing.CameraProbeSense.html">CameraProbeSense</a>, <a class="xref" href="../api/EvoSim.CapRule.html">CapRule</a>, <a class="xref" href="../api/EvoSim.Samples.ChasedSense.html">ChasedSense</a>, <a class="xref" href="../api/EvoSim.Testing.CountingCrossover.html">CountingCrossover</a>, <a class="xref" href="../api/EvoSim.Crossover.html">Crossover</a>, <a class="xref" href="../api/EvoSim.DeathRule.html">DeathRule</a>, <a class="xref" href="../api/EvoSim.DecisionSchedule.html">DecisionSchedule</a>, <a class="xref" href="../api/EvoSim.Samples.DiesOfThirst.html">DiesOfThirst</a>, <a class="xref" href="../api/EvoSim.Diet.html">Diet</a>, <a class="xref" href="../api/EvoSim.Digestion.html">Digestion</a>, <a class="xref" href="../api/EvoSim.Samples.DragAction.html">DragAction</a>, <a class="xref" href="../api/EvoSim.Samples.DrinkAction.html">DrinkAction</a>, <a class="xref" href="../api/EvoSim.EatAction.html">EatAction</a>, <a class="xref" href="../api/EvoSim.Energy.html">Energy</a>, <a class="xref" href="../api/EvoSim.Testing.ExerciseProbe.html">ExerciseProbe</a>, <a class="xref" href="../api/EvoSim.Testing.FeedAction.html">FeedAction</a>, <a class="xref" href="../api/EvoSim.FleeAction.html">FleeAction</a>, <a class="xref" href="../api/EvoSim.FloorRule.html">FloorRule</a>, <a class="xref" href="../api/EvoSim.FollowAction.html">FollowAction</a>, <a class="xref" href="../api/EvoSim.GaussianMutation.html">GaussianMutation</a>, <a class="xref" href="../api/EvoSim.Gene.html">Gene</a>, <a class="xref" href="../api/EvoSim.Testing.GoToAction.html">GoToAction</a>, <a class="xref" href="../api/EvoSim.HideAction.html">HideAction</a>, <a class="xref" href="../api/EvoSim.Testing.HookProbe.html">HookProbe</a>, <a class="xref" href="../api/EvoSim.HuntAction.html">HuntAction</a>, <a class="xref" href="../api/EvoSim.Incubation.html">Incubation</a>, <a class="xref" href="../api/EvoSim.Samples.IntensityLadder.html">IntensityLadder</a>, <a class="xref" href="../api/EvoSim.KinematicLocomotion.html">KinematicLocomotion</a>, <a class="xref" href="../api/EvoSim.LevelSense.html">LevelSense</a>, <a class="xref" href="../api/EvoSim.Litter.html">Litter</a>, <a class="xref" href="../api/EvoSim.LlmMutation.html">LlmMutation</a>, <a class="xref" href="../api/EvoSim.Locomotion.html">Locomotion</a>, <a class="xref" href="../api/EvoSim.MateAction.html">MateAction</a>, <a class="xref" href="../api/EvoSim.MatingRule.html">MatingRule</a>, <a class="xref" href="../api/EvoSim.Metabolism.html">Metabolism</a>, <a class="xref" href="../api/EvoSim.MutationOperator.html">MutationOperator</a>, <a class="xref" href="../api/EvoSim.NearestAnimalSense.html">NearestAnimalSense</a>, <a class="xref" href="../api/EvoSim.NearestCoverSense.html">NearestCoverSense</a>, <a class="xref" href="../api/EvoSim.NearestEntitySense.html">NearestEntitySense</a>, <a class="xref" href="../api/EvoSim.NearestResourceSense.html">NearestResourceSense</a>, <a class="xref" href="../api/EvoSim.Samples.NearestWaterSense.html">NearestWaterSense</a>, <a class="xref" href="../api/EvoSim.Testing.NeedsEnergyProbe.html">NeedsEnergyProbe</a>, <a class="xref" href="../api/EvoSim.NumberGene.html">NumberGene</a>, <a class="xref" href="../api/EvoSim.Testing.ObstacleSense.html">ObstacleSense</a>, <a class="xref" href="../api/EvoSim.OldAge.html">OldAge</a>, <a class="xref" href="../api/EvoSim.Testing.OverlayProbeAction.html">OverlayProbeAction</a>, <a class="xref" href="../api/EvoSim.Testing.ProbeAction.html">ProbeAction</a>, <a class="xref" href="../api/EvoSim.Testing.ProbeSense.html">ProbeSense</a>, <a class="xref" href="../api/EvoSim.RestAction.html">RestAction</a>, <a class="xref" href="../api/EvoSim.SearchRule.html">SearchRule</a>, <a class="xref" href="../api/EvoSim.Sense.html">Sense</a>, <a class="xref" href="../api/EvoSim.Testing.SlopeLimitLocomotion.html">SlopeLimitLocomotion</a>, <a class="xref" href="../api/EvoSim.Samples.SlopeLocomotion.html">SlopeLocomotion</a>, <a class="xref" href="../api/EvoSim.Stamina.html">Stamina</a>, <a class="xref" href="../api/EvoSim.Starvation.html">Starvation</a>, <a class="xref" href="../api/EvoSim.Testing.SureKillDiet.html">SureKillDiet</a>, <a class="xref" href="../api/EvoSim.TextGene.html">TextGene</a>, <a class="xref" href="../api/EvoSim.Samples.Thirst.html">Thirst</a>, <a class="xref" href="../api/EvoSim.Testing.TraitProbe.html">TraitProbe</a>, <a class="xref" href="../api/EvoSim.Testing.TurningLocomotion.html">TurningLocomotion</a>, <a class="xref" href="../api/EvoSim.UniformCrossover.html">UniformCrossover</a>.</p>
+<p>In EvoSim: <a class="xref" href="../api/EvoSim.AgeSense.html">AgeSense</a>, <a class="xref" href="../api/EvoSim.Testing.AllLayersObstacleSense.html">AllLayersObstacleSense</a>, <a class="xref" href="../api/EvoSim.AnimalAction.html">AnimalAction</a>, <a class="xref" href="../api/EvoSim.BandedSense.html">BandedSense</a>, <a class="xref" href="../api/EvoSim.BatchedSense.html">BatchedSense</a>, <a class="xref" href="../api/EvoSim.Testing.BatchProbeAction.html">BatchProbeAction</a>, <a class="xref" href="../api/EvoSim.Testing.BatchProbeLocomotion.html">BatchProbeLocomotion</a>, <a class="xref" href="../api/EvoSim.Testing.BatchProbeSense.html">BatchProbeSense</a>, <a class="xref" href="../api/EvoSim.Body.html">Body</a>, <a class="xref" href="../api/EvoSim.Testing.CameraProbeSense.html">CameraProbeSense</a>, <a class="xref" href="../api/EvoSim.CapRule.html">CapRule</a>, <a class="xref" href="../api/EvoSim.Samples.ChasedSense.html">ChasedSense</a>, <a class="xref" href="../api/EvoSim.Testing.CountingCrossover.html">CountingCrossover</a>, <a class="xref" href="../api/EvoSim.Crossover.html">Crossover</a>, <a class="xref" href="../api/EvoSim.DeathRule.html">DeathRule</a>, <a class="xref" href="../api/EvoSim.DecisionSchedule.html">DecisionSchedule</a>, <a class="xref" href="../api/EvoSim.Samples.DiesOfThirst.html">DiesOfThirst</a>, <a class="xref" href="../api/EvoSim.Diet.html">Diet</a>, <a class="xref" href="../api/EvoSim.Digestion.html">Digestion</a>, <a class="xref" href="../api/EvoSim.Samples.DragAction.html">DragAction</a>, <a class="xref" href="../api/EvoSim.Samples.DrinkAction.html">DrinkAction</a>, <a class="xref" href="../api/EvoSim.EatAction.html">EatAction</a>, <a class="xref" href="../api/EvoSim.Energy.html">Energy</a>, <a class="xref" href="../api/EvoSim.Testing.ExerciseProbe.html">ExerciseProbe</a>, <a class="xref" href="../api/EvoSim.Testing.FeedAction.html">FeedAction</a>, <a class="xref" href="../api/EvoSim.FleeAction.html">FleeAction</a>, <a class="xref" href="../api/EvoSim.FloorRule.html">FloorRule</a>, <a class="xref" href="../api/EvoSim.FollowAction.html">FollowAction</a>, <a class="xref" href="../api/EvoSim.GaussianMutation.html">GaussianMutation</a>, <a class="xref" href="../api/EvoSim.Gene.html">Gene</a>, <a class="xref" href="../api/EvoSim.Testing.GoToAction.html">GoToAction</a>, <a class="xref" href="../api/EvoSim.HideAction.html">HideAction</a>, <a class="xref" href="../api/EvoSim.Testing.HookProbe.html">HookProbe</a>, <a class="xref" href="../api/EvoSim.HuntAction.html">HuntAction</a>, <a class="xref" href="../api/EvoSim.Incubation.html">Incubation</a>, <a class="xref" href="../api/EvoSim.Samples.IntensityLadder.html">IntensityLadder</a>, <a class="xref" href="../api/EvoSim.KinematicLocomotion.html">KinematicLocomotion</a>, <a class="xref" href="../api/EvoSim.LevelSense.html">LevelSense</a>, <a class="xref" href="../api/EvoSim.Litter.html">Litter</a>, <a class="xref" href="../api/EvoSim.LlmMutation.html">LlmMutation</a>, <a class="xref" href="../api/EvoSim.Locomotion.html">Locomotion</a>, <a class="xref" href="../api/EvoSim.MateAction.html">MateAction</a>, <a class="xref" href="../api/EvoSim.MatingRule.html">MatingRule</a>, <a class="xref" href="../api/EvoSim.Metabolism.html">Metabolism</a>, <a class="xref" href="../api/EvoSim.MutationOperator.html">MutationOperator</a>, <a class="xref" href="../api/EvoSim.NearestAnimalSense.html">NearestAnimalSense</a>, <a class="xref" href="../api/EvoSim.NearestCoverSense.html">NearestCoverSense</a>, <a class="xref" href="../api/EvoSim.NearestEntitySense.html">NearestEntitySense</a>, <a class="xref" href="../api/EvoSim.NearestResourceSense.html">NearestResourceSense</a>, <a class="xref" href="../api/EvoSim.Samples.NearestWaterSense.html">NearestWaterSense</a>, <a class="xref" href="../api/EvoSim.Testing.NeedsEnergyProbe.html">NeedsEnergyProbe</a>, <a class="xref" href="../api/EvoSim.NumberGene.html">NumberGene</a>, <a class="xref" href="../api/EvoSim.Testing.ObstacleSense.html">ObstacleSense</a>, <a class="xref" href="../api/EvoSim.OldAge.html">OldAge</a>, <a class="xref" href="../api/EvoSim.Testing.OverlayProbeAction.html">OverlayProbeAction</a>, <a class="xref" href="../api/EvoSim.Testing.ProbeAction.html">ProbeAction</a>, <a class="xref" href="../api/EvoSim.Testing.ProbeSense.html">ProbeSense</a>, <a class="xref" href="../api/EvoSim.RestAction.html">RestAction</a>, <a class="xref" href="../api/EvoSim.SearchRule.html">SearchRule</a>, <a class="xref" href="../api/EvoSim.Sense.html">Sense</a>, <a class="xref" href="../api/EvoSim.Testing.SlopeLimitLocomotion.html">SlopeLimitLocomotion</a>, <a class="xref" href="../api/EvoSim.Samples.SlopeLocomotion.html">SlopeLocomotion</a>, <a class="xref" href="../api/EvoSim.Stamina.html">Stamina</a>, <a class="xref" href="../api/EvoSim.Starvation.html">Starvation</a>, <a class="xref" href="../api/EvoSim.Testing.SureKillDiet.html">SureKillDiet</a>, <a class="xref" href="../api/EvoSim.TextGene.html">TextGene</a>, <a class="xref" href="../api/EvoSim.Samples.Thirst.html">Thirst</a>, <a class="xref" href="../api/EvoSim.Testing.TraitProbe.html">TraitProbe</a>, <a class="xref" href="../api/EvoSim.Testing.TurningLocomotion.html">TurningLocomotion</a>, <a class="xref" href="../api/EvoSim.UniformCrossover.html">UniformCrossover</a>, <a class="xref" href="../api/EvoSim.Testing.VectorProbeGene.html">VectorProbeGene</a>.</p>
 <h3 id="stamina">Stamina</h3>
 <p><a class="xref" href="../api/EvoSim.Stamina.html">Stamina</a> — class. Stamina: the meters an animal can move before it must stop (05 §4). Each meter moved costs one point; standing still brings it back, which costs some energy until it is full (ANIM-21).</p>
 <table>
@@ -1405,6 +1415,35 @@ The <a href="index.html">extension guide</a> explains when to use which.</p>
 <h2 id="evosimtesting">EvoSim.Testing</h2>
 <h3 id="worldfixture">WorldFixture</h3>
 <p><a class="xref" href="../api/EvoSim.Testing.WorldFixture.html">WorldFixture</a> — abstract class. The base class of tests that build worlds: every world started with is destroyed after each test, so tests leave nothing in the scene.</p>
+<h2 id="evosimeditor">EvoSim.Editor</h2>
+<h3 id="animalinspectorpanel">AnimalInspectorPanel</h3>
+<p><a class="xref" href="../api/EvoSim.Editor.AnimalInspectorPanel.html">AnimalInspectorPanel</a> — abstract class. An extra section of the Animal Inspector (21 §4): derive from it in any editor assembly, with a constructor without parameters, and the window draws it under the decision for the animals it shows. The neural species' panel (plan M16 §5) is one.</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th></th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.AnimalInspectorPanel.html#EvoSim_Editor_AnimalInspectorPanel_Draw_EvoSim_Animal_EvoSim_World_">Draw(Animal, World)</a></td>
+<td>abstract method</td>
+<td>Draws the panel with EditorGUILayout, inside the window's scroll view.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.AnimalInspectorPanel.html#EvoSim_Editor_AnimalInspectorPanel_Shows_EvoSim_Animal_">Shows(Animal)</a></td>
+<td>abstract method</td>
+<td>Whether this panel has something to show for the animal.</td>
+</tr>
+<tr>
+<td><a class="xref" href="../api/EvoSim.Editor.AnimalInspectorPanel.html#EvoSim_Editor_AnimalInspectorPanel_Title">Title</a></td>
+<td>abstract property</td>
+<td>The section's title, drawn in bold above it; panels are drawn in title order.</td>
+</tr>
+</tbody>
+</table>
 
 </article>
 

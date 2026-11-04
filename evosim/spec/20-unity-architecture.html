@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/20-unity-architecture.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Site/spec/20-unity-architecture.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -573,6 +573,9 @@ public class NumberGene : Gene
         e.SetTrait(trait, v.Number, multiplyDefault);           // clamped to the trait's range
 }
 </code></pre>
+<p>A third kind, <code>AlleleKind.Vector</code> (M16, GENE-07), holds a whole <code>float[]</code> in one allele
+(<code>AlleleValue.OfVector</code>, <code>.Vector</code>, <code>.Canonical(decimals)</code>); <code>NeuralGenomeGene</code> in
+<code>EvoSim.Neuro</code> uses it for a network's weights (<a href="16-neural-species.html">16</a>).</p>
 <p>Founder sentences live in an <code>AllelePool</code> ScriptableObject when several species
 or prefabs share them; the inspector checks every sentence with the mutation
 guards (GENE-22).</p>
@@ -583,14 +586,14 @@ guards (GENE-22).</p>
     [SerializeField] List&lt;Gene&gt; onlyThese;                      // empty = every gene it accepts
     public abstract bool Accepts(Gene g);
     /// Draw every random choice now (MUT-30), then start the work; the job may finish later.
-    public abstract MutationJob Start(Gene gene, Allele parent, RandomStream rng);
+    public abstract MutationJob StartMutation(Gene gene, Allele parent, RandomStream rng);
 }
 
 public class GaussianMutation : MutationOperator
 {
     [SerializeField] float sigma = 5f;
     public override bool Accepts(Gene g) =&gt; g.Kind == AlleleKind.Number;
-    public override MutationJob Start(Gene g, Allele parent, RandomStream rng)
+    public override MutationJob StartMutation(Gene g, Allele parent, RandomStream rng)
     {
         var gene = (NumberGene)g;
         float v = Mathf.Clamp(parent.Number + sigma * rng.NextGaussian(), gene.Min, gene.Max);
@@ -605,7 +608,7 @@ public class LlmMutation : MutationOperator
     [SerializeField] int tries = 5, maxWords = 12;
     List&lt;string&gt; instructions;                                  // read from the deck in Initialize
     public override bool Accepts(Gene g) =&gt; g.Kind == AlleleKind.Text;
-    public override MutationJob Start(Gene g, Allele parent, RandomStream rng)
+    public override MutationJob StartMutation(Gene g, Allele parent, RandomStream rng)
     {
         var plan = TryPlan.Draw(rng, tries, instructions.Count);  // (instruction, seed) per try
         return World.Service&lt;MutatorService&gt;().Submit(parent.Text, plan, contextLine, instructions,
@@ -618,8 +621,12 @@ public class LlmMutation : MutationOperator
 {
     public virtual int MaxActions =&gt; int.MaxValue;
     public virtual bool AcceptsAttachments =&gt; false;
+    public virtual bool CanMixSpecies =&gt; true;                   // false: one batch per species (DEC-13)
+    public virtual bool ReadsGeneText =&gt; true;                   // false: no sentence read, V-05 skipped (M16 C5)
+    public virtual bool Memoizable =&gt; true;                      // false: never memoised or cached
     public abstract string Id { get; }                           // part of memo and cache keys
-    /// Answer a batch (DEC-11). Fast brains fill the answer at once; HTTP brains later.
+    /// Answer a batch (DEC-11). Fast brains fill the answer at once; HTTP brains later;
+    /// a local brain may answer later from a worker task (DEC-16).
     public abstract BrainAnswer Ask(IReadOnlyList&lt;DecisionQuery&gt; batch);
 }
 </code></pre>
@@ -651,6 +658,11 @@ public class LlmMutation : MutationOperator
 <td>Fake</td>
 <td><code>ScriptedBrain</code> (tests)</td>
 <td>returns given vectors, counts calls</td>
+</tr>
+<tr>
+<td>Neural (M16)</td>
+<td><code>NeuralBrain</code> (<code>EvoSim.Neuro</code>)</td>
+<td>a forward pass over the animal's weights from <code>DecisionQuery.Genome</code>; Greedy or Sample; reads no gene text, never memoised; from <code>SyncBelow</code> queries on, on a worker task (<a href="16-neural-species.html">16</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -841,7 +853,11 @@ every module (look-ups by role or name, ARCH-08).</p>
         foreach (var d in t.Decisions.Due)
         {
             var p = Sampling.Temper(d.Probabilities, t.World.SamplingTemperature);   // DEC-20
-            d.Animal.Action = t.Stream(d.Animal.Species, &quot;sampling&quot;).Choose(p);       // RAND-03
+            var sampling = t.Stream(d.Animal.Species, &quot;sampling&quot;);                    // RAND-03
+            d.Animal.Action = sampling.Choose(p);
+            d.Animal.EndOverlay();
+            if (d.Animal.CurrentAction.Overlay)                                        // ACT-07: keep it as the overlay,
+                DrawCarrier(d.Animal, p, sampling);                                    // the carrier from p with overlays at 0
             d.Animal.Searching = d.Animal.BredThisPeriod = false;                     // DEC-03
         }
     }
@@ -870,9 +886,14 @@ can replace GameObject views without touching the simulation.</li>
   Testing/          EvoSim.Testing.asmdef        WorldBuilder, ScriptedBrain, FakeMutator, Golden
   Tests/EditMode/   EvoSim.Tests.EditMode.asmdef
   Tests/PlayMode/   EvoSim.Tests.PlayMode.asmdef
+  Neuro/            EvoSim.Neuro.asmdef          the neural species (M16): Net/ Genes/ Mutation/ Reproduction/
+                                                 Senses/ Brains/ Actions/ Templates/ Comparison/ Recording/
+                                                 Views/ Modules/; Editor/ (EvoSim.Neuro.Editor),
+                                                 Tests/ (EvoSim.Tests.Neuro)
   Modules/          prefabs: Eat, Flee, Hide, Follow, Rest, Mate, Hunt, Scavenge, StaminaGene, ...
   Data/             AllelePools, mutation decks (TextAssets), frozen prompts, control sentences
-  Scenes/           Lab1_Full, Lab1_Small, HideVsFlee, ThreeSpecies, Terrain_Locomotion, Sandbox
+  Scenes/           Lab1_Full, Lab1_Small, HideVsFlee, ThreeSpecies, Terrain_Locomotion, Sandbox;
+                    Neuro_Lab, Neuro_JevPrey, Neuro_JevPredator, Brains_2x2, Prey_vs_Prey (M16)
   Scenarios/        ScenarioAssets (overrides, CFG-02)
 </code></pre>
 <p>Packages: <code>com.unity.nuget.newtonsoft-json</code> (declared explicitly),
@@ -927,6 +948,12 @@ sense phase (SENSE-30).</li>
 </table>
 <p>LLM brains dominate everything else: JEV answers about 12 queries per second, so
 the memo, the answer cache and batching matter far more than C# speed.</p>
+<p><strong>Measured with the neural species (M16.8): the budget is not met.</strong> S32 L0 (Lab1_Full, 136
+neural of 337 animals) takes 6.7 ms a tick without the brain, 4.8 ms of it in the senses: a
+neural ray fan costs about 12 µs, so 300 neural animals need about 4 ms of senses alone. The
+owner accepted the miss (2026-11-03): next to JEV's seconds per tick it is negligible.
+<code>TickTimeOnLab1Full</code> guards 10 ms. Meeting 2 ms needs the optional Burst path behind <code>ReadAll</code>
+(open question, <a href="40-open-questions.html">40</a>).</p>
 <h2 id="10-designed-to-scale-later">10. Designed to scale (later)</h2>
 <p>Nothing is optimised now: a few hundred animals and plain C# lists are enough,
 and the brain is the bottleneck. The seams below let a later version handle

@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_JevBrain.md&amp;value=---%0Auid%3A%20EvoSim.JevBrain%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/new/master/apiSpec/new?filename=EvoSim_JevBrain.md&amp;value=---%0Auid%3A%20EvoSim.JevBrain%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -89,7 +89,7 @@
 
 
   <h1 id="EvoSim_JevBrain" data-uid="EvoSim.JevBrain" class="text-break">
-Class JevBrain  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L27"><i class="bi bi-code-slash"></i></a>
+Class JevBrain  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L27"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -188,6 +188,9 @@ action order; at most 16 (DEC-14); inputs above the training length are counted,
     </div>
     <div>
       <a class="xref" href="EvoSim.Brain.html#EvoSim_Brain_CanMixSpecies">Brain.CanMixSpecies</a>
+    </div>
+    <div>
+      <a class="xref" href="EvoSim.Brain.html#EvoSim_Brain_ReadsGeneText">Brain.ReadsGeneText</a>
     </div>
     <div>
       <a class="xref" href="EvoSim.Brain.html#EvoSim_Brain_Strict">Brain.Strict</a>
@@ -676,7 +679,7 @@ revision, served name) and the mode (template and questions) are part of the ans
 
   <h3 id="EvoSim_JevBrain__ctor" data-uid="EvoSim.JevBrain.#ctor">
   JevBrain()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L71"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L71"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Sets JEV's defaults: the vLLM server on <code>http://localhost:8000</code>, a time-out of 60 s per try.</p>
@@ -706,7 +709,7 @@ revision, served name) and the mode (template and questions) are part of the ans
 
   <h3 id="EvoSim_JevBrain_DefaultQuestion" data-uid="EvoSim.JevBrain.DefaultQuestion">
   DefaultQuestion
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L34"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L34"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The question line of a species that has no question of its own.</p>
@@ -737,7 +740,7 @@ revision, served name) and the mode (template and questions) are part of the ans
 
   <h3 id="EvoSim_JevBrain_Letters" data-uid="EvoSim.JevBrain.Letters">
   Letters
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L32"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The option letters, A to P: action i is shown as the i-th letter, so a species has at most 16 actions (DEC-14).</p>
@@ -773,7 +776,7 @@ revision, served name) and the mode (template and questions) are part of the ans
 
   <h3 id="EvoSim_JevBrain_AnswerInstruction" data-uid="EvoSim.JevBrain.AnswerInstruction">
   AnswerInstruction
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L91"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L91"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Empty: JEV reads a question and lettered options instead of an answer instruction.</p>
@@ -805,7 +808,7 @@ revision, served name) and the mode (template and questions) are part of the ans
 
   <h3 id="EvoSim_JevBrain_Head" data-uid="EvoSim.JevBrain.Head">
   Head
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L104"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L104"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The decision head and calibration, read from the two files on first use (main thread: TextAsset.text).</p>
@@ -843,7 +846,7 @@ revision, served name) and the mode (template and questions) are part of the ans
 
   <h3 id="EvoSim_JevBrain_HealthPath" data-uid="EvoSim.JevBrain.HealthPath">
   HealthPath
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L289"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L289"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p><code>/v1/models</code>.</p>
@@ -875,7 +878,7 @@ revision, served name) and the mode (template and questions) are part of the ans
 
   <h3 id="EvoSim_JevBrain_Id" data-uid="EvoSim.JevBrain.Id">
   Id
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L79"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L79"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p><code>jev</code>.</p>
@@ -907,7 +910,7 @@ revision, served name) and the mode (template and questions) are part of the ans
 
   <h3 id="EvoSim_JevBrain_MaxActions" data-uid="EvoSim.JevBrain.MaxActions">
   MaxActions
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L82"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L82"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>16: one option letter per action (DEC-14).</p>
@@ -939,7 +942,7 @@ revision, served name) and the mode (template and questions) are part of the ans
 
   <h3 id="EvoSim_JevBrain_MaxPromptTokens" data-uid="EvoSim.JevBrain.MaxPromptTokens">
   MaxPromptTokens
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L88"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L88"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The model's training length, in tokens (reference 1 024): validation checks the longest prompt against it (V-11);
@@ -972,7 +975,7 @@ a longer text met during a run is sent whole and counted in <a class="xref" href
 
   <h3 id="EvoSim_JevBrain_Mode" data-uid="EvoSim.JevBrain.Mode">
   Mode
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L99"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L99"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p><code>choice:bare-v1:</code> and a hash of the species' questions: changing a question changes the cache keys (DEC-33).</p>
@@ -1004,7 +1007,7 @@ a longer text met during a run is sent whole and counted in <a class="xref" href
 
   <h3 id="EvoSim_JevBrain_ModelIdentity" data-uid="EvoSim.JevBrain.ModelIdentity">
   ModelIdentity
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L94"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L94"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p><code>repository@revision:served name</code>, the revision cut to 12 characters (part of cache keys, DEC-33).</p>
@@ -1036,7 +1039,7 @@ a longer text met during a run is sent whole and counted in <a class="xref" href
 
   <h3 id="EvoSim_JevBrain_TooLong" data-uid="EvoSim.JevBrain.TooLong">
   TooLong
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L101"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L101"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Texts above the training length sent so far in this run (B-06); they are counted, not cut.</p>
@@ -1072,7 +1075,7 @@ a longer text met during a run is sent whole and counted in <a class="xref" href
 
   <h3 id="EvoSim_JevBrain_AnswerAsync_EvoSim_HttpCaller_System_Collections_Generic_IReadOnlyList_EvoSim_BrainRequest__EvoSim_BrainAnswer_" data-uid="EvoSim.JevBrain.AnswerAsync(EvoSim.HttpCaller,System.Collections.Generic.IReadOnlyList{EvoSim.BrainRequest},EvoSim.BrainAnswer)">
   AnswerAsync(HttpCaller, IReadOnlyList&lt;BrainRequest&gt;, BrainAnswer)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L198"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L198"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Groups the requests by option count, since the allowed tokens differ, and sends each group in requests of at most
@@ -1123,7 +1126,7 @@ request still without a row, with its message.</p>
 
   <h3 id="EvoSim_JevBrain_Body_System_Collections_Generic_IReadOnlyList_System_String__System_Int32_" data-uid="EvoSim.JevBrain.Body(System.Collections.Generic.IReadOnlyList{System.String},System.Int32)">
   Body(IReadOnlyList&lt;string&gt;, int)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L219"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L219"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The request body for some texts with n options (also used by the golden test).</p>
@@ -1168,7 +1171,7 @@ request still without a row, with its message.</p>
 
   <h3 id="EvoSim_JevBrain_Initialize" data-uid="EvoSim.JevBrain.Initialize">
   Initialize()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L138"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L138"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Also forgets the head, so it is read again from the files, and sets the too-long count to 0.</p>
@@ -1200,7 +1203,7 @@ species' modules; a phase after them.</p>
 
   <h3 id="EvoSim_JevBrain_Question_EvoSim_Species_" data-uid="EvoSim.JevBrain.Question(EvoSim.Species)">
   Question(Species)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L130"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L130"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gives the question line asked for a species.</p>
@@ -1239,7 +1242,7 @@ species' modules; a phase after them.</p>
 
   <h3 id="EvoSim_JevBrain_SetModelFiles_UnityEngine_TextAsset_UnityEngine_TextAsset_" data-uid="EvoSim.JevBrain.SetModelFiles(UnityEngine.TextAsset,UnityEngine.TextAsset)">
   SetModelFiles(TextAsset, TextAsset)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L111"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L111"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Sets the head and calibration files from code (tests, scenes built by script); the head is read again on next use.</p>
@@ -1275,7 +1278,7 @@ species' modules; a phase after them.</p>
 
   <h3 id="EvoSim_JevBrain_SetQuestion_System_String_System_String_" data-uid="EvoSim.JevBrain.SetQuestion(System.String,System.String)">
   SetQuestion(string, string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L121"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L121"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Sets the question line of one species, replacing the one it had.</p>
@@ -1311,7 +1314,7 @@ species' modules; a phase after them.</p>
 
   <h3 id="EvoSim_JevBrain_Text_System_String_System_String_System_Collections_Generic_IReadOnlyList_System_String__" data-uid="EvoSim.JevBrain.Text(System.String,System.String,System.Collections.Generic.IReadOnlyList{System.String})">
   Text(string, string, IReadOnlyList&lt;string&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L168"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L168"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The model's input (template bare-v1): the species prompt without the answer instruction, the question, the options.</p>
@@ -1367,7 +1370,7 @@ C) rest
 
   <h3 id="EvoSim_JevBrain_TextFor_EvoSim_DecisionQuery_" data-uid="EvoSim.JevBrain.TextFor(EvoSim.DecisionQuery)">
   TextFor(DecisionQuery)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L185"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L185"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Builds the bare-v1 text from the trimmed prompt, the species' question and its action names (<a class="xref" href="EvoSim.JevBrain.html#EvoSim_JevBrain_Text_System_String_System_String_System_Collections_Generic_IReadOnlyList_System_String__">Text(string, string, IReadOnlyList&lt;string&gt;)</a>),
@@ -1407,7 +1410,7 @@ and counts it in <a class="xref" href="EvoSim.JevBrain.html#EvoSim_JevBrain_TooL
 
   <h3 id="EvoSim_JevBrain_Validate_EvoSim_ValidationReport_" data-uid="EvoSim.JevBrain.Validate(EvoSim.ValidationReport)">
   Validate(ValidationReport)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/JevBrain.cs/#L293"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/JevBrain.cs/#L293"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Also checks that the head and calibration files are set and readable (V-20).</p>

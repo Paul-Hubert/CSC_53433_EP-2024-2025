@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/worked-example-alarm-calls.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Site/extending/worked-example-alarm-calls.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -130,7 +130,9 @@ calling pays.</p>
 </table>
 <p>The files are <code>Assets/Student/AlarmCalls.cs</code>, <code>FadeAlarmCalls.cs</code>, <code>AlarmCallAction.cs</code>, <code>AlarmSense.cs</code>, the tests in
 <code>Assets/Student/Tests/AlarmCallsTests.cs</code>, and the scene builder in <code>Assets/Student/Editor/AlarmCallsScene.cs</code>. The code
-below is that code, with its <code>///</code> comments left out.</p>
+below is that code, shortened: the <code>///</code> comments are left out, and so are the members only the tests and the scene
+builder use (<code>Configure</code>, <code>Memory</code>, <code>Calls</code>, <code>Range</code>, <code>Cost</code>), <code>FadeAlarmCalls.Validate</code>, and <code>AlarmSense</code>'s call to
+<code>base.Initialize()</code>. The action's prompt rule and <code>IsRelevant</code> are described after its code.</p>
 <h2 id="1-the-world-a-list-of-calls">1. The world: a list of calls</h2>
 <p>Several modules share the calls, so they live in a service under the World. A call is a small struct: who, where, when,
 how far. The calls are kept in a <code>List</code>, in the order they were made, so every query gives the same answer in every run

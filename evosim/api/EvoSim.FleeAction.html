@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_FleeAction.md&amp;value=---%0Auid%3A%20EvoSim.FleeAction%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/new/master/apiSpec/new?filename=EvoSim_FleeAction.md&amp;value=---%0Auid%3A%20EvoSim.FleeAction%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -89,7 +89,7 @@
 
 
   <h1 id="EvoSim_FleeAction" data-uid="EvoSim.FleeAction" class="text-break">
-Class FleeAction  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/FleeAction.cs/#L23"><i class="bi bi-code-slash"></i></a>
+Class FleeAction  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/FleeAction.cs/#L23"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -154,6 +154,9 @@ already in cover, stay; cover within coverSeek, run into it.</p>
     </div>
     <div>
       <a class="xref" href="EvoSim.AnimalAction.html#EvoSim_AnimalAction_Mates">AnimalAction.Mates</a>
+    </div>
+    <div>
+      <a class="xref" href="EvoSim.AnimalAction.html#EvoSim_AnimalAction_SelfDirected">AnimalAction.SelfDirected</a>
     </div>
     <div>
       <a class="xref" href="EvoSim.AnimalAction.html#EvoSim_AnimalAction_Overlay">AnimalAction.Overlay</a>
@@ -625,7 +628,7 @@ cover within <code>coverSeek</code> meters;</li><li>otherwise runs straight away
 
   <h3 id="EvoSim_FleeAction_DefaultDescription" data-uid="EvoSim.FleeAction.DefaultDescription">
   DefaultDescription
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/FleeAction.cs/#L26"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/FleeAction.cs/#L26"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The reference prompt line of this action (08 §7), used when the Inspector field is empty. Every action should
@@ -658,7 +661,7 @@ override it with a short phrase, such as &quot;go to the nearest visible food an
 
   <h3 id="EvoSim_FleeAction_FleeIntoCover" data-uid="EvoSim.FleeAction.FleeIntoCover">
   FleeIntoCover
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/FleeAction.cs/#L45"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/FleeAction.cs/#L45"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>True to flee like the prototype (scenario S06): stay when in cover, run into cover within <code>coverSeek</code>
@@ -695,7 +698,7 @@ meters. Off in the reference, where hiding is its own action.</p>
 
   <h3 id="EvoSim_FleeAction_Act_EvoSim_Animal_EvoSim_ActContext_" data-uid="EvoSim.FleeAction.Act(EvoSim.Animal,EvoSim.ActContext)">
   Act(Animal, ActContext)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/FleeAction.cs/#L64"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/FleeAction.cs/#L64"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Runs away from the nearest threat in sight, or into nearby cover when <a class="xref" href="EvoSim.FleeAction.html#EvoSim_FleeAction_FleeIntoCover">FleeIntoCover</a> is on;
@@ -738,7 +741,7 @@ and the last interaction the method set; doing nothing means stay.</p>
 
   <h3 id="EvoSim_FleeAction_Initialize" data-uid="EvoSim.FleeAction.Initialize">
   Initialize()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/FleeAction.cs/#L49"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/FleeAction.cs/#L49"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Resolves the listed species by id or display name (ARCH-08); names that match no species are skipped (V-20).</p>
@@ -769,7 +772,7 @@ and the last interaction the method set; doing nothing means stay.</p>
 
   <h3 id="EvoSim_FleeAction_IsRelevant_EvoSim_ObservationView_" data-uid="EvoSim.FleeAction.IsRelevant(EvoSim.ObservationView)">
   IsRelevant(ObservationView)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/FleeAction.cs/#L82"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/FleeAction.cs/#L82"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>True when the threat sense (<code>relevantSense</code>, reference <code>&quot;Predator&quot;</code>) reports a threat in sight
@@ -809,7 +812,7 @@ and the last interaction the method set; doing nothing means stay.</p>
 
   <h3 id="EvoSim_FleeAction_Validate_EvoSim_ValidationReport_" data-uid="EvoSim.FleeAction.Validate(EvoSim.ValidationReport)">
   Validate(ValidationReport)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/FleeAction.cs/#L90"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/FleeAction.cs/#L90"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Warns when the species has nothing to flee from (V-21) and reports listed names that are no species (V-20).</p>

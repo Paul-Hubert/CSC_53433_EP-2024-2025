@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_OllamaPointsBrain.md&amp;value=---%0Auid%3A%20EvoSim.OllamaPointsBrain%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/new/master/apiSpec/new?filename=EvoSim_OllamaPointsBrain.md&amp;value=---%0Auid%3A%20EvoSim.OllamaPointsBrain%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -89,7 +89,7 @@
 
 
   <h1 id="EvoSim_OllamaPointsBrain" data-uid="EvoSim.OllamaPointsBrain" class="text-break">
-Class OllamaPointsBrain  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L19"><i class="bi bi-code-slash"></i></a>
+Class OllamaPointsBrain  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L19"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -199,6 +199,9 @@ points become a row by DEC-41.</p>
     </div>
     <div>
       <a class="xref" href="EvoSim.Brain.html#EvoSim_Brain_CanMixSpecies">Brain.CanMixSpecies</a>
+    </div>
+    <div>
+      <a class="xref" href="EvoSim.Brain.html#EvoSim_Brain_ReadsGeneText">Brain.ReadsGeneText</a>
     </div>
     <div>
       <a class="xref" href="EvoSim.Brain.html#EvoSim_Brain_Strict">Brain.Strict</a>
@@ -679,7 +682,7 @@ cache's keys (DEC-33): pin the digest in the Inspector, or it is asked from the 
 
   <h3 id="EvoSim_OllamaPointsBrain__ctor" data-uid="EvoSim.OllamaPointsBrain.#ctor">
   OllamaPointsBrain()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L42"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L42"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Sets the Ollama defaults: the server on <code>http://localhost:11434</code>, two requests in flight.</p>
@@ -709,7 +712,7 @@ cache's keys (DEC-33): pin the digest in the Inspector, or it is asked from the 
 
   <h3 id="EvoSim_OllamaPointsBrain_Instruction" data-uid="EvoSim.OllamaPointsBrain.Instruction">
   Instruction
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L22"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L22"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The answer instruction that ends every prompt (PROMPT-07); <a class="xref" href="EvoSim.PointsAnswer.html">PointsAnswer</a> reads the answer.</p>
@@ -745,7 +748,7 @@ cache's keys (DEC-33): pin the digest in the Inspector, or it is asked from the 
 
   <h3 id="EvoSim_OllamaPointsBrain_AnswerInstruction" data-uid="EvoSim.OllamaPointsBrain.AnswerInstruction">
   AnswerInstruction
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L56"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L56"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p><a class="xref" href="EvoSim.OllamaPointsBrain.html#EvoSim_OllamaPointsBrain_Instruction">Instruction</a>: the answer is a share of 100 points per action.</p>
@@ -777,7 +780,7 @@ cache's keys (DEC-33): pin the digest in the Inspector, or it is asked from the 
 
   <h3 id="EvoSim_OllamaPointsBrain_CpuOnly" data-uid="EvoSim.OllamaPointsBrain.CpuOnly">
   CpuOnly
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L69"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L69"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>True to run the model on the CPU (<code>num_gpu</code> 0): slower, for a machine whose GPU is busy.</p>
@@ -809,7 +812,7 @@ cache's keys (DEC-33): pin the digest in the Inspector, or it is asked from the 
 
   <h3 id="EvoSim_OllamaPointsBrain_HealthPath" data-uid="EvoSim.OllamaPointsBrain.HealthPath">
   HealthPath
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L163"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L163"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p><code>/api/tags</code>.</p>
@@ -841,7 +844,7 @@ cache's keys (DEC-33): pin the digest in the Inspector, or it is asked from the 
 
   <h3 id="EvoSim_OllamaPointsBrain_Id" data-uid="EvoSim.OllamaPointsBrain.Id">
   Id
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L50"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L50"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p><code>ollama-points</code>.</p>
@@ -873,7 +876,7 @@ cache's keys (DEC-33): pin the digest in the Inspector, or it is asked from the 
 
   <h3 id="EvoSim_OllamaPointsBrain_MaxPromptTokens" data-uid="EvoSim.OllamaPointsBrain.MaxPromptTokens">
   MaxPromptTokens
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L59"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L59"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The context length, in tokens (reference 4 096).</p>
@@ -905,7 +908,7 @@ cache's keys (DEC-33): pin the digest in the Inspector, or it is asked from the 
 
   <h3 id="EvoSim_OllamaPointsBrain_Mode" data-uid="EvoSim.OllamaPointsBrain.Mode">
   Mode
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L53"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L53"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p><code>points</code>.</p>
@@ -937,7 +940,7 @@ cache's keys (DEC-33): pin the digest in the Inspector, or it is asked from the 
 
   <h3 id="EvoSim_OllamaPointsBrain_Model" data-uid="EvoSim.OllamaPointsBrain.Model">
   Model
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L67"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L67"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The Ollama model tag, such as <code>gemma4:12b</code>.</p>
@@ -969,7 +972,7 @@ cache's keys (DEC-33): pin the digest in the Inspector, or it is asked from the 
 
   <h3 id="EvoSim_OllamaPointsBrain_ModelIdentity" data-uid="EvoSim.OllamaPointsBrain.ModelIdentity">
   ModelIdentity
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L65"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L65"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p><code>tag@digest</code>: the pinned digest, else the one the server gave when the run began, else <code>unknown</code>
@@ -1006,7 +1009,7 @@ cache's keys (DEC-33): pin the digest in the Inspector, or it is asked from the 
 
   <h3 id="EvoSim_OllamaPointsBrain_AnswerAsync_EvoSim_HttpCaller_System_Collections_Generic_IReadOnlyList_EvoSim_BrainRequest__EvoSim_BrainAnswer_" data-uid="EvoSim.OllamaPointsBrain.AnswerAsync(EvoSim.HttpCaller,System.Collections.Generic.IReadOnlyList{EvoSim.BrainRequest},EvoSim.BrainAnswer)">
   AnswerAsync(HttpCaller, IReadOnlyList&lt;BrainRequest&gt;, BrainAnswer)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L137"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L137"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Sends one chat call per request, all at once; <a class="xref" href="EvoSim.HttpBrain.html#EvoSim_HttpBrain_Caller">Caller</a> keeps at most <code>maxParallel</code> in flight.</p>
@@ -1056,7 +1059,7 @@ request still without a row, with its message.</p>
 
   <h3 id="EvoSim_OllamaPointsBrain_Begin" data-uid="EvoSim.OllamaPointsBrain.Begin">
   Begin()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L89"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L89"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Asks Ollama for the model's digest, once, when no digest is pinned and a species uses this brain. It blocks the
@@ -1088,7 +1091,7 @@ main thread for at most about 5 s; an unreachable server gives <code>unknown</co
 
   <h3 id="EvoSim_OllamaPointsBrain_Body_System_String_System_Collections_Generic_IReadOnlyList_System_String__" data-uid="EvoSim.OllamaPointsBrain.Body(System.String,System.Collections.Generic.IReadOnlyList{System.String})">
   Body(string, IReadOnlyList&lt;string&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L107"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L107"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The chat request for one prompt (also used by the golden test).</p>
@@ -1130,7 +1133,7 @@ main thread for at most about 5 s; an unreachable server gives <code>unknown</co
 
   <h3 id="EvoSim_OllamaPointsBrain_Configure_System_String_System_Int32_System_Int32_System_String_" data-uid="EvoSim.OllamaPointsBrain.Configure(System.String,System.Int32,System.Int32,System.String)">
   Configure(string, int, int, string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L76"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/OllamaPointsBrain.cs/#L76"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Sets the model from code (tests, scenarios).</p>

@@ -954,7 +954,8 @@ It only reads the World (<a class="xref" href="EvoSim.RunNumbers.html">RunNumber
     <dl class="jumplist">
       <dt><a class="xref" href="EvoSim.RunRecorder.html">RunRecorder</a></dt>
       <dd><p>Writes a run into its own folder (13): events.jsonl, stats.csv, alleles.jsonl, final_population.json,
-summary.json, run_info.json. Events and stats are flushed every 500 ticks, alleles every 5 000 (RAND-22), and
+summary.json, run_info.json, and vectors.jsonl in a run with a vector gene (the values of each vector allele,
+which the other files name by hash). Events and stats are flushed every 500 ticks, alleles every 5 000 (RAND-22), and
 every file is written when the run stops, whatever the reason (RAND-20). The compatibility mode writes a
 two-species world exactly as the prototype does (OUT-05).</p>
 </dd>
@@ -1177,7 +1178,7 @@ animal of its group, and what the act phase then moves and applies.</p>
     </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="EvoSim.AlleleValue.html">AlleleValue</a></dt>
-      <dd><p>One allele value: a sentence or a number.</p>
+      <dd><p>One allele value: a sentence, a number or a vector of numbers.</p>
 </dd>
     </dl>
     <dl class="jumplist">
@@ -1301,7 +1302,7 @@ Enums
     </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="EvoSim.AlleleKind.html">AlleleKind</a></dt>
-      <dd><p>What kind of value a gene holds (GENE-02): a sentence or a number.</p>
+      <dd><p>What kind of value a gene holds (GENE-02): a sentence, a number or a vector of numbers.</p>
 </dd>
     </dl>
     <dl class="jumplist">

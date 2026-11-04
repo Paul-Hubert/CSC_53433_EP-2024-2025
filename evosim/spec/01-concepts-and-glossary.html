@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/01-concepts-and-glossary.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Site/spec/01-concepts-and-glossary.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -236,8 +236,12 @@ its answer caches (<a href="12-tick-order-and-determinism.html">12</a>).</li>
 <td>A gene whose value is a number, expressed into a trait.</td>
 </tr>
 <tr>
+<td><strong>Vector gene, vector allele</strong></td>
+<td>A gene whose one allele holds a whole list of floats, such as a neural network's weights; two vectors are the same allele when they agree at the gene's decimals (<code>Canonical</code>). Their values are recorded in <code>vectors.jsonl</code> (<a href="09-genes-alleles-and-genomes.html">09</a> GENE-07, <a href="16-neural-species.html">16</a>).</td>
+</tr>
+<tr>
 <td><strong>Allele</strong></td>
-<td>One value a gene can take (a sentence or a number), with an id and a lineage.</td>
+<td>One value a gene can take (a sentence, a number or a vector), with an id and a lineage.</td>
 </tr>
 <tr>
 <td><strong>Genome</strong></td>
@@ -262,6 +266,10 @@ its answer caches (<a href="12-tick-order-and-determinism.html">12</a>).</li>
 <tr>
 <td><strong>Crossover</strong></td>
 <td>Building a child's genome from its parents', locus by locus.</td>
+</tr>
+<tr>
+<td><strong>Recombinant</strong></td>
+<td>An allele a crossover built from two parent alleles (a neuron mix of two networks); it records both parents (GENE-12).</td>
 </tr>
 <tr>
 <td><strong>Mutation operator</strong></td>
@@ -316,6 +324,10 @@ its answer caches (<a href="12-tick-order-and-determinism.html">12</a>).</li>
 <td>A behaviour the brain can choose (eat, flee, hide, hunt, …). It chooses a target, produces an <strong>intent</strong> (a direction, walk or run, how far at most) and may trigger an <strong>interaction</strong>.</td>
 </tr>
 <tr>
+<td><strong>Overlay, carrier</strong></td>
+<td>An overlay is an action done in passing (a call, a scent mark): when the draw picks it, a second action, the carrier, is drawn from the rest of the probabilities and moves the animal; the overlay only adds its interaction (<a href="07-actions-and-locomotion.html">07</a> ACT-07).</td>
+</tr>
+<tr>
 <td><strong>Search</strong></td>
 <td>What an action does when it has nothing to act on in sight: a random walk. Counted as an invalid choice.</td>
 </tr>
@@ -338,6 +350,34 @@ its answer caches (<a href="12-tick-order-and-determinism.html">12</a>).</li>
 <tr>
 <td><strong>Brain</strong></td>
 <td>A module that maps a batch of queries to probability rows over actions.</td>
+</tr>
+<tr>
+<td><strong>Neural species</strong></td>
+<td>A species whose brain is a small network carried in its genome (<code>NeuralBrain</code>, M16): it reads numbers from its senses, not sentences, and steers with five actions (<a href="16-neural-species.html">16</a>).</td>
+</tr>
+<tr>
+<td><strong>Attachment</strong></td>
+<td>Extra data a sense hands the brain beside its token, such as a ray fan's floats or a camera image (SENSE-40).</td>
+</tr>
+<tr>
+<td><strong>Ray fan</strong></td>
+<td>The neural species' eyes: rays spread around the heading, each stopped by the first object it meets and reporting its kind and closeness (<code>RayFanSense</code>).</td>
+</tr>
+<tr>
+<td><strong>Self-directed action</strong></td>
+<td>An action with no target, such as turning or walking straight; it never searches (ACT-04, <code>AnimalAction.SelfDirected</code>).</td>
+</tr>
+<tr>
+<td><strong>Matched pair</strong></td>
+<td>A JEV species and its neural copy with the same body and life settings, so only the controller differs (<code>MatchedPairs</code>, V-78, V-79).</td>
+</tr>
+<tr>
+<td><strong>Plateau stop</strong></td>
+<td>The rule that ends a comparison run once every neural species has 50 generations and its measures stay within ±10 % over three 2 000-tick windows (<code>PlateauStop</code>; cap 60 000 ticks).</td>
+</tr>
+<tr>
+<td><strong>Survival analysis</strong></td>
+<td>Kaplan–Meier survival by age and death-rate ratios between the two species of a matched pair, read from the events (<code>SurvivalAnalysis</code>, the Survival Report).</td>
 </tr>
 <tr>
 <td><strong>Query</strong></td>

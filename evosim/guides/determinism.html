@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/determinism.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Site/guides/determinism.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -230,11 +230,14 @@ of step 2.)</p>
 <li><p><strong>Read the result line</strong>, the last line of <code>Logs/EvoSim/realtime-batch.txt</code>. Its <code>hash</code> must equal the live run's
 <code>events_hash</code>, and it must say <strong><code>brain calls 0</code></strong> and <strong><code>mutator calls 0</code></strong>: any other number means answers were
 missing from the cache and the models were asked again, so the replay is not a replay. Don't trust the exit code:
-<code>FromCommandLine</code> exits with 0 whatever happened, a failure included (the line then starts with <code>FAILED</code>).</p>
+<code>FromCommandLine</code> exits with 0 whatever happened, a failure included (after the line's date and <code>headless:</code>, the
+result then reads <code>FAILED: …</code>).</p>
 </li>
 </ol>
-<p>A model server that was down when the live run started records the model as <code>@unknown</code>; the replay then misses the cache.
-Start the servers and check them in <em>Brain Health</em> before a live run you want to replay.</p>
+<p>An Ollama server that was down when the live run started gives its model the identity <code>&lt;model&gt;@unknown</code> instead of
+<code>&lt;model&gt;@&lt;digest&gt;</code> (the mutator's, and an Ollama brain's); the replay, with the server up, then misses those answers in the
+cache. JEV's identity comes from its settings, not from the server. Start the servers and check them in <em>Brain Health</em>
+before a live run you want to replay.</p>
 <h2 id="the-same-run-everywhere">The same run everywhere</h2>
 <p>The World makes the run independent of how it is driven:</p>
 <ul>

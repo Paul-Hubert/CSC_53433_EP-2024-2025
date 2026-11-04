@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_Allele.md&amp;value=---%0Auid%3A%20EvoSim.Allele%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/new/master/apiSpec/new?filename=EvoSim_Allele.md&amp;value=---%0Auid%3A%20EvoSim.Allele%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -89,7 +89,7 @@
 
 
   <h1 id="EvoSim_Allele" data-uid="EvoSim.Allele" class="text-break">
-Class Allele  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Allele.cs/#L13"><i class="bi bi-code-slash"></i></a>
+Class Allele  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Genes/Allele.cs/#L13"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -143,7 +143,7 @@ Class Allele  <a class="header-action link-secondary" title="View source" href="
 
 
   <h2 id="EvoSim_Allele_remarks">Remarks</h2>
-  <div class="markdown level0 remarks"><p>Alleles are made by <a class="xref" href="EvoSim.AlleleRegistry.html#EvoSim_AlleleRegistry_Register_EvoSim_Gene_EvoSim_AlleleValue_System_String_System_String_System_String_System_String_System_Nullable_System_Int64__">Register(Gene, AlleleValue, string, string, string, string, long?)</a>, once per (locus, value): every animal carrying the
+  <div class="markdown level0 remarks"><p>Alleles are made by <a class="xref" href="EvoSim.AlleleRegistry.html#EvoSim_AlleleRegistry_Register_EvoSim_Gene_EvoSim_AlleleValue_System_String_System_String_System_String_System_String_System_Nullable_System_Int64__System_String_">Register(Gene, AlleleValue, string, string, string, string, long?, string)</a>, once per (locus, value): every animal carrying the
 same sentence at the same gene shares one <a class="xref" href="EvoSim.Allele.html">Allele</a> object. An allele never changes once registered.</p>
 <p>A mutant records the allele it came from (<a class="xref" href="EvoSim.Allele.html#EvoSim_Allele_ParentId">ParentId</a>) and how it was made (<a class="xref" href="EvoSim.Allele.html#EvoSim_Allele_Operator">Operator</a>,
 <a class="xref" href="EvoSim.Allele.html#EvoSim_Allele_Model">Model</a>, <a class="xref" href="EvoSim.Allele.html#EvoSim_Allele_Seed">Seed</a>): following parent ids back gives the lineage of a gene down to a founder.</p>
@@ -156,18 +156,18 @@ same sentence at the same gene shares one <a class="xref" href="EvoSim.Allele.ht
 
   <a id="EvoSim_Allele__ctor_" data-uid="EvoSim.Allele.#ctor*"></a>
 
-  <h3 id="EvoSim_Allele__ctor_System_String_System_Int32_EvoSim_AlleleValue_System_String_System_String_System_String_System_String_System_Nullable_System_Int64__" data-uid="EvoSim.Allele.#ctor(System.String,System.Int32,EvoSim.AlleleValue,System.String,System.String,System.String,System.String,System.Nullable{System.Int64})">
-  Allele(string, int, AlleleValue, string, string, string, string, long?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Allele.cs/#L58"><i class="bi bi-code-slash"></i></a>
+  <h3 id="EvoSim_Allele__ctor_System_String_System_Int32_EvoSim_AlleleValue_System_String_System_String_System_String_System_String_System_Nullable_System_Int64__System_String_" data-uid="EvoSim.Allele.#ctor(System.String,System.Int32,EvoSim.AlleleValue,System.String,System.String,System.String,System.String,System.Nullable{System.Int64},System.String)">
+  Allele(string, int, AlleleValue, string, string, string, string, long?, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Genes/Allele.cs/#L67"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Creates an allele. Code outside the registry should call <a class="xref" href="EvoSim.AlleleRegistry.html#EvoSim_AlleleRegistry_Register_EvoSim_Gene_EvoSim_AlleleValue_System_String_System_String_System_String_System_String_System_Nullable_System_Int64__">Register(Gene, AlleleValue, string, string, string, string, long?)</a> instead, which
+  <div class="markdown level1 summary"><p>Creates an allele. Code outside the registry should call <a class="xref" href="EvoSim.AlleleRegistry.html#EvoSim_AlleleRegistry_Register_EvoSim_Gene_EvoSim_AlleleValue_System_String_System_String_System_String_System_String_System_Nullable_System_Int64__System_String_">Register(Gene, AlleleValue, string, string, string, string, long?, string)</a> instead, which
 numbers alleles and keeps one per value.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Allele(string locus, int index, AlleleValue value, string origin, string parentId = null, string op = null, string model = null, long? seed = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public Allele(string locus, int index, AlleleValue value, string origin, string parentId = null, string op = null, string model = null, long? seed = null, string secondParentId = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -196,6 +196,9 @@ numbers alleles and keeps one per value.</p>
     <dt><code>seed</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>?</dt>
     <dd><p>The mutator call's seed, or null.</p>
 </dd>
+    <dt><code>secondParentId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>For a recombinant, the second parent's allele id; else null.</p>
+</dd>
   </dl>
 
 
@@ -217,7 +220,7 @@ numbers alleles and keeps one per value.</p>
 
   <h3 id="EvoSim_Allele_Id" data-uid="EvoSim.Allele.Id">
   Id
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Allele.cs/#L16"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Genes/Allele.cs/#L16"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The allele id, <code>&quot;&lt;locus id&gt;:&lt;n&gt;&quot;</code>, e.g. <code>prey.eat:3</code> (GENE-11).</p>
@@ -249,7 +252,7 @@ numbers alleles and keeps one per value.</p>
 
   <h3 id="EvoSim_Allele_Index" data-uid="EvoSim.Allele.Index">
   Index
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Allele.cs/#L20"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Genes/Allele.cs/#L20"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>n: the registration order within the locus, from 0.</p>
@@ -281,10 +284,10 @@ numbers alleles and keeps one per value.</p>
 
   <h3 id="EvoSim_Allele_Kind" data-uid="EvoSim.Allele.Kind">
   Kind
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Allele.cs/#L44"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Genes/Allele.cs/#L52"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Whether it holds a sentence or a number.</p>
+  <div class="markdown level1 summary"><p>Whether it holds a sentence, a number or a vector.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
@@ -313,7 +316,7 @@ numbers alleles and keeps one per value.</p>
 
   <h3 id="EvoSim_Allele_Locus" data-uid="EvoSim.Allele.Locus">
   Locus
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Allele.cs/#L18"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Genes/Allele.cs/#L18"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The locus id of the gene it belongs to, e.g. <code>prey.eat</code> (see <a class="xref" href="EvoSim.Gene.html#EvoSim_Gene_LocusId">LocusId</a>).</p>
@@ -345,7 +348,7 @@ numbers alleles and keeps one per value.</p>
 
   <h3 id="EvoSim_Allele_Model" data-uid="EvoSim.Allele.Model">
   Model
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Allele.cs/#L35"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Genes/Allele.cs/#L43"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The name of the mutator model that wrote a mutant sentence, or null.</p>
@@ -377,7 +380,7 @@ numbers alleles and keeps one per value.</p>
 
   <h3 id="EvoSim_Allele_Number" data-uid="EvoSim.Allele.Number">
   Number
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Allele.cs/#L42"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Genes/Allele.cs/#L50"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The number of a number allele; 0 for a text allele.</p>
@@ -409,7 +412,7 @@ numbers alleles and keeps one per value.</p>
 
   <h3 id="EvoSim_Allele_Operator" data-uid="EvoSim.Allele.Operator">
   Operator
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Allele.cs/#L33"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Genes/Allele.cs/#L41"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The operator detail of a mutant, e.g. <code>llm#3</code> (instruction 3 of the deck) or <code>gauss</code>; null otherwise.</p>
@@ -441,11 +444,11 @@ numbers alleles and keeps one per value.</p>
 
   <h3 id="EvoSim_Allele_Origin" data-uid="EvoSim.Allele.Origin">
   Origin
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Allele.cs/#L27"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Genes/Allele.cs/#L27"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Where it came from: <code>founder</code>, <code>neutral</code>, <code>contrast</code>, <code>control</code>, <code>mutant</code> or
-<code>custom</code> (placed by a test or a tool) (GENE-12).</p>
+  <div class="markdown level1 summary"><p>Where it came from: <code>founder</code>, <code>neutral</code>, <code>contrast</code>, <code>control</code>, <code>mutant</code>,
+<code>recombinant</code> (built by a crossover from two parents) or <code>custom</code> (placed by a test or a tool) (GENE-12).</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
@@ -474,10 +477,11 @@ numbers alleles and keeps one per value.</p>
 
   <h3 id="EvoSim_Allele_ParentId" data-uid="EvoSim.Allele.ParentId">
   ParentId
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Allele.cs/#L29"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Genes/Allele.cs/#L32"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>The id of the allele it mutated from, or null when it is not a mutant.</p>
+  <div class="markdown level1 summary"><p>The id of the allele it mutated from, or null when it is not a mutant; for a recombinant, the first parent's
+allele.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
@@ -502,11 +506,44 @@ numbers alleles and keeps one per value.</p>
 
 
 
+  <a id="EvoSim_Allele_SecondParentId_" data-uid="EvoSim.Allele.SecondParentId*"></a>
+
+  <h3 id="EvoSim_Allele_SecondParentId" data-uid="EvoSim.Allele.SecondParentId">
+  SecondParentId
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Genes/Allele.cs/#L37"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>For a <code>recombinant</code> (a crossover that built a new value from two alleles), the second parent's allele id;
+null otherwise (GENE-12, plan M16 §4 C7).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string SecondParentId { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="EvoSim_Allele_Seed_" data-uid="EvoSim.Allele.Seed*"></a>
 
   <h3 id="EvoSim_Allele_Seed" data-uid="EvoSim.Allele.Seed">
   Seed
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Allele.cs/#L37"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Genes/Allele.cs/#L45"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The seed of the mutator call that wrote a mutant sentence, or null.</p>
@@ -538,7 +575,7 @@ numbers alleles and keeps one per value.</p>
 
   <h3 id="EvoSim_Allele_Text" data-uid="EvoSim.Allele.Text">
   Text
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Allele.cs/#L40"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Genes/Allele.cs/#L48"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The sentence of a text allele; null for a number allele.</p>
@@ -570,7 +607,7 @@ numbers alleles and keeps one per value.</p>
 
   <h3 id="EvoSim_Allele_Value" data-uid="EvoSim.Allele.Value">
   Value
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Allele.cs/#L22"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Genes/Allele.cs/#L22"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The value: a sentence or a number.</p>
@@ -606,7 +643,7 @@ numbers alleles and keeps one per value.</p>
 
   <h3 id="EvoSim_Allele_ToString" data-uid="EvoSim.Allele.ToString">
   ToString()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Genes/Allele.cs/#L74"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Genes/Allele.cs/#L84"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The id and the value, e.g. <code>prey.rest:0 Rest when you are tired.</code></p>

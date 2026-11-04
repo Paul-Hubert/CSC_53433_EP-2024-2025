@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Before you start a feature | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Before you start a feature | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Site/extending/before-you-start.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="extend-before-you-start">
+<h1 id="before-you-start-a-feature">Before you start a feature</h1>
+
+<p>You have an idea for EvoSim: animals that get thirsty, prey that call out when they see a predator, a brain of your own,
+winters that slow the grass down. This page helps you turn the idea into modules: which mechanism to use, what to read
+first, how to start, which rules keep the simulation working, and the mistakes that are easy to make. It teaches
+nothing in depth: every section links to the page that does.</p>
+<h2 id="what-a-feature-is-in-evosim">What a feature is in EvoSim</h2>
+<p>Everything is a component in the scene. A world is a tree of GameObjects: a World at the root, its species below it,
+and under each species its senses, actions, genes, stats and brain. Phases, services and food layers sit under the
+World, outside any species. When you press Play, the World <strong>discovers</strong> every component, <strong>validates</strong> the tree and
+<strong>runs</strong> the modules in a fixed tick order (<a href="../guides/the-tick.html">A tick, phase by phase</a>).</p>
+<p>Your feature is one class (sometimes two or three) that derives from a public base class, exactly like the reference
+modules. They use no hidden shortcut, so the closest reference module is always a working example of what you write.
+Some features need no code at all: a number gene, a free text gene, a new species.</p>
+<h2 id="before-you-write-code">Before you write code</h2>
+<ol>
+<li><strong>Say in one sentence</strong> what your feature changes in an animal's life, and which species it applies to. <em>&quot;Prey get
+thirsty and die if they don't drink.&quot;</em></li>
+<li><strong>Choose the mechanism</strong> with the table below. If your sentence names several things (a stat, a sense of it, an
+action that resets it), that is several modules: one row each.</li>
+<li><strong>Read the closest reference module</strong> the table names, and its tests. Then read the page of its kind.</li>
+<li><strong>Decide how you will see that it works</strong>: a column of <code>stats.csv</code>, a cause of death, the
+<em>Window ▸ EvoSim ▸ Animal Inspector</em>, the <em>Prompt preview</em> of the Species inspector, or a scenario.</li>
+</ol>
+<h2 id="which-mechanism">Which mechanism</h2>
+<p>Recipes are sections of 22 (the specification's recipes); the samples are in <code>Assets/EvoSim/Samples</code>. A conformance
+suite is a test of <code>ConformanceTests</code> that finds your class by itself (<a href="testing-your-module.html">Testing your module</a>).</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Base class</th>
+<th>Recipe</th>
+<th>Read first</th>
+<th>Suite</th>
+<th>Page</th>
+<th>Watch out</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a sense</td>
+<td><a class="xref" href="../api/EvoSim.Sense.html">Sense</a>, <a class="xref" href="../api/EvoSim.BandedSense.html">BandedSense</a> for distances</td>
+<td>22 §2, §13</td>
+<td><code>LevelSense</code>, <code>NearestAnimalSense</code>; sample <code>ChasedSense</code></td>
+<td><code>SenseConformance</code></td>
+<td><a href="sense.html">A sense</a></td>
+<td>few tokens: each one multiplies the species' observation space</td>
+</tr>
+<tr>
+<td>an action</td>
+<td><a class="xref" href="../api/EvoSim.AnimalAction.html">AnimalAction</a></td>
+<td>22 §3, §11</td>
+<td><code>RestAction</code>, <code>FleeAction</code>, <code>HideAction</code>; sample <code>DrinkAction</code></td>
+<td><code>ActionConformance</code></td>
+<td><a href="action.html">An action</a></td>
+<td><code>Act</code> only plans: walk, search, an interaction on arrival</td>
+</tr>
+<tr>
+<td>a stat and a death rule</td>
+<td><a class="xref" href="../api/EvoSim.SpeciesModule.html">SpeciesModule</a> declaring a <a class="xref" href="../api/EvoSim.StatId.html">StatId</a>; <a class="xref" href="../api/EvoSim.DeathRule.html">DeathRule</a></td>
+<td>22 §1</td>
+<td><code>Stamina</code>, <code>Starvation</code>; samples <code>Thirst</code>, <code>DiesOfThirst</code></td>
+<td><code>StatConformance</code> (the stat); none for the rule</td>
+<td><a href="stats-and-death.html">Stats, costs and death rules</a></td>
+<td>the value lives in the animal, not in a module field</td>
+</tr>
+<tr>
+<td>a gene</td>
+<td><a class="xref" href="../api/EvoSim.NumberGene.html">NumberGene</a>, <a class="xref" href="../api/EvoSim.TextGene.html">TextGene</a> (no code); <a class="xref" href="../api/EvoSim.Gene.html">Gene</a> for a new kind</td>
+<td>22 §4, §5</td>
+<td>a number gene under the reference species; <code>NeuralGenomeGene</code> for a vector</td>
+<td>none; <code>MutationOperatorConformance</code> checks results against your gene's <code>Check</code></td>
+<td><a href="genes.html">Genes</a></td>
+<td>a number gene needs a cost (V-47) and an operator that accepts it (V-48)</td>
+</tr>
+<tr>
+<td>a mutation operator</td>
+<td><a class="xref" href="../api/EvoSim.MutationOperator.html">MutationOperator</a></td>
+<td>22 §8</td>
+<td><code>GaussianMutation</code>; sample <code>IntensityLadder</code></td>
+<td><code>MutationOperatorConformance</code></td>
+<td><a href="mutation.html">Mutation</a></td>
+<td>blind: it sees only the gene and the parent allele</td>
+</tr>
+<tr>
+<td>a brain</td>
+<td><a class="xref" href="../api/EvoSim.Brain.html">Brain</a></td>
+<td>22 §7</td>
+<td><code>RandomBrain</code>; <code>NeuralBrain</code> for numbers</td>
+<td>none runs on yours: copy <code>DecisionTests.BrainConformance</code></td>
+<td><a href="brain.html">A brain</a></td>
+<td>one row per query, in order; the same query gives the same row</td>
+</tr>
+<tr>
+<td>a food layer or a world change</td>
+<td><a class="xref" href="../api/EvoSim.ResourceLayer.html">ResourceLayer</a>; <a class="xref" href="../api/EvoSim.TickPhase.html">TickPhase</a>; <a class="xref" href="../api/EvoSim.Cover.html">Cover</a>, <a class="xref" href="../api/EvoSim.Ground.html">Ground</a></td>
+<td>22 §6, §9</td>
+<td><code>FoodGrid</code>; sample <code>SeasonsPhase</code></td>
+<td><code>LayerConformance</code>, <code>PhaseConformance</code></td>
+<td><a href="environment.html">Food, cover, entities and ground</a>, <a href="world-modules.html">Phases, services and world hooks</a></td>
+<td>a layer changes only in its own phase, with its own stream</td>
+</tr>
+<tr>
+<td>a new species</td>
+<td>duplicate one; <a class="xref" href="../api/EvoSim.Species.html">Species</a> only for hooks</td>
+<td>22 §10</td>
+<td>the reference prey; <em>GameObject ▸ EvoSim ▸ New Neural Species</em> for a neural one</td>
+<td>none: validation</td>
+<td><a href="species-modules.html#species">Species modules</a>, <a href="neural-species.html">A neural species</a></td>
+<td>add it to the diets of what should eat it</td>
+</tr>
+</tbody>
+</table>
+<p>Not on the list? <a href="index.html">Extending EvoSim</a> has a longer <em>I want to…</em> table, and
+<a href="extension-points.html">Every extension point</a> lists every base class and member.</p>
+<h2 id="the-workflow">The workflow</h2>
+<ol>
+<li><strong>Create the class.</strong> In the Project window, <em>Assets ▸ Create ▸ EvoSim ▸ Script ▸</em> <strong>Sense</strong>, <strong>Action</strong>, <strong>Gene
+kind</strong>, <strong>Stat</strong>, <strong>Phase</strong>, <strong>Brain</strong> or <strong>Mutation operator</strong> writes <code>Assets/Student/&lt;Name&gt;.cs</code> and a test in
+<code>Assets/Student/Tests</code>. For a death rule, a layer, a cover or a ground, derive from the base class yourself in
+<code>Assets/Student</code> (<a href="testing-your-module.html#step-by-step">Testing your module</a>).</li>
+<li><strong>Place the component</strong> in a copy of a reference scene (<em>File ▸ Save As</em>), for example
+<code>Assets/EvoSim/Scenes/Lab1_Small.unity</code>: under the species it belongs to, or under the World for a phase or a layer
+(<a href="species-modules.html">Species modules</a>, <a href="world-modules.html">Phases, services and world hooks</a>).</li>
+<li><strong>Press Play and read the validation messages.</strong> The World and Species inspectors end with a validation list; each
+message names the object to fix, and some have a fix button. <em>Validation is green</em> means the tree is consistent
+(<a href="../guides/editor-tooling.html#validation">Editor tooling</a>).</li>
+<li><strong>Run the conformance suite of its kind</strong>: <em>Window ▸ General ▸ Test Runner</em>, tab <strong>EditMode</strong>, <code>ConformanceTests</code>,
+the cases named after your class. Then your own tests, under <code>Student.Tests</code>.</li>
+<li><strong>Record a short run and read <code>stats.csv</code>.</strong> Each run writes a folder under <code>Logs/EvoSim/runs/</code>; <code>stats.csv</code> has a
+row every 100 ticks (<a href="../guides/recording-and-outputs.html">Recording and outputs</a>). Check that your feature shows: a
+population that changes, a <code>deaths_&lt;cause&gt;</code> column, a column of your own (<a href="recording.html">Recording and statistics</a>).</li>
+</ol>
+<h2 id="the-rules-every-module-keeps">The rules every module keeps</h2>
+<p>Break one of these and the simulation still runs, but it no longer means what you think. Each id links to the rule in
+the specification.</p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Why</th>
+<th>How to keep it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CORE-05: no per-animal state in a module</td>
+<td>one module serves every animal of its species</td>
+<td>declare a stat or a trait in <code>Declare</code>, and read it through its id: <code>a[thirst]</code></td>
+</tr>
+<tr>
+<td>RAND-01: no global randomness</td>
+<td>a seed must replay the run exactly</td>
+<td>draw only from the <a class="xref" href="../api/EvoSim.RandomStream.html">RandomStream</a> you are given, never <code>UnityEngine.Random</code>, <code>System.Random</code> or the clock</td>
+</tr>
+<tr>
+<td>RAND-05: no decision from a <code>Dictionary</code> or <code>HashSet</code> order</td>
+<td>their order is not fixed</td>
+<td>iterate lists</td>
+</tr>
+<tr>
+<td>ACT-06: actions only produce intents</td>
+<td>the act phase moves animals; interactions check diet and reach</td>
+<td>in <code>Act</code>, call <code>WalkTo</code>, <code>Search</code>, <code>OnArrival</code>; change animals only in an interaction's <code>Apply</code></td>
+</tr>
+<tr>
+<td>SENSE-01: a sense returns a declared token</td>
+<td>the brain reads a fixed list of situations</td>
+<td>build <code>Tokens</code> once, with a token for &quot;nothing&quot;; <code>Read</code> returns an index into it</td>
+</tr>
+<tr>
+<td>SENSE-05: the observation space stays small</td>
+<td>the memo and the answer cache stop working when it is large</td>
+<td>keep to a few tokens per sense; V-50 warns above 100 000 situations</td>
+</tr>
+<tr>
+<td>PROMPT-06: the prompt stays under the brain's limit</td>
+<td>a longer prompt is cut or rejected</td>
+<td>read the <em>Prompt preview</em> and its token estimate; V-11 reports a prompt above the limit</td>
+</tr>
+<tr>
+<td>ARCH-04: set up in <code>Initialize</code></td>
+<td>the World initialises modules in a fixed order</td>
+<td>look services and modules up in <code>Initialize</code>, never in <code>Awake</code> or <code>Start</code></td>
+</tr>
+</tbody>
+</table>
+<p>Together they give <strong>determinism</strong>: the same scene and seed, with the same brain answers, give the same run, event for
+event, and the same events hash. A test that fails once fails every time, which is what makes it useful. See
+<a href="../guides/determinism.html">Determinism and replay</a>. Its static checks scan the reference code, not <code>Assets/Student</code>:
+in your own code the rules are yours to keep.</p>
+<h2 id="common-mistakes">Common mistakes</h2>
+<ol>
+<li><strong>A <code>List&lt;Animal&gt;</code> or a <code>Dictionary&lt;Animal, …&gt;</code> field in a module</strong>, to remember something per animal (CORE-05).
+Declare a stat instead (<a href="species-modules.html#stats-traits-and-their-ids">Stats, traits and their ids</a>).</li>
+<li><strong>Calling <code>UnityEngine.Random</code></strong> in a sense, an action or a phase (RAND-01). The run still works, but a seed no
+longer replays it, and your tests become flaky.</li>
+<li><strong>Moving an animal, or changing its stats, from <code>Act</code></strong> (ACT-06). <code>ActionConformance</code> fails. Plan the move with the
+act context, and put the effect in an <a class="xref" href="../api/EvoSim.IInteraction.html">IInteraction</a>.</li>
+<li><strong>A sense with dozens of tokens</strong>, such as a distance in every metre. One such sense can multiply the observation
+space by 50. Use a few bands: <a class="xref" href="../api/EvoSim.BandedSense.html">BandedSense</a> does it for you.</li>
+<li><strong>A new prey nobody eats.</strong> Duplicating the prey gives a species no predator hunts until you add it to their diets
+(22 §10); validation only notes it (V-25). For a neural pair, V-79 warns.</li>
+<li><strong>An action without a gene.</strong> The brain can't be steered for it (V-05). Put a text gene on the same GameObject, with
+founder sentences (22 §3, <a href="action.html#where-to-put-it">An action</a>).</li>
+<li><strong>A brain that accepts attachments and ignores them.</strong> If <code>AcceptsAttachments</code> is true, senses may send float
+arrays or images instead of text (SENSE-41); read them, or leave it false and V-51 tells you which sense needs them.</li>
+<li><strong>Setting up in <code>Awake</code> or <code>Start</code></strong>, or keeping a field from the last run. Reset your fields in <code>Initialize</code>: the
+same object starts every run (<a href="species-modules.html#rules-your-module-keeps">Species modules</a>).</li>
+</ol>
+<h2 id="ways-in">Ways in</h2>
+<p>To get a feel for the code first, rewrite one small reference module (<code>RestAction</code>, <code>LevelSense</code>, <code>Starvation</code>) from
+its stub: <a href="exercises.html">the teaching path</a>. To see a whole idea built, read
+<a href="worked-example-alarm-calls.html">Worked example: alarm calls</a>: a sense, an action, a gene and a world service, from the
+idea to a working scene. The <a href="samples.html">samples</a> are small complete features (thirst, water, seasons, slopes) to
+copy, change and combine.</p>
+<h2 id="watching-your-idea-at-work">Watching your idea at work</h2>
+<p>Once it runs, the editor shows what your modules do. All are under <em>Window ▸ EvoSim ▸</em>
+(<a href="../guides/editor-tooling.html#windows">Editor tooling</a>):</p>
+<table>
+<thead>
+<tr>
+<th>To see</th>
+<th>Open</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>what one animal senses, chooses and carries, and its stats</td>
+<td><strong>Animal Inspector</strong>, then click the animal in the Scene view</td>
+</tr>
+<tr>
+<td>what a gene sentence does to the brain's answer, in a situation you pick</td>
+<td><strong>Ask the Brain</strong></td>
+</tr>
+<tr>
+<td>populations, births and deaths by cause, action shares over time</td>
+<td><strong>Ecology Monitor</strong></td>
+</tr>
+<tr>
+<td>which sentences spread and where they came from</td>
+<td><strong>Gene Pool</strong></td>
+</tr>
+<tr>
+<td>who eats whom, once your species or food is in</td>
+<td><strong>Food Web</strong></td>
+</tr>
+<tr>
+<td>every event as it happens, filtered to one animal</td>
+<td><strong>Event Log</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Change one thing at a time and keep the seed: the same seed and the same brain answers replay a run exactly, so any
+difference comes from your change. The <strong>Scenario Runner</strong> runs several seeds headless, when one run is not enough to
+tell.</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

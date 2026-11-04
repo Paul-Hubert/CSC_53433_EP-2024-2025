@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_Brain.md&amp;value=---%0Auid%3A%20EvoSim.Brain%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/new/master/apiSpec/new?filename=EvoSim_Brain.md&amp;value=---%0Auid%3A%20EvoSim.Brain%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -89,7 +89,7 @@
 
 
   <h1 id="EvoSim_Brain" data-uid="EvoSim.Brain" class="text-break">
-Class Brain  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/Brain.cs/#L46"><i class="bi bi-code-slash"></i></a>
+Class Brain  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L46"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -637,7 +637,7 @@ the species' action order, every entry ≥ 0, summing to 1 ± 1e-6 (DEC-11); the
 
   <h3 id="EvoSim_Brain_strict" data-uid="EvoSim.Brain.strict">
   strict
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/Brain.cs/#L53"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L53"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The Inspector's strict setting: a failure after retries stops the run cleanly (DEC-40); off, the decision gets
@@ -671,7 +671,7 @@ protected bool strict</code></pre>
 
   <h3 id="EvoSim_Brain_useCache" data-uid="EvoSim.Brain.useCache">
   useCache
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/Brain.cs/#L60"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L60"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The Inspector's cache setting: store and reuse answers in the answer cache across runs (DEC-33). Off by default;
@@ -710,7 +710,7 @@ protected bool useCache</code></pre>
 
   <h3 id="EvoSim_Brain_AcceptsAttachments" data-uid="EvoSim.Brain.AcceptsAttachments">
   AcceptsAttachments
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/Brain.cs/#L77"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L77"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>True when queries may carry attachments (SENSE-41); false by default, and then V-51 rejects senses that give them.</p>
@@ -742,7 +742,7 @@ protected bool useCache</code></pre>
 
   <h3 id="EvoSim_Brain_AnswerInstruction" data-uid="EvoSim.Brain.AnswerInstruction">
   AnswerInstruction
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/Brain.cs/#L86"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L93"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The answer instruction that ends the prompt, hard-coded per brain because its parsing depends on it (PROMPT-07);
@@ -775,7 +775,7 @@ empty for brains that read no prompt.</p>
 
   <h3 id="EvoSim_Brain_CanMixSpecies" data-uid="EvoSim.Brain.CanMixSpecies">
   CanMixSpecies
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/Brain.cs/#L80"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L80"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>True when one batch may hold queries of several species (DEC-13); false gives one batch per species.</p>
@@ -807,7 +807,7 @@ empty for brains that read no prompt.</p>
 
   <h3 id="EvoSim_Brain_Id" data-uid="EvoSim.Brain.Id">
   Id
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/Brain.cs/#L66"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L66"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>A short name of the brain and its settings (&quot;random&quot;, &quot;tinynet-8&quot;): part of memo and cache keys, and the name of
@@ -840,7 +840,7 @@ its answer cache file (DEC-30, DEC-33). Two brains that may answer differently n
 
   <h3 id="EvoSim_Brain_MaxActions" data-uid="EvoSim.Brain.MaxActions">
   MaxActions
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/Brain.cs/#L69"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L69"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The most actions a species may have with this brain (DEC-14, V-11); no limit by default.</p>
@@ -872,7 +872,7 @@ its answer cache file (DEC-30, DEC-33). Two brains that may answer differently n
 
   <h3 id="EvoSim_Brain_MaxPromptTokens" data-uid="EvoSim.Brain.MaxPromptTokens">
   MaxPromptTokens
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/Brain.cs/#L72"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L72"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The longest prompt this brain takes, in estimated tokens (DEC-14, V-11); 0 = no prompt or no limit.</p>
@@ -904,7 +904,7 @@ its answer cache file (DEC-30, DEC-33). Two brains that may answer differently n
 
   <h3 id="EvoSim_Brain_Memoizable" data-uid="EvoSim.Brain.Memoizable">
   Memoizable
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/Brain.cs/#L111"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L118"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>True (reference): equal queries get equal rows, so they are memoised and shared within a tick (DEC-30, DEC-32).
@@ -940,7 +940,7 @@ A brain with memory, or one that learns, says false: every query then reaches it
 
   <h3 id="EvoSim_Brain_Mode" data-uid="EvoSim.Brain.Mode">
   Mode
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/Brain.cs/#L92"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L99"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The brain's mode (points, choice…), part of cache keys (DEC-33); empty by default.</p>
@@ -972,7 +972,7 @@ A brain with memory, or one that learns, says false: every query then reaches it
 
   <h3 id="EvoSim_Brain_ModelIdentity" data-uid="EvoSim.Brain.ModelIdentity">
   ModelIdentity
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/Brain.cs/#L89"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L96"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The model and its pinned revision or digest, part of cache keys (DEC-33); the <a class="xref" href="EvoSim.Brain.html#EvoSim_Brain_Id">Id</a> by default.</p>
@@ -1000,11 +1000,45 @@ A brain with memory, or one that learns, says false: every query then reaches it
 
 
 
+  <a id="EvoSim_Brain_ReadsGeneText_" data-uid="EvoSim.Brain.ReadsGeneText*"></a>
+
+  <h3 id="EvoSim_Brain_ReadsGeneText" data-uid="EvoSim.Brain.ReadsGeneText">
+  ReadsGeneText
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L87"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True (reference) when the brain is steered by text genes, one per action; a brain that reads no sentence (a
+network reading a vector gene) says false, and validation then doesn't ask its species' actions for a text gene
+(V-05; plan M16 §4 C5).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool ReadsGeneText { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="EvoSim_Brain_Strict_" data-uid="EvoSim.Brain.Strict*"></a>
 
   <h3 id="EvoSim_Brain_Strict" data-uid="EvoSim.Brain.Strict">
   Strict
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/Brain.cs/#L98"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L105"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>True when a failure after retries stops the run cleanly (DEC-40); false when the decision gets a uniform row and
@@ -1037,7 +1071,7 @@ is counted as a failure. Never cached either way (DEC-34).</p>
 
   <h3 id="EvoSim_Brain_UsesCache" data-uid="EvoSim.Brain.UsesCache">
   UsesCache
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/Brain.cs/#L104"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L111"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>True when the ask-brains phase looks answers up in the world's <a class="xref" href="EvoSim.AnswerCache.html">AnswerCache</a> and stores new ones there
@@ -1074,7 +1108,7 @@ is counted as a failure. Never cached either way (DEC-34).</p>
 
   <h3 id="EvoSim_Brain_Ask_System_Collections_Generic_IReadOnlyList_EvoSim_DecisionQuery__" data-uid="EvoSim.Brain.Ask(System.Collections.Generic.IReadOnlyList{EvoSim.DecisionQuery})">
   Ask(IReadOnlyList&lt;DecisionQuery&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/Brain.cs/#L124"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L131"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Answers a batch of queries (DEC-11). Fast brains fill the answer at once; HTTP brains later.</p>
@@ -1119,7 +1153,7 @@ marked with <a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Fai
 
   <h3 id="EvoSim_Brain_EstimateTokens_System_String_" data-uid="EvoSim.Brain.EstimateTokens(System.String)">
   EstimateTokens(string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/Brain.cs/#L162"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L169"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Estimates a prompt's length in model tokens: one token per 4 characters, rounded up (PROMPT-06).</p>
@@ -1158,7 +1192,7 @@ marked with <a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Fai
 
   <h3 id="EvoSim_Brain_Normalize_System_Double___" data-uid="EvoSim.Brain.Normalize(System.Double[])">
   Normalize(double[])
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/Brain.cs/#L139"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L146"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Makes a probability row from non-negative weights, as floats summing to 1 within 1e-6 (DEC-11).</p>
@@ -1197,7 +1231,7 @@ marked with <a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Fai
 
   <h3 id="EvoSim_Brain_Uniform_System_Int32_" data-uid="EvoSim.Brain.Uniform(System.Int32)">
   Uniform(int)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/Brain.cs/#L129"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/Brain.cs/#L136"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Makes a uniform row over n actions (the random brain, and the non-strict failure answer).</p>

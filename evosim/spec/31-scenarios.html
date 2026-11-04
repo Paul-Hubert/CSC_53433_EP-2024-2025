@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/31-scenarios.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Site/spec/31-scenarios.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -335,6 +335,41 @@ point <code>EvoSim.Batch.RunScenario</code> both read these assets.</p>
 <td>scripted, then JEV</td>
 <td>T2 / T4</td>
 </tr>
+<tr>
+<td>S29</td>
+<td>Neuro lab</td>
+<td>neural prey and predators only (M16)</td>
+<td>neural</td>
+<td>T2</td>
+</tr>
+<tr>
+<td>S30</td>
+<td>JEV prey, neural predators</td>
+<td>the predator's brain</td>
+<td>JEV + neural; random (L0)</td>
+<td>T2 / T4</td>
+</tr>
+<tr>
+<td>S31</td>
+<td>Neural prey, JEV predators</td>
+<td>the prey's brain</td>
+<td>neural + JEV; random (L0)</td>
+<td>T2 / T4</td>
+</tr>
+<tr>
+<td>S32</td>
+<td>Brains 2×2</td>
+<td>JEV and neural prey and predators in one world</td>
+<td>JEV + neural; random (L0)</td>
+<td>T2 / T4 measured</td>
+</tr>
+<tr>
+<td>S33</td>
+<td>Prey vs prey</td>
+<td>JEV and neural prey, no predators</td>
+<td>JEV + neural; random (L0)</td>
+<td>T2 / T4 measured</td>
+</tr>
 </tbody>
 </table>
 <h2 id="3-scenarios-in-detail">3. Scenarios in detail</h2>
@@ -485,6 +520,26 @@ diet is <code>egg:prey</code> (<a href="22-extending-recipes.html#15-food-make-e
 <strong>Expect</strong> (T2, scripted egg eaters): eaten eggs never hatch and are recorded as
 lost; without the <code>Edible</code>, V-24 fires and no egg is eaten. With JEV (T4): the
 prey's births drop compared with S03 at incubation 20 without egg eaters.</p>
+<h3 id="s29s33-neural-species-m16">S29–S33 Neural species (M16)</h3>
+<p>The neural species, their scenes and the survival analysis are in <a href="16-neural-species.html">16</a>. In every one of
+these scenarios a <code>jev-…</code> or plain variant runs the JEV species on JEV; an <code>L0-…</code> variant gives them the random brain
+and removes their LLM mutation (T2). Asexual variants set the JEV species' mating line to &quot;An adult that chooses mate
+breeds alone as soon as it is ready.&quot;</p>
+<ul>
+<li><strong>S29 NeuroLab</strong> — <code>Neuro_Lab</code> (Lab1_Small's map), neural prey and neural predators, 5 000 ticks, seeds 1234, 7,
+42; variants <code>asexual</code>, <code>sexual</code>, <code>no-mutation</code> (asexual, no mutation), <code>more-predators</code> (asexual, predator cap 20
+instead of 6). <strong>Expect</strong> (T2): the same seed twice gives
+the same hash; evolving prey eat more per animal-tick over the last 1 000 ticks than under <code>no-mutation</code> in seeds
+1234 and 7 (T-NEURO-15).</li>
+<li><strong>S30 JevPreyNeuroPredator</strong> — <code>Neuro_JevPrey</code>: JEV prey, neural predators; <strong>S31 NeuroPreyJevPredator</strong> —
+<code>Neuro_JevPredator</code>: neural prey, JEV predators. 2 000 ticks, seeds 1234, 7, 42; variants <code>L0-asexual</code>,
+<code>L0-sexual</code>, <code>jev-asexual</code>, <code>jev-sexual</code>. <strong>Expect</strong>: L0 replays (T2); with JEV, functional checks only (T4).</li>
+<li><strong>S32 Brains2x2</strong> — <code>Brains_2x2</code> (Lab1_Full's map): <code>prey</code>, <code>prey-nn</code>, <code>predator</code>, <code>predator-nn</code>, both
+predators eating both preys. <strong>S33 PreyVsPrey</strong> — <code>Prey_vs_Prey</code>: <code>prey</code> and <code>prey-nn</code>, no predators. Both
+asexual, grass <code>regrowP</code> 0.003 (×2), seeds 1 and 2, up to 60 000 ticks (<code>PlateauStop</code>), variants <code>default</code> (the
+neural species decide every tick), <code>matched</code> (period 4, staggered), <code>L0-default</code>, <code>L0-matched</code>. <strong>Expect</strong>: L0
+replays (T2, T-NEURO-15); with JEV, the measured runs of M16.9 and one Survival Report per scenario and arm (T4).</li>
+</ul>
 
 </article>
 

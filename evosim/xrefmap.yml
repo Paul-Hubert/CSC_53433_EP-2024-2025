@@ -802,15 +802,15 @@ references:
   commentId: T:EvoSim.Allele
   fullName: EvoSim.Allele
   nameWithType: Allele
-- uid: EvoSim.Allele.#ctor(System.String,System.Int32,EvoSim.AlleleValue,System.String,System.String,System.String,System.String,System.Nullable{System.Int64})
-  name: Allele(string, int, AlleleValue, string, string, string, string, long?)
-  href: api/EvoSim.Allele.html#EvoSim_Allele__ctor_System_String_System_Int32_EvoSim_AlleleValue_System_String_System_String_System_String_System_String_System_Nullable_System_Int64__
-  commentId: M:EvoSim.Allele.#ctor(System.String,System.Int32,EvoSim.AlleleValue,System.String,System.String,System.String,System.String,System.Nullable{System.Int64})
-  name.vb: New(String, Integer, AlleleValue, String, String, String, String, Long?)
-  fullName: EvoSim.Allele.Allele(string, int, EvoSim.AlleleValue, string, string, string, string, long?)
-  fullName.vb: EvoSim.Allele.New(String, Integer, EvoSim.AlleleValue, String, String, String, String, Long?)
-  nameWithType: Allele.Allele(string, int, AlleleValue, string, string, string, string, long?)
-  nameWithType.vb: Allele.New(String, Integer, AlleleValue, String, String, String, String, Long?)
+- uid: EvoSim.Allele.#ctor(System.String,System.Int32,EvoSim.AlleleValue,System.String,System.String,System.String,System.String,System.Nullable{System.Int64},System.String)
+  name: Allele(string, int, AlleleValue, string, string, string, string, long?, string)
+  href: api/EvoSim.Allele.html#EvoSim_Allele__ctor_System_String_System_Int32_EvoSim_AlleleValue_System_String_System_String_System_String_System_String_System_Nullable_System_Int64__System_String_
+  commentId: M:EvoSim.Allele.#ctor(System.String,System.Int32,EvoSim.AlleleValue,System.String,System.String,System.String,System.String,System.Nullable{System.Int64},System.String)
+  name.vb: New(String, Integer, AlleleValue, String, String, String, String, Long?, String)
+  fullName: EvoSim.Allele.Allele(string, int, EvoSim.AlleleValue, string, string, string, string, long?, string)
+  fullName.vb: EvoSim.Allele.New(String, Integer, EvoSim.AlleleValue, String, String, String, String, Long?, String)
+  nameWithType: Allele.Allele(string, int, AlleleValue, string, string, string, string, long?, string)
+  nameWithType.vb: Allele.New(String, Integer, AlleleValue, String, String, String, String, Long?, String)
 - uid: EvoSim.Allele.#ctor*
   name: Allele
   href: api/EvoSim.Allele.html#EvoSim_Allele__ctor_
@@ -938,6 +938,19 @@ references:
   isSpec: "True"
   fullName: EvoSim.Allele.ParentId
   nameWithType: Allele.ParentId
+- uid: EvoSim.Allele.SecondParentId
+  name: SecondParentId
+  href: api/EvoSim.Allele.html#EvoSim_Allele_SecondParentId
+  commentId: P:EvoSim.Allele.SecondParentId
+  fullName: EvoSim.Allele.SecondParentId
+  nameWithType: Allele.SecondParentId
+- uid: EvoSim.Allele.SecondParentId*
+  name: SecondParentId
+  href: api/EvoSim.Allele.html#EvoSim_Allele_SecondParentId_
+  commentId: Overload:EvoSim.Allele.SecondParentId
+  isSpec: "True"
+  fullName: EvoSim.Allele.SecondParentId
+  nameWithType: Allele.SecondParentId
 - uid: EvoSim.Allele.Seed
   name: Seed
   href: api/EvoSim.Allele.html#EvoSim_Allele_Seed
@@ -1008,6 +1021,12 @@ references:
   commentId: F:EvoSim.AlleleKind.Text
   fullName: EvoSim.AlleleKind.Text
   nameWithType: AlleleKind.Text
+- uid: EvoSim.AlleleKind.Vector
+  name: Vector
+  href: api/EvoSim.AlleleKind.html#EvoSim_AlleleKind_Vector
+  commentId: F:EvoSim.AlleleKind.Vector
+  fullName: EvoSim.AlleleKind.Vector
+  nameWithType: AlleleKind.Vector
 - uid: EvoSim.AllelePool
   name: AllelePool
   href: api/EvoSim.AllelePool.html
@@ -1109,15 +1128,15 @@ references:
   isSpec: "True"
   fullName: EvoSim.AlleleRegistry.Find
   nameWithType: AlleleRegistry.Find
-- uid: EvoSim.AlleleRegistry.Register(EvoSim.Gene,EvoSim.AlleleValue,System.String,System.String,System.String,System.String,System.Nullable{System.Int64})
-  name: Register(Gene, AlleleValue, string, string, string, string, long?)
-  href: api/EvoSim.AlleleRegistry.html#EvoSim_AlleleRegistry_Register_EvoSim_Gene_EvoSim_AlleleValue_System_String_System_String_System_String_System_String_System_Nullable_System_Int64__
-  commentId: M:EvoSim.AlleleRegistry.Register(EvoSim.Gene,EvoSim.AlleleValue,System.String,System.String,System.String,System.String,System.Nullable{System.Int64})
-  name.vb: Register(Gene, AlleleValue, String, String, String, String, Long?)
-  fullName: EvoSim.AlleleRegistry.Register(EvoSim.Gene, EvoSim.AlleleValue, string, string, string, string, long?)
-  fullName.vb: EvoSim.AlleleRegistry.Register(EvoSim.Gene, EvoSim.AlleleValue, String, String, String, String, Long?)
-  nameWithType: AlleleRegistry.Register(Gene, AlleleValue, string, string, string, string, long?)
-  nameWithType.vb: AlleleRegistry.Register(Gene, AlleleValue, String, String, String, String, Long?)
+- uid: EvoSim.AlleleRegistry.Register(EvoSim.Gene,EvoSim.AlleleValue,System.String,System.String,System.String,System.String,System.Nullable{System.Int64},System.String)
+  name: Register(Gene, AlleleValue, string, string, string, string, long?, string)
+  href: api/EvoSim.AlleleRegistry.html#EvoSim_AlleleRegistry_Register_EvoSim_Gene_EvoSim_AlleleValue_System_String_System_String_System_String_System_String_System_Nullable_System_Int64__System_String_
+  commentId: M:EvoSim.AlleleRegistry.Register(EvoSim.Gene,EvoSim.AlleleValue,System.String,System.String,System.String,System.String,System.Nullable{System.Int64},System.String)
+  name.vb: Register(Gene, AlleleValue, String, String, String, String, Long?, String)
+  fullName: EvoSim.AlleleRegistry.Register(EvoSim.Gene, EvoSim.AlleleValue, string, string, string, string, long?, string)
+  fullName.vb: EvoSim.AlleleRegistry.Register(EvoSim.Gene, EvoSim.AlleleValue, String, String, String, String, Long?, String)
+  nameWithType: AlleleRegistry.Register(Gene, AlleleValue, string, string, string, string, long?, string)
+  nameWithType.vb: AlleleRegistry.Register(Gene, AlleleValue, String, String, String, String, Long?, String)
 - uid: EvoSim.AlleleRegistry.Register*
   name: Register
   href: api/EvoSim.AlleleRegistry.html#EvoSim_AlleleRegistry_Register_
@@ -1248,6 +1267,22 @@ references:
   isSpec: "True"
   fullName: EvoSim.AlleleValue.OfText
   nameWithType: AlleleValue.OfText
+- uid: EvoSim.AlleleValue.OfVector(System.ReadOnlySpan{System.Single})
+  name: OfVector(ReadOnlySpan<float>)
+  href: api/EvoSim.AlleleValue.html#EvoSim_AlleleValue_OfVector_System_ReadOnlySpan_System_Single__
+  commentId: M:EvoSim.AlleleValue.OfVector(System.ReadOnlySpan{System.Single})
+  name.vb: OfVector(ReadOnlySpan(Of Single))
+  fullName: EvoSim.AlleleValue.OfVector(System.ReadOnlySpan<float>)
+  fullName.vb: EvoSim.AlleleValue.OfVector(System.ReadOnlySpan(Of Single))
+  nameWithType: AlleleValue.OfVector(ReadOnlySpan<float>)
+  nameWithType.vb: AlleleValue.OfVector(ReadOnlySpan(Of Single))
+- uid: EvoSim.AlleleValue.OfVector*
+  name: OfVector
+  href: api/EvoSim.AlleleValue.html#EvoSim_AlleleValue_OfVector_
+  commentId: Overload:EvoSim.AlleleValue.OfVector
+  isSpec: "True"
+  fullName: EvoSim.AlleleValue.OfVector
+  nameWithType: AlleleValue.OfVector
 - uid: EvoSim.AlleleValue.Text
   name: Text
   href: api/EvoSim.AlleleValue.html#EvoSim_AlleleValue_Text
@@ -1267,6 +1302,48 @@ references:
   isSpec: "True"
   fullName: EvoSim.AlleleValue.ToString
   nameWithType: AlleleValue.ToString
+- uid: EvoSim.AlleleValue.Vector
+  name: Vector
+  href: api/EvoSim.AlleleValue.html#EvoSim_AlleleValue_Vector
+  commentId: P:EvoSim.AlleleValue.Vector
+  fullName: EvoSim.AlleleValue.Vector
+  nameWithType: AlleleValue.Vector
+- uid: EvoSim.AlleleValue.Vector*
+  name: Vector
+  href: api/EvoSim.AlleleValue.html#EvoSim_AlleleValue_Vector_
+  commentId: Overload:EvoSim.AlleleValue.Vector
+  isSpec: "True"
+  fullName: EvoSim.AlleleValue.Vector
+  nameWithType: AlleleValue.Vector
+- uid: EvoSim.AlleleValue.VectorLength
+  name: VectorLength
+  href: api/EvoSim.AlleleValue.html#EvoSim_AlleleValue_VectorLength
+  commentId: P:EvoSim.AlleleValue.VectorLength
+  fullName: EvoSim.AlleleValue.VectorLength
+  nameWithType: AlleleValue.VectorLength
+- uid: EvoSim.AlleleValue.VectorLength*
+  name: VectorLength
+  href: api/EvoSim.AlleleValue.html#EvoSim_AlleleValue_VectorLength_
+  commentId: Overload:EvoSim.AlleleValue.VectorLength
+  isSpec: "True"
+  fullName: EvoSim.AlleleValue.VectorLength
+  nameWithType: AlleleValue.VectorLength
+- uid: EvoSim.AlleleValue.VectorSha(System.ReadOnlySpan{System.Single},System.Int32)
+  name: VectorSha(ReadOnlySpan<float>, int)
+  href: api/EvoSim.AlleleValue.html#EvoSim_AlleleValue_VectorSha_System_ReadOnlySpan_System_Single__System_Int32_
+  commentId: M:EvoSim.AlleleValue.VectorSha(System.ReadOnlySpan{System.Single},System.Int32)
+  name.vb: VectorSha(ReadOnlySpan(Of Single), Integer)
+  fullName: EvoSim.AlleleValue.VectorSha(System.ReadOnlySpan<float>, int)
+  fullName.vb: EvoSim.AlleleValue.VectorSha(System.ReadOnlySpan(Of Single), Integer)
+  nameWithType: AlleleValue.VectorSha(ReadOnlySpan<float>, int)
+  nameWithType.vb: AlleleValue.VectorSha(ReadOnlySpan(Of Single), Integer)
+- uid: EvoSim.AlleleValue.VectorSha*
+  name: VectorSha
+  href: api/EvoSim.AlleleValue.html#EvoSim_AlleleValue_VectorSha_
+  commentId: Overload:EvoSim.AlleleValue.VectorSha
+  isSpec: "True"
+  fullName: EvoSim.AlleleValue.VectorSha
+  nameWithType: AlleleValue.VectorSha
 - uid: EvoSim.Animal
   name: Animal
   href: api/EvoSim.Animal.html
@@ -1789,6 +1866,19 @@ references:
   isSpec: "True"
   fullName: EvoSim.AnimalAction.Rests
   nameWithType: AnimalAction.Rests
+- uid: EvoSim.AnimalAction.SelfDirected
+  name: SelfDirected
+  href: api/EvoSim.AnimalAction.html#EvoSim_AnimalAction_SelfDirected
+  commentId: P:EvoSim.AnimalAction.SelfDirected
+  fullName: EvoSim.AnimalAction.SelfDirected
+  nameWithType: AnimalAction.SelfDirected
+- uid: EvoSim.AnimalAction.SelfDirected*
+  name: SelfDirected
+  href: api/EvoSim.AnimalAction.html#EvoSim_AnimalAction_SelfDirected_
+  commentId: Overload:EvoSim.AnimalAction.SelfDirected
+  isSpec: "True"
+  fullName: EvoSim.AnimalAction.SelfDirected
+  nameWithType: AnimalAction.SelfDirected
 - uid: EvoSim.AnimalAction.SetDescription(System.String)
   name: SetDescription(string)
   href: api/EvoSim.AnimalAction.html#EvoSim_AnimalAction_SetDescription_System_String_
@@ -3086,6 +3176,19 @@ references:
   isSpec: "True"
   fullName: EvoSim.Brain.Normalize
   nameWithType: Brain.Normalize
+- uid: EvoSim.Brain.ReadsGeneText
+  name: ReadsGeneText
+  href: api/EvoSim.Brain.html#EvoSim_Brain_ReadsGeneText
+  commentId: P:EvoSim.Brain.ReadsGeneText
+  fullName: EvoSim.Brain.ReadsGeneText
+  nameWithType: Brain.ReadsGeneText
+- uid: EvoSim.Brain.ReadsGeneText*
+  name: ReadsGeneText
+  href: api/EvoSim.Brain.html#EvoSim_Brain_ReadsGeneText_
+  commentId: Overload:EvoSim.Brain.ReadsGeneText
+  isSpec: "True"
+  fullName: EvoSim.Brain.ReadsGeneText
+  nameWithType: Brain.ReadsGeneText
 - uid: EvoSim.Brain.Strict
   name: Strict
   href: api/EvoSim.Brain.html#EvoSim_Brain_Strict
@@ -4653,15 +4756,15 @@ references:
   commentId: T:EvoSim.DecisionQuery
   fullName: EvoSim.DecisionQuery
   nameWithType: DecisionQuery
-- uid: EvoSim.DecisionQuery.#ctor(EvoSim.Species,System.Collections.Generic.IReadOnlyList{System.Collections.Generic.KeyValuePair{System.String,System.String}},EvoSim.Observation,System.String,EvoSim.TextStyle,System.String,System.Collections.Generic.IReadOnlyList{System.Object})
-  name: DecisionQuery(Species, IReadOnlyList<KeyValuePair<string, string>>, Observation, string, TextStyle, string, IReadOnlyList<object>)
-  href: api/EvoSim.DecisionQuery.html#EvoSim_DecisionQuery__ctor_EvoSim_Species_System_Collections_Generic_IReadOnlyList_System_Collections_Generic_KeyValuePair_System_String_System_String___EvoSim_Observation_System_String_EvoSim_TextStyle_System_String_System_Collections_Generic_IReadOnlyList_System_Object__
-  commentId: M:EvoSim.DecisionQuery.#ctor(EvoSim.Species,System.Collections.Generic.IReadOnlyList{System.Collections.Generic.KeyValuePair{System.String,System.String}},EvoSim.Observation,System.String,EvoSim.TextStyle,System.String,System.Collections.Generic.IReadOnlyList{System.Object})
-  name.vb: New(Species, IReadOnlyList(Of KeyValuePair(Of String, String)), Observation, String, TextStyle, String, IReadOnlyList(Of Object))
-  fullName: EvoSim.DecisionQuery.DecisionQuery(EvoSim.Species, System.Collections.Generic.IReadOnlyList<System.Collections.Generic.KeyValuePair<string, string>>, EvoSim.Observation, string, EvoSim.TextStyle, string, System.Collections.Generic.IReadOnlyList<object>)
-  fullName.vb: EvoSim.DecisionQuery.New(EvoSim.Species, System.Collections.Generic.IReadOnlyList(Of System.Collections.Generic.KeyValuePair(Of String, String)), EvoSim.Observation, String, EvoSim.TextStyle, String, System.Collections.Generic.IReadOnlyList(Of Object))
-  nameWithType: DecisionQuery.DecisionQuery(Species, IReadOnlyList<KeyValuePair<string, string>>, Observation, string, TextStyle, string, IReadOnlyList<object>)
-  nameWithType.vb: DecisionQuery.New(Species, IReadOnlyList(Of KeyValuePair(Of String, String)), Observation, String, TextStyle, String, IReadOnlyList(Of Object))
+- uid: EvoSim.DecisionQuery.#ctor(EvoSim.Species,System.Collections.Generic.IReadOnlyList{System.Collections.Generic.KeyValuePair{System.String,System.String}},EvoSim.Observation,System.String,EvoSim.TextStyle,System.String,System.Collections.Generic.IReadOnlyList{System.Object},EvoSim.Genome)
+  name: DecisionQuery(Species, IReadOnlyList<KeyValuePair<string, string>>, Observation, string, TextStyle, string, IReadOnlyList<object>, Genome)
+  href: api/EvoSim.DecisionQuery.html#EvoSim_DecisionQuery__ctor_EvoSim_Species_System_Collections_Generic_IReadOnlyList_System_Collections_Generic_KeyValuePair_System_String_System_String___EvoSim_Observation_System_String_EvoSim_TextStyle_System_String_System_Collections_Generic_IReadOnlyList_System_Object__EvoSim_Genome_
+  commentId: M:EvoSim.DecisionQuery.#ctor(EvoSim.Species,System.Collections.Generic.IReadOnlyList{System.Collections.Generic.KeyValuePair{System.String,System.String}},EvoSim.Observation,System.String,EvoSim.TextStyle,System.String,System.Collections.Generic.IReadOnlyList{System.Object},EvoSim.Genome)
+  name.vb: New(Species, IReadOnlyList(Of KeyValuePair(Of String, String)), Observation, String, TextStyle, String, IReadOnlyList(Of Object), Genome)
+  fullName: EvoSim.DecisionQuery.DecisionQuery(EvoSim.Species, System.Collections.Generic.IReadOnlyList<System.Collections.Generic.KeyValuePair<string, string>>, EvoSim.Observation, string, EvoSim.TextStyle, string, System.Collections.Generic.IReadOnlyList<object>, EvoSim.Genome)
+  fullName.vb: EvoSim.DecisionQuery.New(EvoSim.Species, System.Collections.Generic.IReadOnlyList(Of System.Collections.Generic.KeyValuePair(Of String, String)), EvoSim.Observation, String, EvoSim.TextStyle, String, System.Collections.Generic.IReadOnlyList(Of Object), EvoSim.Genome)
+  nameWithType: DecisionQuery.DecisionQuery(Species, IReadOnlyList<KeyValuePair<string, string>>, Observation, string, TextStyle, string, IReadOnlyList<object>, Genome)
+  nameWithType.vb: DecisionQuery.New(Species, IReadOnlyList(Of KeyValuePair(Of String, String)), Observation, String, TextStyle, String, IReadOnlyList(Of Object), Genome)
 - uid: EvoSim.DecisionQuery.#ctor*
   name: DecisionQuery
   href: api/EvoSim.DecisionQuery.html#EvoSim_DecisionQuery__ctor_
@@ -4737,6 +4840,19 @@ references:
   isSpec: "True"
   fullName: EvoSim.DecisionQuery.GenesBlock
   nameWithType: DecisionQuery.GenesBlock
+- uid: EvoSim.DecisionQuery.Genome
+  name: Genome
+  href: api/EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Genome
+  commentId: P:EvoSim.DecisionQuery.Genome
+  fullName: EvoSim.DecisionQuery.Genome
+  nameWithType: DecisionQuery.Genome
+- uid: EvoSim.DecisionQuery.Genome*
+  name: Genome
+  href: api/EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Genome_
+  commentId: Overload:EvoSim.DecisionQuery.Genome
+  isSpec: "True"
+  fullName: EvoSim.DecisionQuery.Genome
+  nameWithType: DecisionQuery.Genome
 - uid: EvoSim.DecisionQuery.GenomeKey
   name: GenomeKey
   href: api/EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_GenomeKey
@@ -5655,6 +5771,51 @@ references:
   commentId: N:EvoSim.Editor
   fullName: EvoSim.Editor
   nameWithType: EvoSim.Editor
+- uid: EvoSim.Editor.AnimalInspectorPanel
+  name: AnimalInspectorPanel
+  href: api/EvoSim.Editor.AnimalInspectorPanel.html
+  commentId: T:EvoSim.Editor.AnimalInspectorPanel
+  fullName: EvoSim.Editor.AnimalInspectorPanel
+  nameWithType: AnimalInspectorPanel
+- uid: EvoSim.Editor.AnimalInspectorPanel.Draw(EvoSim.Animal,EvoSim.World)
+  name: Draw(Animal, World)
+  href: api/EvoSim.Editor.AnimalInspectorPanel.html#EvoSim_Editor_AnimalInspectorPanel_Draw_EvoSim_Animal_EvoSim_World_
+  commentId: M:EvoSim.Editor.AnimalInspectorPanel.Draw(EvoSim.Animal,EvoSim.World)
+  fullName: EvoSim.Editor.AnimalInspectorPanel.Draw(EvoSim.Animal, EvoSim.World)
+  nameWithType: AnimalInspectorPanel.Draw(Animal, World)
+- uid: EvoSim.Editor.AnimalInspectorPanel.Draw*
+  name: Draw
+  href: api/EvoSim.Editor.AnimalInspectorPanel.html#EvoSim_Editor_AnimalInspectorPanel_Draw_
+  commentId: Overload:EvoSim.Editor.AnimalInspectorPanel.Draw
+  isSpec: "True"
+  fullName: EvoSim.Editor.AnimalInspectorPanel.Draw
+  nameWithType: AnimalInspectorPanel.Draw
+- uid: EvoSim.Editor.AnimalInspectorPanel.Shows(EvoSim.Animal)
+  name: Shows(Animal)
+  href: api/EvoSim.Editor.AnimalInspectorPanel.html#EvoSim_Editor_AnimalInspectorPanel_Shows_EvoSim_Animal_
+  commentId: M:EvoSim.Editor.AnimalInspectorPanel.Shows(EvoSim.Animal)
+  fullName: EvoSim.Editor.AnimalInspectorPanel.Shows(EvoSim.Animal)
+  nameWithType: AnimalInspectorPanel.Shows(Animal)
+- uid: EvoSim.Editor.AnimalInspectorPanel.Shows*
+  name: Shows
+  href: api/EvoSim.Editor.AnimalInspectorPanel.html#EvoSim_Editor_AnimalInspectorPanel_Shows_
+  commentId: Overload:EvoSim.Editor.AnimalInspectorPanel.Shows
+  isSpec: "True"
+  fullName: EvoSim.Editor.AnimalInspectorPanel.Shows
+  nameWithType: AnimalInspectorPanel.Shows
+- uid: EvoSim.Editor.AnimalInspectorPanel.Title
+  name: Title
+  href: api/EvoSim.Editor.AnimalInspectorPanel.html#EvoSim_Editor_AnimalInspectorPanel_Title
+  commentId: P:EvoSim.Editor.AnimalInspectorPanel.Title
+  fullName: EvoSim.Editor.AnimalInspectorPanel.Title
+  nameWithType: AnimalInspectorPanel.Title
+- uid: EvoSim.Editor.AnimalInspectorPanel.Title*
+  name: Title
+  href: api/EvoSim.Editor.AnimalInspectorPanel.html#EvoSim_Editor_AnimalInspectorPanel_Title_
+  commentId: Overload:EvoSim.Editor.AnimalInspectorPanel.Title
+  isSpec: "True"
+  fullName: EvoSim.Editor.AnimalInspectorPanel.Title
+  nameWithType: AnimalInspectorPanel.Title
 - uid: EvoSim.Editor.AnimalInspectorWindow
   name: AnimalInspectorWindow
   href: api/EvoSim.Editor.AnimalInspectorWindow.html
@@ -17421,6 +17582,22 @@ references:
   commentId: T:EvoSim.RunRecorder
   fullName: EvoSim.RunRecorder
   nameWithType: RunRecorder
+- uid: EvoSim.RunRecorder.AddValue(System.Collections.Generic.IDictionary{System.String,System.Object},EvoSim.Allele)
+  name: AddValue(IDictionary<string, object>, Allele)
+  href: api/EvoSim.RunRecorder.html#EvoSim_RunRecorder_AddValue_System_Collections_Generic_IDictionary_System_String_System_Object__EvoSim_Allele_
+  commentId: M:EvoSim.RunRecorder.AddValue(System.Collections.Generic.IDictionary{System.String,System.Object},EvoSim.Allele)
+  name.vb: AddValue(IDictionary(Of String, Object), Allele)
+  fullName: EvoSim.RunRecorder.AddValue(System.Collections.Generic.IDictionary<string, object>, EvoSim.Allele)
+  fullName.vb: EvoSim.RunRecorder.AddValue(System.Collections.Generic.IDictionary(Of String, Object), EvoSim.Allele)
+  nameWithType: RunRecorder.AddValue(IDictionary<string, object>, Allele)
+  nameWithType.vb: RunRecorder.AddValue(IDictionary(Of String, Object), Allele)
+- uid: EvoSim.RunRecorder.AddValue*
+  name: AddValue
+  href: api/EvoSim.RunRecorder.html#EvoSim_RunRecorder_AddValue_
+  commentId: Overload:EvoSim.RunRecorder.AddValue
+  isSpec: "True"
+  fullName: EvoSim.RunRecorder.AddValue
+  nameWithType: RunRecorder.AddValue
 - uid: EvoSim.RunRecorder.AfterTick(System.Int32)
   name: AfterTick(int)
   href: api/EvoSim.RunRecorder.html#EvoSim_RunRecorder_AfterTick_System_Int32_
@@ -23436,6 +23613,25 @@ references:
   isSpec: "True"
   fullName: EvoSim.Testing.ScriptedBrain.Prefer
   nameWithType: ScriptedBrain.Prefer
+- uid: EvoSim.Testing.ScriptedBrain.ReadsGeneText
+  name: ReadsGeneText
+  href: api/EvoSim.Testing.ScriptedBrain.html#EvoSim_Testing_ScriptedBrain_ReadsGeneText
+  commentId: P:EvoSim.Testing.ScriptedBrain.ReadsGeneText
+  fullName: EvoSim.Testing.ScriptedBrain.ReadsGeneText
+  nameWithType: ScriptedBrain.ReadsGeneText
+- uid: EvoSim.Testing.ScriptedBrain.ReadsGeneText*
+  name: ReadsGeneText
+  href: api/EvoSim.Testing.ScriptedBrain.html#EvoSim_Testing_ScriptedBrain_ReadsGeneText_
+  commentId: Overload:EvoSim.Testing.ScriptedBrain.ReadsGeneText
+  isSpec: "True"
+  fullName: EvoSim.Testing.ScriptedBrain.ReadsGeneText
+  nameWithType: ScriptedBrain.ReadsGeneText
+- uid: EvoSim.Testing.ScriptedBrain.ReadsText
+  name: ReadsText
+  href: api/EvoSim.Testing.ScriptedBrain.html#EvoSim_Testing_ScriptedBrain_ReadsText
+  commentId: F:EvoSim.Testing.ScriptedBrain.ReadsText
+  fullName: EvoSim.Testing.ScriptedBrain.ReadsText
+  nameWithType: ScriptedBrain.ReadsText
 - uid: EvoSim.Testing.ScriptedBrain.Seen
   name: Seen
   href: api/EvoSim.Testing.ScriptedBrain.html#EvoSim_Testing_ScriptedBrain_Seen
@@ -24109,6 +24305,89 @@ references:
   isSpec: "True"
   fullName: EvoSim.Testing.TurningLocomotion.Move
   nameWithType: TurningLocomotion.Move
+- uid: EvoSim.Testing.VectorProbeGene
+  name: VectorProbeGene
+  href: api/EvoSim.Testing.VectorProbeGene.html
+  commentId: T:EvoSim.Testing.VectorProbeGene
+  fullName: EvoSim.Testing.VectorProbeGene
+  nameWithType: VectorProbeGene
+- uid: EvoSim.Testing.VectorProbeGene.Check(EvoSim.AlleleValue)
+  name: Check(AlleleValue)
+  href: api/EvoSim.Testing.VectorProbeGene.html#EvoSim_Testing_VectorProbeGene_Check_EvoSim_AlleleValue_
+  commentId: M:EvoSim.Testing.VectorProbeGene.Check(EvoSim.AlleleValue)
+  fullName: EvoSim.Testing.VectorProbeGene.Check(EvoSim.AlleleValue)
+  nameWithType: VectorProbeGene.Check(AlleleValue)
+- uid: EvoSim.Testing.VectorProbeGene.Check*
+  name: Check
+  href: api/EvoSim.Testing.VectorProbeGene.html#EvoSim_Testing_VectorProbeGene_Check_
+  commentId: Overload:EvoSim.Testing.VectorProbeGene.Check
+  isSpec: "True"
+  fullName: EvoSim.Testing.VectorProbeGene.Check
+  nameWithType: VectorProbeGene.Check
+- uid: EvoSim.Testing.VectorProbeGene.Clamp
+  name: Clamp
+  href: api/EvoSim.Testing.VectorProbeGene.html#EvoSim_Testing_VectorProbeGene_Clamp
+  commentId: F:EvoSim.Testing.VectorProbeGene.Clamp
+  fullName: EvoSim.Testing.VectorProbeGene.Clamp
+  nameWithType: VectorProbeGene.Clamp
+- uid: EvoSim.Testing.VectorProbeGene.Express(EvoSim.AlleleValue,EvoSim.Expression)
+  name: Express(AlleleValue, Expression)
+  href: api/EvoSim.Testing.VectorProbeGene.html#EvoSim_Testing_VectorProbeGene_Express_EvoSim_AlleleValue_EvoSim_Expression_
+  commentId: M:EvoSim.Testing.VectorProbeGene.Express(EvoSim.AlleleValue,EvoSim.Expression)
+  fullName: EvoSim.Testing.VectorProbeGene.Express(EvoSim.AlleleValue, EvoSim.Expression)
+  nameWithType: VectorProbeGene.Express(AlleleValue, Expression)
+- uid: EvoSim.Testing.VectorProbeGene.Express*
+  name: Express
+  href: api/EvoSim.Testing.VectorProbeGene.html#EvoSim_Testing_VectorProbeGene_Express_
+  commentId: Overload:EvoSim.Testing.VectorProbeGene.Express
+  isSpec: "True"
+  fullName: EvoSim.Testing.VectorProbeGene.Express
+  nameWithType: VectorProbeGene.Express
+- uid: EvoSim.Testing.VectorProbeGene.FounderPool
+  name: FounderPool
+  href: api/EvoSim.Testing.VectorProbeGene.html#EvoSim_Testing_VectorProbeGene_FounderPool
+  commentId: P:EvoSim.Testing.VectorProbeGene.FounderPool
+  fullName: EvoSim.Testing.VectorProbeGene.FounderPool
+  nameWithType: VectorProbeGene.FounderPool
+- uid: EvoSim.Testing.VectorProbeGene.FounderPool*
+  name: FounderPool
+  href: api/EvoSim.Testing.VectorProbeGene.html#EvoSim_Testing_VectorProbeGene_FounderPool_
+  commentId: Overload:EvoSim.Testing.VectorProbeGene.FounderPool
+  isSpec: "True"
+  fullName: EvoSim.Testing.VectorProbeGene.FounderPool
+  nameWithType: VectorProbeGene.FounderPool
+- uid: EvoSim.Testing.VectorProbeGene.Initialize
+  name: Initialize()
+  href: api/EvoSim.Testing.VectorProbeGene.html#EvoSim_Testing_VectorProbeGene_Initialize
+  commentId: M:EvoSim.Testing.VectorProbeGene.Initialize
+  fullName: EvoSim.Testing.VectorProbeGene.Initialize()
+  nameWithType: VectorProbeGene.Initialize()
+- uid: EvoSim.Testing.VectorProbeGene.Initialize*
+  name: Initialize
+  href: api/EvoSim.Testing.VectorProbeGene.html#EvoSim_Testing_VectorProbeGene_Initialize_
+  commentId: Overload:EvoSim.Testing.VectorProbeGene.Initialize
+  isSpec: "True"
+  fullName: EvoSim.Testing.VectorProbeGene.Initialize
+  nameWithType: VectorProbeGene.Initialize
+- uid: EvoSim.Testing.VectorProbeGene.Kind
+  name: Kind
+  href: api/EvoSim.Testing.VectorProbeGene.html#EvoSim_Testing_VectorProbeGene_Kind
+  commentId: P:EvoSim.Testing.VectorProbeGene.Kind
+  fullName: EvoSim.Testing.VectorProbeGene.Kind
+  nameWithType: VectorProbeGene.Kind
+- uid: EvoSim.Testing.VectorProbeGene.Kind*
+  name: Kind
+  href: api/EvoSim.Testing.VectorProbeGene.html#EvoSim_Testing_VectorProbeGene_Kind_
+  commentId: Overload:EvoSim.Testing.VectorProbeGene.Kind
+  isSpec: "True"
+  fullName: EvoSim.Testing.VectorProbeGene.Kind
+  nameWithType: VectorProbeGene.Kind
+- uid: EvoSim.Testing.VectorProbeGene.Length
+  name: Length
+  href: api/EvoSim.Testing.VectorProbeGene.html#EvoSim_Testing_VectorProbeGene_Length
+  commentId: F:EvoSim.Testing.VectorProbeGene.Length
+  fullName: EvoSim.Testing.VectorProbeGene.Length
+  nameWithType: VectorProbeGene.Length
 - uid: EvoSim.Testing.WorldBuilder
   name: WorldBuilder
   href: api/EvoSim.Testing.WorldBuilder.html
@@ -27078,6 +27357,9 @@ references:
 - uid: extend-action
   name: An action or an interaction
   href: extending/action.html
+- uid: extend-before-you-start
+  name: Before you start a feature
+  href: extending/before-you-start.html
 - uid: extend-brain
   name: A brain
   href: extending/brain.html
@@ -27105,6 +27387,9 @@ references:
 - uid: extend-mutation
   name: Mutation
   href: extending/mutation.html
+- uid: extend-neural-species
+  name: A neural species
+  href: extending/neural-species.html
 - uid: extend-recording
   name: Recording and statistics
   href: extending/recording.html

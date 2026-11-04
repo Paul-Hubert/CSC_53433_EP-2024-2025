@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/guides/actions-and-movement.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Site/guides/actions-and-movement.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -112,6 +112,11 @@ still there, and allowed by the eater's diet.</li>
 <li><strong>Settle.</strong> <a class="xref" href="../api/EvoSim.Metabolism.html">Metabolism</a> charges energy for what the animal did, and <a class="xref" href="../api/EvoSim.Stamina.html">Stamina</a> pays the
 meters or recovers. A busy animal's countdown drops by one.</li>
 </ol>
+<p>An action done in passing, an <strong>overlay</strong> such as a call (ACT-07), runs beside the animal's action, its <strong>carrier</strong>. In
+step 1 the carrier plans the intent and its interaction as above, then the overlay plans in the same context: its intent
+is ignored and only its interaction is kept. In step 3 both apply, the carrier's first. In step 4 the overlay's own
+countdown drops (once by default); it also ends at the next decision, when the animal becomes busy, or when it dies.
+The inspector shows both: &quot;flee + alarm&quot;. See <a href="../extending/action.html#actions-done-in-passing">Actions done in passing</a>.</p>
 <h2 id="planning-with-the-act-context">Planning with the act context</h2>
 <p>An action never moves an animal and never changes another one (ACT-06). It only asks questions and states a plan:</p>
 <table>

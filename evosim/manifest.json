@@ -135,7 +135,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "EvoSim.AlleleKind",
-      "Summary": "<p sourcefile=\"api/EvoSim.AlleleKind.yml\" sourcestartlinenumber=\"1\">What kind of value a gene holds (GENE-02): a sentence or a number.</p>\n"
+      "Summary": "<p sourcefile=\"api/EvoSim.AlleleKind.yml\" sourcestartlinenumber=\"1\">What kind of value a gene holds (GENE-02): a sentence, a number or a vector of numbers.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -177,7 +177,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "EvoSim.AlleleValue",
-      "Summary": "<p sourcefile=\"api/EvoSim.AlleleValue.yml\" sourcestartlinenumber=\"1\">One allele value: a sentence or a number.</p>\n"
+      "Summary": "<p sourcefile=\"api/EvoSim.AlleleValue.yml\" sourcestartlinenumber=\"1\">One allele value: a sentence, a number or a vector of numbers.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -797,6 +797,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/EvoSim.Editor.AnimalInspectorPanel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/EvoSim.Editor.AnimalInspectorPanel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "EvoSim.Editor.AnimalInspectorPanel",
+      "Summary": "<p sourcefile=\"api/EvoSim.Editor.AnimalInspectorPanel.yml\" sourcestartlinenumber=\"1\">An extra section of the Animal Inspector (21 §4): derive from it in any editor assembly, with a constructor without\nparameters, and the window draws it under the decision for the animals it shows. The neural species' panel (plan\nM16 §5) is one.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/EvoSim.Editor.AnimalInspectorWindow.yml",
       "output": {
         ".html": {
@@ -807,7 +821,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "EvoSim.Editor.AnimalInspectorWindow",
-      "Summary": "<p sourcefile=\"api/EvoSim.Editor.AnimalInspectorWindow.yml\" sourcestartlinenumber=\"1\">The selected animal (21 §4, lab C): stats, traits, genome sentences, last situation, last probabilities as bars,\ncurrent action and target, busy reason, parents and offspring. Click an animal's view to select it.</p>\n"
+      "Summary": "<p sourcefile=\"api/EvoSim.Editor.AnimalInspectorWindow.yml\" sourcestartlinenumber=\"1\">The selected animal (21 §4, lab C): stats, traits, genome sentences, last situation, last probabilities as bars,\ncurrent action and target, busy reason, parents and offspring, then the <xref href=\"EvoSim.Editor.AnimalInspectorPanel\" data-throw-if-not-resolved=\"false\"></xref>s that show\nit. Click an animal's view to select it.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2711,7 +2725,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "EvoSim.RunRecorder",
-      "Summary": "<p sourcefile=\"api/EvoSim.RunRecorder.yml\" sourcestartlinenumber=\"1\">Writes a run into its own folder (13): events.jsonl, stats.csv, alleles.jsonl, final_population.json,\nsummary.json, run_info.json. Events and stats are flushed every 500 ticks, alleles every 5 000 (RAND-22), and\nevery file is written when the run stops, whatever the reason (RAND-20). The compatibility mode writes a\ntwo-species world exactly as the prototype does (OUT-05).</p>\n"
+      "Summary": "<p sourcefile=\"api/EvoSim.RunRecorder.yml\" sourcestartlinenumber=\"1\">Writes a run into its own folder (13): events.jsonl, stats.csv, alleles.jsonl, final_population.json,\nsummary.json, run_info.json, and vectors.jsonl in a run with a vector gene (the values of each vector allele,\nwhich the other files name by hash). Events and stats are flushed every 500 ticks, alleles every 5 000 (RAND-22), and\nevery file is written when the run stops, whatever the reason (RAND-20). The compatibility mode writes a\ntwo-species world exactly as the prototype does (OUT-05).</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3919,6 +3933,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/EvoSim.Testing.VectorProbeGene.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/EvoSim.Testing.VectorProbeGene.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "EvoSim.Testing.VectorProbeGene",
+      "Summary": "<p sourcefile=\"api/EvoSim.Testing.VectorProbeGene.yml\" sourcestartlinenumber=\"1\">A free vector gene for tests (plan M16 §4 C6): a few founder vectors of fixed length, values within ±<xref href=\"EvoSim.Testing.VectorProbeGene.Clamp\" data-throw-if-not-resolved=\"false\"></xref>;\nsets no trait and writes nothing into the prompt. The T-MUT suite puts it beside a text and a number gene, so an\noperator may accept any of the three kinds (30 §4).</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/EvoSim.Testing.WorldBuilder.yml",
       "output": {
         ".html": {
@@ -4288,6 +4316,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "extending/before-you-start.md",
+      "output": {
+        ".html": {
+          "relative_path": "extending/before-you-start.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "extending/brain.md",
       "output": {
         ".html": {
@@ -4392,6 +4430,16 @@
       "output": {
         ".html": {
           "relative_path": "extending/mutation.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "extending/neural-species.md",
+      "output": {
+        ".html": {
+          "relative_path": "extending/neural-species.html"
         }
       },
       "version": ""
@@ -4878,6 +4926,16 @@
       "output": {
         ".html": {
           "relative_path": "spec/15-controls-metrics-and-gates.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "spec/16-neural-species.md",
+      "output": {
+        ".html": {
+          "relative_path": "spec/16-neural-species.html"
         }
       },
       "version": ""

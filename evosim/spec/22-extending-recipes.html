@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/22-extending-recipes.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Site/spec/22-extending-recipes.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -197,6 +197,11 @@ water and drink</em>. Save the GameObject as a prefab in <code>Modules/</code> t
 the gene passes the guards; the signature changes (accept it); copy <em>T-ACT
 template</em> (search when nothing is in sight, reach, intent never moves the animal
 itself).</p>
+<p>Something done in a moment (a call, a scent mark) is an <strong>overlay</strong> (07 ACT-07):
+override <code>Overlay</code> to return true and plan only an interaction, with no search;
+the engine draws a carrier from the rest of the row to move the animal. The
+worked example in <code>Assets/Student</code> (alarm calls: a service, a phase, an overlay
+action with its gene, a sense, tests and a scene) builds one completely.</p>
 <h2 id="4-a-number-gene">4. A number gene</h2>
 <p>No code: add a <code>NumberGene</code> under the species, set its trait (<code>stamina.max</code>),
 range and founder values, and make sure a <code>GaussianMutation</code> accepts it. To keep
@@ -245,7 +250,7 @@ same query same answer, failure handling).</p>
 {
     static readonly string[] Ladder = { &quot;never&quot;, &quot;rarely&quot;, &quot;sometimes&quot;, &quot;often&quot;, &quot;always&quot; };
     public override bool Accepts(Gene g) =&gt; g.Kind == AlleleKind.Text;
-    public override MutationJob Start(Gene g, Allele parent, RandomStream rng)
+    public override MutationJob StartMutation(Gene g, Allele parent, RandomStream rng)
     {
         var words = parent.Text.Split(' ');
         int i = Array.FindIndex(words, w =&gt; Ladder.Contains(w.ToLowerInvariant()));

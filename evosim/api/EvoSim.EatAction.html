@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_EatAction.md&amp;value=---%0Auid%3A%20EvoSim.EatAction%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/new/master/apiSpec/new?filename=EvoSim_EatAction.md&amp;value=---%0Auid%3A%20EvoSim.EatAction%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -89,7 +89,7 @@
 
 
   <h1 id="EvoSim_EatAction" data-uid="EvoSim.EatAction" class="text-break">
-Class EatAction  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/EatAction.cs/#L22"><i class="bi bi-code-slash"></i></a>
+Class EatAction  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/EatAction.cs/#L22"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -153,6 +153,9 @@ Class EatAction  <a class="header-action link-secondary" title="View source" hre
     </div>
     <div>
       <a class="xref" href="EvoSim.AnimalAction.html#EvoSim_AnimalAction_Mates">AnimalAction.Mates</a>
+    </div>
+    <div>
+      <a class="xref" href="EvoSim.AnimalAction.html#EvoSim_AnimalAction_SelfDirected">AnimalAction.SelfDirected</a>
     </div>
     <div>
       <a class="xref" href="EvoSim.AnimalAction.html#EvoSim_AnimalAction_Overlay">AnimalAction.Overlay</a>
@@ -630,7 +633,7 @@ egg of that species its diet eats (<a class="xref" href="EvoSim.ActContext.html#
 
   <h3 id="EvoSim_EatAction_DefaultDescription" data-uid="EvoSim.EatAction.DefaultDescription">
   DefaultDescription
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/EatAction.cs/#L25"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/EatAction.cs/#L25"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The reference prompt line of this action (08 §7), used when the Inspector field is empty. Every action should
@@ -667,7 +670,7 @@ override it with a short phrase, such as &quot;go to the nearest visible food an
 
   <h3 id="EvoSim_EatAction_Act_EvoSim_Animal_EvoSim_ActContext_" data-uid="EvoSim.EatAction.Act(EvoSim.Animal,EvoSim.ActContext)">
   Act(Animal, ActContext)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/EatAction.cs/#L48"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/EatAction.cs/#L48"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Walks to the nearest visible food the diet allows and grazes it on arrival (or eats the nearest egg); searches
@@ -710,7 +713,7 @@ and the last interaction the method set; doing nothing means stay.</p>
 
   <h3 id="EvoSim_EatAction_Initialize" data-uid="EvoSim.EatAction.Initialize">
   Initialize()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/EatAction.cs/#L37"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/EatAction.cs/#L37"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Reads the target: <code>&quot;egg:&lt;species&gt;&quot;</code> makes this action eat that species' eggs.</p>
@@ -741,7 +744,7 @@ and the last interaction the method set; doing nothing means stay.</p>
 
   <h3 id="EvoSim_EatAction_IsRelevant_EvoSim_ObservationView_" data-uid="EvoSim.EatAction.IsRelevant(EvoSim.ObservationView)">
   IsRelevant(ObservationView)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/EatAction.cs/#L67"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/EatAction.cs/#L67"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>True when the food sense (<code>relevantSense</code>, reference <code>&quot;Food&quot;</code>) reports food in sight (CTRL-10).</p>
@@ -780,7 +783,7 @@ and the last interaction the method set; doing nothing means stay.</p>
 
   <h3 id="EvoSim_EatAction_SetTarget_System_String_" data-uid="EvoSim.EatAction.SetTarget(System.String)">
   SetTarget(string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/EatAction.cs/#L80"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/EatAction.cs/#L80"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Sets the target from code (WorldBuilder, scenarios), before the world initializes: <a class="xref" href="EvoSim.EatAction.html#EvoSim_EatAction_Initialize">Initialize()</a>

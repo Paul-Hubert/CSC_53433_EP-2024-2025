@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_HttpBrain.md&amp;value=---%0Auid%3A%20EvoSim.HttpBrain%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/new/master/apiSpec/new?filename=EvoSim_HttpBrain.md&amp;value=---%0Auid%3A%20EvoSim.HttpBrain%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -89,7 +89,7 @@
 
 
   <h1 id="EvoSim_HttpBrain" data-uid="EvoSim.HttpBrain" class="text-break">
-Class HttpBrain  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L65"><i class="bi bi-code-slash"></i></a>
+Class HttpBrain  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L65"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -156,6 +156,9 @@ them off the main thread and fills the <a class="xref" href="EvoSim.BrainAnswer.
     </div>
     <div>
       <a class="xref" href="EvoSim.Brain.html#EvoSim_Brain_CanMixSpecies">Brain.CanMixSpecies</a>
+    </div>
+    <div>
+      <a class="xref" href="EvoSim.Brain.html#EvoSim_Brain_ReadsGeneText">Brain.ReadsGeneText</a>
     </div>
     <div>
       <a class="xref" href="EvoSim.Brain.html#EvoSim_Brain_AnswerInstruction">Brain.AnswerInstruction</a>
@@ -694,7 +697,7 @@ variable that holds it (OUT-04).</p>
 
   <h3 id="EvoSim_HttpBrain__ctor" data-uid="EvoSim.HttpBrain.#ctor">
   HttpBrain()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L94"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L94"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Sets the defaults of a brain behind a language model: strict (DEC-40) and with the answer cache (DEC-33).</p>
@@ -724,7 +727,7 @@ variable that holds it (OUT-04).</p>
 
   <h3 id="EvoSim_HttpBrain_apiKeyVariable" data-uid="EvoSim.HttpBrain.apiKeyVariable">
   apiKeyVariable
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L75"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L75"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The name of the environment variable that holds the API key, or empty when the server needs none. Never the key
@@ -758,7 +761,7 @@ protected string apiKeyVariable</code></pre>
 
   <h3 id="EvoSim_HttpBrain_backoffSeconds" data-uid="EvoSim.HttpBrain.backoffSeconds">
   backoffSeconds
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L84"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L84"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The wait before the second try, in seconds; it doubles before each further try (reference 1, DEC-42).</p>
@@ -792,7 +795,7 @@ protected float backoffSeconds</code></pre>
 
   <h3 id="EvoSim_HttpBrain_host" data-uid="EvoSim.HttpBrain.host">
   host
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L69"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L69"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The server's address: <code>http://localhost:8000</code> for JEV on vLLM, <code>http://localhost:11434</code> for Ollama.</p>
@@ -825,7 +828,7 @@ protected string host</code></pre>
 
   <h3 id="EvoSim_HttpBrain_maxParallel" data-uid="EvoSim.HttpBrain.maxParallel">
   maxParallel
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L87"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L87"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The most requests in flight at once; the others wait their turn (reference 2 for Ollama, 4 for vLLM).</p>
@@ -859,7 +862,7 @@ protected int maxParallel</code></pre>
 
   <h3 id="EvoSim_HttpBrain_timeoutSeconds" data-uid="EvoSim.HttpBrain.timeoutSeconds">
   timeoutSeconds
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L78"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L78"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The time-out of one try, in seconds (reference 60–120, DEC-42).</p>
@@ -893,7 +896,7 @@ protected float timeoutSeconds</code></pre>
 
   <h3 id="EvoSim_HttpBrain_tries" data-uid="EvoSim.HttpBrain.tries">
   tries
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L81"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L81"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Tries per request before it fails, 1 to 10 (reference 3, DEC-42).</p>
@@ -932,7 +935,7 @@ protected int tries</code></pre>
 
   <h3 id="EvoSim_HttpBrain_Caller" data-uid="EvoSim.HttpBrain.Caller">
   Caller
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L110"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L110"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The client the requests go through, with this brain's settings; made on first use and again after a setting changed.</p>
@@ -964,7 +967,7 @@ protected int tries</code></pre>
 
   <h3 id="EvoSim_HttpBrain_HealthPath" data-uid="EvoSim.HttpBrain.HealthPath">
   HealthPath
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L208"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L208"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The path a connection test reads, such as <code>/v1/models</code> or <code>/api/tags</code> (V-60).</p>
@@ -996,7 +999,7 @@ protected int tries</code></pre>
 
   <h3 id="EvoSim_HttpBrain_Host" data-uid="EvoSim.HttpBrain.Host">
   Host
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L101"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L101"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The server's address; setting it makes a new <a class="xref" href="EvoSim.HttpBrain.html#EvoSim_HttpBrain_Caller">Caller</a> on its next use.</p>
@@ -1028,7 +1031,7 @@ protected int tries</code></pre>
 
   <h3 id="EvoSim_HttpBrain_Stats" data-uid="EvoSim.HttpBrain.Stats">
   Stats
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L112"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L112"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>What this brain's calls did since its client was made: tries, retries, failures, time-outs, latencies (B-01).</p>
@@ -1060,7 +1063,7 @@ protected int tries</code></pre>
 
   <h3 id="EvoSim_HttpBrain_Transport" data-uid="EvoSim.HttpBrain.Transport">
   Transport
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L106"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L106"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The transport set from code, or null for the real one (<a class="xref" href="EvoSim.SystemHttpTransport.html">SystemHttpTransport</a>). Tests set a fake server
@@ -1093,7 +1096,7 @@ here (30 §2); setting it makes a new <a class="xref" href="EvoSim.HttpBrain.htm
 
   <h3 id="EvoSim_HttpBrain_Wire" data-uid="EvoSim.HttpBrain.Wire">
   Wire
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L114"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L114"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The transport calls go through: the injected one, else this component's own HttpClient (ARCH-07).</p>
@@ -1129,7 +1132,7 @@ here (30 §2); setting it makes a new <a class="xref" href="EvoSim.HttpBrain.htm
 
   <h3 id="EvoSim_HttpBrain_ActionNames_EvoSim_Species_" data-uid="EvoSim.HttpBrain.ActionNames(EvoSim.Species)">
   ActionNames(Species)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L168"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L168"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Lists a species' action names in action order. Call it on the main thread: the names are GameObject names.</p>
@@ -1168,7 +1171,7 @@ here (30 §2); setting it makes a new <a class="xref" href="EvoSim.HttpBrain.htm
 
   <h3 id="EvoSim_HttpBrain_AnswerAsync_EvoSim_HttpCaller_System_Collections_Generic_IReadOnlyList_EvoSim_BrainRequest__EvoSim_BrainAnswer_" data-uid="EvoSim.HttpBrain.AnswerAsync(EvoSim.HttpCaller,System.Collections.Generic.IReadOnlyList{EvoSim.BrainRequest},EvoSim.BrainAnswer)">
   AnswerAsync(HttpCaller, IReadOnlyList&lt;BrainRequest&gt;, BrainAnswer)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L205"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L205"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Sends the requests and fills a row or a failure for each of them.</p>
@@ -1218,7 +1221,7 @@ request still without a row, with its message.</p>
 
   <h3 id="EvoSim_HttpBrain_Ask_System_Collections_Generic_IReadOnlyList_EvoSim_DecisionQuery__" data-uid="EvoSim.HttpBrain.Ask(System.Collections.Generic.IReadOnlyList{EvoSim.DecisionQuery})">
   Ask(IReadOnlyList&lt;DecisionQuery&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L146"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L146"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Builds one request per query on the main thread, starts sending them on the thread pool and returns at once an
@@ -1264,7 +1267,7 @@ marked with <a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Fai
 
   <h3 id="EvoSim_HttpBrain_ConfigureClient_System_String_System_Single_System_Int32_System_Single_System_Int32_System_String_" data-uid="EvoSim.HttpBrain.ConfigureClient(System.String,System.Single,System.Int32,System.Single,System.Int32,System.String)">
   ConfigureClient(string, float, int, float, int, string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L126"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L126"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Sets the client settings from code (tests, scenarios); the next call uses a new <a class="xref" href="EvoSim.HttpBrain.html#EvoSim_HttpBrain_Caller">Caller</a>.</p>
@@ -1312,7 +1315,7 @@ marked with <a class="xref" href="EvoSim.BrainAnswer.html#EvoSim_BrainAnswer_Fai
 
   <h3 id="EvoSim_HttpBrain_Initialize" data-uid="EvoSim.HttpBrain.Initialize">
   Initialize()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L139"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L139"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Drops the client, so that the run uses the current settings and counts its calls from 0.</p>
@@ -1344,7 +1347,7 @@ species' modules; a phase after them.</p>
 
   <h3 id="EvoSim_HttpBrain_TestConnection" data-uid="EvoSim.HttpBrain.TestConnection">
   TestConnection()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L215"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L215"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Reads <a class="xref" href="EvoSim.HttpBrain.html#EvoSim_HttpBrain_HealthPath">HealthPath</a> once, with a time-out of at most 5 s: the V-60 check, run on demand by the Brain
@@ -1378,7 +1381,7 @@ health window's Test connection button. Its call isn't counted in <a class="xref
 
   <h3 id="EvoSim_HttpBrain_TextFor_EvoSim_DecisionQuery_" data-uid="EvoSim.HttpBrain.TextFor(EvoSim.DecisionQuery)">
   TextFor(DecisionQuery)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L163"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L163"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gives the text sent for one query: by default the full prompt, ending with this brain's answer instruction.
@@ -1418,7 +1421,7 @@ Called on the main thread, so an override may read Unity objects.</p>
 
   <h3 id="EvoSim_HttpBrain_Validate_EvoSim_ValidationReport_" data-uid="EvoSim.HttpBrain.Validate(EvoSim.ValidationReport)">
   Validate(ValidationReport)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Http/HttpBrain.cs/#L231"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Http/HttpBrain.cs/#L231"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Checks that the address is an http(s) URL (V-20) and that no key sits in a serialized field (V-61).</p>

@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/13-outputs-and-recording.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Site/spec/13-outputs-and-recording.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -126,7 +126,15 @@ editor, a database) receive the same events.</li>
 </tr>
 <tr>
 <td><code>alleles.jsonl</code></td>
-<td>every allele seen, all species: <code>id</code>, <code>locus</code>, <code>text</code> (or <code>value</code> for number genes), <code>origin</code>, <code>parent_id</code>, <code>operator</code>, <code>model</code>, <code>seed</code></td>
+<td>every allele seen, all species: <code>id</code>, <code>locus</code>, <code>text</code> (or <code>value</code> for number genes, or <code>vector_sha</code> and <code>length</code> for vector genes), <code>origin</code>, <code>parent_id</code> (and <code>parent2_id</code> for a recombinant), <code>operator</code>, <code>model</code>, <code>seed</code></td>
+</tr>
+<tr>
+<td><code>vectors.jsonl</code></td>
+<td>only in a run with a vector gene: the values of every vector allele, one line <code>{id, values}</code> each, in registration order, appended when <code>alleles.jsonl</code> is written</td>
+</tr>
+<tr>
+<td><code>survival.json</code></td>
+<td>only in a world with <code>SurvivalStats</code> (M16): at the run's end, <code>end_tick</code>, <code>stop_reason</code>, <code>plateau_tick</code> (−1 if none), the matched <code>pairs</code>, and per species its maturity, cap, floor, initial population, whether it is neural, the living, births, newcomers, deaths by cause and kills by victim; read with <code>events.jsonl</code> by the Survival Report (<a href="16-neural-species.html#4-survival">16 §4</a>)</td>
 </tr>
 <tr>
 <td><code>final_population.json</code></td>
@@ -161,7 +169,7 @@ editor, a database) receive the same events.</li>
 </tr>
 <tr>
 <td><code>birth</code></td>
-<td><code>id</code>, <code>parents</code>, <code>gen</code>, <code>genome</code>, <code>litter</code> (its litter's size), <code>mutations</code>: a list of {<code>locus</code>, <code>parent</code> (allele id), <code>child</code> (new allele id), <code>prompt</code> (instruction number, LLM operator) or <code>operator</code>, <code>text</code> or <code>value</code>}; a hatched egg also has <code>laid</code> (the conception tick)</td>
+<td><code>id</code>, <code>parents</code>, <code>gen</code>, <code>genome</code>, <code>litter</code> (its litter's size), <code>mutations</code>: a list of {<code>locus</code>, <code>parent</code> (allele id), <code>child</code> (new allele id), <code>prompt</code> (instruction number, LLM operator) or <code>operator</code>, <code>text</code> or <code>value</code> (or <code>vector_sha</code> and <code>length</code>)}; a hatched egg also has <code>laid</code> (the conception tick)</td>
 </tr>
 <tr>
 <td><code>death</code></td>
@@ -218,7 +226,7 @@ editor, a database) receive the same events.</li>
 </tr>
 <tr>
 <td><code>act_&lt;action&gt;</code></td>
-<td>cumulative decisions per action</td>
+<td>cumulative decisions per action; a drawn overlay counts for itself and for its carrier (ACT-07), so with overlays these columns add up to more than <code>decisions</code></td>
 </tr>
 <tr>
 <td><code>portions</code></td>
@@ -227,6 +235,40 @@ editor, a database) receive the same events.</li>
 </tbody>
 </table>
 <p>and <code>alleles</code>, the number of alleles registered (all species).</p>
+<p>Modules add columns through <code>IStatsColumns</code>: a species module's columns follow that species'
+<code>act_…</code> columns, with its prefix; a world module's (phase or service) end the row, unprefixed.
+The neural species (M16, <a href="16-neural-species.html">16</a>) add two sets:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Module</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;species&gt;_nn_speed</code>, <code>_nn_meals_per_tick</code>, <code>_nn_meals_per_m</code></td>
+<td><code>NeuroStats</code> (species)</td>
+<td>meters per animal-tick, meals (graze, strike or scavenge) per animal-tick and per meter, over the last <code>Window</code> ticks (100)</td>
+</tr>
+<tr>
+<td><code>&lt;species&gt;_nn_loops</code>, <code>_nn_share_&lt;action&gt;</code></td>
+<td><code>NeuroStats</code></td>
+<td>shares of the living animals now: repeating one action for <code>LoopTicks</code> (50) ticks or more; deciding each action</td>
+</tr>
+<tr>
+<td><code>sv_&lt;species&gt;_alive</code>, <code>_births</code>, <code>_immigrants</code>, <code>_deaths_&lt;cause&gt;</code></td>
+<td><code>SurvivalStats</code> (world service)</td>
+<td>living animals, then cumulative counts; causes <code>starvation</code>, <code>killed</code>, <code>old_age</code>, <code>migrated</code></td>
+</tr>
+<tr>
+<td><code>sv_&lt;killer&gt;_kills_&lt;victim&gt;</code></td>
+<td><code>SurvivalStats</code></td>
+<td>cumulative kills, for each species whose diet strikes another</td>
+</tr>
+</tbody>
+</table>
 <h2 id="5-summary">5. Summary</h2>
 <p>Per species: final population, births, newcomers, hatched eggs, deaths by cause,
 mean lifespan, maximum generation, decisions, brain queries, memo hit rate,

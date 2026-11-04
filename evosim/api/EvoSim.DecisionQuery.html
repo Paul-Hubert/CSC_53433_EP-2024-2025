@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_DecisionQuery.md&amp;value=---%0Auid%3A%20EvoSim.DecisionQuery%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/new/master/apiSpec/new?filename=EvoSim_DecisionQuery.md&amp;value=---%0Auid%3A%20EvoSim.DecisionQuery%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -89,7 +89,7 @@
 
 
   <h1 id="EvoSim_DecisionQuery" data-uid="EvoSim.DecisionQuery" class="text-break">
-Class DecisionQuery  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L14"><i class="bi bi-code-slash"></i></a>
+Class DecisionQuery  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L14"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -158,9 +158,9 @@ reads <a class="xref" href="EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Obser
 
   <a id="EvoSim_DecisionQuery__ctor_" data-uid="EvoSim.DecisionQuery.#ctor*"></a>
 
-  <h3 id="EvoSim_DecisionQuery__ctor_EvoSim_Species_System_Collections_Generic_IReadOnlyList_System_Collections_Generic_KeyValuePair_System_String_System_String___EvoSim_Observation_System_String_EvoSim_TextStyle_System_String_System_Collections_Generic_IReadOnlyList_System_Object__" data-uid="EvoSim.DecisionQuery.#ctor(EvoSim.Species,System.Collections.Generic.IReadOnlyList{System.Collections.Generic.KeyValuePair{System.String,System.String}},EvoSim.Observation,System.String,EvoSim.TextStyle,System.String,System.Collections.Generic.IReadOnlyList{System.Object})">
-  DecisionQuery(Species, IReadOnlyList&lt;KeyValuePair&lt;string, string&gt;&gt;, Observation, string, TextStyle, string, IReadOnlyList&lt;object&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L51"><i class="bi bi-code-slash"></i></a>
+  <h3 id="EvoSim_DecisionQuery__ctor_EvoSim_Species_System_Collections_Generic_IReadOnlyList_System_Collections_Generic_KeyValuePair_System_String_System_String___EvoSim_Observation_System_String_EvoSim_TextStyle_System_String_System_Collections_Generic_IReadOnlyList_System_Object__EvoSim_Genome_" data-uid="EvoSim.DecisionQuery.#ctor(EvoSim.Species,System.Collections.Generic.IReadOnlyList{System.Collections.Generic.KeyValuePair{System.String,System.String}},EvoSim.Observation,System.String,EvoSim.TextStyle,System.String,System.Collections.Generic.IReadOnlyList{System.Object},EvoSim.Genome)">
+  DecisionQuery(Species, IReadOnlyList&lt;KeyValuePair&lt;string, string&gt;&gt;, Observation, string, TextStyle, string, IReadOnlyList&lt;object&gt;, Genome)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L60"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Makes a query. The ask-brains phase builds them; build one yourself for tools and tests.</p>
@@ -168,7 +168,7 @@ reads <a class="xref" href="EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Obser
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DecisionQuery(Species species, IReadOnlyList&lt;KeyValuePair&lt;string, string&gt;&gt; genes, Observation observation, string situation, TextStyle style, string genomeKey, IReadOnlyList&lt;object&gt; attachments = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public DecisionQuery(Species species, IReadOnlyList&lt;KeyValuePair&lt;string, string&gt;&gt; genes, Observation observation, string situation, TextStyle style, string genomeKey, IReadOnlyList&lt;object&gt; attachments = null, Genome genome = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -194,6 +194,9 @@ reads <a class="xref" href="EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Obser
     <dt><code>attachments</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</dt>
     <dd><p>Attachments from senses, or null for none.</p>
 </dd>
+    <dt><code>genome</code> <a class="xref" href="EvoSim.Genome.html">Genome</a></dt>
+    <dd><p>The genome the brain reads, or null (tools).</p>
+</dd>
   </dl>
 
 
@@ -215,7 +218,7 @@ reads <a class="xref" href="EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Obser
 
   <h3 id="EvoSim_DecisionQuery_AnimalId" data-uid="EvoSim.DecisionQuery.AnimalId">
   AnimalId
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L41"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L49"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The deciding animal's id (-1 when the query is built by a tool): for brains that aren't memoizable.</p>
@@ -247,7 +250,7 @@ reads <a class="xref" href="EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Obser
 
   <h3 id="EvoSim_DecisionQuery_Attachments" data-uid="EvoSim.DecisionQuery.Attachments">
   Attachments
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L32"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Attachments from senses (images…), or empty (SENSE-40).</p>
@@ -279,7 +282,7 @@ reads <a class="xref" href="EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Obser
 
   <h3 id="EvoSim_DecisionQuery_Genes" data-uid="EvoSim.DecisionQuery.Genes">
   Genes
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L20"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L20"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Brain-visible genes, in locus order: (label, sentence or number).</p>
@@ -311,7 +314,7 @@ reads <a class="xref" href="EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Obser
 
   <h3 id="EvoSim_DecisionQuery_GenesBlock" data-uid="EvoSim.DecisionQuery.GenesBlock">
   GenesBlock
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L65"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L76"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The genes block of the prompt: one line per gene, - label: &quot;sentence&quot; (PROMPT-02).</p>
@@ -342,11 +345,46 @@ reads <a class="xref" href="EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Obser
 
 
 
+  <a id="EvoSim_DecisionQuery_Genome_" data-uid="EvoSim.DecisionQuery.Genome*"></a>
+
+  <h3 id="EvoSim_DecisionQuery_Genome" data-uid="EvoSim.DecisionQuery.Genome">
+  Genome
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L46"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The genome the brain reads (DEC-10): the animal's own, or the one the shuffled-genes control lent it
+(CTRL-01); null for a query built by a tool without one. A brain reads only the genes whose
+<a class="xref" href="EvoSim.Gene.html#EvoSim_Gene_ReadByBrain">ReadByBrain</a> is true, so <a class="xref" href="EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_GenomeKey">GenomeKey</a> stays exact (DEC-31). A numeric brain reads a
+vector gene's values here (plan M16 §4 C3).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Genome Genome { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="EvoSim.Genome.html">Genome</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="EvoSim_DecisionQuery_GenomeKey_" data-uid="EvoSim.DecisionQuery.GenomeKey*"></a>
 
   <h3 id="EvoSim_DecisionQuery_GenomeKey" data-uid="EvoSim.DecisionQuery.GenomeKey">
   GenomeKey
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L38"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L38"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The brain-visible genome key (DEC-31): a hash of the species id and the alleles the brain reads, or the species id
@@ -379,7 +417,7 @@ when the animal has no genome. Part of the memo and cache keys.</p>
 
   <h3 id="EvoSim_DecisionQuery_Observation" data-uid="EvoSim.DecisionQuery.Observation">
   Observation
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L23"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L23"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The animal's sense tokens, in sense order (SENSE-02).</p>
@@ -411,7 +449,7 @@ when the animal has no genome. Part of the memo and cache keys.</p>
 
   <h3 id="EvoSim_DecisionQuery_Situation" data-uid="EvoSim.DecisionQuery.Situation">
   Situation
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L26"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L26"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The observation as text, in <a class="xref" href="EvoSim.DecisionQuery.html#EvoSim_DecisionQuery_Style">Style</a> (&quot;Energy: low. Food: 1-4 meters away. …&quot;, SENSE-10).</p>
@@ -443,7 +481,7 @@ when the animal has no genome. Part of the memo and cache keys.</p>
 
   <h3 id="EvoSim_DecisionQuery_Species" data-uid="EvoSim.DecisionQuery.Species">
   Species
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L17"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L17"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The deciding animal's species: its actions give the row's length and order, its template the prompt.</p>
@@ -475,7 +513,7 @@ when the animal has no genome. Part of the memo and cache keys.</p>
 
   <h3 id="EvoSim_DecisionQuery_Style" data-uid="EvoSim.DecisionQuery.Style">
   Style
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L29"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L29"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The world's text style the situation was written in (SENSE-11); part of the cache key.</p>
@@ -511,7 +549,7 @@ when the animal has no genome. Part of the memo and cache keys.</p>
 
   <h3 id="EvoSim_DecisionQuery_BrainGenes_EvoSim_Species_EvoSim_Genome_" data-uid="EvoSim.DecisionQuery.BrainGenes(EvoSim.Species,EvoSim.Genome)">
   BrainGenes(Species, Genome)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L83"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L94"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Lists the genes a brain reads from a genome, in locus order, with their labels (DEC-10, GENE-03).</p>
@@ -553,7 +591,7 @@ when the animal has no genome. Part of the memo and cache keys.</p>
 
   <h3 id="EvoSim_DecisionQuery_Prompt_EvoSim_Brain_" data-uid="EvoSim.DecisionQuery.Prompt(EvoSim.Brain)">
   Prompt(Brain)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L98"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Brains/DecisionQuery.cs/#L109"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Builds the full prompt for a brain: the species' template with genes, situation and the brain's answer instruction.</p>

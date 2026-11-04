@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/extending/editor.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Site/extending/editor.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -130,14 +130,18 @@ in tests. Choose a <strong>window or inspector</strong> to look at a running wor
 </table>
 <h2 id="where-editor-code-lives">Where editor code lives</h2>
 <p>Editor code uses <code>UnityEditor</code>, which players lack, so it lives in an editor-only assembly (EDIT-03); in the runtime
-<code>Student</code> assembly it would break the player build. Create <code>Assets/Student/Editor/Student.Editor.asmdef</code>:</p>
+<code>Student</code> assembly it would break the player build. The repository already has one,
+<code>Assets/Student/Editor/Student.Editor.asmdef</code>, made for the scene builder of the
+<a href="worked-example-alarm-calls.html">worked example</a>:</p>
 <pre><code class="lang-json">{
     &quot;name&quot;: &quot;Student.Editor&quot;,
-    &quot;references&quot;: [&quot;Student&quot;, &quot;EvoSim.Runtime&quot;, &quot;EvoSim.Samples&quot;, &quot;EvoSim.Editor&quot;],
-    &quot;includePlatforms&quot;: [&quot;Editor&quot;]
+    &quot;references&quot;: [&quot;Student&quot;, &quot;EvoSim.Runtime&quot;, &quot;EvoSim.Editor&quot;],
+    &quot;includePlatforms&quot;: [&quot;Editor&quot;],
+    &quot;autoReferenced&quot;: false
 }
 </code></pre>
-<p>Put your windows, inspectors and menus in that folder: they see your modules, EvoSim and its editor helpers.</p>
+<p>Put your windows, inspectors and menus in that folder: they see your modules, EvoSim and its editor helpers. If your
+editor code uses the samples, add <code>&quot;EvoSim.Samples&quot;</code> to <code>references</code>.</p>
 <h2 id="a-window">A window</h2>
 <p>This window lists the living animals of each species with their energy. It uses <a class="xref" href="../api/EvoSim.Editor.EditorWorlds.html">EditorWorlds</a> to
 find the world the other EvoSim windows show: the one of the selection, else the first running one.</p>

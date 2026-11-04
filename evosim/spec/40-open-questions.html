@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/40-open-questions.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Site/spec/40-open-questions.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -341,8 +341,18 @@ deferred.</p>
 <td>as implemented</td>
 <td>20 §3, 22</td>
 </tr>
+<tr>
+<td>18</td>
+<td>Short actions (a call, a scent mark): under ACT-02 an action runs every tick until the next decision, so the first alarm call stood next to the predator for up to 4 ticks and was caught. <strong>Owner, 2026-10-21: overlays</strong> (option A of the M15 design report, <code>Logs/EvoSim/Reports/SHORT-ACTIONS-DESIGN.md</code>, which stays local: <code>Logs/</code> is not in git). An action may be an overlay: when drawn, a carrier is drawn from the rest of the row and moves the animal, the overlay adds only its interaction, for <code>OverlayTicks</code> ticks; no extra brain call; decision timing, REPRO-03 and the memo unchanged</td>
+<td>as implemented (M15)</td>
+<td>01, 07 ACT-07, 08 DEC-20 and PROMPT-03, 13 §4, 20 §3.6 and §5, 21 §2 (V-19, V-27), 22 §3, 30 T-ACT-11</td>
+</tr>
 </tbody>
 </table>
+<p>| 19 | The Burst path for the neural species (M16.8): a Burst ray march and forward pass behind <code>ReadAll</code>, checked against the managed oracle, to meet the 20 §9 budget (S32 L0 takes 6.7 ms a tick, 2 ms asked) | managed code only; the owner accepted the miss (2026-11-03) | 20 §9, 16 |
+| 20 | The JEV species' Ollama mutator in the measured runs (M16.9): with Ollama down, T-NEURO-16 spent about 24 of 32 minutes on mutation calls that all failed | Ollama up for every run with LLM mutation (started for M16.9); otherwise run the JEV arms without LLM mutation | 16 §3, 31 S32/S33 |
+| 21 | V-72 is not a validation message: a sense whose width changed after the layout was built fails each query at decision time (&quot;… (V-72)&quot;), not before the run | as implemented | 16 §2, 21 §2 |
+| 22 | T-NEURO-16 doesn't check the plan's &quot;JEV cache hit rate within ±5 points of Lab1 alone&quot; (no Lab1 run with JEV to compare with yet) | not checked | 30 T-NEURO-16 |</p>
 <h2 id="3-deferred-by-the-owner-later">3. Deferred by the owner (&quot;later&quot;)</h2>
 <table>
 <thead>
@@ -383,6 +393,14 @@ deferred.</p>
 <tr>
 <td>A shared answer cache for a class</td>
 <td>the cache key (DEC-33) doesn't depend on where the file lives</td>
+</tr>
+<tr>
+<td>Pre-evolved neural founders (a <code>NeuralFounderPool</code> asset), sexual measured runs (M16)</td>
+<td><code>vectors.jsonl</code> holds every network of a run; S32/S33 have no sexual variant yet (<a href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Neuro/PLAN.md">Neuro plan §9</a>)</td>
+</tr>
+<tr>
+<td>A trained (DRL) brain on the neural species</td>
+<td>the species' ray observation and 5 discrete actions fit an ML-Agents policy; a <code>Brain</code> with <code>Memoizable =&gt; false</code> (<a href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Neuro/PLAN.md">Neuro plan §10</a>)</td>
 </tr>
 </tbody>
 </table>

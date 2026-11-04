@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_HuntAction.md&amp;value=---%0Auid%3A%20EvoSim.HuntAction%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/new/master/apiSpec/new?filename=EvoSim_HuntAction.md&amp;value=---%0Auid%3A%20EvoSim.HuntAction%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -89,7 +89,7 @@
 
 
   <h1 id="EvoSim_HuntAction" data-uid="EvoSim.HuntAction" class="text-break">
-Class HuntAction  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/HuntAction.cs/#L24"><i class="bi bi-code-slash"></i></a>
+Class HuntAction  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/HuntAction.cs/#L24"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -151,6 +151,9 @@ sure meal); strike the animal or eat from the carcass on arrival (07 §4).</p>
     </div>
     <div>
       <a class="xref" href="EvoSim.AnimalAction.html#EvoSim_AnimalAction_Mates">AnimalAction.Mates</a>
+    </div>
+    <div>
+      <a class="xref" href="EvoSim.AnimalAction.html#EvoSim_AnimalAction_SelfDirected">AnimalAction.SelfDirected</a>
     </div>
     <div>
       <a class="xref" href="EvoSim.AnimalAction.html#EvoSim_AnimalAction_Overlay">AnimalAction.Overlay</a>
@@ -627,7 +630,7 @@ tick (ACT-12); a kill or a portion makes the hunter busy digesting (<a class="xr
 
   <h3 id="EvoSim_HuntAction_DefaultDescription" data-uid="EvoSim.HuntAction.DefaultDescription">
   DefaultDescription
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/HuntAction.cs/#L27"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/HuntAction.cs/#L27"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The reference prompt line of this action (08 §7), used when the Inspector field is empty. Every action should
@@ -660,7 +663,7 @@ override it with a short phrase, such as &quot;go to the nearest visible food an
 
   <h3 id="EvoSim_HuntAction_Hunts" data-uid="EvoSim.HuntAction.Hunts">
   Hunts
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/HuntAction.cs/#L29"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/HuntAction.cs/#L29"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>True: senses such as the sample <code>ChasedSense</code> see an animal that chose this action as hunting.</p>
@@ -696,7 +699,7 @@ override it with a short phrase, such as &quot;go to the nearest visible food an
 
   <h3 id="EvoSim_HuntAction_Act_EvoSim_Animal_EvoSim_ActContext_" data-uid="EvoSim.HuntAction.Act(EvoSim.Animal,EvoSim.ActContext)">
   Act(Animal, ActContext)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/HuntAction.cs/#L41"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/HuntAction.cs/#L41"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Runs to the nearer of the nearest prey and the nearest edible carcass (the carcass on a tie) and strikes or
@@ -739,7 +742,7 @@ and the last interaction the method set; doing nothing means stay.</p>
 
   <h3 id="EvoSim_HuntAction_IsRelevant_EvoSim_ObservationView_" data-uid="EvoSim.HuntAction.IsRelevant(EvoSim.ObservationView)">
   IsRelevant(ObservationView)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/HuntAction.cs/#L58"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/HuntAction.cs/#L58"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>True when the prey sense (<code>relevantSense</code>, reference <code>&quot;Prey&quot;</code>) reports prey in sight (CTRL-10).</p>
@@ -778,7 +781,7 @@ and the last interaction the method set; doing nothing means stay.</p>
 
   <h3 id="EvoSim_HuntAction_Validate_EvoSim_ValidationReport_" data-uid="EvoSim.HuntAction.Validate(EvoSim.ValidationReport)">
   Validate(ValidationReport)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Actions/HuntAction.cs/#L66"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Actions/HuntAction.cs/#L66"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Warns when the species has no prey to strike and no carcass in its diet (V-21).</p>

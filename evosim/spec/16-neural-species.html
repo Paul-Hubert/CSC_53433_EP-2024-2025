@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>16 — Neural species and the brain comparison | EvoSim </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="16 — Neural species and the brain comparison | EvoSim ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Site/spec/16-neural-species.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="EvoSim">
+            EvoSim
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="16--neural-species-and-the-brain-comparison">16 — Neural species and the brain comparison</h1>
+
+<p>A neural species is an ordinary EvoSim species whose brain is a small neural network carried in its genome. It lives
+beside the JEV species, in the same worlds, under the same rules. The question it answers: does an evolved network
+survive better or worse than an evolved sentence genome read by an LLM? The design and its reasons are in
+<a href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Neuro/PLAN.md"><code>Docs/Neuro/PLAN.md</code></a>; this chapter is the reference for what was built. Code:
+<code>Assets/EvoSim/Neuro</code> (assembly <code>EvoSim.Neuro</code>, editor tools in <code>EvoSim.Neuro.Editor</code>).</p>
+<h2 id="1-what-a-neural-animal-is">1. What a neural animal is</h2>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Class</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Genome</td>
+<td><code>NeuralGenomeGene</code></td>
+<td>one locus holding every weight as a vector allele (<code>vec[n]#hash</code>, values in <code>vectors.jsonl</code>)</td>
+</tr>
+<tr>
+<td>Network</td>
+<td><code>NeuralLayout</code>, <code>NeuralNet</code></td>
+<td>inputs from the senses in order, hidden layers (default one of 12, tanh), one linear output per action</td>
+</tr>
+<tr>
+<td>Senses</td>
+<td><code>RayFanSense</code>, <code>InteroceptionSense</code></td>
+<td>12 rays over 360° (one channel per kind of thing, 1 − distance/range), and energy, stamina, age, readiness, food, cover, the last action, ticks since a meal</td>
+</tr>
+<tr>
+<td>Actions</td>
+<td><code>TurnAction</code>, <code>ForwardAction</code>, <code>StopAction</code></td>
+<td><code>left</code>, <code>right</code> (20°), <code>walk</code>, <code>run</code>, <code>stop</code>; each eats, strikes or scavenges what is in reach, and breeds when ready</td>
+</tr>
+<tr>
+<td>Brain</td>
+<td><code>NeuralBrain</code></td>
+<td>one forward pass per decision; Greedy (the largest output) by default, or Sample (softmax); from <code>SyncBelow</code> (32) queries on, on a worker task beside the other brains, with the same rows</td>
+</tr>
+<tr>
+<td>Evolution</td>
+<td><code>NeuralMutation</code>, <code>NeuronCrossover</code></td>
+<td>adds or replaces weights at random; a baby takes each neuron whole from one parent</td>
+</tr>
+<tr>
+<td>Stats</td>
+<td><code>HungerClock</code>, <code>NeuroStats</code></td>
+<td>the meal clock the interoception reads; speed, meals per tick and per meter, action shares, loops in <code>stats.csv</code></td>
+</tr>
+</tbody>
+</table>
+<p>Founders are random networks from a seeded pool, the same in every run (GENE-21). Rays stop at the first thing they
+meet: animals, food, carcasses, cover and the world's edge all occlude.</p>
+<h2 id="2-matched-to-jev">2. Matched to JEV</h2>
+<p><code>NeuralTemplates</code> (menu <code>GameObject ▸ EvoSim ▸ New Neural Species ▸ Prey | Predator</code>) builds <code>prey-nn</code> (&quot;neural prey&quot;)
+or <code>predator-nn</code> (&quot;neural predator&quot;) as a copy of a JEV species: every body and life setting is kept, only the
+controller changes. <code>MatchedPairs</code> names the pairs and validation reports:</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Severity</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V-70</td>
+<td>error</td>
+<td>a species with <code>NeuralBrain</code> has no <code>NeuralGenomeGene</code></td>
+</tr>
+<tr>
+<td>V-71</td>
+<td>error</td>
+<td>founder vectors don't match the layout's length</td>
+</tr>
+<tr>
+<td>V-72</td>
+<td>error</td>
+<td>a neural sense's width changed since the layout was built (reported as a failed query at decision time, not before the run; <a href="40-open-questions.html">40</a> #21)</td>
+</tr>
+<tr>
+<td>V-73</td>
+<td>warning</td>
+<td>sexual mating without <code>NeuronCrossover</code></td>
+</tr>
+<tr>
+<td>V-74</td>
+<td>info</td>
+<td>a neural species decides less often than every tick</td>
+</tr>
+<tr>
+<td>V-75</td>
+<td>warning</td>
+<td>a contact the diet can't use</td>
+</tr>
+<tr>
+<td>V-76</td>
+<td>error</td>
+<td>ray fan settings out of range</td>
+</tr>
+<tr>
+<td>V-77</td>
+<td>info</td>
+<td>the Sample policy in a World whose sampling τ ≠ 1</td>
+</tr>
+<tr>
+<td>V-78</td>
+<td>warning</td>
+<td>a matched pair differs in a body or life setting (each one is named)</td>
+</tr>
+<tr>
+<td>V-79</td>
+<td>warning</td>
+<td>a diet or a cover treats the two of a pair differently</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-scenes-and-scenarios">3. Scenes and scenarios</h2>
+<p>Variants, seeds and lengths: <a href="31-scenarios.html#s29s33-neural-species-m16">31 §3</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Scene</th>
+<th>Prey</th>
+<th>Predators</th>
+<th>Tier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S29 NeuroLab</td>
+<td><code>Neuro_Lab</code> (Lab1_Small's map)</td>
+<td>neural</td>
+<td>neural</td>
+<td>T2</td>
+</tr>
+<tr>
+<td>S30 JevPreyNeuroPredator</td>
+<td><code>Neuro_JevPrey</code></td>
+<td>JEV</td>
+<td>neural</td>
+<td>T4, L0 in T2</td>
+</tr>
+<tr>
+<td>S31 NeuroPreyJevPredator</td>
+<td><code>Neuro_JevPredator</code></td>
+<td>neural</td>
+<td>JEV</td>
+<td>T4, L0 in T2</td>
+</tr>
+<tr>
+<td>S32 Brains2x2</td>
+<td><code>Brains_2x2</code> (Lab1_Full's map)</td>
+<td>JEV and neural</td>
+<td>JEV and neural</td>
+<td>T4 measured, L0 in T2</td>
+</tr>
+<tr>
+<td>S33 PreyVsPrey</td>
+<td><code>Prey_vs_Prey</code> (Lab1_Full's map)</td>
+<td>JEV and neural</td>
+<td>none</td>
+<td>T4 measured, L0 in T2</td>
+</tr>
+</tbody>
+</table>
+<p>S32 and S33 run asexual (with the JEV mating line &quot;An adult that chooses mate breeds alone as soon as it is ready.&quot;),
+with grass regrowth ×2, seeds 1 and 2, and two arms: <code>default</code> (neural species decide every tick) and <code>matched</code> (every
+4 ticks, staggered, as JEV). L0 variants replace JEV by the random brain and switch the JEV species' LLM mutation off.
+The JEV species keep their senses and prompts, so their answer caches stay valid; in <code>Prey_vs_Prey</code> the placeholders
+that named the removed predator are written as their values, so the JEV prey's prompt is exactly Lab1_Full's. The
+builders are <code>EvoSim ▸ Neuro ▸ Build Neuro Scenes</code> and <code>Build Comparison Scenes</code>.</p>
+<h2 id="4-survival">4. Survival</h2>
+<ul>
+<li><strong><code>SurvivalStats</code></strong> (world service) adds the <code>sv_</code> columns to <code>stats.csv</code> and writes <code>survival.json</code> at the run's end
+(<a href="13-outputs-and-recording.html">13</a>: files and columns); <code>NeuroStats</code> adds each neural species' <code>nn_</code> columns.</li>
+<li><strong><code>PlateauStop</code></strong> (a phase after Record) closes a window every 2 000 ticks and stops the run cleanly (RAND-20) at the
+first boundary where every tracked species (the ids listed, else every neural species) has a mean generation of at least 50 and its mean population, starvation
+hazard, predation hazard and births per animal stay within ±10 % over the last three windows. Cap: 60 000 ticks
+(reason <code>plateau cap</code>). With <strong>Stops Run</strong> off it only records the tick.</li>
+<li><strong><code>SurvivalAnalysis</code></strong> rebuilds each life from <code>events.jsonl</code> (founder, birth or newcomer to death; migration and the
+run's end are censoring) and computes Kaplan–Meier curves with Greenwood bands, death-rate ratios with a 95 % interval
+from the log rate ratio (SE = √(1/d₁ + 1/d₂)), per-window measures and the kill matrix.</li>
+<li><strong><code>SurvivalReportWindow</code></strong> (<code>Window ▸ EvoSim ▸ Survival Report</code>) opens the runs of one scenario and arm and writes
+<code>Logs/EvoSim/Reports/&lt;scenario&gt;-&lt;variant&gt;-&lt;date&gt;.md</code> and <code>.csv</code>. Headline: the death hazard ratio neural/JEV per role
+over the late windows, per seed and pooled; an effect counts only when both seeds agree and the pooled interval
+excludes 1.</li>
+</ul>
+<h2 id="5-tests">5. Tests</h2>
+<p>T-NEURO-01…16 (<a href="30-tests.html#neural-species-m16">30 §3</a>) in <code>Assets/EvoSim/Neuro/Tests</code> (assembly <code>EvoSim.Tests.Neuro</code>), plus the conformance suites,
+which pick up every neural sense, action, brain, gene and operator. T-NEURO-16 calls JEV: it runs only with
+<code>EVOSIM_T4=1</code> in the environment.</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          EvoSim — evolving animals in Unity. CSC_53433. Built from the code with DocFX.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

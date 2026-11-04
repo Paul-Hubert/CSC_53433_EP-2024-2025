@@ -6,7 +6,7 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta name="title" content="Class RunRecorder | EvoSim ">
       
-      <meta name="description" content="Writes a run into its own folder (13): events.jsonl, stats.csv, alleles.jsonl, final_population.json, summary.json, run_info.json. Events and stats are flushed every 500 ticks, alleles every 5 000 (RAND-22), and every file is written when the run stops, whatever the reason (RAND-20). The compatibility mode writes a two-species world exactly as the prototype does (OUT-05).">
+      <meta name="description" content="Writes a run into its own folder (13): events.jsonl, stats.csv, alleles.jsonl, final_population.json, summary.json, run_info.json, and vectors.jsonl in a run with a vector gene (the values of each vector allele, which the other files name by hash). Events and stats are flushed every 500 ticks, alleles every 5 000 (RAND-22), and every file is written when the run stops, whatever the reason (RAND-20). The compatibility mode writes a two-species world exactly as the prototype does (OUT-05).">
       <link rel="icon" href="../favicon.ico">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/new/llm-evolution/apiSpec/new?filename=EvoSim_RunRecorder.md&amp;value=---%0Auid%3A%20EvoSim.RunRecorder%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/new/master/apiSpec/new?filename=EvoSim_RunRecorder.md&amp;value=---%0Auid%3A%20EvoSim.RunRecorder%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -89,7 +89,7 @@
 
 
   <h1 id="EvoSim_RunRecorder" data-uid="EvoSim.RunRecorder" class="text-break">
-Class RunRecorder  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L31"><i class="bi bi-code-slash"></i></a>
+Class RunRecorder  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L32"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -98,7 +98,8 @@ Class RunRecorder  <a class="header-action link-secondary" title="View source" h
   </div>
 
   <div class="markdown summary"><p>Writes a run into its own folder (13): events.jsonl, stats.csv, alleles.jsonl, final_population.json,
-summary.json, run_info.json. Events and stats are flushed every 500 ticks, alleles every 5 000 (RAND-22), and
+summary.json, run_info.json, and vectors.jsonl in a run with a vector gene (the values of each vector allele,
+which the other files name by hash). Events and stats are flushed every 500 ticks, alleles every 5 000 (RAND-22), and
 every file is written when the run stops, whatever the reason (RAND-20). The compatibility mode writes a
 two-species world exactly as the prototype does (OUT-05).</p>
 </div>
@@ -607,7 +608,7 @@ the hash. The summary's <code>events_hash</code> and <code>events_sha</code> (it
 
   <h3 id="EvoSim_RunRecorder_Compatibility" data-uid="EvoSim.RunRecorder.Compatibility">
   Compatibility
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L57"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L59"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>True to write a two-species world as the prototype does (OUT-05), for its analysis tools.</p>
@@ -639,7 +640,7 @@ the hash. The summary's <code>events_hash</code> and <code>events_sha</code> (it
 
   <h3 id="EvoSim_RunRecorder_ExtraInfo" data-uid="EvoSim.RunRecorder.ExtraInfo">
   ExtraInfo
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L67"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L69"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Extra entries for run_info.json (the scenario, its overrides), set before the run.</p>
@@ -671,7 +672,7 @@ the hash. The summary's <code>events_hash</code> and <code>events_sha</code> (it
 
   <h3 id="EvoSim_RunRecorder_OutputRoot" data-uid="EvoSim.RunRecorder.OutputRoot">
   OutputRoot
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L63"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L65"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The folder that receives one sub-folder per run, relative to the project (in a player: to its folder).</p>
@@ -703,7 +704,7 @@ the hash. The summary's <code>events_hash</code> and <code>events_sha</code> (it
 
   <h3 id="EvoSim_RunRecorder_RunFolder" data-uid="EvoSim.RunRecorder.RunFolder">
   RunFolder
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L55"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L57"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The full path of this run's folder, or null before <a class="xref" href="EvoSim.RunRecorder.html#EvoSim_RunRecorder_Begin">Begin()</a> or when files are off.</p>
@@ -735,7 +736,7 @@ the hash. The summary's <code>events_hash</code> and <code>events_sha</code> (it
 
   <h3 id="EvoSim_RunRecorder_RunName" data-uid="EvoSim.RunRecorder.RunName">
   RunName
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L65"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L67"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The run folder's name; empty = <code>&lt;world&gt;-s&lt;seed&gt;-&lt;date&gt;</code>. <code>{world}</code> and <code>{seed}</code> are replaced.</p>
@@ -767,7 +768,7 @@ the hash. The summary's <code>events_hash</code> and <code>events_sha</code> (it
 
   <h3 id="EvoSim_RunRecorder_StatsEvery" data-uid="EvoSim.RunRecorder.StatsEvery">
   StatsEvery
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L61"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L63"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>A statistics row every this many ticks (reference 100).</p>
@@ -799,7 +800,7 @@ the hash. The summary's <code>events_hash</code> and <code>events_sha</code> (it
 
   <h3 id="EvoSim_RunRecorder_WriteFiles" data-uid="EvoSim.RunRecorder.WriteFiles">
   WriteFiles
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L59"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L61"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>True to write files; false keeps only the hash and the counters (tests).</p>
@@ -831,11 +832,48 @@ the hash. The summary's <code>events_hash</code> and <code>events_sha</code> (it
 </h2>
 
 
+  <a id="EvoSim_RunRecorder_AddValue_" data-uid="EvoSim.RunRecorder.AddValue*"></a>
+
+  <h3 id="EvoSim_RunRecorder_AddValue_System_Collections_Generic_IDictionary_System_String_System_Object__EvoSim_Allele_" data-uid="EvoSim.RunRecorder.AddValue(System.Collections.Generic.IDictionary{System.String,System.Object},EvoSim.Allele)">
+  AddValue(IDictionary&lt;string, object&gt;, Allele)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L392"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Writes an allele's value into a record: <code>text</code> for a sentence, <code>value</code> for a number, and for a vector
+<code>vector_sha</code> and <code>length</code>, never the values (13, plan M16 §4 C2: they go to <code>vectors.jsonl</code>).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void AddValue(IDictionary&lt;string, object&gt; record, Allele a)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>record</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2">IDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</dt>
+    <dd><p>A birth event's mutation entry or a line of <code>alleles.jsonl</code>.</p>
+</dd>
+    <dt><code>a</code> <a class="xref" href="EvoSim.Allele.html">Allele</a></dt>
+    <dd><p>The allele.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
   <a id="EvoSim_RunRecorder_AfterTick_" data-uid="EvoSim.RunRecorder.AfterTick*"></a>
 
   <h3 id="EvoSim_RunRecorder_AfterTick_System_Int32_" data-uid="EvoSim.RunRecorder.AfterTick(System.Int32)">
   AfterTick(int)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L320"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L322"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Called by the record phase every tick: flushes events and stats, and the allele list, on their periods.</p>
@@ -868,7 +906,7 @@ the hash. The summary's <code>events_hash</code> and <code>events_sha</code> (it
 
   <h3 id="EvoSim_RunRecorder_Begin" data-uid="EvoSim.RunRecorder.Begin">
   Begin()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L85"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L87"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>After everything is ready, before founders: open the folder and the files.</p>
@@ -898,7 +936,7 @@ the hash. The summary's <code>events_hash</code> and <code>events_sha</code> (it
 
   <h3 id="EvoSim_RunRecorder_CompatId_System_String_" data-uid="EvoSim.RunRecorder.CompatId(System.String)">
   CompatId(string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L149"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L151"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>In the compatibility mode the first species' loci have no prefix: &quot;prey.eat:3&quot; → &quot;eat:3&quot; (OUT-05).</p>
@@ -937,7 +975,7 @@ the hash. The summary's <code>events_hash</code> and <code>events_sha</code> (it
 
   <h3 id="EvoSim_RunRecorder_Configure_System_String_System_String_System_Boolean_System_Boolean_System_Int32_" data-uid="EvoSim.RunRecorder.Configure(System.String,System.String,System.Boolean,System.Boolean,System.Int32)">
   Configure(string, string, bool, bool, int)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L501"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L544"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Sets the recorder from code (WorldBuilder, batch runs, tests), before the World initialises.</p>
@@ -982,7 +1020,7 @@ the hash. The summary's <code>events_hash</code> and <code>events_sha</code> (it
 
   <h3 id="EvoSim_RunRecorder_Initialize" data-uid="EvoSim.RunRecorder.Initialize">
   Initialize()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L74"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L76"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Closes any file left open and forgets the previous run's folder and rows.</p>
@@ -1014,7 +1052,7 @@ species' modules; a phase after them.</p>
 
   <h3 id="EvoSim_RunRecorder_OnEvent_EvoSim_SimEvent_System_String_" data-uid="EvoSim.RunRecorder.OnEvent(EvoSim.SimEvent,System.String)">
   OnEvent(SimEvent, string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L110"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L112"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Writes the event's line to events.jsonl, in the prototype's form in the compatibility mode.</p>
@@ -1050,7 +1088,7 @@ species' modules; a phase after them.</p>
 
   <h3 id="EvoSim_RunRecorder_OnRunStopped_System_String_" data-uid="EvoSim.RunRecorder.OnRunStopped(System.String)">
   OnRunStopped(string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L330"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L332"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Writes the final files (alleles, final population, summary with the stop reason, run info) and closes the run's files; only once.</p>
@@ -1088,7 +1126,7 @@ modules still hear the stop.</p>
 
   <h3 id="EvoSim_RunRecorder_WriteStats_System_Int32_" data-uid="EvoSim.RunRecorder.WriteStats(System.Int32)">
   WriteStats(int)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L162"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Runtime/Recording/RunRecorder.cs/#L164"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>One statistics row; the record phase calls it every statsEvery ticks.</p>

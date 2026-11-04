@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/spec/30-tests.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Site/spec/30-tests.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -377,6 +377,27 @@ a fixed seed.</p>
 <li><strong>T-EDIT-02</strong> — the runtime assembly has no reference to <code>UnityEditor</code> <em>(EDIT-03)</em>.</li>
 <li><strong>T-EDIT-03</strong> <em>(T0)</em> — validate every scene in <code>Scenes/</code> and every prefab in <code>Modules/</code> → no errors <em>(EDIT-01)</em>.</li>
 </ul>
+<h3 id="neural-species-m16">Neural species (M16)</h3>
+<p>In <code>Assets/EvoSim/Neuro/Tests</code> (assembly <code>EvoSim.Tests.Neuro</code>), except T-NEURO-01 (<code>Tests/EditMode/Genes</code>). The
+species, the codes V-70…V-79 and the scenarios are in <a href="16-neural-species.html">16</a>.</p>
+<ul>
+<li><strong>T-NEURO-01</strong> — vector alleles equal at the gene's decimals → one allele, different → two; <code>Canonical</code> stable across runs; <code>alleles.jsonl</code> names a vector by <code>vector_sha</code> and <code>length</code>, <code>vectors.jsonl</code> holds its values (and is absent without a vector gene), <code>parent2_id</code> only on a recombinant; a query carries the brain-visible genome; V-05 skipped for a brain that reads no sentence <em>(GENE-07, GENE-10, GENE-12, DEC-10, C1–C3, C5, C7)</em>.</li>
+<li><strong>T-NEURO-02</strong> — <code>NeuralGenomeGene</code> passes the gene template; vector length = Σ (fan-in + 1) × fan-out for 1–3 senses, 1–8 actions, 0–2 hidden layers; the random founder pool is the same under two run seeds; an action added after the founders were drawn → V-71 with a fix that rebuilds them <em>(T-GENE-01, GENE-21)</em>.</li>
+<li><strong>T-NEURO-03</strong> — <code>NeuralMutation</code> passes the T-MUT template (same stream → same mutant, differs from its parent, clamped); over 10 000 mutations the shares of added and replaced weights match pAdd and pReplace within 4 s.e. <em>(MUT-20, MUT-30)</em>.</li>
+<li><strong>T-NEURO-04</strong> — <code>NeuronCrossover</code>: each neuron slice whole from one parent; same stream → same baby; a recombinant registered once with both parents; a child equal to a parent reuses its allele <em>(GENE-30, GENE-32, GENE-12)</em>.</li>
+<li><strong>T-NEURO-05</strong> — the ray fan: 12 rays at 0°, 30° … 330°, partial fans symmetric; food 3 m ahead → proximity 0.85; the first object occludes; cover stops a predator's ray at a hidden prey; the world's edge is an Obstacle; ties follow the kind order; in a 4-species world both predators are Threats to both preys <em>(SENSE-06, SENSE-40, SPACE-08)</em>.</li>
+<li><strong>T-NEURO-06</strong> — <code>ReadAll</code> = <code>Read</code> over 500 animals; interoception: the in-cover flag, the previous action one-hot (zeros before the first decision), ticks since the last meal (reset by a meal, clamped at <code>hungerHorizon</code>); widths 84 + 12 = 96 with the default kinds <em>(SENSE-31, T-SENSE-09, CORE-05)</em>.</li>
+<li><strong>T-NEURO-07</strong> — <code>NeuralBrain</code> passes the brain template on both neural species; Greedy is a one-hot on the largest output (ties → lower index), drawn whatever the World's τ; Sample is a softmax; no genome or a wrong length fails the query; V-70 <em>(T-DEC-03, DEC-11, DEC-12, DEC-20, DEC-40)</em>.</li>
+<li><strong>T-NEURO-08</strong> — the worker task gives the synchronous rows bit for bit; S32 with a slow fake JEV completes its ticks, and inline or worker, Freeze or Responsive, Fast or RealTime give one hash; binned casts equal the full scan ray for ray; the tick pool; S32 L0's tick time is reported against 20 §9 <em>(DEC-16, SPACE-11, SPACE-14)</em>.</li>
+<li><strong>T-NEURO-09</strong> — the actions pass the T-ACT template as self-directed; <code>left</code>/<code>right</code> turn ∓20° a tick at walk speed, a 35° turn at run speed turns 35°; <code>walk</code>/<code>run</code> keep the heading; <code>stop</code> stays, pays the rest cost and recovers stamina <em>(ACT-04)</em>.</li>
+<li><strong>T-NEURO-10</strong> — contacts: grass 0.8 m ahead is grazed in the same tick; a prey 0.8 m ahead is struck and leaves a carcass; at most one interaction a tick, strike &gt; scavenge &gt; graze <em>(ACT-03, ACT-10)</em>.</li>
+<li><strong>T-NEURO-11</strong> — breeding: asexual, a ready animal breeds alone; sexual, only on contact with a ready kin, the baby a neuron mix; mutation at rate 1 always, at 0 never <em>(REPRO-02, REPRO-04, MUT-01)</em>.</li>
+<li><strong>T-NEURO-12</strong> — templates against the reference species → no V-78, V-79; a changed run speed → V-78 names it; a diet without <code>prey-nn</code> → V-79; V-73, V-74.</li>
+<li><strong>T-NEURO-13</strong> — <code>SurvivalAnalysis</code>: Kaplan–Meier and Greenwood on a worked example, the rate ratio and its interval, lives and censoring from events; <code>SurvivalStats</code> on S32 L0 equals the events and writes <code>survival.json</code>.</li>
+<li><strong>T-NEURO-14</strong> — <code>PlateauStop</code>: no stop before 50 generations; a ±10 % plateau over three windows stops at the window boundary with complete outputs; otherwise the cap <em>(RAND-20)</em>.</li>
+<li><strong>T-NEURO-15</strong> <em>(T2)</em> — S29 asexual and sexual for 5 000 ticks, and the L0 versions of S30–S33: the same seed twice → the same hash, no model call; evolving neural prey (S29) eat more per animal-tick than under the no-mutation control in seeds 1234 and 7.</li>
+<li><strong>T-NEURO-16</strong> <em>(T4)</em> — S32 and S33 with JEV (seed 1, 600 ticks): no stall on the neural brain, <code>survival.json</code> written, a run stopped halfway and rerun from its caches gives the unbroken hash. <code>[Explicit]</code>, runs only with <code>EVOSIM_T4=1</code>; timeout 4 hours.</li>
+</ul>
 <h2 id="4-conformance-suites-for-students-modules">4. Conformance suites for students' modules</h2>
 <p>Parameterised tests that run against <strong>every</strong> class of a kind found in the
 project, so a new module is tested the moment it exists. They are the &quot;templates&quot;
@@ -393,12 +414,12 @@ the recipes of <a href="22-extending-recipes.html">22</a> refer to.</p>
 <tr>
 <td>T-SENSE template</td>
 <td>every <code>Sense</code></td>
-<td>tokens declared and non-empty; <code>Read</code> returns a declared index in 200 random worlds; <code>Write</code> is deterministic and non-empty for every token; nothing hidden is reported; batched equals sequential</td>
+<td>tokens declared and non-empty; <code>Read</code> returns a declared index in 200 random worlds; <code>Write</code> is deterministic and non-empty for every token; nothing hidden is reported; batched equals sequential. A sense with attachments gets a scripted brain that accepts them (V-51)</td>
 </tr>
 <tr>
 <td>T-ACT template</td>
 <td>every <code>AnimalAction</code></td>
-<td>searches when alone; intent only (no position or stat of another animal changed); description present; bound gene or V-05</td>
+<td>searches when alone (a self-directed action instead moves alone and doesn't search, ACT-04); intent only (no position or stat of another animal changed); description present; bound gene or V-05</td>
 </tr>
 <tr>
 <td>T-ANIM stat template</td>
@@ -413,12 +434,12 @@ the recipes of <a href="22-extending-recipes.html">22</a> refer to.</p>
 <tr>
 <td>T-DEC brain template</td>
 <td>every <code>Brain</code></td>
-<td>row shape, sum, order; same query same answer; failure behaviour</td>
+<td>row shape, sum, order; same query same answer; failure behaviour. The modules the brain names with <code>[RequiresModule]</code> are added to the species, and each query carries its animal's genome</td>
 </tr>
 <tr>
 <td>T-MUT template</td>
 <td>every <code>MutationOperator</code></td>
-<td>receives only gene and allele; same seed same result; result passes the gene kind's checks or is rejected</td>
+<td>receives only gene and allele; same seed same result; result passes the gene kind's checks or is rejected. The species holds a text, a number and a vector gene (<code>VectorProbeGene</code>): an operator accepts at least one</td>
 </tr>
 <tr>
 <td>T-TICK phase template</td>

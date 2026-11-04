@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2024-2025/blob/llm-evolution/Docs/Site/api/index.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Site/api/index.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -874,7 +874,7 @@ members with their documentation, and links to its source on GitHub. Where to st
 <tr>
 <td><a class="xref" href="EvoSim.AlleleKind.html">AlleleKind</a></td>
 <td>enum</td>
-<td>What kind of value a gene holds (GENE-02): a sentence or a number.</td>
+<td>What kind of value a gene holds (GENE-02): a sentence, a number or a vector of numbers.</td>
 </tr>
 <tr>
 <td><a class="xref" href="EvoSim.AllelePool.html">AllelePool</a></td>
@@ -889,7 +889,7 @@ members with their documentation, and links to its source on GitHub. Where to st
 <tr>
 <td><a class="xref" href="EvoSim.AlleleValue.html">AlleleValue</a></td>
 <td>struct</td>
-<td>One allele value: a sentence or a number.</td>
+<td>One allele value: a sentence, a number or a vector of numbers.</td>
 </tr>
 <tr>
 <td><a class="xref" href="EvoSim.AnimalWords.html">AnimalWords</a></td>
@@ -1247,7 +1247,7 @@ members with their documentation, and links to its source on GitHub. Where to st
 <tr>
 <td><a class="xref" href="EvoSim.RunRecorder.html">RunRecorder</a></td>
 <td>class</td>
-<td>Writes a run into its own folder (13): events.jsonl, stats.csv, alleles.jsonl, final_population.json, summary.json, run_info.json. Events and stats are flushed every 500 ticks, alleles every 5 000 (RAND-22), and every file is written when the run stops, whatever the reason (RAND-20). The compatibility mode writes a two-species world exactly as the prototype does (OUT-05).</td>
+<td>Writes a run into its own folder (13): events.jsonl, stats.csv, alleles.jsonl, final_population.json, summary.json, run_info.json, and vectors.jsonl in a run with a vector gene (the values of each vector allele, which the other files name by hash). Events and stats are flushed every 500 ticks, alleles every 5 000 (RAND-22), and every file is written when the run stops, whatever the reason (RAND-20). The compatibility mode writes a two-species world exactly as the prototype does (OUT-05).</td>
 </tr>
 <tr>
 <td><a class="xref" href="EvoSim.SimEvent.html">SimEvent</a></td>
@@ -1746,6 +1746,11 @@ members with their documentation, and links to its source on GitHub. Where to st
 <td>A test locomotion that ignores the intent's direction: it turns it by 30° and halves the distance (T-MOVE-06).</td>
 </tr>
 <tr>
+<td><a class="xref" href="EvoSim.Testing.VectorProbeGene.html">VectorProbeGene</a></td>
+<td>class</td>
+<td>A free vector gene for tests (plan M16 §4 C6): a few founder vectors of fixed length, values within ±; sets no trait and writes nothing into the prompt. The T-MUT suite puts it beside a text and a number gene, so an operator may accept any of the three kinds (30 §4).</td>
+</tr>
+<tr>
 <td><a class="xref" href="EvoSim.Testing.WorldHookProbe.html">WorldHookProbe</a></td>
 <td>class</td>
 <td>A test-only world service that counts every species' births and deaths and adds one statistics column (world_born, after the species' columns in stats.csv).</td>
@@ -1764,9 +1769,14 @@ members with their documentation, and links to its source on GitHub. Where to st
 </thead>
 <tbody>
 <tr>
+<td><a class="xref" href="EvoSim.Editor.AnimalInspectorPanel.html">AnimalInspectorPanel</a></td>
+<td>abstract class</td>
+<td>An extra section of the Animal Inspector (21 §4): derive from it in any editor assembly, with a constructor without parameters, and the window draws it under the decision for the animals it shows. The neural species' panel (plan M16 §5) is one.</td>
+</tr>
+<tr>
 <td><a class="xref" href="EvoSim.Editor.AnimalInspectorWindow.html">AnimalInspectorWindow</a></td>
 <td>class</td>
-<td>The selected animal (21 §4, lab C): stats, traits, genome sentences, last situation, last probabilities as bars, current action and target, busy reason, parents and offspring. Click an animal's view to select it.</td>
+<td>The selected animal (21 §4, lab C): stats, traits, genome sentences, last situation, last probabilities as bars, current action and target, busy reason, parents and offspring, then the s that show it. Click an animal's view to select it.</td>
 </tr>
 <tr>
 <td><a class="xref" href="EvoSim.Editor.AskTheBrainWindow.html">AskTheBrainWindow</a></td>
