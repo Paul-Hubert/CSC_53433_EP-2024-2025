@@ -9,7 +9,7 @@ namespace EvoSim
     /// </summary>
     /// <remarks>
     /// One of the run views: put it on any GameObject of the scene, outside the World (the "Run views" object of the
-    /// reference scenes). It draws a <see cref="FlatGround"/> only; a terrain shows itself. The pixel is the finest cell of
+    /// reference scenes). It draws a <see cref="FlatGround"/> only; the food on a <see cref="TerrainGround"/> is drawn by <see cref="TerrainFoodView"/>. The pixel is the finest cell of
     /// the food grids and cover layers. A pixel is the food colour when its centre's cell holds a food item, else the
     /// cover colour when its centre is in cover, else the soil colour (food and cover only when their switch is on).
     /// </remarks>
@@ -20,7 +20,9 @@ namespace EvoSim
         World world;
         [SerializeField] Color soil = new Color(0.62f, 0.55f, 0.4f);       // bare ground
         [SerializeField] Color cover = new Color(0.1f, 0.32f, 0.12f);      // a cell in cover
-        [SerializeField] Color food = new Color(0.55f, 0.95f, 0.3f);       // a cell with a food item
+        /// <summary>The default colour of a cell with a food item, shared with <see cref="TerrainFoodView"/>.</summary>
+        public static readonly Color DefaultFoodColor = new Color(0.55f, 0.95f, 0.3f);
+        [SerializeField] Color food = DefaultFoodColor;                    // a cell with a food item
         [SerializeField, Tooltip("Draw the cover cells.")]
         bool showCover = true;
         [SerializeField, Tooltip("Draw the food items.")]

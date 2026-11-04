@@ -66,6 +66,7 @@ Turn **Interpolate Views** off on the World to see the raw tick positions.
 | <xref:EvoSim.ViewPool> | the reusable views of one species |
 | <xref:EvoSim.ActionColors> | one colour per action name, shared by views and the overlay |
 | <xref:EvoSim.GroundView> | paints a flat world's ground, cover and food |
+| <xref:EvoSim.TerrainFoodView> | paints the food of a terrain world over the terrain |
 | <xref:EvoSim.EntityMarkers> | one small marker per carcass, egg or other entity |
 | <xref:EvoSim.RunOverlay> | the panels of numbers, drawn in the editor and in a build |
 | <xref:EvoSim.RunNumbers> | what the overlay shows, read from the World's own counters |
@@ -86,7 +87,15 @@ scene when its **World** field is empty.
 <xref:EvoSim.GroundView> draws a flat ground as one quad with a texture of one pixel per cell, the finest cell of the
 food and cover layers. A pixel is **Food** colour when its cell holds a food item, **Cover** colour when it is in cover,
 **Soil** colour otherwise. The texture is repainted once per tick and uploaded only when a pixel changed. **Show Cover**
-and **Show Food** switch the layers off. A terrain ground is not painted: the terrain shows itself.
+and **Show Food** switch the layers off. A terrain ground is not painted by it: the terrain shows itself.
+
+On a terrain, <xref:EvoSim.TerrainFoodView> shows the food. It drapes a transparent mesh over the terrain's heights (8 cm
+above the surface) and gives it a texture of one pixel per food cell: **Food** colour where a cell holds an item, clear
+elsewhere, so an eaten cell shows the terrain again and a regrown one turns bright. Water cells and cells that are not
+walkable (steep mountains, trees) show no food, and the water plane stays visible. Like the other views it only reads the
+World (no collider, no random numbers). Every terrain scene has it on its *Run views* object: *Add Run Views to Reference Scenes* adds it to any scene with a
+terrain (`Terrain_Locomotion` included), and the Neuro terrain builder does too. In a terrain scene of your own, add it next
+to <xref:EvoSim.GroundView>.
 
 ### Entities
 

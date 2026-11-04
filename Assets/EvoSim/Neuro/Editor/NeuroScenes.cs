@@ -252,6 +252,8 @@ namespace EvoSim.Neuro.Editor
             var ground = flat.gameObject;
             Object.DestroyImmediate(flat);
             ReferenceScenes.AddTerrain(ground, terrainData, size, 20f, size <= 96f ? 129 : 257);
+            foreach (var root in world.gameObject.scene.GetRootGameObjects())                // GroundView draws flat ground only: the terrain gets its food view
+                if (root.name == RunViews.ObjectName && root.GetComponent<TerrainFoodView>() == null) root.AddComponent<TerrainFoodView>();
         }
 
         /// <summary>The World's species with that id.</summary>

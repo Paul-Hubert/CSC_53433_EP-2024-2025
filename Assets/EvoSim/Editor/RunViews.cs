@@ -27,7 +27,8 @@ namespace EvoSim.Editor
 
         /// <summary>Adds what is missing to the open scene's run views and camera; returns what it added.</summary>
         /// <remarks>Adds the <c>Run views</c> root with <see cref="GroundView"/>, <see cref="EntityMarkers"/>,
-        /// <see cref="RunOverlay"/> and <see cref="RunCapture"/>, and a <see cref="WorldCamera"/> on the scene's first camera.
+        /// <see cref="RunOverlay"/> and <see cref="RunCapture"/> (and <see cref="TerrainFoodView"/> when the scene has a
+        /// <see cref="TerrainGround"/>), and a <see cref="WorldCamera"/> on the scene's first camera.
         /// Components already there are kept. The scene is not saved.</remarks>
         /// <param name="scene">A loaded scene.</param>
         /// <returns>The names of what was added, comma-separated, or <c>nothing</c>.</returns>
@@ -49,6 +50,8 @@ namespace EvoSim.Editor
             }
             Add<GroundView>(views, added);
             Add<EntityMarkers>(views, added);
+            foreach (var root in scene.GetRootGameObjects())                               // a terrain scene shows its food too
+                if (root.GetComponentInChildren<TerrainGround>(true) != null) { Add<TerrainFoodView>(views, added); break; }
             Add<RunOverlay>(views, added);
             Add<RunCapture>(views, added);
             if (camera != null && camera.GetComponent<WorldCamera>() == null)
