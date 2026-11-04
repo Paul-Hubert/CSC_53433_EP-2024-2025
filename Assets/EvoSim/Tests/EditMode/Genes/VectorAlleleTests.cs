@@ -12,6 +12,7 @@ namespace EvoSim.Tests
     /// </summary>
     public class VectorAlleleTests : WorldFixture
     {
+        /// <summary>The weights of the vector gene under test.</summary>
         static readonly float[] Weights = { 0.1f, -0.25f, 1.5f };
 
         /// <summary>A small world whose prey carries a vector gene labelled <c>weights</c>, optionally recorded.</summary>

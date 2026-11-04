@@ -156,7 +156,7 @@ not asked again, and a species without overlays draws exactly once. See
 
 The random brain is the **null model**: random hunters can't feed themselves, which shows that the brain matters. It is
 also the default brain of a new world, so a world runs without any server. The full reference scenes use JEV by
-default; their `Brains` object also holds a Random and an Ollama points brain to switch to. JEV and Ollama points are
+default; their `Brains` object also holds a Random and an Ollama points brain to switch to. The *Neuro scenes* are the exception: their species use the neural brain, a small network that runs inside Unity, so they need no server. JEV and Ollama points are
 strict and use the answer cache by default.
 
 ## Settings

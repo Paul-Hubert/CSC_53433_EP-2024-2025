@@ -44,6 +44,9 @@ controller changes. `MatchedPairs` names the pairs and validation reports:
 
 Variants, seeds and lengths: [31 §3](31-scenarios.md#s29s33-neural-species-m16).
 
+**Neural-only scenes need no JEV, no LLM and no model server** (S29, S34, S35): the scenes for students without a GPU. The
+others have at least one JEV species and need JEV, or their L0 variant.
+
 | Scenario | Scene | Prey | Predators | Tier |
 |---|---|---|---|---|
 | S29 NeuroLab | `Neuro_Lab` (Lab1_Small's map) | neural | neural | T2 |
@@ -51,6 +54,8 @@ Variants, seeds and lengths: [31 §3](31-scenarios.md#s29s33-neural-species-m16)
 | S31 NeuroPreyJevPredator | `Neuro_JevPredator` | neural | JEV | T4, L0 in T2 |
 | S32 Brains2x2 | `Brains_2x2` (Lab1_Full's map) | JEV and neural | JEV and neural | T4 measured, L0 in T2 |
 | S33 PreyVsPrey | `Prey_vs_Prey` (Lab1_Full's map) | JEV and neural | none | T4 measured, L0 in T2 |
+| S34 NeuroTerrainSmall | `Neuro_Terrain_Small` (48 m Terrain) | neural | neural | T2 |
+| S35 NeuroTerrainLarge | `Neuro_Terrain_Large` (192 m Terrain) | neural | neural | T2 |
 
 S32 and S33 run asexual (with the JEV mating line "An adult that chooses mate breeds alone as soon as it is ready."),
 with grass regrowth ×2, seeds 1 and 2, and two arms: `default` (neural species decide every tick) and `matched` (every

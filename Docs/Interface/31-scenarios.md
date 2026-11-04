@@ -76,6 +76,8 @@ point `EvoSim.Batch.RunScenario` both read these assets.
 | S31 | Neural prey, JEV predators | the prey's brain | neural + JEV; random (L0) | T2 / T4 |
 | S32 | Brains 2×2 | JEV and neural prey and predators in one world | JEV + neural; random (L0) | T2 / T4 measured |
 | S33 | Prey vs prey | JEV and neural prey, no predators | JEV + neural; random (L0) | T2 / T4 measured |
+| S34 | Neuro terrain, small | neural prey and predators on a 48 m Terrain, no JEV | neural | T2 |
+| S35 | Neuro terrain, large | the same on a 192 m Terrain (Lab1_Full's size) | neural | T2 |
 
 ## 3. Scenarios in detail
 

@@ -158,13 +158,15 @@ The *Add* menus copy prefabs from `Assets/EvoSim/Modules`. A new world has no ru
 copy the `Run views` object from a reference scene and add a <xref:EvoSim.WorldCamera> to your camera, or start from a
 copy of `Sandbox`.
 
-Three menus are for course staff, when the reference itself changes:
+Some menus are for course staff, when the reference itself changes:
 
 | Menu | What it does |
 |---|---|
 | *EvoSim ▸ Build Reference Scenes* | rebuilds the six reference scenes, allele pools, module prefabs and scenario assets from code (<xref:EvoSim.Editor.ReferenceScenes>), overwriting any edit made in them |
 | *EvoSim ▸ Reference ▸ Update Reference Scenes* | brings the saved scenes to the reference decision period and staggered decisions, without rebuilding them |
 | *EvoSim ▸ Views ▸ Add Run Views to Reference Scenes* | adds what is missing of the run views and rebuilds the two placeholder bodies ([Views and real time](views-and-real-time.md)) |
+| *EvoSim ▸ Neuro ▸ Build Neuro Scenes* | rebuilds the Neuro scenes (`Neuro_Lab`, `Neuro_JevPrey`, `Neuro_JevPredator`, the two terrain scenes, `Brains_2x2`, `Prey_vs_Prey`) and their scenarios from `Lab1_Small` and `Lab1_Full` |
+| *EvoSim ▸ Neuro ▸ Build Terrain Scenes* | rebuilds only `Neuro_Terrain_Small`, `Neuro_Terrain_Large` and their scenarios (S34, S35) |
 
 ## Script templates
 

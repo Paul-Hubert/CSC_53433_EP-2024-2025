@@ -1,8 +1,11 @@
 # EvoSim — evolving animals in Unity
 
-Animals whose behaviour is written in English: each gene is a short sentence, a
-language model reads the genes with what the animal senses and picks an action,
-and the sentences mutate and cross over from one generation to the next. The
+Animals whose behaviour evolves. In the *JEV scenes* it is written in English:
+each gene is a short sentence, a language model reads the genes with what the
+animal senses and picks an action, and the sentences mutate and cross over from
+one generation to the next. In the *Neuro scenes* it is the weights of a small
+neural network, which mutate and cross over the same way. **The Neuro scenes need
+no JEV and no LLM**, so you can work on any machine. The
 contract is in [`Docs/Interface`](../../Docs/Interface/) (start with
 [22 — Extending](../../Docs/Interface/22-extending-recipes.md)).
 
@@ -14,12 +17,18 @@ it, and the API reference built from the code's comments. Build and open it with
 
 ## 1. Open a scene and run it
 
-1. Open `Assets/EvoSim/Scenes/Lab1_Small.unity` (48 m, prey and predators).
-   The other scenes: `Lab1_Full`, `HideVsFlee`, `ThreeSpecies`,
-   `Terrain_Locomotion`, `Sandbox`.
-2. The scenes ask the JEV brain (a model server at `localhost:8000`). Without a
-   server, select the `World` object and set **Default Brain** to `Brains/Random`;
-   everything else works the same.
+1. Pick a scene. There are two families:
+   - **Neuro scenes (no JEV, no LLM, no GPU needed)**: `Neuro_Lab` (flat, 48 m),
+     `Neuro_Terrain_Small` (48 m Terrain), `Neuro_Terrain_Large` (192 m Terrain).
+     Start with `Neuro_Lab.unity`.
+   - **JEV scenes (need the JEV model server for real runs)**: `Lab1_Small`
+     (48 m, prey and predators), `Lab1_Full`, `HideVsFlee`, `ThreeSpecies`,
+     `Terrain_Locomotion`, `Sandbox` (random brain only).
+   - Mixed scenes (`Neuro_JevPrey`, `Neuro_JevPredator`, `Brains_2x2`,
+     `Prey_vs_Prey`) have JEV species next to neural ones.
+2. Neuro scenes run as they are. The JEV scenes ask the JEV brain (a model server
+   at `localhost:8000`). Without a server, select the `World` object and set
+   **Default Brain** to `Brains/Random`; everything else works the same.
 3. Press **Play**. The play-mode gate stops you if the world has validation
    errors; each message names the object to fix.
 
@@ -30,7 +39,7 @@ it, and the API reference built from the code's comments. Build and open it with
   and the prompt its animals send (`PromptPreview`).
 - `Window ▸ EvoSim ▸` *Animal Inspector* (click an animal), *Ecology Monitor*,
   *Event Log*, *Food Web*, *Gene Pool*, *Brain Health*, *Ask the Brain* (try a
-  gene on a situation), *Scenario Runner* (the scenarios S00–S28).
+  gene on a situation), *Scenario Runner* (the scenarios S00–S35).
 - Runs write their files to `Logs/EvoSim/runs/`.
 
 ## 3. Extend

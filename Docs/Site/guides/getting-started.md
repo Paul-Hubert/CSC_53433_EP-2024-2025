@@ -11,7 +11,9 @@ about ten minutes.
 
 - **Unity 6000.3.9f1**, installed with the Unity Hub, on Windows (the course's machines).
 - This repository, opened as a Unity project. The EvoSim code is under `Assets/EvoSim`.
-- *Optional:* the two model servers. Without them you can still run everything with the random brain.
+- *Optional:* the two model servers. **You do not need them to start.** The *Neuro scenes* (below) run on small neural
+  networks that evolve inside Unity, with no JEV, no LLM and no GPU. Only the *JEV scenes* need the servers, and even
+  they run without them on the random brain.
 
 | Server | Address | What it does | Start it with |
 |---|---|---|---|
@@ -91,7 +93,22 @@ fails and the gene is copied unchanged. Check it in *Brain Health* with **Test c
 
 ## 1. Open a scene
 
-The reference scenes are in `Assets/EvoSim/Scenes`:
+The scenes are in `Assets/EvoSim/Scenes`. They come in two families, by what decides an animal's next action:
+
+- **JEV scenes**: the animals' behaviour is written in English genes, read by the JEV language model (and mutated by
+  an LLM). They need the model servers for real runs.
+- **Neuro scenes**: the animals' behaviour is the weights of a small neural network, which mutate and cross over like
+  any gene. **No JEV and no LLM**: they run on any machine, straight from the editor.
+
+### Neuro scenes: start here if you have no GPU
+
+| Scene | What lives there |
+|---|---|
+| `Neuro_Lab` | neural prey and neural predators on a flat 48 m world: the quickest to watch |
+| `Neuro_Terrain_Small` | the same on a 48 m Unity Terrain with water and mountains |
+| `Neuro_Terrain_Large` | neural prey and predators on a 192 m Terrain (Lab 1 Full's size and populations) |
+
+### JEV scenes
 
 | Scene | What lives there |
 |---|---|
@@ -102,11 +119,19 @@ The reference scenes are in `Assets/EvoSim/Scenes`:
 | `Terrain_Locomotion` | a Unity Terrain with slopes, water and trees |
 | `Sandbox` | grazers only, with the random brain: a place to try your own modules |
 
+### Mixed scenes (need JEV for the JEV species)
+
+`Neuro_JevPrey` (JEV prey, neural predators), `Neuro_JevPredator` (neural prey, JEV predators), `Brains_2x2` and
+`Prey_vs_Prey` (JEV and neural species side by side) compare the two kinds of brain. Use them only when JEV is available,
+or run them as L0 (see below), where the JEV species get the random brain.
+
 ## 2. Choose a brain
 
-The scenes ask JEV by default. If JEV is not running, select the `World` object and set **Default Brain** to
+**Neuro scenes: nothing to choose.** Their species already carry their own neural brain and mutation; press Play.
+
+**JEV scenes** ask JEV by default. If JEV is not running, select the `World` object and set **Default Brain** to
 `Brains/Random`, the null model that picks actions uniformly at random. Everything else works the same, and the run
-still repeats exactly with its seed.
+still repeats exactly with its seed. (`Sandbox` already uses the random brain.)
 
 Without Ollama, mutations fail quietly: the gene is copied unchanged (MUT-04). Tick **No Mutation** on the World to
 switch mutation off altogether.

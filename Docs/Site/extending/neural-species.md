@@ -15,7 +15,7 @@ worked example of a brain that reads numbers: every part of it is an ordinary ex
    species' body and life settings and gets its own senses, actions, genome and brain.
 3. Add the new prey to the diets of the predators that should eat it. Validation warns (V-79) until you do.
 
-The scenes `Neuro_Lab`, `Brains_2x2` and `Prey_vs_Prey` are ready-made examples; select a neural animal in Play mode
+The scenes `Neuro_Lab`, `Neuro_Terrain_Small` and `Neuro_Terrain_Large` are ready-made examples with neural species only (no JEV, no LLM, no model server); `Brains_2x2` and `Prey_vs_Prey` put them beside JEV species; select a neural animal in Play mode
 and open **Window ▸ EvoSim ▸ Animal Inspector**: its **Network** section shows the inputs and the outputs.
 
 ## The parts, and the extension point each uses

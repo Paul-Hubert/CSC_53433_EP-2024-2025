@@ -189,6 +189,11 @@ namespace EvoSim.Editor
         /// plane): <paramref name="size"/> meters square, <paramref name="height"/> meters high, its data saved at
         /// <paramref name="dataPath"/>.
         /// </summary>
+        /// <param name="groundGo">The World's Ground object: its flat ground, if any, must already be removed.</param>
+        /// <param name="dataPath">Where the TerrainData asset is saved.</param>
+        /// <param name="size">The side of the square terrain, in meters.</param>
+        /// <param name="height">The terrain's height range, in meters.</param>
+        /// <param name="resolution">The heightmap resolution (a power of two plus one).</param>
         public static void AddTerrain(GameObject groundGo, string dataPath, float size, float height, int resolution)
         {
             var data = TerrainAsset(dataPath, size, height, resolution, out float waterLevel);

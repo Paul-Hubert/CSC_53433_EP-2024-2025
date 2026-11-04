@@ -50,6 +50,8 @@ Three levels name the usual combinations of brain and mutation:
 | L1 | the scene's brain (JEV) | off | JEV |
 | L2 | the scene's brain (JEV) | the LLM mutator | JEV and Ollama |
 
+These levels are for the JEV scenes. The Neuro scenes (`Neuro_Lab`, `Neuro_Terrain_Small`, `Neuro_Terrain_Large`) have no JEV and no LLM mutator: they run as they are, with no server. In the mixed scenes (`Neuro_JevPrey`, `Neuro_JevPredator`, `Brains_2x2`, `Prey_vs_Prey`) the levels apply to the JEV species only.
+
 `EvoSim.Editor.RealTimeRuns.SetLevel(world, "L0")` sets a world to a level. In batch mode, `-level` exists only for
 `RealTimeRuns.FromCommandLine` (below). The player has **no** `-level` argument, and it ignores an argument it doesn't
 know without a word: `EvoSim.exe -level L0` runs the scene as it is, which is L2, calling JEV and Ollama. Give the player
