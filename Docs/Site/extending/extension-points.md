@@ -35,6 +35,7 @@ The [extension guide](index.md) explains when to use which.
 | [Overlay](<xref:EvoSim.AnimalAction.Overlay>) | virtual property | True for an action done in passing (a call, a scent mark): when the brain's draw picks it, the animal also does a second action, the carrier, drawn from the rest of the row; this one adds its interaction only (ACT-07). |
 | [OverlayTicks](<xref:EvoSim.AnimalAction.OverlayTicks>) | virtual property | How many ticks an overlay acts, counting the tick of its decision; 0 = until the next decision. |
 | [Rests](<xref:EvoSim.AnimalAction.Rests>) | virtual property | True for actions that rest: the metabolism charges its rest cost, not its base cost, when the animal stays still (05 §4). |
+| [SelfDirected](<xref:EvoSim.AnimalAction.SelfDirected>) | virtual property | True for a steering action that has no target, such as turn left or walk straight on: it moves the animal by itself, so the search rule (ACT-04) doesn't apply to it. False by default (plan M16 §4 C4). |
 
 In EvoSim: <xref:EvoSim.Testing.BatchProbeAction>, <xref:EvoSim.Samples.DragAction>, <xref:EvoSim.Samples.DrinkAction>, <xref:EvoSim.EatAction>, <xref:EvoSim.Testing.FeedAction>, <xref:EvoSim.FleeAction>, <xref:EvoSim.FollowAction>, <xref:EvoSim.Testing.GoToAction>, <xref:EvoSim.HideAction>, <xref:EvoSim.HuntAction>, <xref:EvoSim.MateAction>, <xref:EvoSim.Testing.OverlayProbeAction>, <xref:EvoSim.Testing.ProbeAction>, <xref:EvoSim.RestAction>.
 
@@ -87,6 +88,7 @@ In EvoSim: <xref:EvoSim.Testing.AllLayersObstacleSense>, <xref:EvoSim.Testing.Ob
 | [Memoizable](<xref:EvoSim.Brain.Memoizable>) | virtual property | True (reference): equal queries get equal rows, so they are memoised and shared within a tick (DEC-30, DEC-32). A brain with memory, or one that learns, says false: every query then reaches it, with its animal's id. |
 | [Mode](<xref:EvoSim.Brain.Mode>) | virtual property | The brain's mode (points, choice…), part of cache keys (DEC-33); empty by default. |
 | [ModelIdentity](<xref:EvoSim.Brain.ModelIdentity>) | virtual property | The model and its pinned revision or digest, part of cache keys (DEC-33); the by default. |
+| [ReadsGeneText](<xref:EvoSim.Brain.ReadsGeneText>) | virtual property | True (reference) when the brain is steered by text genes, one per action; a brain that reads no sentence (a network reading a vector gene) says false, and validation then doesn't ask its species' actions for a text gene (V-05; plan M16 §4 C5). |
 
 In EvoSim: <xref:EvoSim.HttpBrain>, <xref:EvoSim.JevBrain>, <xref:EvoSim.Testing.MemoryBrain>, <xref:EvoSim.OllamaPointsBrain>, <xref:EvoSim.RandomBrain>, <xref:EvoSim.Testing.ScriptedBrain>.
 
@@ -234,7 +236,7 @@ In EvoSim: <xref:EvoSim.CarcassSystem>, <xref:EvoSim.EggSystem>, <xref:EvoSim.Te
 | [MayMutate(Allele)](<xref:EvoSim.Gene.MayMutate(EvoSim.Allele)>) | virtual method | Whether this allele may mutate (the neutral allele's setting, MUT-22). |
 | [ReadByBrain](<xref:EvoSim.Gene.ReadByBrain>) | virtual property | Whether the brain reads this gene (text genes; number genes only if configured, GENE-04). |
 
-In EvoSim: <xref:EvoSim.NumberGene>, <xref:EvoSim.TextGene>.
+In EvoSim: <xref:EvoSim.NumberGene>, <xref:EvoSim.TextGene>, <xref:EvoSim.Testing.VectorProbeGene>.
 
 ### Ground
 
@@ -437,7 +439,7 @@ In EvoSim: <xref:EvoSim.AgeSense>, <xref:EvoSim.Testing.AllLayersObstacleSense>,
 | [Validate(ValidationReport)](<xref:EvoSim.SpeciesModule.Validate(EvoSim.ValidationReport)>) | virtual method | Reports this module's configuration problems: in the editor, and at the start of a run. |
 | [WritePromptRules(PromptWriter)](<xref:EvoSim.SpeciesModule.WritePromptRules(EvoSim.PromptWriter)>) | virtual method | Lines this module adds to the prompt's rules (PROMPT-01, PROMPT-03). |
 
-In EvoSim: <xref:EvoSim.AgeSense>, <xref:EvoSim.Testing.AllLayersObstacleSense>, <xref:EvoSim.AnimalAction>, <xref:EvoSim.BandedSense>, <xref:EvoSim.BatchedSense>, <xref:EvoSim.Testing.BatchProbeAction>, <xref:EvoSim.Testing.BatchProbeLocomotion>, <xref:EvoSim.Testing.BatchProbeSense>, <xref:EvoSim.Body>, <xref:EvoSim.Testing.CameraProbeSense>, <xref:EvoSim.CapRule>, <xref:EvoSim.Samples.ChasedSense>, <xref:EvoSim.Testing.CountingCrossover>, <xref:EvoSim.Crossover>, <xref:EvoSim.DeathRule>, <xref:EvoSim.DecisionSchedule>, <xref:EvoSim.Samples.DiesOfThirst>, <xref:EvoSim.Diet>, <xref:EvoSim.Digestion>, <xref:EvoSim.Samples.DragAction>, <xref:EvoSim.Samples.DrinkAction>, <xref:EvoSim.EatAction>, <xref:EvoSim.Energy>, <xref:EvoSim.Testing.ExerciseProbe>, <xref:EvoSim.Testing.FeedAction>, <xref:EvoSim.FleeAction>, <xref:EvoSim.FloorRule>, <xref:EvoSim.FollowAction>, <xref:EvoSim.GaussianMutation>, <xref:EvoSim.Gene>, <xref:EvoSim.Testing.GoToAction>, <xref:EvoSim.HideAction>, <xref:EvoSim.Testing.HookProbe>, <xref:EvoSim.HuntAction>, <xref:EvoSim.Incubation>, <xref:EvoSim.Samples.IntensityLadder>, <xref:EvoSim.KinematicLocomotion>, <xref:EvoSim.LevelSense>, <xref:EvoSim.Litter>, <xref:EvoSim.LlmMutation>, <xref:EvoSim.Locomotion>, <xref:EvoSim.MateAction>, <xref:EvoSim.MatingRule>, <xref:EvoSim.Metabolism>, <xref:EvoSim.MutationOperator>, <xref:EvoSim.NearestAnimalSense>, <xref:EvoSim.NearestCoverSense>, <xref:EvoSim.NearestEntitySense>, <xref:EvoSim.NearestResourceSense>, <xref:EvoSim.Samples.NearestWaterSense>, <xref:EvoSim.Testing.NeedsEnergyProbe>, <xref:EvoSim.NumberGene>, <xref:EvoSim.Testing.ObstacleSense>, <xref:EvoSim.OldAge>, <xref:EvoSim.Testing.OverlayProbeAction>, <xref:EvoSim.Testing.ProbeAction>, <xref:EvoSim.Testing.ProbeSense>, <xref:EvoSim.RestAction>, <xref:EvoSim.SearchRule>, <xref:EvoSim.Sense>, <xref:EvoSim.Testing.SlopeLimitLocomotion>, <xref:EvoSim.Samples.SlopeLocomotion>, <xref:EvoSim.Stamina>, <xref:EvoSim.Starvation>, <xref:EvoSim.Testing.SureKillDiet>, <xref:EvoSim.TextGene>, <xref:EvoSim.Samples.Thirst>, <xref:EvoSim.Testing.TraitProbe>, <xref:EvoSim.Testing.TurningLocomotion>, <xref:EvoSim.UniformCrossover>.
+In EvoSim: <xref:EvoSim.AgeSense>, <xref:EvoSim.Testing.AllLayersObstacleSense>, <xref:EvoSim.AnimalAction>, <xref:EvoSim.BandedSense>, <xref:EvoSim.BatchedSense>, <xref:EvoSim.Testing.BatchProbeAction>, <xref:EvoSim.Testing.BatchProbeLocomotion>, <xref:EvoSim.Testing.BatchProbeSense>, <xref:EvoSim.Body>, <xref:EvoSim.Testing.CameraProbeSense>, <xref:EvoSim.CapRule>, <xref:EvoSim.Samples.ChasedSense>, <xref:EvoSim.Testing.CountingCrossover>, <xref:EvoSim.Crossover>, <xref:EvoSim.DeathRule>, <xref:EvoSim.DecisionSchedule>, <xref:EvoSim.Samples.DiesOfThirst>, <xref:EvoSim.Diet>, <xref:EvoSim.Digestion>, <xref:EvoSim.Samples.DragAction>, <xref:EvoSim.Samples.DrinkAction>, <xref:EvoSim.EatAction>, <xref:EvoSim.Energy>, <xref:EvoSim.Testing.ExerciseProbe>, <xref:EvoSim.Testing.FeedAction>, <xref:EvoSim.FleeAction>, <xref:EvoSim.FloorRule>, <xref:EvoSim.FollowAction>, <xref:EvoSim.GaussianMutation>, <xref:EvoSim.Gene>, <xref:EvoSim.Testing.GoToAction>, <xref:EvoSim.HideAction>, <xref:EvoSim.Testing.HookProbe>, <xref:EvoSim.HuntAction>, <xref:EvoSim.Incubation>, <xref:EvoSim.Samples.IntensityLadder>, <xref:EvoSim.KinematicLocomotion>, <xref:EvoSim.LevelSense>, <xref:EvoSim.Litter>, <xref:EvoSim.LlmMutation>, <xref:EvoSim.Locomotion>, <xref:EvoSim.MateAction>, <xref:EvoSim.MatingRule>, <xref:EvoSim.Metabolism>, <xref:EvoSim.MutationOperator>, <xref:EvoSim.NearestAnimalSense>, <xref:EvoSim.NearestCoverSense>, <xref:EvoSim.NearestEntitySense>, <xref:EvoSim.NearestResourceSense>, <xref:EvoSim.Samples.NearestWaterSense>, <xref:EvoSim.Testing.NeedsEnergyProbe>, <xref:EvoSim.NumberGene>, <xref:EvoSim.Testing.ObstacleSense>, <xref:EvoSim.OldAge>, <xref:EvoSim.Testing.OverlayProbeAction>, <xref:EvoSim.Testing.ProbeAction>, <xref:EvoSim.Testing.ProbeSense>, <xref:EvoSim.RestAction>, <xref:EvoSim.SearchRule>, <xref:EvoSim.Sense>, <xref:EvoSim.Testing.SlopeLimitLocomotion>, <xref:EvoSim.Samples.SlopeLocomotion>, <xref:EvoSim.Stamina>, <xref:EvoSim.Starvation>, <xref:EvoSim.Testing.SureKillDiet>, <xref:EvoSim.TextGene>, <xref:EvoSim.Samples.Thirst>, <xref:EvoSim.Testing.TraitProbe>, <xref:EvoSim.Testing.TurningLocomotion>, <xref:EvoSim.UniformCrossover>, <xref:EvoSim.Testing.VectorProbeGene>.
 
 ### Stamina
 
@@ -537,4 +539,16 @@ In EvoSim: <xref:EvoSim.Testing.FakeHttpTransport>, <xref:EvoSim.RecordingTransp
 ### WorldFixture
 
 <xref:EvoSim.Testing.WorldFixture> — abstract class. The base class of tests that build worlds: every world started with is destroyed after each test, so tests leave nothing in the scene.
+
+## EvoSim.Editor
+
+### AnimalInspectorPanel
+
+<xref:EvoSim.Editor.AnimalInspectorPanel> — abstract class. An extra section of the Animal Inspector (21 §4): derive from it in any editor assembly, with a constructor without parameters, and the window draws it under the decision for the animals it shows. The neural species' panel (plan M16 §5) is one.
+
+| Member | | What it does |
+|---|---|---|
+| [Draw(Animal, World)](<xref:EvoSim.Editor.AnimalInspectorPanel.Draw(EvoSim.Animal,EvoSim.World)>) | abstract method | Draws the panel with EditorGUILayout, inside the window's scroll view. |
+| [Shows(Animal)](<xref:EvoSim.Editor.AnimalInspectorPanel.Shows(EvoSim.Animal)>) | abstract method | Whether this panel has something to show for the animal. |
+| [Title](<xref:EvoSim.Editor.AnimalInspectorPanel.Title>) | abstract property | The section's title, drawn in bold above it; panels are drawn in title order. |
 
