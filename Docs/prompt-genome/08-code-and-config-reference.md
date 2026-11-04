@@ -19,7 +19,7 @@ command-line script. For concepts, read [03](03-world-and-simulation.md)–[05](
 ## 1. Repository layout
 
 ```text
-CSC_53433_EP-2024-2025/
+CSC_53433_EP-2026-2027/
 ├── Assets/ Packages/ ProjectSettings/   Unity course project (existing labs, unchanged)
 ├── README.md                           course README (Unity setup)
 ├── Docs/
