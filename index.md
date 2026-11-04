@@ -9,7 +9,7 @@
 > design history: [`Docs/redesign/`](https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/redesign/README.md) · current state:
 > [`Docs/redesign/09-progress-log.md`](https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/redesign/09-progress-log.md) · Python
 > prototype: [`prototype/`](https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/prototype/README.md) · contract and proposed Unity architecture:
-> [`Docs/Interface/`](https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Interface/README.md). The Unity instructions below are unchanged.
+> [`Docs/Interface/`](https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Docs/Interface/README.md).
 
 ------
 
@@ -18,10 +18,7 @@
 	- [Schedule](#Schedule)
 	- [Labs](#Labs)
 - [Before the first session](#Beforethefirstsession)
-- [First Steps](#Firststeps)
-	- [Introduction](#Introduction)
-	- [Installing Unity](#InstallingUnity)
-	- [Opening the project](#Openingtheproject)
+- [Opening the project](#Openingtheproject)
 
 
 ------
@@ -29,7 +26,7 @@
 <a name="Courseorganisation"></a>
 ## Course organisation
 
-Programming modules in Unity.
+Welcome to the lab sessions of CSC_53433_EP "Creative and Generative Models in Computer Graphics" for the course 2026-2027: programming modules in Unity.
 
 <a name="Teachingassistants"></a>
 ### Teaching assistants
@@ -60,47 +57,24 @@ The labs are done in groups of 3 (8 groups in total). Each group will be assigne
 <a name="Beforethefirstsession"></a>
 ## Before the first session
 
-- Install [Unity Hub](https://unity.com/download), then install the Unity 6 editor from the Hub (`Installs > Install Editor`). **Please do this at home:** the network in the Turing building can't handle everyone downloading it at once.
-- Clone the repository: `git clone https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027`
-- Create a Unity account.
-- Install a text editor configured for C# (e.g., [Visual Studio Code](https://code.visualstudio.com/Download)).
-- Bring a mouse during the sessions!
+**Please do this at home:** the network in the Turing building can't handle everyone downloading Unity at once.
 
-Details for each step are in [First Steps](#Firststeps) below.
-
-------
-
-<a name="Firststeps"></a>
-## First Steps
-
-<a name="Introduction"></a>
-### Introduction
-
-Welcome to the repository for the lab sessions of CSC_53433_EP "Creative and Generative Models in Computer Graphics" for the course 2026-2027! 
-
-Here, you will find a brief introduction to install and setup Unity. 
-
-Please follow the instructions in the LAB 1 presentation.
-
-<a name="InstallingUnity"></a>
-### Installing Unity
-
-Link to download: https://unity.com/download
-
-- Download Unity Hub. It's a explorer tool for your projects where you can have simultaneously different Unity builds.
-- Create a Unity account: It will be required when you launch the program. You can select the free option for personal use.
-- Choose your Unity build. For this lab, we will be using Unity **6.3** (`6000.3.9f1`, the version the project is saved with).
-- Make sure you have a text editor installed and configured for C#. [Visual Studio Code](https://code.visualstudio.com/Download) is a popular option, but you can use any other code editor or IDE.
-- Now you should be able to open Unity. Make sure that you can successfully launch it, that your graphic drivers are working or that you do not have any particular problem.
+1. Install [Unity Hub](https://unity.com/download), the launcher that manages your Unity versions and projects.
+2. Create a Unity account: the Hub asks for it on launch. The free personal plan is enough.
+3. In the Hub, install the Unity **6.3** editor (`6000.3.9f1`, the version the project is saved with): `Installs > Install Editor`.
+4. Install a text editor configured for C#. [Visual Studio Code](https://code.visualstudio.com/Download) is a popular option, but any code editor or IDE works.
+5. Clone the repository: `git clone https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027`
+6. Check that Unity launches and that your graphics drivers work: open the project once (see below).
+7. Bring a mouse during the sessions!
 
 ------
 
 <a name="Openingtheproject"></a>
-### Opening the project
+## Opening the project
 
-- Clone this repository.
-- Make sure you have Unity Hub and a Unity built installed (as we describe in *Introduction*)
-- In Unity Hub, click on `Open > Add project from disk`
-- Select the parent folder of the repository, containing the Unity project. You will differentiate it because it contains folders such as `Assets` or `Packages`.
-- Open the project by selecting the installed built of Unity.
-- In the project, open "SampleScene". That's all!
+1. In Unity Hub, click `Add > Add project from disk`.
+2. Select the folder you cloned: it contains folders such as `Assets` and `Packages`.
+3. Open the project with Unity 6.3.
+4. In the project, open "SampleScene". That's all!
+
+Then follow the instructions in the Lab 1 presentation.

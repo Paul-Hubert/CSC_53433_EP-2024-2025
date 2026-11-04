@@ -222,6 +222,7 @@ Speed</strong> to <em>RealTime</em> and <strong>Real Time Ticks Per Second</stro
 </tr>
 </tbody>
 </table>
+<p>These levels are for the JEV scenes. The Neuro scenes (<code>Neuro_Lab</code>, <code>Neuro_Terrain_Small</code>, <code>Neuro_Terrain_Large</code>) have no JEV and no LLM mutator: they run as they are, with no server. In the mixed scenes (<code>Neuro_JevPrey</code>, <code>Neuro_JevPredator</code>, <code>Brains_2x2</code>, <code>Prey_vs_Prey</code>) the levels apply to the JEV species only.</p>
 <p><code>EvoSim.Editor.RealTimeRuns.SetLevel(world, &quot;L0&quot;)</code> sets a world to a level. In batch mode, <code>-level</code> exists only for
 <code>RealTimeRuns.FromCommandLine</code> (below). The player has <strong>no</strong> <code>-level</code> argument, and it ignores an argument it doesn't
 know without a word: <code>EvoSim.exe -level L0</code> runs the scene as it is, which is L2, calling JEV and Ollama. Give the player

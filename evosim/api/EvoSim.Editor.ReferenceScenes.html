@@ -385,6 +385,53 @@ so a new world and the reference worlds have the same tree.</p>
 </h2>
 
 
+  <a id="EvoSim_Editor_ReferenceScenes_AddTerrain_" data-uid="EvoSim.Editor.ReferenceScenes.AddTerrain*"></a>
+
+  <h3 id="EvoSim_Editor_ReferenceScenes_AddTerrain_UnityEngine_GameObject_System_String_System_Single_System_Single_System_Int32_" data-uid="EvoSim.Editor.ReferenceScenes.AddTerrain(UnityEngine.GameObject,System.String,System.Single,System.Single,System.Int32)">
+  AddTerrain(GameObject, string, float, float, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Editor/ReferenceScenes.cs/#L197"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Puts the generated terrain of S17 on a Ground object (<a class="xref" href="EvoSim.TerrainGround.html">TerrainGround</a>, a Terrain child, a visual water
+plane): <code class="paramref">size</code> meters square, <code class="paramref">height</code> meters high, its data saved at
+<code class="paramref">dataPath</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void AddTerrain(GameObject groundGo, string dataPath, float size, float height, int resolution)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>groundGo</code> <span class="xref">GameObject</span></dt>
+    <dd><p>The World's Ground object: its flat ground, if any, must already be removed.</p>
+</dd>
+    <dt><code>dataPath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>Where the TerrainData asset is saved.</p>
+</dd>
+    <dt><code>size</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The side of the square terrain, in meters.</p>
+</dd>
+    <dt><code>height</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>The terrain's height range, in meters.</p>
+</dd>
+    <dt><code>resolution</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The heightmap resolution (a power of two plus one).</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
   <a id="EvoSim_Editor_ReferenceScenes_BuildAll_" data-uid="EvoSim.Editor.ReferenceScenes.BuildAll*"></a>
 
   <h3 id="EvoSim_Editor_ReferenceScenes_BuildAll" data-uid="EvoSim.Editor.ReferenceScenes.BuildAll">
@@ -422,7 +469,7 @@ erases any edit made in them. Scenes open in the editor should be closed first.<
 
   <h3 id="EvoSim_Editor_ReferenceScenes_BuildPools" data-uid="EvoSim.Editor.ReferenceScenes.BuildPools">
   BuildPools()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Editor/ReferenceScenes.cs/#L615"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Editor/ReferenceScenes.cs/#L627"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The allele pools of 09 §3, one asset per locus, from Data/Pools (the prototype's v2 pools) plus the Unity hide draft.</p>
@@ -459,7 +506,7 @@ contrast pair (pro, anti) overwritten.</p>
 
   <h3 id="EvoSim_Editor_ReferenceScenes_BuildScenarios" data-uid="EvoSim.Editor.ReferenceScenes.BuildScenarios">
   BuildScenarios()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Editor/ReferenceScenes.cs/#L673"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Editor/ReferenceScenes.cs/#L685"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The scenario assets whose scenes exist (31 §2); more come with the samples (M11).</p>
@@ -490,7 +537,7 @@ seeds (1234, 7, 42 unless set after), expected facts and variants overwritten.</
 
   <h3 id="EvoSim_Editor_ReferenceScenes_ControlSentences" data-uid="EvoSim.Editor.ReferenceScenes.ControlSentences">
   ControlSentences()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Editor/ReferenceScenes.cs/#L661"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Editor/ReferenceScenes.cs/#L673"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The control sentences of GENE-23: 20 shuffled-word and 20 irrelevant ones (Data/Pools/control_alleles_v1.json).</p>
@@ -523,7 +570,7 @@ seeds (1234, 7, 42 unless set after), expected facts and variants overwritten.</
 
   <h3 id="EvoSim_Editor_ReferenceScenes_UpdateReferenceScenes" data-uid="EvoSim.Editor.ReferenceScenes.UpdateReferenceScenes">
   UpdateReferenceScenes()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Editor/ReferenceScenes.cs/#L438"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Paul-Hubert/CSC_53433_EP-2026-2027/blob/master/Assets/EvoSim/Editor/ReferenceScenes.cs/#L452"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Brings the saved reference scenes to the builder's reference without rebuilding them: the reference decision period

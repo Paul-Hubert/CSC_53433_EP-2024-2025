@@ -6486,6 +6486,22 @@ references:
   commentId: T:EvoSim.Editor.ReferenceScenes
   fullName: EvoSim.Editor.ReferenceScenes
   nameWithType: ReferenceScenes
+- uid: EvoSim.Editor.ReferenceScenes.AddTerrain(UnityEngine.GameObject,System.String,System.Single,System.Single,System.Int32)
+  name: AddTerrain(GameObject, string, float, float, int)
+  href: api/EvoSim.Editor.ReferenceScenes.html#EvoSim_Editor_ReferenceScenes_AddTerrain_UnityEngine_GameObject_System_String_System_Single_System_Single_System_Int32_
+  commentId: M:EvoSim.Editor.ReferenceScenes.AddTerrain(UnityEngine.GameObject,System.String,System.Single,System.Single,System.Int32)
+  name.vb: AddTerrain(GameObject, String, Single, Single, Integer)
+  fullName: EvoSim.Editor.ReferenceScenes.AddTerrain(UnityEngine.GameObject, string, float, float, int)
+  fullName.vb: EvoSim.Editor.ReferenceScenes.AddTerrain(UnityEngine.GameObject, String, Single, Single, Integer)
+  nameWithType: ReferenceScenes.AddTerrain(GameObject, string, float, float, int)
+  nameWithType.vb: ReferenceScenes.AddTerrain(GameObject, String, Single, Single, Integer)
+- uid: EvoSim.Editor.ReferenceScenes.AddTerrain*
+  name: AddTerrain
+  href: api/EvoSim.Editor.ReferenceScenes.html#EvoSim_Editor_ReferenceScenes_AddTerrain_
+  commentId: Overload:EvoSim.Editor.ReferenceScenes.AddTerrain
+  isSpec: "True"
+  fullName: EvoSim.Editor.ReferenceScenes.AddTerrain
+  nameWithType: ReferenceScenes.AddTerrain
 - uid: EvoSim.Editor.ReferenceScenes.BodiesFolder
   name: BodiesFolder
   href: api/EvoSim.Editor.ReferenceScenes.html#EvoSim_Editor_ReferenceScenes_BodiesFolder
