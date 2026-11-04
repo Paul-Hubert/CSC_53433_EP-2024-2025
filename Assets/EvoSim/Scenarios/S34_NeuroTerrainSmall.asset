@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a848ffdcb441a8448c1b33aeb415ce1, type: 3}
+  m_Name: S34_NeuroTerrainSmall
+  m_EditorClassIdentifier: EvoSim.Runtime::EvoSim.ScenarioAsset
+  title: S34 Neural prey and predators on terrain (small)
+  scene: Assets/EvoSim/Scenes/Neuro_Terrain_Small.unity
+  set: []
+  variants:
+  - name: asexual
+    brain: 
+    tier: T2
+    set:
+    - path: World/asexual
+      value: true
+    remove: []
+  - name: sexual
+    brain: 
+    tier: T2
+    set: []
+    remove: []
+  seeds: d2040000070000002a000000
+  ticks: 5000
+  brain: Random
+  expect:
+  - invariants
+  - deterministic
+  - no animal on water or unwalkable ground
+  tier: T2

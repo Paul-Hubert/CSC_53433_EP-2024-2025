@@ -33,6 +33,10 @@ namespace EvoSim.Neuro.Editor
         public const string JevPrey = ReferenceScenes.ScenesFolder + "/Neuro_JevPrey.unity";
         /// <summary>S31: neural prey and JEV predators.</summary>
         public const string JevPredator = ReferenceScenes.ScenesFolder + "/Neuro_JevPredator.unity";
+        /// <summary>S34: neural prey and neural predators on a generated terrain (water, mountains), Lab1_Small's size.</summary>
+        public const string NeuroTerrainSmall = ReferenceScenes.ScenesFolder + "/Neuro_Terrain_Small.unity";
+        /// <summary>S35: the same on Lab1_Full's size and populations.</summary>
+        public const string NeuroTerrainLarge = ReferenceScenes.ScenesFolder + "/Neuro_Terrain_Large.unity";
         /// <summary>The scene the comparison scenes copy: Lab1_Full's map, populations and services (plan §6.2, owner).</summary>
         public const string FullSource = ReferenceScenes.ScenesFolder + "/Lab1_Full.unity";
         /// <summary>S32: JEV and neural prey, JEV and neural predators, in one world.</summary>
@@ -62,6 +66,8 @@ namespace EvoSim.Neuro.Editor
             };
             lines.Add(ComparisonScene(Brains2x2, true, preyBody, predatorBody));
             lines.Add(ComparisonScene(PreyVsPrey, false, preyBody, predatorBody));
+            lines.Add(Scene(NeuroTerrainSmall, true, true, preyBody, predatorBody, false, Source, ReferenceScenes.ScenesFolder + "/Neuro_Terrain_Small_TerrainData.asset"));
+            lines.Add(Scene(NeuroTerrainLarge, true, true, preyBody, predatorBody, false, FullSource, ReferenceScenes.ScenesFolder + "/Neuro_Terrain_Large_TerrainData.asset"));
             BuildScenarios();
             AssetDatabase.SaveAssets();
             string result = string.Join("\n", lines);
@@ -88,6 +94,28 @@ namespace EvoSim.Neuro.Editor
             AssetDatabase.SaveAssets();
             string result = string.Join("\n", lines);
             Debug.Log("EvoSim: comparison content built\n" + result);
+            return result;
+        }
+
+        /// <summary>
+        /// <c>EvoSim ▸ Neuro ▸ Build Terrain Scenes</c>: only <c>Neuro_Terrain_Small</c>, <c>Neuro_Terrain_Large</c> and their
+        /// scenarios, leaving the other scenes as they are. Neural species only: no JEV, no model server.
+        /// </summary>
+        /// <returns>One line per scene.</returns>
+        [MenuItem("EvoSim/Neuro/Build Terrain Scenes")]
+        public static string BuildTerrain()
+        {
+            var preyBody = NeuralSpeciesMenu.Body("NeuroPreyBody");
+            var predatorBody = NeuralSpeciesMenu.Body("NeuroPredatorBody");
+            var lines = new List<string>
+            {
+                Scene(NeuroTerrainSmall, true, true, preyBody, predatorBody, false, Source, ReferenceScenes.ScenesFolder + "/Neuro_Terrain_Small_TerrainData.asset"),
+                Scene(NeuroTerrainLarge, true, true, preyBody, predatorBody, false, FullSource, ReferenceScenes.ScenesFolder + "/Neuro_Terrain_Large_TerrainData.asset"),
+            };
+            BuildScenarios();
+            AssetDatabase.SaveAssets();
+            string result = string.Join("\n", lines);
+            Debug.Log("EvoSim: terrain scenes built\n" + result);
             return result;
         }
 
@@ -166,10 +194,15 @@ namespace EvoSim.Neuro.Editor
         /// <paramref name="savePrefabs"/>, the neural species are also saved as the <c>NeuroPrey</c> and
         /// <c>NeuroPredator</c> prefabs.
         /// </summary>
-        static string Scene(string path, bool neuralPrey, bool neuralPredator, GameObject preyBody, GameObject predatorBody, bool savePrefabs)
+        /// <remarks>
+        /// With <paramref name="terrainData"/>, the scene copies <paramref name="source"/> and its flat ground is replaced by
+        /// the generated terrain of S17 (about 15 % water, 10 % mountains) of the same size, saved at that path.
+        /// </remarks>
+        static string Scene(string path, bool neuralPrey, bool neuralPredator, GameObject preyBody, GameObject predatorBody, bool savePrefabs,
+                            string source = Source, string terrainData = null)
         {
             if (SceneManager.GetSceneByPath(path).isLoaded) return path + ": open in the editor, skipped";
-            File.Copy(Source, path, true);
+            File.Copy(source, path, true);
             AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
             var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
             try
@@ -177,7 +210,8 @@ namespace EvoSim.Neuro.Editor
                 World world = null;
                 foreach (var root in scene.GetRootGameObjects())
                     if ((world = root.GetComponentInChildren<World>(true)) != null) break;
-                world.gameObject.name = "Neuro World";
+                world.gameObject.name = terrainData != null ? "Neuro Terrain World" : "Neuro World";
+                if (terrainData != null) ReplaceGround(world, terrainData);
                 var prey = Find(world, "prey");
                 var predator = Find(world, "predator");
                 Species nnPrey = null, nnPredator = null;
@@ -208,6 +242,16 @@ namespace EvoSim.Neuro.Editor
             {
                 EditorSceneManager.CloseScene(scene, true);
             }
+        }
+
+        /// <summary>Swaps the World's <see cref="FlatGround"/> for the generated terrain of the same size (heightmap 129 up to 96 m, 257 above).</summary>
+        static void ReplaceGround(World world, string terrainData)
+        {
+            var flat = world.GetComponentInChildren<FlatGround>(true);
+            float size = flat.Bounds.width;
+            var ground = flat.gameObject;
+            Object.DestroyImmediate(flat);
+            ReferenceScenes.AddTerrain(ground, terrainData, size, 20f, size <= 96f ? 129 : 257);
         }
 
         /// <summary>The World's species with that id.</summary>
@@ -293,6 +337,13 @@ namespace EvoSim.Neuro.Editor
                 Variant("sexual", "", "T2", null),
                 Variant("no-mutation", "", "T2", null, ("World/asexual", "true"), ("World/noMutation", "true")),
                 Variant("more-predators", "", "T2", null, ("World/asexual", "true"), ("Neuro Predator/CapRule/cap", "20")));
+            var terrainExpect = new[] { "invariants", "deterministic", "no animal on water or unwalkable ground" };
+            Scenario("S34_NeuroTerrainSmall", "S34 Neural prey and predators on terrain (small)", NeuroTerrainSmall, 5000, "T2", seeds, terrainExpect,
+                Variant("asexual", "", "T2", null, ("World/asexual", "true")),
+                Variant("sexual", "", "T2", null));
+            Scenario("S35_NeuroTerrainLarge", "S35 Neural prey and predators on terrain (large)", NeuroTerrainLarge, 5000, "T2", seeds, terrainExpect,
+                Variant("asexual", "", "T2", null, ("World/asexual", "true")),
+                Variant("sexual", "", "T2", null));
             Scenario("S30_JevPreyNeuroPredator", "S30 JEV prey and neural predators", JevPrey, 2000, "T4", seeds,
                 new[] { "invariants", "deterministic" },
                 Variant("L0-asexual", "Random", "T2", "Prey/Mutation", ("World/asexual", "true")),

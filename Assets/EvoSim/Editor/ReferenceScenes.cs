@@ -175,10 +175,23 @@ namespace EvoSim.Editor
         static void TerrainLocomotion(Kit kit)
         {
             const float size = 96f, height = 20f;
-            var data = TerrainAsset(size, height, out float waterLevel);
             var worldGo = new GameObject("Terrain World");
             worldGo.SetActive(false);
-            var groundGo = Child(worldGo, "Ground");
+            AddTerrain(Child(worldGo, "Ground"), ScenesFolder + "/Terrain_Locomotion_TerrainData.asset", size, height, 129);
+
+            var world = World(worldGo, 0.2f, true);
+            Prey(kit, world, 40, 70, 10);
+            Predator(kit, world, 6, 10, 3);
+        }
+
+        /// <summary>
+        /// Puts the generated terrain of S17 on a Ground object (<see cref="TerrainGround"/>, a Terrain child, a visual water
+        /// plane): <paramref name="size"/> meters square, <paramref name="height"/> meters high, its data saved at
+        /// <paramref name="dataPath"/>.
+        /// </summary>
+        public static void AddTerrain(GameObject groundGo, string dataPath, float size, float height, int resolution)
+        {
+            var data = TerrainAsset(dataPath, size, height, resolution, out float waterLevel);
             var terrainGo = Terrain.CreateTerrainGameObject(data);
             terrainGo.transform.SetParent(groundGo.transform, false);
             groundGo.AddComponent<TerrainGround>().Configure(terrainGo.GetComponent<Terrain>(), waterLevel, 35f);
@@ -190,10 +203,6 @@ namespace EvoSim.Editor
             water.transform.position = new Vector3(size / 2f, waterLevel, size / 2f);
             water.transform.localScale = new Vector3(size / 10f, 1f, size / 10f);
             water.GetComponent<Renderer>().sharedMaterial = BodyMaterial("Water", new Color(0.2f, 0.45f, 0.8f));
-
-            var world = World(worldGo, 0.2f, true);
-            Prey(kit, world, 40, 70, 10);
-            Predator(kit, world, 6, 10, 3);
         }
 
         /// <summary>A small world for trying things: grass and one grazing species, the random brain, no mutation.</summary>
@@ -567,10 +576,8 @@ namespace EvoSim.Editor
         /// The terrain of S17: value noise from a fixed seed, the top tenth raised into steep mountains; the water level is
         /// the 15th percentile of the heights.
         /// </summary>
-        static TerrainData TerrainAsset(float size, float height, out float waterLevel)
+        static TerrainData TerrainAsset(string path, float size, float height, int resolution, out float waterLevel)
         {
-            const int resolution = 129;
-            string path = ScenesFolder + "/Terrain_Locomotion_TerrainData.asset";
             var data = AssetDatabase.LoadAssetAtPath<TerrainData>(path);
             if (data == null)
             {
