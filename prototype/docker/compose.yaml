@@ -6,7 +6,9 @@
 # Knobs (environment or docker/.env): JEV_QUANT, JEV_GPU, JEV_KV, MUTATOR_GPU, JEV_PORT, MUTATOR_PORT.
 
 x-vllm: &vllm
-  image: vllm/vllm-openai:nightly-81198e97ba7eee2a22540caaa756b7fdddcb4d93   # pinned 2026-10-08 (Qwen3.5, LoRA on lm_head)
+  # pinned 2026-10-08 (Qwen3.5, LoRA on lm_head): build nightly-81198e97ba7eee2a22540caaa756b7fdddcb4d93, by digest
+  # because Docker Hub prunes nightly tags (that tag was gone by 2026-11-04; the digest still pulls)
+  image: vllm/vllm-openai@sha256:a83c7f976879e0c6101f734fd5b84a098d12d6d8d12baa41e31eb323b84b0802
   ipc: host
   restart: unless-stopped
   volumes:
